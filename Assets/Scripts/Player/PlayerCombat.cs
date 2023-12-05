@@ -32,6 +32,8 @@ public class PlayerCombat : MonoBehaviour
     [HideInInspector] public Vector2 mouse;     //마우스 좌표
     public Vector2 direction;                   //방향벡터
 
+    public bool canAttack = true;
+
     //시작하면서 AttackEntity에 존재하는 attackObject를 얻어오며, attackObject를 Init해준다.
     private void Start()
     {
@@ -52,6 +54,9 @@ public class PlayerCombat : MonoBehaviour
     //공격 함수
     public void Attack()
     {
+        if (!canAttack)
+            return;
+
         //공격중이라면, 리턴
         if (isAttack)
             return;
