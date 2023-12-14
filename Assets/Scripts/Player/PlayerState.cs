@@ -16,7 +16,7 @@ public class PlayerState : MonoBehaviour
     private int attackDmg;
     private int[] magicLevel;    // 0이면 안배움, 1이면 기본, 2이면 업그레이드 상태
 
-    private int currentHP;
+    private int curHP;
 
     public void Init(/*int maxHP, int attackDmg, bool[] plantMagicUnlock ...*/)
     {
@@ -24,8 +24,28 @@ public class PlayerState : MonoBehaviour
         stateUI = PlayerStateUI.Instance;
     }
 
-    public void Heal(int amount) { }
-    public void TakeDamage(int amount) { }
-    public void SetAttackDmg() { }
-    public void UpgradePlantMagic(PlantMagicCode magicCode) { } // 획득 및 업그레이드
+    public void Heal(int amount)
+    {
+        if (curHP + amount > maxHP)
+            curHP = maxHP;
+        else
+            curHP += amount;
+    }
+    public void TakeDamage(int amount)
+    {
+        if (curHP - amount <= 0)
+        {
+            curHP = 0;
+            //죽음
+        }
+        else
+            curHP -= amount;
+    }
+
+    public void SetAttackDmg() { PlayerRef.Instance.combat.SetDamage(attackDmg); }
+
+    public void UpgradePlantMagic(PlantMagicCode magicCode)
+    {
+
+    } // 획득 및 업그레이드
 }

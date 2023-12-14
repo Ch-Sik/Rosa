@@ -5171,6 +5171,18 @@ PrefabInstance:
       propertyPath: wallJumpPower.y
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 2511583701210880143, guid: 4d169afb5daf8ff45a95f9e61fa0e022, type: 3}
+      propertyPath: hitTime
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511583701210880143, guid: 4d169afb5daf8ff45a95f9e61fa0e022, type: 3}
+      propertyPath: knockbackCoef
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 2511583701210880143, guid: 4d169afb5daf8ff45a95f9e61fa0e022, type: 3}
+      propertyPath: invincibleTime
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3115691681920552347, guid: 4d169afb5daf8ff45a95f9e61fa0e022, type: 3}
       propertyPath: m_Name
       value: Player
@@ -7708,6 +7720,14 @@ PrefabInstance:
     - target: {fileID: 175286258378592011, guid: c5c52c75013b59b4194c5d530aeab4cb, type: 3}
       propertyPath: m_Name
       value: ButterFlyMoudle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7078631078596596169, guid: c5c52c75013b59b4194c5d530aeab4cb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 7078631078596596169, guid: c5c52c75013b59b4194c5d530aeab4cb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9.16
       objectReference: {fileID: 0}
     - target: {fileID: 8314199589962362502, guid: c5c52c75013b59b4194c5d530aeab4cb, type: 3}
       propertyPath: m_LocalPosition.x

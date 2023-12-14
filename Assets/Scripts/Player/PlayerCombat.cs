@@ -13,6 +13,7 @@ public class PlayerCombat : MonoBehaviour
 {
     public bool showGizmo = false;          //기즈모 가시 여부
 
+    private int damage = 1;
     Sequence attack;                        //공격 시퀀스
     public GameObject attackEntity;         //공격을 위한 AttackObject의 게임오브젝트
     public AttackObject attackObject;       //공격 이벤트를 위한 AttackObject
@@ -27,6 +28,11 @@ public class PlayerCombat : MonoBehaviour
     public float attackDistance;            //공격 사거리
     public float attackTime;                //공격 시간
     public float attackCooltime;            //공격을 위한 쿨타임
+    public float knockbackCoef= 0.05f;             //넉백 계수
+    public float hitTime = 0.3f;                   //Hit 상태의 시간
+    public float invincibleTime = 1.5f;            //무적 시간
+    bool isHit = false;
+    bool isInvincible = false;
 
     public float angle;                         //마우스의 Euler Angle
     [HideInInspector] public Vector2 mouse;     //마우스 좌표
@@ -39,6 +45,8 @@ public class PlayerCombat : MonoBehaviour
         attackObject.Init(this, attackableObjects, butterfly);
     }
 
+    public void SetDamage(int changedDamage) { damage = changedDamage; }
+
     //SetData는 호출되면, 현재의 마우스 위치를 토대로 각도와 방향벡터 Data를 Set해준다.
     void SetData()
     {
@@ -47,6 +55,26 @@ public class PlayerCombat : MonoBehaviour
         direction = new Vector2(mouse.x - transform.position.x, mouse.y - transform.position.y).normalized;     //해당 좌표 데이터를 기반으로 방향벡터 얻음
         if (transform.lossyScale.x < 0)
             direction = new Vector2(-1 * direction.x, direction.y);
+    }
+
+    [Button]
+    public void Hit(int dmg, LR dir)
+    {
+        PlayerRef.Instance.State.TakeDamage(dmg);
+        TakeKnockBack(dir);
+        OnHit();
+    }
+
+    [Button]
+    public void TakeKnockBack(LR dir)
+    {
+        Debug.Log(dir);
+
+        Vector2 knockbackVec = dir == LR.LEFT ? (Vector2.left * 5) : (Vector2.right * 5);
+        knockbackVec += Vector2.up * 0.5f;
+        knockbackVec *= knockbackCoef;
+        PlayerRef.Instance.rb.AddForce(knockbackVec);
+        Debug.Log(knockbackVec);
     }
 
     //공격 함수
@@ -142,5 +170,39 @@ public class PlayerCombat : MonoBehaviour
         Gizmos.color = Color.red; // 직사각형 색상 설정
         Gizmos.DrawWireCube(Vector3.zero, Vector3.one); // 회전된 직사각형 그리기
         Gizmos.matrix = Matrix4x4.identity; // 다음 Gizmo에 영향을 미치지 않도록 기본 매트릭스로 돌아가기
+    }
+
+    public void OnHit()
+    {
+        Sequence invincible = DOTween.Sequence()
+        .AppendCallback(() => isInvincible = true)
+        .AppendInterval(invincibleTime)
+        .AppendCallback(() => isInvincible = false);
+
+        Sequence hit = DOTween.Sequence()
+        .AppendCallback(() => isHit = true)
+        .AppendInterval(hitTime)
+        .AppendCallback(() => isHit = false);
+    }
+
+    //트리거 충돌인 경우
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //무적시간이라면 리턴
+        if (isInvincible)
+            return;
+
+        //몬스터와 충돌한 경우
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Monster"))
+        {
+            //넉백을 위한 충돌 방향 설정
+            LR dir = collision.transform.position.x > transform.position.x ? LR.LEFT : LR.RIGHT;
+            Hit(1, dir);
+        }
     }
 }
