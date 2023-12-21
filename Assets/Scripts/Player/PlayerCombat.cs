@@ -28,7 +28,8 @@ public class PlayerCombat : MonoBehaviour
     public float attackDistance;            //공격 사거리
     public float attackTime;                //공격 시간
     public float attackCooltime;            //공격을 위한 쿨타임
-    public float knockbackCoef= 0.05f;             //넉백 계수
+    public float knockbackCoef= 5.0f;             //넉백 계수
+    public float knockbackTime = 0.3f;              //넉백 시간
     public float hitTime = 0.3f;                   //Hit 상태의 시간
     public float invincibleTime = 1.5f;            //무적 시간
     bool isHit = false;
@@ -70,11 +71,26 @@ public class PlayerCombat : MonoBehaviour
     {
         Debug.Log(dir);
 
-        Vector2 knockbackVec = dir == LR.LEFT ? (Vector2.left * 5) : (Vector2.right * 5);
+        Vector2 knockbackVec = dir == LR.LEFT ? Vector2.left : Vector2.right;
         knockbackVec += Vector2.up * 0.5f;
         knockbackVec *= knockbackCoef;
-        PlayerRef.Instance.rb.AddForce(knockbackVec);
+
+        Transform player = PlayerRef.Instance.rb.gameObject.transform;
+
+        StartCoroutine(Knockback(player, knockbackVec));
+
         Debug.Log(knockbackVec);
+    }
+
+    public IEnumerator Knockback(Transform player, Vector2 knockbackVec)
+    {
+        float time = 0.0f;
+        while (time < knockbackTime)
+        {
+            player.Translate(knockbackVec * Time.deltaTime);
+            time += Time.deltaTime;
+            yield return null;
+        }
     }
 
     //공격 함수
@@ -175,9 +191,17 @@ public class PlayerCombat : MonoBehaviour
     public void OnHit()
     {
         Sequence invincible = DOTween.Sequence()
-        .AppendCallback(() => isInvincible = true)
+        .AppendCallback(() =>
+        {
+            isInvincible = true;
+            PlayerRef.Instance.gameObject.layer = LayerMask.NameToLayer("PlayerInvincible");
+        })
         .AppendInterval(invincibleTime)
-        .AppendCallback(() => isInvincible = false);
+        .AppendCallback(() =>
+        {
+            isInvincible = false;
+            PlayerRef.Instance.gameObject.layer = LayerMask.NameToLayer("Player");
+        });
 
         Sequence hit = DOTween.Sequence()
         .AppendCallback(() => isHit = true)
