@@ -14,12 +14,17 @@ public class PlayerStateUI : MonoBehaviour
     public static PlayerStateUI Instance { get { return _instance; } }
 
     [SerializeField] TMP_Text text_selectedMagic;
-    [SerializeField] GameObject heart;
+    [SerializeField] GameObject heartPrefab;
     [SerializeField] GameObject heartContainer;
+    [SerializeField] GameObject seedPrefab;
+    [SerializeField] GameObject seedContainer;
     [SerializeField] Sprite filled;
     [SerializeField] Sprite empty;
+
     [SerializeField] List<Image> hearts = new List<Image>();
+    [SerializeField] List<Image> seeds = new List<Image>();
     int curHp = 0;
+    int curSeed = 0;
 
     private void Awake()
     {
@@ -28,9 +33,16 @@ public class PlayerStateUI : MonoBehaviour
 
     public void AddHPUI()
     {
-        GameObject h = Instantiate(heart, heartContainer.transform);
+        GameObject h = Instantiate(heartPrefab, heartContainer.transform);
         hearts.Add(h.GetComponent<Image>());
         curHp++;
+    }
+
+    public void AddSeedUI()
+    {
+        GameObject s = Instantiate(seedPrefab, seedContainer.transform);
+        seeds.Add(s.GetComponent<Image>());
+        curSeed++;
     }
 
     public void Heal(int amount) 
@@ -42,9 +54,8 @@ public class PlayerStateUI : MonoBehaviour
             curHp++;
             amount--;
         }
-        
-        
     }
+
     public void TakeDamage(int amount)
     {
         while (amount > 0)
@@ -52,6 +63,28 @@ public class PlayerStateUI : MonoBehaviour
             if (curHp <= 0) return;
             curHp--;
             hearts[curHp].sprite = empty;
+            amount--;
+        }
+    }
+
+    public void RechargeSeed(int amount)
+    {
+        while (amount > 0)
+        {
+            if (curSeed >= seeds.Count) return;
+            seeds[curSeed].fillAmount = 1f;
+            curSeed++;
+            amount--;
+        }
+    }
+
+    public void ConsumeSeed(int amount)
+    {
+        while(amount > 0)
+        {
+            if (curSeed <= 0) return;
+            curSeed--;
+            seeds[curSeed].fillAmount = 0f;
             amount--;
         }
     }

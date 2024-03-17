@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MagicCucumber : MonoBehaviour
+public class MagicCucumber : MagicObject
 {
     public Collider2D trigger;
 

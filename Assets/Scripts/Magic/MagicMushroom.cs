@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MagicMushroom : MonoBehaviour
+public class MagicMushroom : MagicObject
 {
     [SerializeField] float jumpPower; // 점프력
 

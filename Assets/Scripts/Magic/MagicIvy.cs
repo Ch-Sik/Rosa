@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class MagicIvy : MonoBehaviour
+public class MagicIvy : MagicObject
 {
     [SerializeField]
     private EdgeCollider2D edgeCol;     // 0번 점이 위, 1번 점이 아래
@@ -37,8 +37,10 @@ public class MagicIvy : MonoBehaviour
     private int downLength = 0;
     private WaitForSeconds tick;
 
-    public void Init(Vector2 magicPos, TilemapGroup tilemapGroup)
+    public override void Init(Vector2 magicPos, float lifeTime, TilemapGroup tilemapGroup)
     {
+        base.Init(magicPos, lifeTime, tilemapGroup);
+
         // 필드 값 세팅
         if(edgeCol == null) edgeCol = GetComponent<EdgeCollider2D>();
         targetTilemapGroup = tilemapGroup;
