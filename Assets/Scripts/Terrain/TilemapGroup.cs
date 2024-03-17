@@ -19,7 +19,17 @@ public class TilemapGroup : MonoBehaviour
         tilemapManager = TilemapManager.Instance;
         if(grid == null)
             grid = GetComponent<Grid>();
+        RefreshTilemapList();
+    }
+
+    public void RefreshTilemapList()
+    {
         tilemaps = gameObject.GetComponentsInChildren<Tilemap>().ToList();
+    }
+
+    public void RemoveTilemapFromList(Tilemap element)
+    {
+        tilemaps.Remove(element);
     }
 
     // tilePosition은 world 좌표계가 아닌 grid 좌표계임
