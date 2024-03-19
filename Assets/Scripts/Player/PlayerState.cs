@@ -20,8 +20,7 @@ public class PlayerState : MonoBehaviour
     [SerializeField] private int attackDmg;
     [SerializeField] private int seedRechargeTime;
     [SerializeField] private int[] magicLevel;    // 0이면 안배움, 1이면 기본, 2이면 업그레이드 상태
-
-    private Timer seedTimer = null;
+    private Coroutine[] seedRecharge = null;
 
     private void Start()
     {
@@ -35,12 +34,15 @@ public class PlayerState : MonoBehaviour
     {
         // HP, 공격력 등의 값 초기화하기
         stateUI = PlayerStateUI.Instance;
+
         currentHP = maxHP;
-        currentSeed = maxSeed;
         for(int i = 0; i < maxHP; i++)
         {
             stateUI.AddHPUI();
         }
+
+        currentSeed = maxSeed;
+        seedRecharge = new Coroutine[maxSeed];
         for(int i=0; i<maxSeed; i++)
         {
             stateUI.AddSeedUI();
@@ -73,37 +75,28 @@ public class PlayerState : MonoBehaviour
         }
     }
 
-    public void ConsumeSeed(int amount)
+    public void ConsumeSeed(int amount, float rechargeTime)
     {
         Debug.Assert(currentSeed >= amount);
         currentSeed -= amount;
-        stateUI.ConsumeSeed(amount);
-        if(seedTimer == null)
+        for (int i = maxSeed - 1; i >= 0; i--)
         {
-            seedTimer = Timer.StartTimer();
-        }
-    }
-
-    private void Update()
-    {
-        if(seedTimer != null && seedTimer.duration >= seedRechargeTime)
-        {
-            RechargeSeed();
-            if (currentSeed < maxSeed)
+            if (amount <= 0) break;
+            if (seedRecharge[i] == null)
             {
-                seedTimer.Reset();
-            }
-            else
-            {
-                seedTimer = null;
+                seedRecharge[i] = StartCoroutine(RechargeSeed(i, rechargeTime));
+                stateUI.ConsumeSeed(i, rechargeTime);
+                amount--;
             }
         }
     }
 
-    private void RechargeSeed()
+    private IEnumerator RechargeSeed(int index, float t)
     {
-        currentSeed++;
-        stateUI.RechargeSeed(1);
+        yield return new WaitForSeconds(t);
+        currentSeed += 1;
+        stateUI.RechargeSeed(index);
+        seedRecharge[index] = null;
     }
 
     public void UpgradePlantMagic(SkillCode magicCode) { } // 획득 및 업그레이드

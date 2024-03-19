@@ -144,7 +144,7 @@ public class PlayerMagic : MonoBehaviour
 
     private void DoMagic()
     {
-        PlayerRef.Instance.State.ConsumeSeed(1);
+        PlayerRef.Instance.State.ConsumeSeed(1, selectedMagic.seedRechargeTime);
 
         GameObject magicInstance;
         if (selectedMagic.prefab == null)

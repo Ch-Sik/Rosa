@@ -9,5 +9,6 @@ public class SO_Magic : SO_Skill
     public Sprite previewSprite;
     public MagicCastType castType;
     public float lifeTime;
+    public float seedRechargeTime;
     public GameObject prefab;
 }

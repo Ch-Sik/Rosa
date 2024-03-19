@@ -67,26 +67,30 @@ public class PlayerStateUI : MonoBehaviour
         }
     }
 
-    public void RechargeSeed(int amount)
+    public void ConsumeSeed(int index, float rechargeTime)
     {
-        while (amount > 0)
+        seeds[index].fillAmount = 0f;
+        StartCoroutine(UpdateSeedUI());
+
+        IEnumerator UpdateSeedUI()
         {
-            if (curSeed >= seeds.Count) return;
-            seeds[curSeed].fillAmount = 1f;
-            curSeed++;
-            amount--;
+            Debug.Log($"{index}번 식물마법 재충전 시작");
+            int step = 5;
+            float timePerStep = rechargeTime / step;
+            var wait = new WaitForSeconds(timePerStep);
+
+            for(int i=0; i<step; i++)
+            {
+                seeds[index].fillAmount = (float)1 / step * i;
+                yield return wait;
+            }
         }
     }
 
-    public void ConsumeSeed(int amount)
+    public void RechargeSeed(int index)
     {
-        while(amount > 0)
-        {
-            if (curSeed <= 0) return;
-            curSeed--;
-            seeds[curSeed].fillAmount = 0f;
-            amount--;
-        }
+        Debug.Log($"{index}번 씨앗 준비됨");
+        seeds[index].fillAmount = 1f;
     }
 
     // TODO: 아이콘과 스프라이트 기반으로 기능 재구현
