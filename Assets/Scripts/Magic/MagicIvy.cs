@@ -1,7 +1,4 @@
-using JetBrains.Annotations;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,8 +6,6 @@ public class MagicIvy : MonoBehaviour
 {
     [SerializeField]
     private EdgeCollider2D edgeCol;     // 0번 점이 위, 1번 점이 아래
-    [SerializeField]
-    private TilemapManager tilemapManager;
     [SerializeField]
     private Vector3Int originCellPos;   // 담쟁이가 설치된 타일 위치
     [SerializeField]
@@ -36,21 +31,23 @@ public class MagicIvy : MonoBehaviour
     [SerializeField, Tooltip("덩굴 스프라이트가 벽과 떨어진 정도 (만약 음수면 벽을 파고들어감)")]
     private float offset;
 
+    private TilemapGroup targetTilemapGroup;
     private LR wallDirection;   // 현재 담쟁이가 자라는 벽이 바라보는 방향
     private int upLength = 0;
     private int downLength = 0;
     private WaitForSeconds tick;
 
-    public void Init(Vector2 magicPos)
+    public void Init(Vector2 magicPos, TilemapGroup tilemapGroup)
     {
         // 필드 값 세팅
         if(edgeCol == null) edgeCol = GetComponent<EdgeCollider2D>();
-        tilemapManager = TilemapManager.Instance;
+        targetTilemapGroup = tilemapGroup;
 
         // 오른쪽 벽에 부딪혔는지 왼쪽 벽에 부딪혔는지 판단
         // 0.5의 오프셋을 주어서 오른쪽 셀 검사
-        originCellPos = tilemapManager.WorldToCell(magicPos + new Vector2(0.5f, 0));   
-        if(TilemapManager.Instance.GetIfSubstanceTileExist(originCellPos))
+        originCellPos = targetTilemapGroup.WorldToCell(magicPos + new Vector2(0.5f, 0));
+        TileData originCellData = targetTilemapGroup.GetTileData(originCellPos);
+        if (originCellData != null && originCellData.isSubstance)
         {
             wallDirection = LR.LEFT;
             Debug.Log("왼쪽 보는 벽에 담쟁이 설치");
@@ -64,7 +61,7 @@ public class MagicIvy : MonoBehaviour
         // y축 방향 위치 보정
         magicPos.y = Mathf.Round(magicPos.y - 0.5f) + 0.5f;
         transform.position = magicPos;
-        originCellPos = tilemapManager.WorldToCell(magicPos + new Vector2(0.5f, 0));
+        originCellPos = targetTilemapGroup.WorldToCell(magicPos + new Vector2(0.5f, 0));
 
         // 최적화
         tick = new WaitForSeconds(tickTime);
@@ -82,16 +79,19 @@ public class MagicIvy : MonoBehaviour
         {
             // 한칸씩 위쪽으로 가면서 타일 검사
             upLength++;
+            Vector3 centerPos = transform.position + upLength * Vector3.up;
+            Vector3 innerPos = centerPos - (Vector3)(0.5f * wallDirection.toVector2());
+            Vector3 outerPos = centerPos + (Vector3)(0.5f * wallDirection.toVector2());
 
-            TileData innerTile = tilemapManager.GetTileDataByCellPosition(originCellPos
-                    + new Vector3Int(wallDirection.isRIGHT() ? -1 : 0, upLength, 0)
-                    );
-            TileData outerTile = tilemapManager.GetTileDataByCellPosition(originCellPos
-                    + new Vector3Int(wallDirection.isRIGHT() ? 0 : -1, upLength, 0)
-                    );
+            Vector3Int innerCellPos = targetTilemapGroup.WorldToCell(innerPos);
+            Vector3Int outerCellPos = targetTilemapGroup.WorldToCell(outerPos);
 
-            bool isInnerTileMagicAllowed = innerTile != null && innerTile.magicAllowed;
-            bool isOuterTileNonSubstance = !outerTile || !outerTile.isSubstance;
+            TileData innerData = targetTilemapGroup.GetTileData(innerCellPos);
+            TileData outerData = targetTilemapGroup.GetTileData(outerCellPos);
+
+            bool isInnerTileMagicAllowed = innerData != null && innerData.isPlantable;
+            bool isOuterTileNonSubstance = !outerData || !outerData.isSubstance;
+
             if (isInnerTileMagicAllowed && isOuterTileNonSubstance)
             {
                 points = edgeCol.points;
@@ -137,16 +137,20 @@ public class MagicIvy : MonoBehaviour
         {
             // 한칸씩 아래쪽으로 가면서 타일 검사
             downLength--;
+            Vector3 centerPos = transform.position + downLength * Vector3.up;
+            Debug.Log(centerPos);
+            Vector3 innerPos = centerPos - (Vector3)(0.5f * wallDirection.toVector2());
+            Vector3 outerPos = centerPos + (Vector3)(0.5f * wallDirection.toVector2());
 
-            TileData innerTile = tilemapManager.GetTileDataByCellPosition(originCellPos
-                    + new Vector3Int(wallDirection.isRIGHT() ? -1 : 0, downLength, 0)
-                    );
-            TileData outerTile = tilemapManager.GetTileDataByCellPosition(originCellPos
-                    + new Vector3Int(wallDirection.isRIGHT() ? 0 : -1, downLength, 0)
-                    );
+            Vector3Int innerCellPos = targetTilemapGroup.WorldToCell(innerPos);
+            Vector3Int outerCellPos = targetTilemapGroup.WorldToCell(outerPos);
 
-            bool isInnerTileMagicAllowed = innerTile != null && innerTile.magicAllowed;
-            bool isOuterTileNonSubstance = !outerTile || !outerTile.isSubstance;
+            TileData innerData = targetTilemapGroup.GetTileData(innerCellPos);
+            TileData outerData = targetTilemapGroup.GetTileData(outerCellPos);
+
+            bool isInnerTileMagicAllowed = innerData != null && innerData.isPlantable;
+            bool isOuterTileNonSubstance = !outerData || !outerData.isSubstance;
+
             if (isInnerTileMagicAllowed && isOuterTileNonSubstance)
             {
                 points = edgeCol.points;

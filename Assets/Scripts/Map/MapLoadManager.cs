@@ -1,11 +1,6 @@
 using Sirenix.OdinInspector;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 /// <summary>
 /// 맵 데이터를 관리하는 매니저 클래스
@@ -96,7 +91,6 @@ public class MapLoadManager : MonoBehaviour
             //기존 씬의 로드
             sceneDatas[index] = sceneData;
         }
-        TilemapManager.Instance.UpdateTilemapList();
     }
 
     public SceneData DownloadSceneData(int i)
