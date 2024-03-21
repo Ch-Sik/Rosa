@@ -67,6 +67,7 @@ public class HiddenWall : MonoBehaviour
                 }
                 yield return fadeTick;
             }
+            GetComponentInParent<TilemapGroup>().RemoveTilemapFromList(GetComponent<Tilemap>());
             Destroy(gameObject);
         }
     }

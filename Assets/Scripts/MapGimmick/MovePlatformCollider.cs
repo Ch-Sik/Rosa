@@ -30,7 +30,7 @@ public class MovePlatformCollider : MonoBehaviour
 
     bool IsOnTopOfPlatform(Collision2D collision)
     {
-        float platformTopY = transform.position.y +  GetComponent<EdgeCollider2D>().bounds.size.y / 2;
+        float platformTopY = transform.position.y +  GetComponent<Collider2D>().bounds.size.y / 2;
 
         float objectBottomY = collision.collider.bounds.min.y;
 

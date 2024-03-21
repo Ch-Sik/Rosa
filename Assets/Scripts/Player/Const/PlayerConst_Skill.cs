@@ -10,6 +10,7 @@ public enum SkillCode
     MAGIC_MYOSOTIS,
     MAGIC_CISTUS,
     MAGIC_WATERMELON,
+    MAGIC_MUSHROOM
 }
 
 /// <summary> 설치 가능 지형별로 구분한 식물마법 타입 </summary>

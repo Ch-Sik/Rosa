@@ -17,7 +17,8 @@ public class CursorFairy : MonoBehaviour
     [SerializeField, ReadOnly] private Vector3 mouseWorldPosition;
     [SerializeField, ReadOnly] private Vector3 magicPreviewPosition;
 
-    InputAction aimAction;
+    InputAction defaultAim;
+    InputAction magicAim;
 
     // Start is called before the first frame update
     void Start()
@@ -31,22 +32,29 @@ public class CursorFairy : MonoBehaviour
             mainParticle = particle.main;
             originColor = mainParticle.startColor.color;
         }
-        InputManager.Instance.AM_ActionDefault.FindAction("Aim").performed += GetMousePosition;
-        InputManager.Instance.AM_ActionMagicReady.FindAction("Aim").performed += GetMousePosition;
+        defaultAim = InputManager.Instance.AM_ActionDefault.FindAction("Aim");
+        magicAim = InputManager.Instance.AM_ActionMagicReady.FindAction("Aim");
+        defaultAim.performed += GetMousePosition;
+        magicAim.performed += GetMousePosition;
     }
 
     void GetMousePosition(InputAction.CallbackContext context)
     {
         mouseScreenPosition = context.ReadValue<Vector2>();
         // z=0인 xy평면으로 좌표 계산
-        mouseScreenPosition.z = -Camera.main.transform.position.z;
-        mouseWorldPosition = Camera.main.ScreenToWorldPoint(mouseScreenPosition);
+        mouseWorldPosition = ScreenToWorldPosition(mouseScreenPosition);
 
         // 마우스 위치 설정
         if (!isTargetingTiles)
         {
             transform.position = mouseWorldPosition;
         }
+    }
+
+    Vector3 ScreenToWorldPosition(Vector3 screenPos)
+    {
+        screenPos.z = -Camera.main.transform.position.z;
+        return Camera.main.ScreenToWorldPoint(screenPos);
     }
 
     // Update is called once per frame
@@ -71,6 +79,7 @@ public class CursorFairy : MonoBehaviour
 
     public void SetMagicPreview(bool isValidPos, Vector3 targetPosition)
     {
+        magicPreviewPosition = targetPosition;
         if(isValidPos)
         {
             isTargetingTiles = true;
@@ -83,7 +92,9 @@ public class CursorFairy : MonoBehaviour
         {
             isTargetingTiles = false;
             mainParticle.startColor = Color.red;
+
+            // 커서 위치 설정
+            transform.position = ScreenToWorldPosition(magicAim.ReadValue<Vector2>());
         }
-        magicPreviewPosition = targetPosition;
     }
 }
