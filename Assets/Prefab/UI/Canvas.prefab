@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6884539951646369429}
   - component: {fileID: 6423206156007189216}
   m_Layer: 5
-  m_Name: Selected Magic
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,8 +92,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -144,7 +144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 981903948598798606}
   m_Layer: 5
-  m_Name: HP
+  m_Name: HP UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,6 +180,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1876001584518325201}
+  - component: {fileID: 1287604614238647410}
   - component: {fileID: 3503118842112695824}
   - component: {fileID: 1432996486254770544}
   - component: {fileID: 7203691366219128592}
@@ -204,6 +205,7 @@ RectTransform:
   m_Children:
   - {fileID: 2311731864841060975}
   - {fileID: 981903948598798606}
+  - {fileID: 4424928779839821884}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -211,6 +213,27 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1287604614238647410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1884796897744692640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d44a580d2f4e87439f547f96a0f7db9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text_selectedMagic: {fileID: 6423206156007189216}
+  heartPrefab: {fileID: 6028797462179889781, guid: 1065f44ed965162479353c7919d3fcf1, type: 3}
+  heartContainer: {fileID: 4888545471563243280}
+  seedPrefab: {fileID: 7266334476337217478, guid: 011041205d4fb5b47890e8bcbb2f10a8, type: 3}
+  seedContainer: {fileID: 6564404712311381462}
+  filled: {fileID: 21300000, guid: 1df1795708316f642b96c2c5091f7703, type: 3}
+  empty: {fileID: 21300000, guid: 913c120aa9d2ab343b5b0b3225f35a08, type: 3}
+  hearts: []
+  seeds: []
 --- !u!223 &3503118842112695824
 Canvas:
   m_ObjectHideFlags: 0
@@ -308,7 +331,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 272, y: -75}
+  m_AnchoredPosition: {x: 236, y: -75}
   m_SizeDelta: {x: 384, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6014204601144101428
@@ -382,7 +405,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 480, y: -72}
+  m_AnchoredPosition: {x: 443.99997, y: -72}
   m_SizeDelta: {x: 800, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7434881966284842411
@@ -411,6 +434,68 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &6564404712311381462
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4424928779839821884}
+  - component: {fileID: 9102555128171979096}
+  m_Layer: 5
+  m_Name: Seed UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4424928779839821884
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6564404712311381462}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1876001584518325201}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 245.4256, y: -156}
+  m_SizeDelta: {x: 402.8512, y: 79.2267}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &9102555128171979096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6564404712311381462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 16
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &8131091285130057122
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,11 +505,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2311731864841060975}
-  - component: {fileID: 4634819330131258546}
   - component: {fileID: 6726908866680056007}
   - component: {fileID: 7754097753953015022}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Selected Magic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -447,27 +531,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1920, y: -1100}
-  m_SizeDelta: {x: 112, y: 30}
+  m_AnchoredPosition: {x: 185, y: -241}
+  m_SizeDelta: {x: 274.3477, y: 61.7636}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4634819330131258546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8131091285130057122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d44a580d2f4e87439f547f96a0f7db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text_selectedMagic: {fileID: 6423206156007189216}
-  heart: {fileID: 6028797462179889781, guid: 1065f44ed965162479353c7919d3fcf1, type: 3}
-  heartContainer: {fileID: 4888545471563243280}
-  filled: {fileID: 21300000, guid: 1df1795708316f642b96c2c5091f7703, type: 3}
-  empty: {fileID: 21300000, guid: 913c120aa9d2ab343b5b0b3225f35a08, type: 3}
-  hearts: []
 --- !u!222 &6726908866680056007
 CanvasRenderer:
   m_ObjectHideFlags: 0
