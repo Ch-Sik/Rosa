@@ -2,7 +2,6 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class NPCCommunicationInteraction : MonoBehaviour
@@ -71,8 +70,8 @@ public class CommunicationDecision
 {
     //첫 대화인지 파악
     [HideInInspector] public bool isFirst = true;
-    public int initialID;
-    public int iterativeID;
+    public int initialID = -1;
+    public int iterativeID = -1;
     public List<CommunicationDecisionNode> flagedID = new List<CommunicationDecisionNode>();
 
     public int GetID()
@@ -81,7 +80,8 @@ public class CommunicationDecision
         if (isFirst)
         {
             isFirst = false;
-            return initialID;
+            if (initialID >= 0)
+                return initialID;
         }
 
         foreach (var flagID in flagedID)

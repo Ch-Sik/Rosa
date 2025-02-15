@@ -238,6 +238,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.Sfx:                 Sfx(data[i].sfx); return;
             case CommunicationType.Flag:                SetFlag(data[i].flag); return;
             case CommunicationType.HideAll:             HideAll(); return;
+            case CommunicationType.MoveRoom:            MoveRoom(data[i].room, data[i].roomPosition); return;
         }
     }
 
@@ -345,6 +346,13 @@ public class CommunicationManager : MonoBehaviour
         float time = UI.HideAll();
         //딜레이를 제공한다.
         Delay(time);
+    }
+
+    //룸의 특정 위치로 이동
+    public void MoveRoom(SORoom room, Vector3 pos)
+    {
+        MapManager.Instance.OpenScene(room, pos);
+        Next();
     }
 
     //다음 커뮤니케이션 실행
@@ -456,6 +464,11 @@ public class CommunicationData
     public AudioClip sfx;
     [ShowIf("@type == CommunicationType.Flag")]
     public Flag flag;
+    [ShowIf("@type == CommunicationType.MoveRoom")]
+    public SORoom room;
+    [ShowIf("@type == CommunicationType.MoveRoom")]
+    public Vector2 roomPosition;
+
 }
 
 public enum CommunicationType
@@ -473,6 +486,7 @@ public enum CommunicationType
     Sfx,                        //특정 소리를 발생시킨다.
     Flag,                       //플래그를 변경한다.
     HideAll,                    // 24.12.22) 화면 상에 보이는 모든 대상을 '동시에' 숨긴다.
+    MoveRoom                    //특정 룸으로 이동시킨다.
 }
 
 public enum CommunicationTarget

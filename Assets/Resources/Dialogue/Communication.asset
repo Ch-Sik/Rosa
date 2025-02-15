@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 54c58b93f86daa14eb4b55c9445fa728, type: 3}
-  m_Name: Communication_Test
+  m_Name: Communication
   m_EditorClassIdentifier: 
-  ID: 0
-  textFileName: Test
+  ID: 3
+  textFileName: Test3
   data:
   - type: 1
     target: 1
@@ -50,7 +50,7 @@ MonoBehaviour:
   - type: 5
     target: 0
     emotion: 0
-    text: "\uC548\uB155\uD558\uC138\uC694"
+    text: "\uBC18\uBCF5\uB300\uD654"
     location: 0
     position: {x: 0, y: 0}
     function:
@@ -66,23 +66,7 @@ MonoBehaviour:
   - type: 4
     target: 2
     emotion: 0
-    text: "\uBC29\uAC00\uBC29\uAC00 \uBC29\uC5B4\uAD6C\uAC00\uB974\uAE30"
-    location: 0
-    position: {x: 0, y: 0}
-    function:
-      m_PersistentCalls:
-        m_Calls: []
-    delay: 0
-    sfx: {fileID: 0}
-    flag:
-      flag: 
-      value: 0
-    room: {fileID: 0}
-    roomPosition: {x: 0, y: 0}
-  - type: 4
-    target: 2
-    emotion: 0
-    text: "\uC6B0\uD558\uD558\uD558\uD558\uD558"
+    text: "\uBC18\uBCF5\uB300\uD654"
     location: 0
     position: {x: 0, y: 0}
     function:
@@ -96,7 +80,7 @@ MonoBehaviour:
     room: {fileID: 0}
     roomPosition: {x: 0, y: 0}
   - type: 2
-    target: 1
+    target: 2
     emotion: 0
     text: 
     location: 0
@@ -112,23 +96,7 @@ MonoBehaviour:
     room: {fileID: 0}
     roomPosition: {x: 0, y: 0}
   - type: 13
-    target: 2
-    emotion: 0
-    text: 
-    location: 0
-    position: {x: 0, y: 0}
-    function:
-      m_PersistentCalls:
-        m_Calls: []
-    delay: 0
-    sfx: {fileID: 0}
-    flag:
-      flag: 
-      value: 0
-    room: {fileID: 11400000, guid: e9cfa23d658d4ab49b0bea12e7b1236e, type: 2}
-    roomPosition: {x: 50, y: 50}
-  - type: 12
-    target: 0
+    target: 1
     emotion: 0
     text: 
     location: 0

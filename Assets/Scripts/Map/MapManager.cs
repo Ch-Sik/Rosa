@@ -108,18 +108,6 @@ public class MapManager : MonoBehaviour
     public void Enter(SORoom room)
     {
         currentRoom = room;
-        /*
-        List<SORoom> newRooms = new List<SORoom>();
-
-        newRooms.Clear();
-        newRooms.Add(room);
-        newRooms.AddRange(room.GetConnectedRooms());
-
-        CloseScenes(newRooms);
-        OpenScenes(newRooms);
-
-        oldRooms = new List<SORoom>(newRooms);
-        */
 
         Sequence seq = DOTween.Sequence()
         .Append(fadePanel.DOFade(1, 0.5f))
@@ -127,6 +115,19 @@ public class MapManager : MonoBehaviour
         {
             OpenScene(currentRoom);
             Invoke("MoveStartPoint", 0.3f);
+        })
+        .AppendInterval(1)
+        .Append(fadePanel.DOFade(0, 0.5f));
+    }
+
+    public void Enter(SORoom room, Vector2 position)
+    {
+        Sequence seq = DOTween.Sequence()
+        .Append(fadePanel.DOFade(1, 0.5f))
+        .AppendCallback(() =>
+        {
+            CloseScene(currentRoom);
+            OpenScene(currentRoom, position);
         })
         .AppendInterval(1)
         .Append(fadePanel.DOFade(0, 0.5f));
@@ -189,7 +190,7 @@ public class MapManager : MonoBehaviour
             Vector2Int position = currentRoom.GetRoomPort(direction, ports[0].index).ports[0];
             Vector3 destination = new Vector3(position.x, position.y) + GetMargin(direction);
 
-            StartCoroutine(OpenScene(currentRoom, destination));
+            StartCoroutine(AsyncOpenScene(currentRoom, destination));
         })
         .AppendInterval(1)
         .Append(fadePanel.DOFade(0, 0.5f));
@@ -215,7 +216,7 @@ public class MapManager : MonoBehaviour
 
         CloseScene(currentRoom);
         currentRoom = room;
-        StartCoroutine(OpenScene(currentRoom, Vector3.zero));
+        StartCoroutine(AsyncOpenScene(currentRoom, Vector3.zero));
 
         //플래그
         FindConnectedPosition(room, direction, index, percentage, playerPosition);
@@ -318,11 +319,18 @@ public class MapManager : MonoBehaviour
 
     public void OpenScene(SORoom room)
     {
-        StartCoroutine(OpenScene(room, Vector3.zero));
+        if (currentRoom != null) CloseScene(currentRoom);
+        StartCoroutine(AsyncOpenScene(room, Vector3.zero));
+    }
+
+    public void OpenScene(SORoom room, Vector2 pos)
+    {
+        if (currentRoom != null) CloseScene(currentRoom);
+        StartCoroutine(AsyncOpenScene(room, pos));
     }
 
     //동기화를 위한 코루틴 사용
-    public IEnumerator OpenScene(SORoom room, Vector3 playerPosition)
+    public IEnumerator AsyncOpenScene(SORoom room, Vector3 playerPosition)
     {
         SceneField scene = room.scene;
         if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded)
@@ -413,7 +421,7 @@ public class MapManager : MonoBehaviour
 
         if (SceneManager.GetSceneByName(currentRoom.scene.SceneName).isLoaded)
             CloseScene(currentRoom);
-        StartCoroutine(OpenScene(rooms[SceneName], Position));
+        StartCoroutine(AsyncOpenScene(rooms[SceneName], Position));
 
         PlayerRef.Instance.transform.position = Position;
 
