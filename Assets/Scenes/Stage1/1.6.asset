@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e66c76671cd64cb449192b5c4468e16e, type: 3}
+  m_Name: 1.6
+  m_EditorClassIdentifier: 
+  scene:
+    m_SceneAsset: {fileID: 102900000, guid: 6637763dfa14fb44893528944fec200a, type: 3}
+    m_SceneName: 1.6 UnUsed
+  flagName: 
+  flagIndex: 0
+  title: Test-4
+  subTitle: 
+  size: {x: 99, y: 51}
+  offset: {x: 105, y: -22}
+  topPorts: []
+  botPorts: []
+  rigPorts:
+  - flag: 
+    index: 0
+    direction: 2
+    ports:
+    - {x: 203, y: 17}
+    - {x: 203, y: 18}
+    - {x: 203, y: 19}
+    - {x: 203, y: 20}
+    connectedPorts:
+    - flag: 
+      flagIndex: 0
+      scene:
+        m_SceneAsset: {fileID: 102900000, guid: ed2dc4ca39e8cc840a9a9ca4551cacd6, type: 3}
+        m_SceneName: 1.7
+      index: 0
+  lefPorts:
+  - flag: 
+    index: 0
+    direction: 3
+    ports:
+    - {x: 105, y: -10}
+    - {x: 105, y: -9}
+    - {x: 105, y: -8}
+    - {x: 105, y: -7}
+    - {x: 105, y: -6}
+    - {x: 105, y: -5}
+    connectedPorts:
+    - flag: 
+      flagIndex: 0
+      scene:
+        m_SceneAsset: {fileID: 102900000, guid: 62c04475c2d05934387cdcc8524c7ae6, type: 3}
+        m_SceneName: 1.5
+      index: 0

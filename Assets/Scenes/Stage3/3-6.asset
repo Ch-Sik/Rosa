@@ -32,7 +32,13 @@ MonoBehaviour:
     - {x: 120, y: 14}
     - {x: 120, y: 15}
     - {x: 120, y: 16}
-    connectedPorts: []
+    connectedPorts:
+    - flag: 
+      flagIndex: 0
+      scene:
+        m_SceneAsset: {fileID: 102900000, guid: 475c30e3c43390c489ed476ada27d8f5, type: 3}
+        m_SceneName: 3-7
+      index: 0
   lefPorts:
   - flag: 
     index: 0
