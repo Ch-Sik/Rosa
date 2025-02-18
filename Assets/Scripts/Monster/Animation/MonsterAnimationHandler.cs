@@ -69,7 +69,6 @@ public class MonsterAnimationHandler : MonoBehaviour
         }
     }
 
-#if UNITY_EDITOR
     [Button]
     void ApplyToAnimController()
     {
@@ -121,5 +120,4 @@ public class MonsterAnimationHandler : MonoBehaviour
             Debug.Log($"새 애니메이터 파라미터 추가\nname: {param.animParameter}\ntype: {param.parameterType}");
         }
     }
-#endif
 }

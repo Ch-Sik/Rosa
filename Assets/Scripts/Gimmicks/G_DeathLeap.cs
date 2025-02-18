@@ -6,9 +6,6 @@ public class G_DeathLeap : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
-        {
-            RespawnManager.Instance.Respawn();
-        }
+        RespawnManager.Instance.Respawn();
     }
 }
