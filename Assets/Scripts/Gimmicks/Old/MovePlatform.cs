@@ -4,6 +4,7 @@ using System.Collections;
 using Sirenix.OdinInspector;
 using System.Net.Http.Headers;
 using Com.LuisPedroFonseca.ProCamera2D;
+using DG.Tweening;
 
 public class MovePlatform : MonoBehaviour
 {
@@ -12,7 +13,8 @@ public class MovePlatform : MonoBehaviour
         OnOff,
         Once,
         Reverse,
-        EndPoint
+        EndPoint,
+        Bounce
     }
 
     [FoldoutGroup("선택"), SerializeField, Tooltip("Cinematic은 OnOff와 Reverse에서만 동작함")]
@@ -34,6 +36,14 @@ public class MovePlatform : MonoBehaviour
     public bool isReverse = false;
     public bool curReverseState = false;
     private bool canMove = false;
+
+    [Space]
+    [Tooltip("Bounce 전용 옵션"), ShowIf("ShowBounceOption")]
+    [SerializeField, ShowIf("ShowBounceOption")] float breachHeight = 3f;     // 튀어오르는 높이
+    [SerializeField, ShowIf("ShowBounceOption")] float breachUpTime = 1f;
+    [SerializeField, ShowIf("ShowBounceOption")] float breachDownTime = 0.7f;
+    [SerializeField, ShowIf("ShowBounceOption")] float timeBetweenDown = 1.0f;
+    [SerializeField, ShowIf("ShowBounceOption")] float timeBetweenBreach = 1.0f;
 
     GameObject cam;
     ProCamera2DCinematics cinematics;
@@ -100,6 +110,11 @@ public class MovePlatform : MonoBehaviour
                 isReverse = true;
                 break;
         }
+    }
+    bool ShowBounceOption()
+    {
+        if(type == MovePlatformType.Bounce) return true;
+        else return false;
     }
 
     [Button]
@@ -178,6 +193,9 @@ public class MovePlatform : MonoBehaviour
 
         if (type == MovePlatformType.EndPoint)
             isReverse = true;
+
+        if (type == MovePlatformType.Bounce)
+            Bounce();
     }
 
     public void Cinematic()
@@ -205,7 +223,9 @@ public class MovePlatform : MonoBehaviour
         if (points.Count == 0) return;
         if (type == MovePlatformType.Once && isArrive) return;
         if (type == MovePlatformType.EndPoint && isArrive) return;
+        if (type == MovePlatformType.Bounce) return;
         if (onWait) return;
+
 
         if (curReverseState != isReverse)
         {
@@ -284,6 +304,29 @@ public class MovePlatform : MonoBehaviour
                 other.SetParent(null);
             }
         }
+    }
+
+    public void Bounce()
+    {
+        Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
+        float originHeight = transform.position.y;
+        DOTween.Sequence().AppendInterval(startDelay).AppendCallback(
+            () =>
+            {
+                DOTween.Sequence()
+                .Append(
+                    rigidbody.DOMoveY(transform.position.y + breachHeight, breachUpTime)
+                        .SetEase(Ease.OutCubic))
+                .Insert(0, transform.DORotate(new Vector3(0, 0, 0), 0.2f))
+                .AppendInterval(timeBetweenDown)
+                .Append(
+                    rigidbody.DOMoveY(originHeight, breachDownTime)
+                        .SetEase(Ease.InQuad))
+                .Insert(breachUpTime, transform.DORotate(new Vector3(0, 0, 0), 0.2f))
+                .AppendInterval(timeBetweenBreach)
+                .SetLoops(-1);
+            }
+        );
     }
 
     public void OnDrawGizmos()

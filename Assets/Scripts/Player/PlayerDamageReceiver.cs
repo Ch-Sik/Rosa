@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerDamageReceiver : MonoBehaviour
 {
     [SerializeField] float defaultNoDmgTime = 2f;
+    public bool ignoreDamage = false;
 
     PlayerRef playerRef;
     bool isJustEndedIgnoreTime = false; // 해당 트리거 켜져있는 동안 플레이어는 '밟기' 수행할 수 없음.
@@ -14,16 +15,17 @@ public class PlayerDamageReceiver : MonoBehaviour
         playerRef = PlayerRef.Instance;
     }
 
-
     public void GetDamage(GameObject target, int damage, bool isDamageFromMonsterBody = false)
     {
+        if (ignoreDamage) return;
+        
         // if(!isJustEndedIgnoreTime && isDamageFromMonsterBody && target.transform.position.y < transform.position.y - 0.73f)
         // {
         //     Debug.Log("몬스터가 플레이어보다 아래에 있음 = 플레이어가 밟은 상황, 데미지 무시");
         //     return;
         // }
 
-        Debug.Log(target.name);
+        Debug.Log("플레이어가 다음 대상에게 피격됨:" + target.name);
 
         playerRef.animation.BlinkEffect();
         playerRef.animation.SetTrigger("Hit");
@@ -82,5 +84,17 @@ public class PlayerDamageReceiver : MonoBehaviour
         isJustEndedIgnoreTime = true;
         yield return new WaitForFixedUpdate();  // 확실하게 FixedUpdate 한번이 끝날 떄까지 기다림
         isJustEndedIgnoreTime = false;
+    }
+
+    public void SetNoDmgForSeconds(float duration)
+    {
+        ignoreDamage = true;
+        StartCoroutine(Co_RestoreInvincible());
+        IEnumerator Co_RestoreInvincible()
+        {
+            yield return new WaitForSeconds(duration);
+            ignoreDamage = false;
+        }
+
     }
 }

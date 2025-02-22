@@ -631,6 +631,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultNoDmgTime: 2
+  ignoreDamage: 0
 --- !u!114 &4348864029274202990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1165,6 +1166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 5124247239520633849}
+  playerDamageReceiver: {fileID: 7376123347842105714}
   hitEffects: {fileID: 1811383673813836875}
   layer_attackable:
     serializedVersion: 2
