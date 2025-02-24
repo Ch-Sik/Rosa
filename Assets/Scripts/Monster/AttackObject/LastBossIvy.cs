@@ -42,7 +42,7 @@ public class LastBossIvy : MonoBehaviour
     public void StartGrow()
     {
         StartCoroutine(co_Grow());
-        Invoke("DoDestroy", lifetime);
+        Invoke("Disappear", lifetime);
 
         IEnumerator co_Grow()
         {
@@ -64,9 +64,13 @@ public class LastBossIvy : MonoBehaviour
         }
     }
 
-    void DoDestroy()
+    public void Disappear()
     {
+        // 덩굴 자라는 도중이었다면 해당 코루틴 중단
+        StopAllCoroutines();
         // TODO: 덩굴 삭제되는 연출 구현
         Destroy(gameObject, 0.5f);
+        // 덩굴 자라는 도중에 삭제 호출되면 Invoke로 인해 Disappear 두번째 호출되는 것 방지
+        CancelInvoke();
     }
 }

@@ -30,8 +30,9 @@ public class PlayerDamageReceiver : MonoBehaviour
         playerRef.animation.BlinkEffect();
         playerRef.animation.SetTrigger("Hit");
 
-        playerRef.movement.Knockback(new Vector2(target.transform.position.x,
-                    target.transform.position.y - (target.transform.localScale.y / 2)));
+        Vector2 knockbackOrigin = new Vector2(target.transform.position.x,
+                    target.transform.position.y - (target.transform.localScale.y / 2));
+        playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
         playerRef.state.TakeDamage(damage);
 
         int originalLayer = target.layer;
@@ -58,8 +59,9 @@ public class PlayerDamageReceiver : MonoBehaviour
         playerRef.animation.BlinkEffect();
         playerRef.animation.SetTrigger("Hit");
 
-        playerRef.movement.Knockback(new Vector2(target.transform.position.x,
-                    target.transform.position.y - (target.transform.localScale.y / 2)));
+        Vector2 knockbackOrigin = new Vector2(target.transform.position.x,
+                    target.transform.position.y - (target.transform.localScale.y / 2));
+        playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
         playerRef.state.TakeDamage(damage);
 
         int originalLayer = target.layer;

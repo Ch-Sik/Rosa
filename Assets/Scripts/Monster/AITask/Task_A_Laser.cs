@@ -57,4 +57,11 @@ public class Task_A_Laser : Task_A_Base
     {
         instance.Terminate();
     }
+
+    protected override void ClearOnTerminated()
+    {
+        base.ClearOnTerminated();
+        // 발사중인 레이저 중단
+        instance.Terminate();
+    }
 }

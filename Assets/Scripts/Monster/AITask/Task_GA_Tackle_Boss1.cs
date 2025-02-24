@@ -143,9 +143,9 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
 
     private void ThrowPlayer()
     {
+        Vector2 knockbackVector = GetCurrentDir().opposite().toVector2() * 2f + Vector2.up * 1f;
         PlayerRef.Instance.movement.Knockback(
-            (Vector2)transform.position 
-            + GetCurrentDir().toVector2() * 5f + Vector2.down * 3f
+            knockbackVector.normalized, knockbackVector.magnitude
         );
     }
 

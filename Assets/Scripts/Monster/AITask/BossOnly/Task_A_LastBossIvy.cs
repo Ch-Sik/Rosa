@@ -56,6 +56,22 @@ public class Task_A_LastBossIvy : Task_A_Base
         
     }
 
+    protected override void ClearOnTerminated()
+    {
+        base.ClearOnTerminated();
+        // 덩굴 자라던 중인 거 삭제
+        if(instances != null)
+        {
+            foreach(GameObject go in instances)
+            {
+                if(go != null)
+                {
+                    go.GetComponent<LastBossIvy>().Disappear();
+                }
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {

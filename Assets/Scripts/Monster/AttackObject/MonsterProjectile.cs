@@ -75,7 +75,7 @@ public class MonsterProjectile : MonoBehaviour
 
     void OnLifetimeEnd()
     {
-        DoDestroy(1f);
+        Disappear(1f);
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collider)
@@ -101,7 +101,7 @@ public class MonsterProjectile : MonoBehaviour
                 case ProjectileWallHitOption.Destroy:
                     rigidbody.velocity = Vector2.zero;
                     this.collider.enabled = false;
-                    DoDestroy(1f);
+                    Disappear(1f);
                     break;
                 case ProjectileWallHitOption.Stop:
                     rigidbody.velocity = Vector2.zero;
@@ -127,7 +127,7 @@ public class MonsterProjectile : MonoBehaviour
             Debug.Log("몬스터 투사체 플레이어와 접촉");
             rigidbody.velocity = Vector2.zero;
             this.collider.enabled = false;
-            DoDestroy(1f);
+            Disappear(1f);
         }
 
         if(canDestroyMushroom && (collider.tag == "Mushroom"))
@@ -137,12 +137,18 @@ public class MonsterProjectile : MonoBehaviour
         }
     }
 
-    protected void DoDestroy(float delay)
+    public void Disappear(float delay)
     {
         if(animator != null)
         {
             animator.SetTrigger("disappear");
         }
-        Destroy(gameObject, delay);
+        Invoke("DoDestroy", delay);
+    }
+
+    void DoDestroy()
+    {
+        Destroy(gameObject);
+        CancelInvoke();
     }
 }

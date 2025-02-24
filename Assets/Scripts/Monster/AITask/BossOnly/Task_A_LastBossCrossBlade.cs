@@ -52,6 +52,21 @@ public class Task_A_LastBossCrossBlade : Task_A_Base
     {
 
     }
+
+    protected override void ClearOnTerminated()
+    {
+        base.ClearOnTerminated();
+        // 생성된 칼날 있다면 삭제
+        if(instances != null)
+        {
+            foreach(GameObject cluster in instances)
+            {
+                if (cluster == null) continue;
+                cluster.GetComponent<LastBossCrossBladeCluster>().DisappearAllClusterImmediatly();
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {

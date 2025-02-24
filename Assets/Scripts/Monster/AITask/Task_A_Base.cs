@@ -80,6 +80,21 @@ public class Task_A_Base : Task_Base
             return;
         }
 
+        // 슈퍼아머 아닐 시 피격되면 패턴 중단
+        bool isHitt;
+        blackboard.TryGet(BBK.isHitt, out isHitt);
+        if (isHitt)
+        {
+            if ((!superArmourOnStartup && attackState == MonsterAtttackState.Startup) ||
+                (!superArmourOnActive && attackState == MonsterAtttackState.Active) ||
+                (!superArmourOnRecovery && attackState == MonsterAtttackState.Recovery))
+            {
+                Debug.Log(this.GetType().Name + ": 피격으로 인해 패턴 중단");
+                Fail();
+                return;
+            }
+        }
+
         // 사망 아니라면 패턴 수행
         switch(attackState)
         {

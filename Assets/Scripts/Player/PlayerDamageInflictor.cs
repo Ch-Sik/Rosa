@@ -79,7 +79,7 @@ public class PlayerDamageInflictor : MonoBehaviour
         //    playerCombat.StopAttack();
         //}
 
-        Debug.Log($"Groundcheck collision enter: {collision.gameObject.name}");
+        // Debug.Log($"Groundcheck collision enter: {collision.gameObject.name}");
 
         // 몬스터 등등과 충돌한다면,
         if ((layer_attackable & 1 << collision.gameObject.layer) != 0)

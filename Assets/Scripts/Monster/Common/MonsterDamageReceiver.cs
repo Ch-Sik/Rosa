@@ -3,6 +3,7 @@ using Panda;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -105,7 +106,7 @@ public class MonsterDamageReceiver : DamageReceiver
     public override void GetHitt(int damage, float attackAngle)
     {
         // 디버깅용
-        Debug.Log("GetHitt 호출");
+        Debug.Log($"{gameObject.name}: 피격당함");
 
         // 이미 죽어있을 경우 피격 무시
         if (!isAlive) return;
@@ -153,7 +154,7 @@ public class MonsterDamageReceiver : DamageReceiver
             StartCoroutine(SetFlagFalse());
             IEnumerator SetFlagFalse()
             {
-                yield return 0;     // 다음프레임까지 대기
+                yield return new WaitForNextFrameUnit();     // 다음프레임까지 대기
                 blackboard.Set(BBK.isHitt, false);
             }
         }

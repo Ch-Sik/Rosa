@@ -39,7 +39,7 @@ public class Boss3Rock : MonsterProjectile
             .Append(rigidbody.DOJump(returnPosition, 2, 1, 1.8f))
             .AppendCallback(() => {
                 damageReceiver.GetHitt(1, 0);   // 보스는 어차피 넉백 없으니 attackAngle 무시
-                DoDestroy(1f);
+                Disappear(1f);
             });
         }
     }

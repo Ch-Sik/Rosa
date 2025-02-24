@@ -906,7 +906,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         RaycastHit2D rayhit 
-            = Physics2D.Raycast(frontPosition, Vector2.down, 1.0f, LayerMask.GetMask("Ground"));
+            = Physics2D.Raycast(frontPosition, Vector2.down, 1.0f, LayerMask.GetMask("Ground", "Platform"));
         if(rayhit.collider == null)
         {
             Debug.Log("전방에 바닥이 감지되지 않음. 버섯 설치 실패");
@@ -1029,28 +1029,35 @@ public class PlayerMovement : MonoBehaviour
         //aimLine.transform.localScale = theScale;
     }
 
-    public void Knockback(Vector2 knockbackPos)
+    public void Knockback(Vector2 knockbackDirNormalized, float customKnockbackPow)
     {
-        Vector2 knockbackDirection = (Vector2)transform.position - knockbackPos;
-        knockbackDirection.Normalize();
+        DoKnockback(knockbackDirNormalized.normalized * customKnockbackPow);
+    }
 
+    public void Knockback(Vector2 knockbackDirNormalized)
+    {
+        DoKnockback(knockbackDirNormalized.normalized * knockbackStrength);
+    }
+
+    public void DoKnockback(Vector2 knockbackVector)
+    {
         // 만약 담쟁이에 매달린 상태라면
-        if(playerControl.currentMoveState == PlayerMoveState.CLIMBING)
+        if (playerControl.currentMoveState == PlayerMoveState.CLIMBING)
         {
             // 벽에서 떨어짐
             UnstickFromWall();
             // 넉백 방향 강제 수정
-            knockbackDirection = facingDirection.isRIGHT() ? Vector2.left : Vector2.right;
+            knockbackVector = facingDirection.isRIGHT() ? Vector2.left : Vector2.right;
         }
         rb.velocity = Vector2.zero;
-        rb.AddForce(knockbackDirection * knockbackStrength, ForceMode2D.Impulse);
+        rb.AddForce(knockbackVector * knockbackStrength, ForceMode2D.Impulse);
 
         StartCoroutine(Knockback());
 
         IEnumerator Knockback()
         {
             playerControl.SetMoveState(PlayerMoveState.NO_MOVE);
-            LookAt2DLocal(-knockbackDirection);     // 넉백되는 방향의 반대편 바라보기
+            LookAt2DLocal(-knockbackVector);     // 넉백되는 방향의 반대편 바라보기
             // 피격 애니메이션 관련은 PlayerDamageReceiver.GetDamage()로 옮김
             // 보스 패턴 등에서 '밀쳐내기'를 하면서도 데미지는 없는 경우가 있기 때문.
             // playerRef.animation.SetTrigger("Hit");

@@ -21,25 +21,23 @@ tree("Phase0")
       sequence
         isHpOverPhaseLimit(0)           // HP 체크하고 만약 HP가 기준 아래(=fail)일 경우 Phase2로 이행
         mute                            // 패턴 하나의 실패로 발생한 fail 때문에 페이즈 바뀌는 거 방지   
-            fallback                    // 여기서부터 실제 패턴 등장
-                // 패턴 1
+            fallback
                 sequence
-                    // 조건 1
-                    not CheckCountGEQ("EnergyBall", 1)  // 카운트가 1이면 에너지볼이 씬에 이미 존재한다는 뜻
-                    tree("EnergyBall")
-                    AddCount("EnergyBall")          
-                random
-                    // 패턴 2
-                    sequence
-                        // 조건 2
-                        tree("CrossBlade")
-                    // 패턴 3
-                    sequence
-                        // 조건 1
-                        tree("Laser")
-                    // 패턴 4
-                    sequence
-                        tree("Ivy")
+                    IsHitt()            // 피격되었다면 피격대응 패턴 발사
+                    HittReaction()
+                fallback                    // 여기서부터 실제 패턴 등장 
+                    random
+                        // 패턴 2
+                        sequence
+                            // 조건 2
+                            tree("CrossBlade")
+                        // 패턴 3
+                        sequence
+                            // 조건 1
+                            tree("Laser")
+                        // 패턴 4
+                        sequence
+                            tree("Ivy")
 
 // 2페이즈
 tree("Phase1")
@@ -47,13 +45,33 @@ tree("Phase1")
     sequence
         isHpOverPhaseLimit(1)
         mute                                // 패턴 하나의 실패로 발생한 fail 때문에 페이즈 바뀌는 거 방지
-            fallback                    // 여기서부터 실제 패턴 등장
-                // 패턴 1
+            fallback
                 sequence
-                    // 조건 1
-                    not CheckCountGEQ("EnergyBall", 1)  // 카운트가 1이면 에너지볼이 씬에 이미 존재한다는 뜻
-                    tree("EnergyBall")
-                    AddCount("EnergyBall")          
+                    IsHitt()            // 피격되었다면 피격대응 패턴 발사
+                    HittReaction()
+                fallback                    // 여기서부터 실제 패턴 등장    
+                    random
+                        // 패턴 2
+                        sequence
+                            // 조건 2
+                            tree("CrossBlade")
+                        // 패턴 3
+                        sequence
+                            // 조건 1
+                            tree("Laser")
+                        // 패턴 4
+                        sequence
+                            tree("Ivy")
+
+// 3페이즈 (마지막)
+tree("Phase2")
+  repeat                                // 마지막 Phase에서는 HP 체크할 필요 없음.
+    mute                                // 패턴 하나의 실패로 발생한 fail 때문에 페이즈 바뀌는 거 방지
+        fallback
+            sequence
+                IsHitt()            // 피격되었다면 피격대응 패턴 발사
+                HittReaction()
+            fallback                    // 여기서부터 실제 패턴 등장    
                 random
                     // 패턴 2
                     sequence
@@ -66,30 +84,6 @@ tree("Phase1")
                     // 패턴 4
                     sequence
                         tree("Ivy")
-
-// 3페이즈 (마지막)
-tree("Phase2")
-  repeat                                // 마지막 Phase에서는 HP 체크할 필요 없음.
-    mute                                // 패턴 하나의 실패로 발생한 fail 때문에 페이즈 바뀌는 거 방지
-        fallback                    // 여기서부터 실제 패턴 등장
-            // 패턴 1
-            sequence
-                // 조건 1
-                not CheckCountGEQ("EnergyBall", 1)  // 카운트가 1이면 에너지볼이 씬에 이미 존재한다는 뜻
-                tree("EnergyBall")
-                AddCount("EnergyBall")          
-            random
-                // 패턴 2
-                sequence
-                    // 조건 2
-                    tree("CrossBlade")
-                // 패턴 3
-                sequence
-                    // 조건 1
-                    tree("Laser")
-                // 패턴 4
-                sequence
-                    tree("Ivy")
 
 
 // 페이즈 전환 시
