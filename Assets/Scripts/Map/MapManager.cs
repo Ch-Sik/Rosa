@@ -63,12 +63,14 @@ public class MapManager : MonoBehaviour
     {
         if (startRoom == null)
             startRoom = FindStartRoom();
-
+        if (startRoom == null)
+            return;
         Init(startRoom);
     }
 
     private void Init(SORoom startRoom)
     {
+
         Enter(startRoom);
 
         currentRoom = startRoom;
@@ -98,6 +100,7 @@ public class MapManager : MonoBehaviour
     private SORoom FindStartRoom()
     {
         this.room = GetComponent<Room>();
+        if (this.room == null) return null;
         SORoom room = this.room.roomData;
 
         return room;

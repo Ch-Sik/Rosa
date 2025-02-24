@@ -1,3 +1,4 @@
+using Com.LuisPedroFonseca.ProCamera2D;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using System;
@@ -44,7 +45,7 @@ public class CommunicationManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-    
+
     //캐릭터 스프라이트 입력 그룹
     public List<CharacterEmotion> characterDatas = new List<CharacterEmotion>();
     //캐릭터 스프라이트 매치 그룹
@@ -192,6 +193,7 @@ public class CommunicationManager : MonoBehaviour
     //커뮤니케이션을 종료시킨다.
     public void EndCommunication()
     {
+        ReturnCameraToPlayer();
         ResetDatas();
         UI.EndAnimation();
         //기존 UI의 생성
@@ -203,7 +205,7 @@ public class CommunicationManager : MonoBehaviour
     public void Communication()
     {
         // 24.12.22) CommunicationType이 None이면 무시하고 다음으로 넘김
-        while (i < data.Count && data[i].type == CommunicationType.None) 
+        while (i < data.Count && data[i].type == CommunicationType.None)
             i++;
 
         //끝 판독
@@ -226,19 +228,19 @@ public class CommunicationManager : MonoBehaviour
         //커뮤니케이션 타입에 따른 함수에 파라미터 전달
         switch (data[i].type)
         {
-            case CommunicationType.Show:                Show(target, data[i].location); return;
-            case CommunicationType.Hide:                Hide(target); return;
-            case CommunicationType.SetEmotion:          SetEmotion(target, data[i].emotion); return;
-            case CommunicationType.TargetText:          TargetText(target, data[i].text); return;
-            case CommunicationType.PlayerText:          TargetText(CommunicationTarget.Player, data[i].text); return;
-            case CommunicationType.MoveToPosition:      MoveToPosition(data[i].position); return;
-            case CommunicationType.ReturnToPosition:    ReturnToPosition(); return;
-            case CommunicationType.Function:            Function(data[i].function); return;
-            case CommunicationType.Delay:               Delay(data[i].delay); return;
-            case CommunicationType.Sfx:                 Sfx(data[i].sfx); return;
-            case CommunicationType.Flag:                SetFlag(data[i].flag); return;
-            case CommunicationType.HideAll:             HideAll(); return;
-            case CommunicationType.MoveRoom:            MoveRoom(data[i].room, data[i].roomPosition); return;
+            case CommunicationType.Show: Show(target, data[i].location); return;
+            case CommunicationType.Hide: Hide(target); return;
+            case CommunicationType.SetEmotion: SetEmotion(target, data[i].emotion); return;
+            case CommunicationType.TargetText: TargetText(target, data[i].text); return;
+            case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); return;
+            case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); return;
+            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); return;
+            case CommunicationType.Function: Function(data[i].function); return;
+            case CommunicationType.Delay: Delay(data[i].delay); return;
+            case CommunicationType.Sfx: Sfx(data[i].sfx); return;
+            case CommunicationType.Flag: SetFlag(data[i].flag); return;
+            case CommunicationType.HideAll: HideAll(); return;
+            case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].roomPosition); return;
         }
     }
 
@@ -277,7 +279,7 @@ public class CommunicationManager : MonoBehaviour
         //다음 커뮤니케이션을 실행시킨다.
         Next();
     }
-    
+
     //TargetText 처리
     public void TargetText(CommunicationTarget target, string text)
     {
@@ -287,29 +289,36 @@ public class CommunicationManager : MonoBehaviour
         UI.Texting(target, text);
     }
 
-    //MoveToPositoin 처리
-    public void MoveToPosition(Vector2 pos)
+    //MoveCameraTo 처리
+    public void MoveCameraTo(Vector2 pos)
     {
         //거리 비례 딜레이를 받을 변수
         float delay = 0.0f;
         //카메라 수식
-        Camera camera = CameraFollow.Instance.GetComponent<Camera>();
+        Camera camera = Camera.main;
         //거리 계산
         float distance = Vector2.Distance(pos, camera.transform.position);
         //거리에 따른 지연 계산
         delay = distance * 0.025f;
         //카메라 이동
-        moveTween = camera.transform.DOMove(pos, delay)
-                                    .OnStart(() => CameraFollow.Instance.DisallowCamFollow())
-                                    .OnComplete(() => CameraFollow.Instance.AllowCamFollow());
+        moveTween = camera.transform.DOMove(new Vector3(pos.x, pos.y, camera.transform.position.z), delay)
+                                    .OnStart(() =>
+                                    {
+                                        ProCamera2D.Instance.FollowHorizontal = false;
+                                        ProCamera2D.Instance.FollowVertical = false;
+                                    });
         //딜레이
         Delay(delay);
     }
 
-    //MoveToPosition 처리
-    public void ReturnToPosition()
+    //ResetCamera 처리
+    public void ReturnCameraToPlayer()
     {
-        MoveToPosition(Vector2.zero);
+        ProCamera2D.Instance.CenterOnTargets();
+        ProCamera2D.Instance.FollowHorizontal = true;
+        ProCamera2D.Instance.FollowVertical = true;
+
+        Next();
     }
 
     //Function 처리
@@ -454,7 +463,7 @@ public class CommunicationData
     public string text;                 // 24.12.21.    가독성 개선 목적으로 인스펙터에 노출되게 변경
     [ShowIf("@type == CommunicationType.Show")]
     public CommunicationLocation location;
-    [ShowIf("@type == CommunicationType.MoveToPosition")]
+    [ShowIf("@type == CommunicationType.MoveCameraTo")]
     public Vector2 position;
     [ShowIf("@type == CommunicationType.Function")]
     public UnityEvent function;
@@ -479,14 +488,15 @@ public enum CommunicationType
     SetEmotion,                 //대상의 이모션을 변경한다.
     TargetText,                 //대상의 채팅을 출력한다.
     PlayerText,                 //플레이어의 채팅을 출력한다.
-    MoveToPosition,             //특정 위치로 카메라를 이동시킨다.
-    ReturnToPosition,           //카메라를 원위치 시킨다.
+    MoveCameraTo,               //특정 위치로 카메라를 이동시킨다.
+    ReturnCameraToPlayer,       //카메라를 원위치 시킨다.
     Function,                   //특정 함수를 작동시킨다.
     Delay,                      //커뮤니케이션에 딜레이를 준다.
     Sfx,                        //특정 소리를 발생시킨다.
     Flag,                       //플래그를 변경한다.
     HideAll,                    // 24.12.22) 화면 상에 보이는 모든 대상을 '동시에' 숨긴다.
-    MoveRoom                    //특정 룸으로 이동시킨다.
+    MoveRoom,                   //특정 룸으로 이동시킨다.
+
 }
 
 public enum CommunicationTarget

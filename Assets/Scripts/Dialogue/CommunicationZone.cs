@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CommunicationStartZoon : MonoBehaviour
+public class CommunicationZone : MonoBehaviour
 {
     public bool showGizmos = false;
     public CommunicationDecision decision;

@@ -111,12 +111,12 @@ MonoBehaviour:
       value: 0
     room: {fileID: 0}
     roomPosition: {x: 0, y: 0}
-  - type: 13
+  - type: 6
     target: 2
     emotion: 0
     text: 
     location: 0
-    position: {x: 0, y: 0}
+    position: {x: 20, y: 20}
     function:
       m_PersistentCalls:
         m_Calls: []
@@ -125,9 +125,25 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
-    room: {fileID: 11400000, guid: e9cfa23d658d4ab49b0bea12e7b1236e, type: 2}
+    room: {fileID: 0}
     roomPosition: {x: 50, y: 50}
-  - type: 12
+  - type: 9
+    target: 0
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 1
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 7
     target: 0
     emotion: 0
     text: 

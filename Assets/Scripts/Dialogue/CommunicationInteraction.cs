@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NPCCommunicationInteraction : MonoBehaviour
+public class CommunicationInteraction : MonoBehaviour
 {
     public float delay = 1f;
     public CommunicationDecision decision;
