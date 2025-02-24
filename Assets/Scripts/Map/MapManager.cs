@@ -70,11 +70,7 @@ public class MapManager : MonoBehaviour
 
     private void Init(SORoom startRoom)
     {
-
         Enter(startRoom);
-
-        currentRoom = startRoom;
-        LoadScene();
 
         startPoint.GetComponent<SpriteRenderer>().enabled = false;
     }
@@ -100,7 +96,7 @@ public class MapManager : MonoBehaviour
     private SORoom FindStartRoom()
     {
         this.room = GetComponent<Room>();
-        if (this.room == null) return null;
+        // if (this.room == null) return null;
         SORoom room = this.room.roomData;
 
         return room;
@@ -110,13 +106,12 @@ public class MapManager : MonoBehaviour
     //강제 엔터
     public void Enter(SORoom room)
     {
-        currentRoom = room;
-
         Sequence seq = DOTween.Sequence()
         .Append(fadePanel.DOFade(1, 0.5f))
         .AppendCallback(() =>
         {
-            OpenScene(currentRoom);
+            OpenScene(room);
+            currentRoom = room;
             Invoke("MoveStartPoint", 0.3f);
         })
         .AppendInterval(1)
@@ -129,8 +124,8 @@ public class MapManager : MonoBehaviour
         .Append(fadePanel.DOFade(1, 0.5f))
         .AppendCallback(() =>
         {
-            CloseScene(currentRoom);
-            OpenScene(currentRoom, position);
+            OpenScene(room, position);
+            currentRoom = room;
         })
         .AppendInterval(1)
         .Append(fadePanel.DOFade(0, 0.5f));
@@ -175,25 +170,24 @@ public class MapManager : MonoBehaviour
         oldRooms = new List<SORoom>(newRooms);
         */
 
-        SaveScene();
-
-        SORoom oldRoom = currentRoom;
+        // 다른 방으로 진입할 경우, 현재 방의 상태 저장
+        SaveSceneState();
 
         Sequence seq = DOTween.Sequence()
         .Append(fadePanel.DOFade(1, 0.5f))
         .AppendCallback(() =>
         {
             //        currentRoom = ports[0].room;     //flag
-            currentRoom = GetRoomSOtoConnectedPorts(ports);
+            SORoom nextRoom = GetRoomSOtoConnectedPorts(ports);
             player.SetParent(transform);
 
-            CloseScene(oldRoom);
             //        Vector2Int position = ports[0].room.(direction, ports[0].index).ports[0];
             //        Vector3 destination = new Vector3(position.x, position.y) + GetMargin(direction);
-            Vector2Int position = currentRoom.GetRoomPort(direction, ports[0].index).ports[0];
+            Vector2Int position = nextRoom.GetRoomPort(direction, ports[0].index).ports[0];
             Vector3 destination = new Vector3(position.x, position.y) + GetMargin(direction);
 
-            StartCoroutine(AsyncOpenScene(currentRoom, destination));
+            OpenScene(nextRoom, destination);
+            currentRoom = nextRoom;
         })
         .AppendInterval(1)
         .Append(fadePanel.DOFade(0, 0.5f));
@@ -362,6 +356,9 @@ public class MapManager : MonoBehaviour
                 yield return null;
             }
 
+            // 로드 완료되면 해당 방 안의 기믹들 상태 로드하여 복구
+            LoadSceneState();
+
             if (isClimbing)
                 PlayerRef.Instance.movement.wallClimbEnabled = true;
 
@@ -394,7 +391,7 @@ public class MapManager : MonoBehaviour
         SceneManager.UnloadSceneAsync(scene);
     }
 
-    public void SaveScene()
+    public void SaveSceneState()
     {
         //현재 룸에 대한 저장
         List<int> senders = new List<int>();
@@ -403,7 +400,7 @@ public class MapManager : MonoBehaviour
         SaveLoadManager.Instance.SaveMap(currentRoom.scene.SceneName, senders);
     }
 
-    public void LoadScene()
+    public void LoadSceneState()
     {
         if (SaveLoadManager.Instance.CanLoadMap(currentRoom.scene.SceneName))
         {

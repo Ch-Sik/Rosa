@@ -95,7 +95,7 @@ public class SaveLoadManager : MonoBehaviour
     [Button]
     public void SaveCurrentMap()
     {
-        MapManager.Instance.SaveScene();
+        MapManager.Instance.SaveSceneState();
     }
 
     //세이브 처리부 - MapLoader에서 자동 호출 됌.
