@@ -270,15 +270,11 @@ GameObject:
   - component: {fileID: 7250734593268076291}
   - component: {fileID: 1562838267116656084}
   - component: {fileID: 3612029987590494770}
-  - component: {fileID: 2787016588067103031}
   - component: {fileID: 7038311778365337352}
   - component: {fileID: 760144525027219976}
-  - component: {fileID: 93132452444496374}
   - component: {fileID: 4033578707123838555}
-  - component: {fileID: 8015320046028753853}
-  - component: {fileID: 5391977391999709341}
-  - component: {fileID: 3584452616051174464}
   - component: {fileID: 6231310587062000956}
+  - component: {fileID: 6989988569084885943}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -362,19 +358,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5012507004362759126}
   m_Enabled: 1
---- !u!114 &2787016588067103031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012507004362759126}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b03d8f4e3b6b0e45add932652aecc9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  allowCameraFollow: 1
 --- !u!114 &7038311778365337352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,7 +370,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b8c96e2cdc154e848a3d9fe62464d42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraTargets: []
+  CameraTargets:
+  - TargetTransform: {fileID: 0}
+    TargetInfluenceH: 1
+    TargetInfluenceV: 1
+    TargetOffset: {x: 0, y: 0}
   CenterTargetOnStart: 1
   Axis: 0
   UpdateType: 1
@@ -429,23 +416,6 @@ MonoBehaviour:
   RightFocus: 0.2
   TopFocus: 0.001
   BottomFocus: 0.001
---- !u!114 &93132452444496374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012507004362759126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e424e3d1203784bf28130fc345b6577b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 7038311778365337352}
-  _serializedAxis: 0
-  MaxHorizontalInfluence: 1
-  MaxVerticalInfluence: 2
-  InfluenceSmoothness: 0.2
 --- !u!114 &4033578707123838555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -477,106 +447,6 @@ MonoBehaviour:
   LetterboxAmount: 0.1
   LetterboxAnimDuration: 1
   LetterboxColor: {r: 0, g: 0, b: 0, a: 1}
---- !u!114 &8015320046028753853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012507004362759126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d86bf0beadb1248c2a5d9f2fe72189fa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 7038311778365337352}
-  _serializedAxis: 0
-  BoundariesLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
---- !u!114 &5391977391999709341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012507004362759126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30112d3b8decd43b5bf051e67694b027, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 7038311778365337352}
-  _serializedAxis: 0
-  Rooms:
-  - ID: 
-    Dimensions:
-      serializedVersion: 2
-      x: 274
-      y: -14
-      width: 28
-      height: 19
-    TransitionDuration: 1
-    TransitionEaseType: 0
-    ScaleCameraToFit: 1
-    Zoom: 0
-    ZoomScale: 1.5
-    InternalID: 0
-  UpdateInterval: 0.1
-  UseTargetsMidPoint: 1
-  TriggerTarget: {fileID: 0}
-  TransitionInstanlyOnStart: 1
-  RestoreOnRoomExit: 1
-  RestoreDuration: 1
-  RestoreEaseType: 0
-  AutomaticRoomActivation: 1
-  UseRelativePosition: 0
-  OnStartedTransition:
-    m_PersistentCalls:
-      m_Calls: []
-  OnFinishedTransition:
-    m_PersistentCalls:
-      m_Calls: []
-  OnExitedAllRooms:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &3584452616051174464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012507004362759126}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6903f12ac8ae44a41ba2a44700ec60ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 7038311778365337352}
-  _serializedAxis: 0
-  UseNumericBoundaries: 1
-  UseTopBoundary: 0
-  TopBoundary: 10
-  TargetTopBoundary: 0
-  UseBottomBoundary: 0
-  BottomBoundary: -10
-  TargetBottomBoundary: 0
-  UseLeftBoundary: 0
-  LeftBoundary: -10
-  TargetLeftBoundary: 0
-  UseRightBoundary: 0
-  RightBoundary: 10
-  TargetRightBoundary: 0
-  IsCameraPositionHorizontallyBounded: 0
-  IsCameraPositionVerticallyBounded: 0
-  CurrentBoundariesTrigger: {fileID: 0}
-  HasFiredTransitionStarted: 0
-  HasFiredTransitionFinished: 0
-  UseSoftBoundaries: 1
-  Softness: 0.5
-  SoftAreaSize: 0.1
-  UseBoundaryDelayOnEnterScene: 0
-  BoundaryDelayFrames: 10
 --- !u!114 &6231310587062000956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,6 +468,23 @@ MonoBehaviour:
     width: 0.2
     height: 0.1
   IsRelativeSizeAndPosition: 1
+--- !u!114 &6989988569084885943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012507004362759126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d86bf0beadb1248c2a5d9f2fe72189fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pc2D: {fileID: 7038311778365337352}
+  _serializedAxis: 0
+  BoundariesLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1001 &5452815901347306802
 PrefabInstance:
   m_ObjectHideFlags: 0
