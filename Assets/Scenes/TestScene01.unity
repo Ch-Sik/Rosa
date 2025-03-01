@@ -177,30 +177,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2787016588067103031, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5012507004362759126, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
-    - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: CameraTargets.Array.size
-      value: 1
+    - target: {fileID: 6989988569084885943, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
+      propertyPath: BoundariesLayerMask.m_Bits
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
       propertyPath: CameraTargets.Array.data[0].TargetTransform
       value: 
       objectReference: {fileID: 5262888440015344438}
-    - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: CameraTargets.Array.data[0].TargetInfluenceH
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: CameraTargets.Array.data[0].TargetInfluenceV
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7250734593268076291, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.3
@@ -241,22 +229,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3584452616051174464, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-    - {fileID: 8015320046028753853, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5012507004362759126, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 706209477}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
 --- !u!114 &210034125 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
   m_PrefabInstance: {fileID: 210034123}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 706209465}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b8c96e2cdc154e848a3d9fe62464d42, type: 3}
@@ -520,48 +503,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7689037927935428045, guid: d6595c51394e8034b93f8231eac1d7e8, type: 3}
   m_PrefabInstance: {fileID: 682269554}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &706209465 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5012507004362759126, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-  m_PrefabInstance: {fileID: 210034123}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &706209477
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 706209465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6903f12ac8ae44a41ba2a44700ec60ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 210034125}
-  _serializedAxis: 0
-  UseNumericBoundaries: 1
-  UseTopBoundary: 0
-  TopBoundary: 10
-  TargetTopBoundary: 0
-  UseBottomBoundary: 0
-  BottomBoundary: -10
-  TargetBottomBoundary: 0
-  UseLeftBoundary: 0
-  LeftBoundary: -10
-  TargetLeftBoundary: 0
-  UseRightBoundary: 0
-  RightBoundary: 10
-  TargetRightBoundary: 0
-  IsCameraPositionHorizontallyBounded: 0
-  IsCameraPositionVerticallyBounded: 0
-  CurrentBoundariesTrigger: {fileID: 0}
-  HasFiredTransitionStarted: 0
-  HasFiredTransitionFinished: 0
-  UseSoftBoundaries: 1
-  Softness: 0.5
-  SoftAreaSize: 0.1
-  UseBoundaryDelayOnEnterScene: 0
-  BoundaryDelayFrames: 10
 --- !u!1 &783893635
 GameObject:
   m_ObjectHideFlags: 0
