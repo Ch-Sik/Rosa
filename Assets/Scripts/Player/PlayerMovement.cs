@@ -917,7 +917,7 @@ public class PlayerMovement : MonoBehaviour
         if(mushroomInstance != null)
         {
             // TODO: 삭제 연출 넣기
-            Destroy(mushroomInstance);
+            mushroomInstance.GetComponent<MagicMushroom>().Disappear();
         }
 
         // 설치 수행
