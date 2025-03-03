@@ -49,6 +49,8 @@ public class MapManager : MonoBehaviour
 
     public Image fadePanel;
 
+    public Action OnNextRoomLoaded;
+
     private void Update()
     {
         position.text = $"{player.position.x.ToString("F1")} , {player.position.y.ToString("F1")}";
@@ -363,6 +365,10 @@ public class MapManager : MonoBehaviour
                 PlayerRef.Instance.movement.wallClimbEnabled = true;
 
             chapter.text = room.scene.SceneName;
+
+            // 25.03.03 추가
+            // 로드 후 이벤트 발생시킴
+            OnNextRoomLoaded?.Invoke();
         }
 
         /*

@@ -21,7 +21,7 @@ public class Room : MonoBehaviour
     public SORoom roomData;
     public Tilemap tempTilemap;
 
-    public Vector3 tilemapWorldPosition;
+    public Transform roomCenterTransfrom;
 
     [FoldoutGroup("PreDatas")]
     public TileBase portTile;

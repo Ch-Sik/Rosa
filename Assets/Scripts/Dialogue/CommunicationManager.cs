@@ -234,7 +234,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.TargetText: TargetText(target, data[i].text); return;
             case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); return;
             case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); return;
-            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); return;
+            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); Next();  return;
             case CommunicationType.Function: Function(data[i].function); return;
             case CommunicationType.Delay: Delay(data[i].delay); return;
             case CommunicationType.Sfx: Sfx(data[i].sfx); return;
@@ -314,11 +314,11 @@ public class CommunicationManager : MonoBehaviour
     //ResetCamera 처리
     public void ReturnCameraToPlayer()
     {
-        ProCamera2D.Instance.CenterOnTargets();
+        // ProCamera2D.Instance.CenterOnTargets();
         ProCamera2D.Instance.FollowHorizontal = true;
         ProCamera2D.Instance.FollowVertical = true;
 
-        Next();
+        // Next();
     }
 
     //Function 처리
