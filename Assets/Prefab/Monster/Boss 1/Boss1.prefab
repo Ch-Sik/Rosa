@@ -744,7 +744,6 @@ MonoBehaviour:
   maxHP: 40
   currentHP: 0
   blackboard: {fileID: 0}
-  mobCounter: {fileID: 0}
 --- !u!114 &7408543541413976975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -791,6 +790,7 @@ MonoBehaviour:
   rigidbody: {fileID: 0}
   portrait: {fileID: 0}
   pandaBT: {fileID: 0}
+  monsterAttackComponent: {fileID: 0}
   isSuperArmour: 1
   tempSuperArmour: 0
   isInvincible: 0
@@ -875,6 +875,7 @@ MonoBehaviour:
   recoveryDrag: 3
   wallStunEnabled: 1
   wallStunDuration: 5
+  cliffStopEnabled: 0
   groggyDuration: 2
   groggyRecoveryAnimDuration: 1.5
 --- !u!114 &3927572607200491955
@@ -1337,7 +1338,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6939096114796468692
 Transform:
   m_ObjectHideFlags: 0
@@ -1836,7 +1837,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1380264847845740746
 Transform:
   m_ObjectHideFlags: 0
@@ -1942,14 +1943,14 @@ ScaleConstraint:
   serializedVersion: 2
   m_Weight: 1
   m_ScaleAtRest: {x: -6.2000003, y: 6.2000003, z: 6.2000003}
-  m_ScaleOffset: {x: 6.897438, y: 6.897438, z: 6.897438}
+  m_ScaleOffset: {x: 4.422422, y: 4.422422, z: 4.422422}
   m_AffectScalingX: 1
   m_AffectScalingY: 1
   m_AffectScalingZ: 1
   m_Active: 1
   m_IsLocked: 0
   m_Sources:
-  - sourceTransform: {fileID: 3282804146814745559}
+  - sourceTransform: {fileID: 6333732659107213988}
     weight: 1
 --- !u!50 &3664178182846235650
 Rigidbody2D:
@@ -2559,6 +2560,7 @@ GameObject:
   - component: {fileID: 3808763436598356551}
   - component: {fileID: 8182394743246902476}
   - component: {fileID: 6657493068124930485}
+  - component: {fileID: 3218695299701768776}
   - component: {fileID: 3459477536530783621}
   - component: {fileID: 8399274091352550278}
   m_Layer: 25
@@ -2567,7 +2569,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6313003180127617402
 Transform:
   m_ObjectHideFlags: 0
@@ -2707,6 +2709,26 @@ ParentConstraint:
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
+  m_Active: 1
+  m_IsLocked: 0
+  m_Sources:
+  - sourceTransform: {fileID: 8611706261151899864}
+    weight: 1
+--- !u!1818360610 &3218695299701768776
+ScaleConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7945018822209565281}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Weight: 1
+  m_ScaleAtRest: {x: 2.9999998, y: 2.9999998, z: 2.9999998}
+  m_ScaleOffset: {x: 2.1390965, y: 2.1390965, z: 2.1390965}
+  m_AffectScalingX: 1
+  m_AffectScalingY: 1
+  m_AffectScalingZ: 1
   m_Active: 1
   m_IsLocked: 0
   m_Sources:
