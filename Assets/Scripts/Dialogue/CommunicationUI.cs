@@ -237,10 +237,16 @@ public class TargetImage
 
     public void SetImage(CommunicationTarget target, Emotion emotion = Emotion.Normal)
     {
-        Sprite sprite = CommunicationManager.Instance.characters[target].GetEmotionImage(emotion);
-
-        if (sprite == null)
+        Sprite sprite;
+        try
+        {
+            sprite = CommunicationManager.Instance.characters[target]?.GetEmotionImage(emotion);
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("캐릭터 스프라이트가 설정되어있지 않음");
             return;
+        }
 
         this.target = target;
         image.sprite = sprite;
