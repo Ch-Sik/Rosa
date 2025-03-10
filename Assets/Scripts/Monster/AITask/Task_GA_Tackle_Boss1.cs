@@ -7,6 +7,12 @@ using UnityEngine;
 
 public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
 {
+    [Title("이펙트 참조 설정")]
+    [SerializeField, Tooltip("돌진 시에 활성화될 이펙트 오브젝트")]
+    protected GameObject tackleVFX;
+    [SerializeField, Tooltip("돌진 중 벽에 박았을 때 활성화될 이펙트 오브젝트")]
+    protected GameObject stunVFX;
+
     [FoldoutGroup("그로기 관련")]
     [Tooltip("그로기 유지 시간")]
     [SerializeField] float groggyDuration;
@@ -16,6 +22,12 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
 
 
     Timer groggyTimer = null;
+
+    protected override void OnActiveBegin()
+    {
+        base.OnActiveBegin();
+        tackleVFX?.SetActive(true);
+    }
 
     protected override void OnActiveLast()
     {
@@ -38,6 +50,8 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
                 // 그로기 첫 프레임
                 if (groggyTimer == null)
                 {
+                    tackleVFX?.SetActive(false);
+                    stunVFX?.SetActive(true);
                     OnGroggyStart();
                 }
                 // 그로기 중간 프레임
@@ -78,6 +92,15 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
 
         // 실제 돌진 수행
         DoTackle();
+    }
+
+    protected override void OnRecoveryBegin()
+    {
+        base.OnRecoveryBegin();
+
+        // 이펙트 정리되지 않은 게 있다면 확실히 정리
+        tackleVFX?.SetActive(false);
+        stunVFX?.SetActive(false);
     }
 
     private void OnGroggyStart()

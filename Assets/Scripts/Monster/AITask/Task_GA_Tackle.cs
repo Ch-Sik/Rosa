@@ -28,7 +28,7 @@ public class Task_GA_Tackle : Task_A_Base
     [Title("벽에 박았을 때 관련")]
     [SerializeField, Tooltip("돌진 중 벽에 박았을 때 스턴 활성화")]
     protected bool wallStunEnabled;
-    [SerializeField, Tooltip("돌진 중 벽에 박았을 떄 스턴 시간")]
+    [SerializeField, Tooltip("돌진 중 벽에 박았을 때 스턴 시간")]
     protected float wallStunDuration;
 
     [Title("절벽 만났을 때 관련")]

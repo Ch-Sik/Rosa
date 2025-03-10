@@ -12,6 +12,8 @@ public class MonsterShockwave : MonoBehaviour
     private float frontSpeed = 2f;
     [SerializeField, Tooltip("충격파의 뒤쪽이 나아가는 속도. frontSpeed보다 빠르다면 충격파가 시간이 지날수록 좌우로 좁아짐")]
     private float backSpeed = 1f;
+    [SerializeField, Tooltip("충격파 비주얼 담당하는 게임오브젝트. 방향에 따라 Flip 되어야 할 녀석")]
+    GameObject vfx;
     
     private bool stuckAtWall = false;
     
@@ -22,6 +24,12 @@ public class MonsterShockwave : MonoBehaviour
             rigidbody = GetComponent<Rigidbody2D>();
         }
         rigidbody.velocity = dir.toVector2() * (frontSpeed + backSpeed) / 2;
+        
+        // 비주얼 이펙트의 좌우 반전 처리. 기본 이펙트 방향은 오른쪽으로 가정.
+        if(dir.isLEFT() && vfx != null)
+        {
+            vfx.transform.localScale.Scale(new Vector3(-1, 1, 1));
+        }
     }
 
     private void Update()
