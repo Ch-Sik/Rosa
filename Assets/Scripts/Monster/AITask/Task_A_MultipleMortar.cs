@@ -14,8 +14,8 @@ using Sirenix.OdinInspector;
 public class Task_A_MultipleMortar : Task_A_Base
 {
     [Header("공격 관련")]
-    [SerializeField, Tooltip("투사체 프리팹")]
-    protected GameObject projectilePrefab;
+    [SerializeField, Tooltip("투사체 프리팹들. 0번 기준으로 궤도가 계산되므로 가급적 물리적인 성질은 통일할 것.")]
+    protected GameObject[] projectilePrefabs;
     [SerializeField, Tooltip("투사체 갯수")]
     protected int projectileCount;
     [SerializeField, Tooltip("투사체가 발사되는 위치")]
@@ -48,7 +48,7 @@ public class Task_A_MultipleMortar : Task_A_Base
             blackboard = GetComponent<Blackboard>();
             Debug.Assert(blackboard != null, $"{gameObject.name}: Blackboard를 찾을 수 없음");
         }
-        Debug.Assert(projectilePrefab != null, $"{gameObject.name}: 투사체 프리팹이 설정되어있지 않음");
+        Debug.Assert(projectilePrefabs.Length != 0, $"{gameObject.name}: 투사체 프리팹이 설정되어있지 않음");
 
         targetLocations = new Vector2[projectileCount];
         launchVectors = new Vector2[projectileCount];
@@ -96,7 +96,7 @@ public class Task_A_MultipleMortar : Task_A_Base
 
         // 곡사에 필요한 계산 미리 해놓기
         float projectileTopPos = this.projectileMaxHeight + groundCoordY;
-        float projectileGravityScale = -Physics2D.gravity.y * projectilePrefab.GetComponent<Rigidbody2D>().gravityScale;
+        float projectileGravityScale = -Physics2D.gravity.y * projectilePrefabs[0].GetComponent<Rigidbody2D>().gravityScale;
         // ↓ 중력가속도 식 두번 적분하고 t=... 꼴로 정리한 거
         float timeForUp = Mathf.Sqrt(2 * (projectileTopPos - muzzle.position.y) / projectileGravityScale);
         float timeForDown = Mathf.Sqrt(2 * (projectileTopPos - groundCoordY) / projectileGravityScale);
@@ -141,7 +141,11 @@ public class Task_A_MultipleMortar : Task_A_Base
     {
         for (int i = 0; i < projectileCount; i++)
         {
-            GameObject projectile = Instantiate(projectilePrefab, muzzle.position, Quaternion.identity);
+            GameObject projectile;
+
+            int randomIndex = Random.Range(0, projectilePrefabs.Length);
+            projectile = Instantiate(projectilePrefabs[randomIndex], muzzle.position, Quaternion.identity);
+
             projectile.GetComponent<MonsterProjectile>().InitProjectile(launchVectors[i]);
         }
     }

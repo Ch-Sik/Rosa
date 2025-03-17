@@ -31,7 +31,7 @@ public enum FallingAttackLaunchMode
 public class Task_A_FallingObjects : Task_A_Base
 {
     [SerializeField]
-    private GameObject attackPrefab;
+    private GameObject[] attackPrefabs;
     [SerializeField, Tooltip("동시에 소환할 낙하 공격 갯수")]
     private int numOfInstance = 1;
     [SerializeField, Tooltip("낙하물 소환 높이")]
@@ -92,7 +92,8 @@ public class Task_A_FallingObjects : Task_A_Base
         // 순서대로 스폰하고 attackInstance에 넣고 Init 수행시킴
         for (int i = 0; i < numOfInstance; i++)
         {
-            GameObject instance = Instantiate(attackPrefab, 
+            int randomIndex = Random.Range(0, attackPrefabs.Length);
+            GameObject instance = Instantiate(attackPrefabs[randomIndex], 
                         new Vector3(spawnPosX[i], transform.position.y + spawnHeight, 0), Quaternion.identity);
             attackInstance.Add(instance.GetComponent<MonsterStalactite>());
             instance.GetComponent<MonsterStalactite>().Init();

@@ -14,21 +14,29 @@ public class MonsterShockwave : MonoBehaviour
     private float backSpeed = 1f;
     [SerializeField, Tooltip("충격파 비주얼 담당하는 게임오브젝트. 방향에 따라 Flip 되어야 할 녀석")]
     GameObject vfx;
+    [SerializeField, ReadOnly]
+    LR _dir;
     
     private bool stuckAtWall = false;
     
     public void Init(LR dir)
     {
+        _dir = dir;
+
         if(rigidbody != null)
         {
             rigidbody = GetComponent<Rigidbody2D>();
         }
-        rigidbody.velocity = dir.toVector2() * (frontSpeed + backSpeed) / 2;
-        
+        rigidbody.velocity = _dir.toVector2() * (frontSpeed + backSpeed) / 2;
+
         // 비주얼 이펙트의 좌우 반전 처리. 기본 이펙트 방향은 오른쪽으로 가정.
-        if(dir.isLEFT() && vfx != null)
+        //if(_dir.isLEFT() && vfx != null)
+        //{
+        //    vfx.transform.localScale = Vector3.Scale(vfx.transform.localScale, new Vector3(-1, 1, 1));
+        //}
+        if(_dir.isLEFT())
         {
-            vfx.transform.localScale.Scale(new Vector3(-1, 1, 1));
+            transform.localScale = Vector3.Scale(transform.localScale, new Vector3(-1, 1, 1));
         }
     }
 
@@ -36,12 +44,12 @@ public class MonsterShockwave : MonoBehaviour
     {
         if (stuckAtWall == false)   // 벽에 가로막히지 않은 경우 좌우 사이즈 서서히 커지기
         {
-            float newXscale = transform.localScale.x + (frontSpeed - backSpeed) * Time.deltaTime;
+            float newXscale = transform.localScale.x + (frontSpeed - backSpeed) * Time.deltaTime * _dir.toFloat();
             transform.localScale = new Vector3(newXscale, transform.localScale.y);
         }
         else    // 벽에 가로막힌 경우 좌우 사이즈 서서히 줄어들기
         {
-            float newXscale = transform.localScale.x - backSpeed * Time.deltaTime;
+            float newXscale = transform.localScale.x - backSpeed * Time.deltaTime * _dir.toFloat();
             if(newXscale < 0.1f)
             {
                 Destroy(gameObject);

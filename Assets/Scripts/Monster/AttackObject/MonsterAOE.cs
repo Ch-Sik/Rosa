@@ -11,17 +11,8 @@ public class MonsterAOE : MonoBehaviour
 {
     [SerializeField]
     private new Collider2D collider;
-    [SerializeField]
-    private new SpriteRenderer renderer;
     [SerializeField, Tooltip("공격이 완료/취소되었을 때 참이면 오브젝트 삭제, 거짓이면 오브젝트 비활성화")]
     private bool destroyOnAttackEnd = true;
-
-    // 현재 디버깅용으로 공격활성화 시각화를 단순히 스프라이트 컬러 바꾸는 걸로 처리하는데 그거 처리용.
-    // 공격 이펙트 제대로 적용되면 이건 삭제할 것.
-    [SerializeField]
-    private Color startupColor = Color.black;
-    [SerializeField]
-    private Color activatedColor = Color.white;
 
     // 위 것들은 에러 방지용으로 남겨뒀음. 240906 시연회 끝나면 아래만 남기고 위는 삭제할 것.
     [SerializeField]
@@ -38,8 +29,6 @@ public class MonsterAOE : MonoBehaviour
             Debug.Assert(collider != null, $"{gameObject.name}: Collider2D를 찾을 수 없음");
         }
         collider.enabled = false;
-        // TODO: 공격 활성화의 시각화를 제대로 된 공격 이펙트로 바꾸기
-        renderer.color = startupColor;
         if(startupSprite != null)
             startupSprite.SetActive(true);
         if(activatedSprite != null)
@@ -50,8 +39,6 @@ public class MonsterAOE : MonoBehaviour
      {
         // Debug.Log("범위 공격 수행");
         collider.enabled = true;
-        // TODO: 공격 활성화의 시각화를 제대로 된 공격 이펙트로 바꾸기
-        renderer.color = activatedColor;
         if (startupSprite != null)
             startupSprite.SetActive(false);
         if (activatedSprite != null)

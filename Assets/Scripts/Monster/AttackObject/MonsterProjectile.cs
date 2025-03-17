@@ -11,7 +11,9 @@ public class MonsterProjectile : MonoBehaviour
     private bool useGravity = false;
     [SerializeField, Tooltip("속도 계수. 중력 사용하지 않을 때에만 사용할 것")]
     private float speedScale = 1f;
-    [SerializeField, Tooltip("투사체 랜덤 회전 여부")]
+    [SerializeField, Tooltip("투사체 스폰 시의 랜덤 회전값. 0 이하면 비활성화")]
+    private float randomRotationOnStart = 0;
+    [SerializeField, Tooltip("투사체 랜덤 회전 속도 여부")]
     private bool useRandomRotation = false;
     [SerializeField, Tooltip("랜덤 회전 최대치")]
     private float randomRotationRange = 30f;
@@ -59,9 +61,14 @@ public class MonsterProjectile : MonoBehaviour
         // 기본 속도 설정
         rigidbody.velocity = direction * speedScale;
         // Debug.Log($"투사체 속도:{direction * speedScale}");
+        // 기본 회전값 설정
+        if(randomRotationOnStart > 0)
+        {
+            transform.rotation = Quaternion.Euler(0, 0, Random.Range(-randomRotationOnStart, randomRotationOnStart));
+        }
 
         // 회전값 설정
-        if(useRandomRotation)
+        if (useRandomRotation)
         {
             rigidbody.angularVelocity = Random.Range(-randomRotationRange, randomRotationRange);
         }
