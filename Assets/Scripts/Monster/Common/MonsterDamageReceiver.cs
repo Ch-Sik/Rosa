@@ -33,6 +33,8 @@ public class MonsterDamageReceiver : DamageReceiver
     [SerializeField] private bool isInvincible;
     // [Tooltip("플레이어 공격에 피격된 후 잠시 플레이어와의 충돌 무시하는 시간 길이")]
     // [SerializeField] private float ignoreDuration = 0.1f;
+    [Tooltip("공격 패턴 등으로 인해 잠깐 얻는 무적 효과")]
+    [SerializeField, ReadOnly] private bool tempInvincible;
 
 
     [Title("넉백 관련 옵션")]
@@ -103,13 +105,13 @@ public class MonsterDamageReceiver : DamageReceiver
     /// <summary>
     /// 데미지 입기 함수. 주로 DamageInflictor에서 호출됨
     /// </summary>
-    public override void GetHitt(int damage, float attackAngle)
+    public override bool GetHitt(int damage, float attackAngle)
     {
         // 디버깅용
         Debug.Log($"{gameObject.name}: 피격당함");
 
         // 이미 죽어있을 경우 피격 무시
-        if (!isAlive) return;
+        if (!isAlive) return false;
 
         // BlinkEffect 수행이 mosterState.TakeDamage->BroadcastMessage("OnDie")->this.OnDie 보다 앞서야 함.
         // 그래야 Die로 인한 밝기 변경이 Blink에 의해 덮어씌워지지 않음.
@@ -127,19 +129,17 @@ public class MonsterDamageReceiver : DamageReceiver
             ToggleAttackComponent(true);        // 플레이어를 공격 활성화
         }
 
-        // 무적이 아닐 경우, 데미지 입고 사망 여부 판단
-        if(!isInvincible)
+        // 슈퍼아머일 경우
+        if(isSuperArmour || !tempSuperArmour)
         {
-            monsterState.TakeDamage(damage);
-            if(monsterState.HP < damage)
+            // 넉백 무시 옵션이 꺼져있고 넉백 계수가 0보다 크다면 넉백 수행
+            if (!ignoreKnockbackOnSuperArmour && knockbackCoeff > float.Epsilon)
             {
-                blackboard.Set(BBK.isDead, true);
-                return;
+                KnockBack(attackAngle);
             }
         }
-
         // 슈퍼아머가 아닐 경우
-        if(!isSuperArmour && !tempSuperArmour)
+        else
         {
             // 넉백 계수가 0보다 크다면 넉백 수행
             if(knockbackCoeff > float.Epsilon)
@@ -158,14 +158,21 @@ public class MonsterDamageReceiver : DamageReceiver
                 blackboard.Set(BBK.isHitt, false);
             }
         }
-        // 슈퍼아머일 경우
+
+        // 무적일 경우, 데미지 입지 않음
+        if (isInvincible || tempInvincible)
+        {
+            return false;
+        }
+        // 무적이 아닐 경우, 데미지 입고 사망 여부 판단
         else
         {
-            // 넉백 무시 옵션이 꺼져있고 넉백 계수가 0보다 크다면 넉백 수행
-            if (!ignoreKnockbackOnSuperArmour && knockbackCoeff > float.Epsilon)
+            monsterState.TakeDamage(damage);
+            if (monsterState.HP < damage)
             {
-                KnockBack(attackAngle);
+                blackboard.Set(BBK.isDead, true);
             }
+            return true;
         }
     }
 
@@ -181,6 +188,11 @@ public class MonsterDamageReceiver : DamageReceiver
     public void SetTempSuperArmour(bool value)
     {
         this.tempSuperArmour = value;
+    }
+
+    public void SetTempInvincible(bool value)
+    {
+        this.tempInvincible = value;
     }
 
     private void KnockBack(float attackAngle)

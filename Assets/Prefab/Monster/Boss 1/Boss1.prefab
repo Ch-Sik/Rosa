@@ -658,7 +658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 40
-  currentHP: 0
+  currentHP: 20
   blackboard: {fileID: 0}
 --- !u!114 &7408543541413976975
 MonoBehaviour:
@@ -710,6 +710,7 @@ MonoBehaviour:
   isSuperArmour: 1
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 0
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -796,6 +797,7 @@ MonoBehaviour:
   stunVFX: {fileID: 5014228560854930113}
   groggyDuration: 2
   groggyRecoveryAnimDuration: 1.5
+  damageReceiver: {fileID: 5219790609965822853}
 --- !u!114 &3927572607200491955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -911,9 +913,9 @@ MonoBehaviour:
   writeStateOnBlackboard: 1
   usePatternID: 1
   patternID: 5
-  startupDuration: 1.5
+  startupDuration: 1
   superArmourOnStartup: 1
-  activeDuration: 0.3
+  activeDuration: 0.7
   superArmourOnActive: 1
   recoveryDuration: 1.2
   superArmourOnRecovery: 1

@@ -20,6 +20,9 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
     [Tooltip("그로기 풀린 이후 정신차리는 모션 시간")]
     [SerializeField] float groggyRecoveryAnimDuration;
 
+    [Title("피격 판정. 임시 무적 적용하는 데 필요")]
+    [SerializeField] MonsterDamageReceiver damageReceiver;
+
 
     Timer groggyTimer = null;
 
@@ -27,6 +30,7 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
     {
         base.OnActiveBegin();
         tackleVFX?.SetActive(true);
+        damageReceiver.SetTempInvincible(true); // 돌진 시 무적 설정
     }
 
     protected override void OnActiveLast()
@@ -109,6 +113,7 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         groggyTimer = Timer.StartTimer();
         blackboard.Set(BBK.isGroggy, true);    // 애니메이션을 위한 블랙보드 설정
         damageComponent.attackEnabled = false;    // 플레이어가 밟을 수 있게 데미지 비활성화
+        damageReceiver.SetTempInvincible(false);    // 돌진시의 무적 해제
     }
 
     private void OnGroggyLast()

@@ -99,21 +99,25 @@ public class PlayerDamageInflictor : MonoBehaviour
 
             // 적에게 데미지 가하기
             DamageReceiver receiver = collision.GetComponent<DamageReceiver>();
-            receiver?.GetHitt(Mathf.RoundToInt(PlayerRef.Instance.state.AttackDmg), attackAngle);
-            GameObject attackEffect = hitEffects.GetNextFromPool();
-            // 공격 이펙트 소환
-            attackEffect.transform.position = transform.position;
-            attackEffect.SetActive(true);
-            DOTween.Sequence().AppendInterval(hitEffectDuration)
-                .AppendCallback(() => attackEffect.SetActive(false));
-            // 플레이어 무적 처리
-            playerDamageReceiver.SetNoDmgForSeconds(0.1f);
+            bool? attackValid = receiver?.GetHitt(Mathf.RoundToInt(PlayerRef.Instance.state.AttackDmg), attackAngle);
+            // 적에게 제대로 데미지가 들어갔다면...
+            if ((bool)attackValid == true)
+            {
+                GameObject attackEffect = hitEffects.GetNextFromPool();
+                // 공격 이펙트 소환
+                attackEffect.transform.position = transform.position;
+                attackEffect.SetActive(true);
+                DOTween.Sequence().AppendInterval(hitEffectDuration)
+                    .AppendCallback(() => attackEffect.SetActive(false));
+                // 플레이어 무적 처리
+                playerDamageReceiver.SetNoDmgForSeconds(0.1f);
 
-            // 범위 공격이 아니라 단일 공격이므로 이후 공격은 중단
-            //playerCombat.StopAttack();
+                // 범위 공격이 아니라 단일 공격이므로 이후 공격은 중단
+                //playerCombat.StopAttack();
 
-            // 플레이어 다시 점프하게 하기
-            PlayerRef.Instance.movement.JumpUp();
+                // 플레이어 다시 점프하게 하기
+                PlayerRef.Instance.movement.JumpUp();
+            }
         }
 
         /*

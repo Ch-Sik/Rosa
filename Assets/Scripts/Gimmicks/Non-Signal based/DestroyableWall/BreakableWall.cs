@@ -35,7 +35,7 @@ public class BreakableWall : DamageReceiver
         curSpriteIndex = 0;
     }
 
-    public override void GetHitt(int damage, float attackAngle)
+    public override bool GetHitt(int damage, float attackAngle)
     {
         if(fixDamageTo1)
             HP -= 1;
@@ -51,6 +51,7 @@ public class BreakableWall : DamageReceiver
             int nextSprite = Mathf.FloorToInt((maxHP - HP) / (float)maxHP * sprites.Length);
             go_wall.GetComponent<SpriteRenderer>().sprite = sprites[nextSprite];
         }
+        return true;
     }
 
     private void BreakWall()
