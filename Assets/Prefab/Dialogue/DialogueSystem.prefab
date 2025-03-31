@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4647647825132423234}
   m_Layer: 5
-  m_Name: TargetImages
+  m_Name: Portraits
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterDatas:
   - target: 1
-    Name: Player
+    Name: "\uC5D0\uD53C"
     Normal: {fileID: 21300000, guid: 3dd399fef9d079d4ca1a346cc8363be0, type: 3}
     Happy1: {fileID: 21300000, guid: 2dc13f55e93898541b333e3c1e98b9d2, type: 3}
     Happy2: {fileID: 0}
@@ -179,7 +179,7 @@ MonoBehaviour:
     Mad: {fileID: 21300000, guid: 6f5d05fd6058fec468736e00f35e6f67, type: 3}
     Special: {fileID: 0}
   - target: 2
-    Name: Healer
+    Name: "\uC544\uB9AC\uC5D8"
     Normal: {fileID: 21300000, guid: 39d19c238bc04c7409badfab049fd922, type: 3}
     Happy1: {fileID: 21300000, guid: 1371bfef91bf24148ac8c8af2525dd4c, type: 3}
     Happy2: {fileID: 21300000, guid: 1e580fac272d3fa439b95d6dd75ff109, type: 3}
@@ -202,10 +202,10 @@ MonoBehaviour:
     Serious2: {fileID: 0}
     Sad: {fileID: 21300000, guid: e602e8dc3c4e2b940badd57b89158e50, type: 3}
     Sigh: {fileID: 0}
-    Mad: {fileID: 0}
+    Mad: {fileID: 302453695, guid: 3ad6223f6b6d9f1458ddb33aa7a18ba1, type: 3}
     Special: {fileID: 21300000, guid: f4a6cc3a19e8c1b4682b106b5b6e875b, type: 3}
   - target: 4
-    Name: Healer
+    Name: "\uC544\uB9AC\uC5D8"
     Normal: {fileID: 0}
     Happy1: {fileID: 0}
     Happy2: {fileID: 0}
@@ -218,7 +218,7 @@ MonoBehaviour:
     Mad: {fileID: 0}
     Special: {fileID: 0}
   - target: 5
-    Name: Salamander
+    Name: "\uD50C\uB7EC\uC774"
     Normal: {fileID: 21300000, guid: 8aae886eb5a7ff541ab3edfb893600c6, type: 3}
     Happy1: {fileID: 21300000, guid: 00e63ec7d7686744fa6eaca75c3831be, type: 3}
     Happy2: {fileID: 21300000, guid: 2d824e1c78f28d04f99c8b45689bdcc8, type: 3}
@@ -244,7 +244,7 @@ MonoBehaviour:
     Mad: {fileID: 21300000, guid: 8e2fefa83591fbd45a85c77582dd7cb8, type: 3}
     Special: {fileID: 0}
   - target: 7
-    Name: Watchmaker
+    Name: "\uCF54\uC6B0\uC694"
     Normal: {fileID: 21300000, guid: 0668e027358bbb9429438c5a33f7243c, type: 3}
     Happy1: {fileID: 21300000, guid: ca50370cd472ebc4cb138f165e7e02d5, type: 3}
     Happy2: {fileID: 0}
@@ -627,7 +627,7 @@ GameObject:
   - component: {fileID: 7098689814581576110}
   - component: {fileID: 558222572875940738}
   m_Layer: 5
-  m_Name: Target
+  m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -680,9 +680,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 39d19c238bc04c7409badfab049fd922, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -702,7 +702,7 @@ GameObject:
   - component: {fileID: 5831511098080988335}
   - component: {fileID: 2880413419870768154}
   m_Layer: 5
-  m_Name: Character
+  m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -755,9 +755,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 3dd399fef9d079d4ca1a346cc8363be0, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

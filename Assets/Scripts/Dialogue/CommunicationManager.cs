@@ -478,6 +478,19 @@ public class CommunicationData
     [ShowIf("@type == CommunicationType.MoveRoom")]
     public Vector2 roomPosition;
 
+    CommunicationData()
+    {
+        type = CommunicationType.None;
+        target = CommunicationTarget.None;
+        emotion = Emotion.Normal;
+        text = "";
+        location = CommunicationLocation.Left;
+        position = Vector2.zero;
+        delay = 0;
+        sfx = null;
+        room = null;
+        roomPosition = Vector2.zero;
+    }
 }
 
 public enum CommunicationType
