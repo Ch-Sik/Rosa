@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4647647825132423234}
   m_Layer: 5
-  m_Name: TargetImages
+  m_Name: Portraits
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,15 +166,148 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterDatas:
   - target: 1
-    Name: Player
-    Normal: {fileID: -1868402832, guid: e1b43026ba5a983459910507feebb357, type: 3}
-    Happy: {fileID: 1272738228, guid: e1b43026ba5a983459910507feebb357, type: 3}
-    Mad: {fileID: 557147014, guid: e1b43026ba5a983459910507feebb357, type: 3}
+    Name: "\uC5D0\uD53C"
+    Normal: {fileID: 21300000, guid: 3dd399fef9d079d4ca1a346cc8363be0, type: 3}
+    Happy1: {fileID: 21300000, guid: 2dc13f55e93898541b333e3c1e98b9d2, type: 3}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 21300000, guid: 219e6d39e3f49894ca85c62bd4e4b109, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: dd986a638d0fa14449ed42a336e21864, type: 3}
+    Serious1: {fileID: 21300000, guid: 411ac6cdeac80ca479fc603491022dbb, type: 3}
+    Serious2: {fileID: 21300000, guid: d379ec3acaae0c8418bbe8b5c4e6704c, type: 3}
+    Sad: {fileID: 21300000, guid: 125493e01acf98e45b6c5c968b06333d, type: 3}
+    Sigh: {fileID: 21300000, guid: bda13c36a824fc94bb766feb2744714c, type: 3}
+    Mad: {fileID: 21300000, guid: 6f5d05fd6058fec468736e00f35e6f67, type: 3}
+    Special: {fileID: 0}
   - target: 2
-    Name: A
-    Normal: {fileID: 1711280359, guid: 3ad6223f6b6d9f1458ddb33aa7a18ba1, type: 3}
-    Happy: {fileID: -207968814, guid: 3ad6223f6b6d9f1458ddb33aa7a18ba1, type: 3}
+    Name: "\uC544\uB9AC\uC5D8"
+    Normal: {fileID: 21300000, guid: 39d19c238bc04c7409badfab049fd922, type: 3}
+    Happy1: {fileID: 21300000, guid: 1371bfef91bf24148ac8c8af2525dd4c, type: 3}
+    Happy2: {fileID: 21300000, guid: 1e580fac272d3fa439b95d6dd75ff109, type: 3}
+    Embarrassed1: {fileID: 21300000, guid: 786b2c55a1b325a4b8cec9053eb8f3b2, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: 503354af7c65cec43b59ce34da1589db, type: 3}
+    Serious1: {fileID: 21300000, guid: d05dd2af354e5c042994c20e64b9765f, type: 3}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 21300000, guid: e602e8dc3c4e2b940badd57b89158e50, type: 3}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 0}
+    Special: {fileID: 21300000, guid: f4a6cc3a19e8c1b4682b106b5b6e875b, type: 3}
+  - target: 3
+    Name: ???
+    Normal: {fileID: 21300000, guid: 39d19c238bc04c7409badfab049fd922, type: 3}
+    Happy1: {fileID: 21300000, guid: 1371bfef91bf24148ac8c8af2525dd4c, type: 3}
+    Happy2: {fileID: 21300000, guid: 1e580fac272d3fa439b95d6dd75ff109, type: 3}
+    Embarrassed1: {fileID: 21300000, guid: 786b2c55a1b325a4b8cec9053eb8f3b2, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: 503354af7c65cec43b59ce34da1589db, type: 3}
+    Serious1: {fileID: 21300000, guid: d05dd2af354e5c042994c20e64b9765f, type: 3}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 21300000, guid: e602e8dc3c4e2b940badd57b89158e50, type: 3}
+    Sigh: {fileID: 0}
     Mad: {fileID: 302453695, guid: 3ad6223f6b6d9f1458ddb33aa7a18ba1, type: 3}
+    Special: {fileID: 21300000, guid: f4a6cc3a19e8c1b4682b106b5b6e875b, type: 3}
+  - target: 4
+    Name: "\uC544\uB9AC\uC5D8"
+    Normal: {fileID: 0}
+    Happy1: {fileID: 0}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 0}
+    Embarrassed2: {fileID: 0}
+    Serious1: {fileID: 0}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 0}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 0}
+    Special: {fileID: 0}
+  - target: 5
+    Name: "\uD50C\uB7EC\uC774"
+    Normal: {fileID: 21300000, guid: 8aae886eb5a7ff541ab3edfb893600c6, type: 3}
+    Happy1: {fileID: 21300000, guid: 00e63ec7d7686744fa6eaca75c3831be, type: 3}
+    Happy2: {fileID: 21300000, guid: 2d824e1c78f28d04f99c8b45689bdcc8, type: 3}
+    Embarrassed1: {fileID: 21300000, guid: 2959e0f93bd60e141924a70682116047, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: 923ea414671705449921c29d5c647cf7, type: 3}
+    Serious1: {fileID: 0}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 21300000, guid: 22f3cc465b362b146bd2d23fb80151ff, type: 3}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 21300000, guid: 8e2fefa83591fbd45a85c77582dd7cb8, type: 3}
+    Special: {fileID: 0}
+  - target: 6
+    Name: ???
+    Normal: {fileID: 21300000, guid: 8aae886eb5a7ff541ab3edfb893600c6, type: 3}
+    Happy1: {fileID: 21300000, guid: 00e63ec7d7686744fa6eaca75c3831be, type: 3}
+    Happy2: {fileID: 21300000, guid: 2d824e1c78f28d04f99c8b45689bdcc8, type: 3}
+    Embarrassed1: {fileID: 21300000, guid: 2959e0f93bd60e141924a70682116047, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: 923ea414671705449921c29d5c647cf7, type: 3}
+    Serious1: {fileID: 0}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 21300000, guid: 22f3cc465b362b146bd2d23fb80151ff, type: 3}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 21300000, guid: 8e2fefa83591fbd45a85c77582dd7cb8, type: 3}
+    Special: {fileID: 0}
+  - target: 7
+    Name: "\uCF54\uC6B0\uC694"
+    Normal: {fileID: 21300000, guid: 0668e027358bbb9429438c5a33f7243c, type: 3}
+    Happy1: {fileID: 21300000, guid: ca50370cd472ebc4cb138f165e7e02d5, type: 3}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 21300000, guid: 364cc74b9a423ff4d8811f840a402172, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: a0db116a403be6742846167b767c0e36, type: 3}
+    Serious1: {fileID: 21300000, guid: 4d6d4dfe7e2156d44b75ddb881eb2cee, type: 3}
+    Serious2: {fileID: 21300000, guid: ae8ee385e4c040a429ba61cb2b365dd6, type: 3}
+    Sad: {fileID: 0}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 21300000, guid: 2ff963b76caf2564cb5e321dc46801f0, type: 3}
+    Special: {fileID: 0}
+  - target: 8
+    Name: ???
+    Normal: {fileID: 21300000, guid: 0668e027358bbb9429438c5a33f7243c, type: 3}
+    Happy1: {fileID: 21300000, guid: ca50370cd472ebc4cb138f165e7e02d5, type: 3}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 21300000, guid: 364cc74b9a423ff4d8811f840a402172, type: 3}
+    Embarrassed2: {fileID: 21300000, guid: a0db116a403be6742846167b767c0e36, type: 3}
+    Serious1: {fileID: 21300000, guid: 4d6d4dfe7e2156d44b75ddb881eb2cee, type: 3}
+    Serious2: {fileID: 21300000, guid: ae8ee385e4c040a429ba61cb2b365dd6, type: 3}
+    Sad: {fileID: 0}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 21300000, guid: 2ff963b76caf2564cb5e321dc46801f0, type: 3}
+    Special: {fileID: 0}
+  - target: 9
+    Name: "\uACF0"
+    Normal: {fileID: 0}
+    Happy1: {fileID: 0}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 0}
+    Embarrassed2: {fileID: 0}
+    Serious1: {fileID: 0}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 0}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 0}
+    Special: {fileID: 0}
+  - target: 10
+    Name: "\uB450\uB8E8\uBBF8"
+    Normal: {fileID: 0}
+    Happy1: {fileID: 0}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 0}
+    Embarrassed2: {fileID: 0}
+    Serious1: {fileID: 0}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 0}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 0}
+    Special: {fileID: 0}
+  - target: 11
+    Name: "\uB291\uB300"
+    Normal: {fileID: 0}
+    Happy1: {fileID: 0}
+    Happy2: {fileID: 0}
+    Embarrassed1: {fileID: 0}
+    Embarrassed2: {fileID: 0}
+    Serious1: {fileID: 0}
+    Serious2: {fileID: 0}
+    Sad: {fileID: 0}
+    Sigh: {fileID: 0}
+    Mad: {fileID: 0}
+    Special: {fileID: 0}
   folderName: Dialogue
   endDelay: 1.5
   UI: {fileID: 4231876701054646599}
@@ -204,13 +337,13 @@ MonoBehaviour:
   Dialogue: {fileID: 7689592206824444975}
   targetImages:
   - target: 1
-    showPos: {x: 60, y: 0, z: 0}
-    hidePos: {x: -500, y: 0, z: 0}
+    showPos: {x: 0, y: -230, z: 0}
+    hidePos: {x: -500, y: -230, z: 0}
     image: {fileID: 2880413419870768154}
     tweenTime: 0.3
   - target: 2
-    showPos: {x: -60, y: 0, z: 0}
-    hidePos: {x: 500, y: 0, z: 0}
+    showPos: {x: 0, y: -230, z: 0}
+    hidePos: {x: 500, y: -230, z: 0}
     image: {fileID: 558222572875940738}
     tweenTime: 0.3
   isTalking: 0
@@ -494,7 +627,7 @@ GameObject:
   - component: {fileID: 7098689814581576110}
   - component: {fileID: 558222572875940738}
   m_Layer: 5
-  m_Name: Target
+  m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -516,8 +649,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -60, y: 0}
-  m_SizeDelta: {x: 500, y: 800}
+  m_AnchoredPosition: {x: 0, y: -280}
+  m_SizeDelta: {x: 900, y: 1400}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &7098689814581576110
 CanvasRenderer:
@@ -547,9 +680,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 39d19c238bc04c7409badfab049fd922, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -569,7 +702,7 @@ GameObject:
   - component: {fileID: 5831511098080988335}
   - component: {fileID: 2880413419870768154}
   m_Layer: 5
-  m_Name: Character
+  m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -591,8 +724,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 500, y: 800}
+  m_AnchoredPosition: {x: 0, y: -280}
+  m_SizeDelta: {x: 900, y: 1400}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &5831511098080988335
 CanvasRenderer:
@@ -622,9 +755,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 3dd399fef9d079d4ca1a346cc8363be0, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

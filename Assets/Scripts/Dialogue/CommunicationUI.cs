@@ -250,6 +250,8 @@ public class TargetImage
 
         this.target = target;
         image.sprite = sprite;
+        // 250401 추가: 1920*1080 캔버스 상에서 이미지 원본 크기를 사용하도록 설정
+        image.SetNativeSize();
     }
 
     public void Show(CommunicationTarget target)

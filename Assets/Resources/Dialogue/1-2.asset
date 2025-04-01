@@ -29,6 +29,24 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 1
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -43,6 +61,24 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -57,6 +93,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -73,6 +111,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -87,6 +127,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
     target: 3
     emotion: 0
@@ -101,6 +143,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
     target: 3
     emotion: 0
@@ -116,6 +160,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 1
     target: 3
     emotion: 0
@@ -130,6 +176,40 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 3
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 3
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -144,6 +224,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
     target: 3
     emotion: 0
@@ -158,8 +240,74 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
-  - type: 4
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
     target: 3
+    emotion: 1
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 2
+    target: 3
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 1
+    target: 2
+    emotion: 0
+    text: 
+    location: 1
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 1
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 4
+    target: 2
     emotion: 0
     text: "\uB9CC\uB098\uC11C \uC815\uB9D0 \uBC18\uAC11\uC2B5\uB2C8\uB2E4! \uC800\uB294
       \uC544\uB9AC\uC5D8, \uCE58\uC720\uC758 \uB9C8\uB140\uB77C\uACE0 \uD569\uB2C8\uB2E4."
@@ -173,6 +321,24 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 3
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -187,6 +353,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 2
     emotion: 0
@@ -202,8 +370,26 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 4
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "\uC74C? \uC544\uB2C8\uC544\uB2C8, \uC804 \uC7A1\uC0C1\uC778\uC774 \uC544\uB2C8\uC5D0\uC694!
       \uB2F9\uC2E0\uC758 \uB3C4\uC6C0\uC774 \uD544\uC694\uD574\uC11C \uC628 \uAC70\uB77C\uAD6C\uC694!"
@@ -217,8 +403,26 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 7
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "\uC124\uB9C8 \uB208 \uC55E\uC5D0 \uB3C4\uC6C0\uC774 \uD544\uC694\uD55C
       \uC0AC\uB78C\uC744 \uBCF4\uACE0\uB3C4 \uADF8\uB0E5 \uC9C0\uB098\uCE58\uB824\uB294
@@ -233,6 +437,24 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 4
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -247,8 +469,26 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 5
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "\uADF8\uB7FC \uC5B4\uCA54 \uC218 \uC5C6\uC8E0\u2026 \uB3C4\uC6C0\uC744
       \uCCAD\uD558\uAE30 \uC704\uD574 \uBA3C \uAE38\uC744 \uCC3E\uC544\uC654\uAC74\uB9CC,
@@ -263,8 +503,26 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 7
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "\uC774 \uC0C1\uD0DC\uB85C \uB3CC\uC544\uAC14\uB2E4\uAC00\uB294\u2026 \uC544\uB2C8
       \uC560\uCD08\uC5D0 \uC774 \uC704\uD5D8\uCC9C\uB9CC\uD55C \uC232\uC5D0\uC11C
@@ -280,8 +538,26 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 5
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "(\uD758\uB08F)"
     location: 0
@@ -294,6 +570,24 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 8
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -308,6 +602,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -323,8 +619,26 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 2
+    emotion: 1
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "\uC815\uB9D0\uC778\uAC00\uC694? \uC5B4\uCA5C \uC774\uB807\uAC8C \uCE5C\uC808\uD560
       \uC218\uAC00! \uC815\uB9D0 \uAC10\uC0AC\uD569\uB2C8\uB2E4!"
@@ -338,8 +652,10 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 4
-    target: 3
+    target: 2
     emotion: 0
     text: "\uADF8\uB7FC \uC77C\uB2E8 \uC7A5\uC18C\uB97C \uC62E\uACA8\uC11C \uC774\uC57C\uAE30\uB97C
       \uD574\uBCFC\uAE4C\uC694!"
@@ -353,6 +669,24 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
+  - type: 3
+    target: 1
+    emotion: 3
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    function:
+      m_PersistentCalls:
+        m_Calls: []
+    delay: 0
+    sfx: {fileID: 0}
+    flag:
+      flag: 
+      value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 5
     target: 0
     emotion: 0
@@ -367,6 +701,8 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
   - type: 12
     target: 0
     emotion: 0
@@ -381,3 +717,5 @@ MonoBehaviour:
     flag:
       flag: 
       value: 0
+    room: {fileID: 0}
+    roomPosition: {x: 0, y: 0}
