@@ -32,72 +32,49 @@ public class FlagManager : MonoBehaviour
         }
     }
     #endregion
-    public FlagSO flagSO;
-    [ShowInInspector] private Dictionary<string, int> flags = new Dictionary<string, int>();
+    public Dictionary<string, int> flags { get { return _flags; } }
+    [ShowInInspector] private Dictionary<string, int> _flags = new Dictionary<string, int>();
 
     private void Start()
     {
         Init();
     }
 
-    //세이브 있을 시 Param으로 save 받기
     private void Init()
     {
-        foreach (Flag eachFlag in flagSO.flags)
-            flags.Add(eachFlag.flag, eachFlag.value);
+        _flags = SaveLoadManager.Instance.LoadFlag();
+        if(_flags == null)
+        {
+            Debug.LogWarning("기존 저장된 플래그 저장소가 없으므로 새로 생성");
+            _flags = new Dictionary<string, int>();
+        }
     }
 
     #region Utiles
-    public void SetFlag(Flag flag)
-    {
-        SetFlag(flag.flag, flag.value);
-    }
-
+    [Button]
     public void SetFlag(string flag, int value)
     {
-        if (!flags.ContainsKey(flag))
+        if (!_flags.ContainsKey(flag))
         {
-            Debug.LogError($"Flag [{flag}]이 존재하지 않습니다.");
-            return;
+            _flags.Add(flag, value);
+            Debug.Log($"새 플래그 항목 추가: {flag}");
         }
-
-        flags[flag] = value;
+        else
+        {
+            _flags[flag] = value;
+        }
     }
 
-    public Flag GetFlagObject(string flag)
+    public int GetFlag(string key)
     {
-        if (!flags.ContainsKey(flag))
+        if (!_flags.ContainsKey(key))
         {
-            Debug.LogError($"Flag [{flag}]이 존재하지 않습니다.");
-            return null;
+            Debug.LogWarning($"Flag [{key}]이 존재하지 않습니다. 기본값 0으로 새로 생성");
+            _flags.Add(key, 0);
+            return 0;
         }
 
-        return new Flag(flag, flags[flag]);
-    }
-
-    public int GetFlag(string flag)
-    {
-        if (!flags.ContainsKey(flag))
-        {
-            Debug.LogError($"Flag [{flag}]이 존재하지 않습니다.");
-            return -1;
-        }
-
-        return flags[flag];
-    }
-
-    public (List<string>, List<int>) GetFlagsData()
-    {
-        List<string> fs = new List<string>();
-        List<int> vs = new List<int>();
-
-        foreach (KeyValuePair<string, int> flag in flags)
-        {
-            fs.Add(flag.Key);
-            vs.Add(flag.Value);
-        }
-
-        return (fs, vs);
+        return _flags[key];
     }
     #endregion
 }

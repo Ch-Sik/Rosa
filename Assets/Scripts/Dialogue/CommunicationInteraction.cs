@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CommunicationInteraction : MonoBehaviour
@@ -45,10 +46,17 @@ public class CommunicationInteraction : MonoBehaviour
     {
         ID = decision.GetID();
 
-        //ID가 없는 경우 리턴
+        // ID가 애초에 없음(0 이하)로 설정된 경우 리턴
+        if (ID <= 0)
+        {
+            Debug.Log($"설정된 대화 데이터가 없음 (ID: {ID})");
+            return;
+        }
+
+        // ID에 해당하는 대화 데이터가 없는 경우 리턴
         if (!CommunicationManager.Instance.HaveCommunicationID(ID))
         {
-            Debug.LogWarning("해당하는 ID의 대화가 없음");
+            Debug.LogError($"ID {ID}에 해당하는 대화 데이터가 없음");
             return;
         }
 
@@ -68,22 +76,25 @@ public class CommunicationInteraction : MonoBehaviour
 [Serializable]
 public class CommunicationDecision
 {
-    //첫 대화인지 파악
-    [HideInInspector] public bool isFirst = true;
+    // 첫 대화일 때 사용될 대화 ID
     public int initialID = -1;
+    // 이후 반복대화일 때 사용될 대화 ID
     public int iterativeID = -1;
     public List<CommunicationDecisionNode> flagedID = new List<CommunicationDecisionNode>();
 
     public int GetID()
     {
-        //첫 대화
-        if (isFirst)
+        if (initialID > 0)      // '첫 대화' ID가 존재한다면 첫 대화인지 판단
         {
-            isFirst = false;
-            if (initialID >= 0)
-                return initialID;
+            if (GetIterativeCommunicationFlagValue() == 0)
+            {
+                SetIterativeCommunicationFlagValue(1);
+                if (initialID >= 0)
+                    return initialID;
+            }
         }
 
+        // 첫 대화가 아니고 조건 대화 플래그 섰을 때
         foreach (var flagID in flagedID)
         {
             int id = flagID.IsAvailable();
@@ -92,8 +103,25 @@ public class CommunicationDecision
                 return id;
         }
 
-        //반복 대화
+        // 모두 해당 안되면 반복 대화 ID 리턴
         return iterativeID;
+    }
+
+    public int GetIterativeCommunicationFlagValue()
+    {
+        string key = GetFlagKeyString();
+        return FlagManager.Instance.GetFlag(key);
+    }
+
+    public void SetIterativeCommunicationFlagValue(int value = 1)
+    {
+        string key = GetFlagKeyString();
+        FlagManager.Instance.SetFlag(key, value);
+    }
+
+    string GetFlagKeyString()
+    {
+        return "IterativeCommunication" + initialID.ToString();
     }
 }
 
@@ -106,9 +134,9 @@ public class CommunicationDecisionNode
         if (isOnce && isUsed)
             return -1;
 
-        for (int i = 0; i < flags.Count; i++)
+        for (int i = 0; i < requireFlags.Count; i++)
         {
-            if (FlagManager.Instance.GetFlag(flags[i].flag) != flags[i].value)
+            if (FlagManager.Instance.GetFlag(requireFlags[i].Key) != requireFlags[i].Value)
                 return -1;
         }
 
@@ -118,6 +146,6 @@ public class CommunicationDecisionNode
 
     public bool isOnce = true;
     bool isUsed = false;
-    public List<Flag> flags = new List<Flag>();
+    public List<KeyValuePair<string, int>> requireFlags = new List<KeyValuePair<string, int>>();
     public int ID;
 }

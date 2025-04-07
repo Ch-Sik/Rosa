@@ -177,6 +177,9 @@ public class CommunicationManager : MonoBehaviour
         //커뮤니케이션 UI의 생성
         float time = UI.StartAnimation();
 
+        // NPC가 자동으로 플레이어 바라보는 기능 비활성화
+        NPCLookatPlayer.EnableGlobally = false;
+
         //시작
         Invoke("StartCommunication", time);
 
@@ -197,6 +200,9 @@ public class CommunicationManager : MonoBehaviour
         ResetDatas();
         UI.EndAnimation();
         //기존 UI의 생성
+
+        // NPC가 자동으로 플레이어 바라보는 기능 복구
+        NPCLookatPlayer.EnableGlobally = true;
         //조작시작
         ResetPlayerState();
     }
@@ -238,7 +244,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.Function: Function(data[i].function); return;
             case CommunicationType.Delay: Delay(data[i].delay); return;
             case CommunicationType.Sfx: Sfx(data[i].sfx); return;
-            case CommunicationType.Flag: SetFlag(data[i].flag); return;
+            case CommunicationType.Flag: SetFlag(data[i].flagKey, data[i].flagValue); return;
             case CommunicationType.HideAll: HideAll(); return;
             case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].roomPosition); return;
         }
@@ -343,9 +349,9 @@ public class CommunicationManager : MonoBehaviour
 
     }
 
-    public void SetFlag(Flag flag)
+    public void SetFlag(string key, int value)
     {
-        FlagManager.Instance.SetFlag(flag);
+        FlagManager.Instance.SetFlag(key, value);
     }
 
     //24.12.22) 한꺼번에 숨기기 추가
@@ -472,7 +478,9 @@ public class CommunicationData
     [ShowIf("@type == CommunicationType.Sfx")]
     public AudioClip sfx;
     [ShowIf("@type == CommunicationType.Flag")]
-    public Flag flag;
+    public string flagKey;
+    [ShowIf("@type == CommunicationType.Flag")]
+    public int flagValue;
     [ShowIf("@type == CommunicationType.MoveRoom")]
     public SORoom room;
     [ShowIf("@type == CommunicationType.MoveRoom")]

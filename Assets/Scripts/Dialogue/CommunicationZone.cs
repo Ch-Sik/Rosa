@@ -21,12 +21,21 @@ public class CommunicationZone : MonoBehaviour
         if (!collision.CompareTag("Player")) return;
 
         ID = decision.GetID();
-        //ID가 없는 경우 리턴
-        if (!CommunicationManager.Instance.HaveCommunicationID(ID))
+
+        // ID가 애초에 없음(0 이하)로 설정된 경우 리턴
+        if (ID <= 0)
         {
-            Debug.LogWarning("해당하는 ID의 대화가 없음");
+            Debug.Log($"설정된 대화 데이터가 없음 (ID: {ID})");
             return;
         }
+
+        // ID에 해당하는 대화 데이터가 없는 경우 리턴
+        if (!CommunicationManager.Instance.HaveCommunicationID(ID))
+        {
+            Debug.LogError($"ID {ID}에 해당하는 대화 데이터가 없음");
+            return;
+        }
+
         InputManager.Instance.SetMoveInputState(PlayerMoveState.NO_MOVE);
         InputManager.Instance.SetUiInputState(UiState.DIALOG);
         CommunicationManager.Instance.StartCommunication(ID);

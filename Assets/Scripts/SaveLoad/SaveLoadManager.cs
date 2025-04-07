@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using UnityEngine.Video;
+using Newtonsoft.Json;
 
 public class SaveLoadManager : MonoBehaviour
 {
@@ -51,7 +51,6 @@ public class SaveLoadManager : MonoBehaviour
         Debug.Log($"세이브 사용이 {useSaveLoad}로 설정되어 있습니다.");
         MakeDirectoryHierarchy();
     }
-
 
     #region Utils
     //Path 병합해서 전달
@@ -108,7 +107,7 @@ public class SaveLoadManager : MonoBehaviour
         Data.SaveSender(senders);
 
         string filePath = GetPath(mapPathName) + $"/{sceneName}.json";
-        string json = JsonUtility.ToJson(Data);
+        string json = JsonConvert.SerializeObject(Data);
         File.WriteAllText(filePath, json);
     }
 
@@ -124,34 +123,31 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(filePath);
-        MapSaveData Data = JsonUtility.FromJson<MapSaveData>(json);
+        MapSaveData Data = JsonConvert.DeserializeObject<MapSaveData>(json);
 
         return Data;
     }
     #endregion
 
     #region Flag
+
     [Button]
     public void SaveFlag()
     {
-        List<string> fs = new List<string>();
-        List<int> vs = new List<int>();
-
-        (fs, vs) = FlagManager.Instance.GetFlagsData();
-
-        FlagSaveData Data = new FlagSaveData()
-        {
-            Flags = fs,
-            Values = vs
-        };
-
-        string filePath = GetPath(flagPathName) + "/flag.json";
-        string json = JsonUtility.ToJson(Data);
-        File.WriteAllText(filePath, json);
+        SaveFlag(FlagManager.Instance.flags);
     }
 
-    [Button]
-    public FlagSaveData LoadFlag()
+    public void SaveFlag(Dictionary<string, int> flags)
+    {
+        string filePath = GetPath(flagPathName) + "/flag.json";
+        string json = JsonConvert.SerializeObject(flags);
+        File.WriteAllText(filePath, json);
+        Debug.Log($"[Flag Data] {filePath}에 저장 완료."
+            + "\nJSON 파일 내용:\n"
+            + json);
+    }
+
+    public Dictionary<string, int> LoadFlag()
     {
         string filePath = GetPath(flagPathName) + "/flag.json";
         if (!File.Exists(filePath)) {
@@ -160,9 +156,10 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(filePath);
-        FlagSaveData Data = JsonUtility.FromJson<FlagSaveData>(json);
-
-        return Data;
+        Dictionary<string, int> deserializedFlags = JsonConvert.DeserializeObject<Dictionary<string, int>>(json);
+        Debug.Log($"[Flag Data] {filePath}에서 불러오기 완료"
+            + $"\n플래그 총 {deserializedFlags.Count}개");
+        return deserializedFlags;
     }
     #endregion
 
@@ -177,7 +174,7 @@ public class SaveLoadManager : MonoBehaviour
         };
 
         string filePath = GetPath(playerPathName) + "/player.json";
-        string json = JsonUtility.ToJson(Data);
+        string json = JsonConvert.SerializeObject(Data);
         File.WriteAllText(filePath, json);
     }
 
@@ -192,7 +189,7 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(filePath);
-        PlayerSaveData Data = JsonUtility.FromJson<PlayerSaveData>(json);
+        PlayerSaveData Data = JsonConvert.DeserializeObject<PlayerSaveData>(json);
 
         Debug.Log($"Data : {Data.lastScene}, Pos : {Data.lastPos}");
 
@@ -216,7 +213,7 @@ public class SaveLoadManager : MonoBehaviour
         OptionSaveData Data = new OptionSaveData(option);
 
         string filePath = GetPath(optionPathName) + "/option.json";
-        string json = JsonUtility.ToJson(Data);
+        string json = JsonConvert.SerializeObject(Data);
         File.WriteAllText(filePath, json);
     }
 
@@ -231,7 +228,7 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(filePath);
-        OptionSaveData Data = JsonUtility.FromJson<OptionSaveData>(json);
+        OptionSaveData Data = JsonConvert.DeserializeObject<OptionSaveData>(json);
 
         return Data.GetOptionSetting();
     }
@@ -277,8 +274,10 @@ public class MapSaveData
 [Serializable]
 public class FlagSaveData
 {
-    public List<string> Flags = new List<string>();
-    public List<int> Values = new List<int>();
+    public string key;
+    public int value;
+
+    public FlagSaveData(string k, int v) { key = k; value = v; }
 }
 
 [Serializable]
