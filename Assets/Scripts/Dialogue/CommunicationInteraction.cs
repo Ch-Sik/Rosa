@@ -4,14 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using DG.Tweening;
 
 public class CommunicationInteraction : MonoBehaviour
 {
-    public float delay = 1f;
+    public float delayAfterWalk = 0.3f;
     public CommunicationDecision decision;
 
     [SerializeField] private Transform communicationStartTransform;
-    private bool isGo = false;
+    private bool isPlayerMoving = false;
     [HideInInspector] public int ID;
 
     private void Start()
@@ -21,10 +22,20 @@ public class CommunicationInteraction : MonoBehaviour
 
     private void Update()
     {
-        if (!isGo)
-            return;
+        HandlePlayerMove();
+    }
 
-        if (Mathf.Abs(PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x) > 0.3f)
+    private void HandlePlayerMove()
+    {
+        if (!isPlayerMoving) return;
+
+        if(communicationStartTransform == null)
+        {
+            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
+            return;
+        }
+
+        if (Mathf.Abs(PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x) > 0.2f)
         {
             int direction = PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x < 0 ? 1 : -1;
             PlayerRef.Instance.movement.Walk(Vector2.one * direction);
@@ -35,14 +46,15 @@ public class CommunicationInteraction : MonoBehaviour
             PlayerRef.Instance.animation.anim.SetBool("isWalking", false);
             PlayerRef.Instance.movement.Walk(Vector2.zero);
             PlayerRef.Instance.movement.LookAt2D(transform.position);
-            isGo = false;
+            isPlayerMoving = false;
 
-            Invoke("ChooseCommunication", delay);
+            // Invoke("StartCommunication", delay);
+            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
         }
     }
 
     [Button]
-    public void StartCommunication()
+    public void ReadyForCommunication()
     {
         ID = decision.GetID();
 
@@ -60,13 +72,13 @@ public class CommunicationInteraction : MonoBehaviour
             return;
         }
 
-        isGo = true;
+        isPlayerMoving = true;
 
         InputManager.Instance.SetMoveInputState(PlayerMoveState.NO_MOVE);
         InputManager.Instance.SetUiInputState(UiState.DIALOG);
     }
 
-    public void ChooseCommunication()
+    public void StartCommunication()
     {
         //ID에 따라 수행
         CommunicationManager.Instance.StartCommunication(ID);

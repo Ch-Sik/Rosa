@@ -185,7 +185,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   delay: 1
   decision:
-    isFirst: 1
     initialID: 0
     iterativeID: 0
     flagedID: []
@@ -217,11 +216,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2503579700913220947, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: StartCommunication
+      value: ReadyForCommunication
       objectReference: {fileID: 0}
     - target: {fileID: 2503579700913220947, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: NPCCommunicationInteraction, Assembly-CSharp
+      value: CommunicationInteraction, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2503579700913220947, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName

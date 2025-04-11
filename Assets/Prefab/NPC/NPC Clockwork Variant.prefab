@@ -53,6 +53,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5507740387277393829, guid: 13f06774b8c840f4cb6e542759e5cc9e, type: 3}
+      propertyPath: delayAfterWalk
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5507740387277393829, guid: 13f06774b8c840f4cb6e542759e5cc9e, type: 3}
       propertyPath: decision.iterativeID
       value: 0
       objectReference: {fileID: 0}
@@ -141,6 +145,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5257542434430606467, guid: 72c05d1241ffccd4583f06d7ab01b587, type: 3}
+      propertyPath: _srcPrefabAssetForRestore
+      value: 
+      objectReference: {fileID: 8249471797365804605}
+    - target: {fileID: 5257542434430606467, guid: 72c05d1241ffccd4583f06d7ab01b587, type: 3}
+      propertyPath: _rootGameObjectAsPrefabInstanceForRestore
+      value: 
+      objectReference: {fileID: 8249471797365804605}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
