@@ -65,6 +65,10 @@ public class CommunicationManager : MonoBehaviour
 
     List<CommunicationData> data = new List<CommunicationData>();   //communication data 수식
 
+    // 25.04.19 추가
+    // 캐릭터 움직이게 하기 위한 참조
+    public Dictionary<CommunicationTarget, NpcMovement> npcMovements;
+
     //CSV 파싱 뜰 데이터
     public List<Dictionary<string, object>> CSV = new List<Dictionary<string, object>>();
     public List<string> textData = new List<string>();                     //CSV 파싱 후 텍스트 데이터만 받음
@@ -178,7 +182,7 @@ public class CommunicationManager : MonoBehaviour
         float time = UI.StartAnimation();
 
         // NPC가 자동으로 플레이어 바라보는 기능 비활성화
-        NPCLookatPlayer.EnableGlobally = false;
+        NpcLookatPlayer.EnableGlobally = false;
 
         //시작
         Invoke("StartCommunication", time);
@@ -202,7 +206,7 @@ public class CommunicationManager : MonoBehaviour
         //기존 UI의 생성
 
         // NPC가 자동으로 플레이어 바라보는 기능 복구
-        NPCLookatPlayer.EnableGlobally = true;
+        NpcLookatPlayer.EnableGlobally = true;
         //조작시작
         ResetPlayerState();
     }
@@ -226,7 +230,8 @@ public class CommunicationManager : MonoBehaviour
         if (data[i].type == CommunicationType.TargetText ||
             data[i].type == CommunicationType.Show ||
             data[i].type == CommunicationType.Hide ||
-            data[i].type == CommunicationType.SetEmotion)
+            data[i].type == CommunicationType.SetEmotion ||
+            data[i].type == CommunicationType.WalkTo)       // 25.04.19 추가
         {
             target = data[i].target;
         }
@@ -242,11 +247,12 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); return;
             case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); Next();  return;
             case CommunicationType.Function: Function(data[i].function); return;
-            case CommunicationType.Delay: Delay(data[i].delay); return;
+            case CommunicationType.Delay: DelayAndGoNext(data[i].delay); return;
             case CommunicationType.Sfx: Sfx(data[i].sfx); return;
             case CommunicationType.Flag: SetFlag(data[i].flagKey, data[i].flagValue); return;
             case CommunicationType.HideAll: HideAll(); return;
             case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].roomPosition); return;
+            case CommunicationType.WalkTo: WalkTo(target, data[i].position); return;        // 25.04.19 추가
         }
     }
 
@@ -265,7 +271,7 @@ public class CommunicationManager : MonoBehaviour
         //보여주는 시간을 리턴받고,
         float time = UI.ShowTarget(target, location);
         //딜레이를 제공한다.
-        Delay(time);
+        DelayAndGoNext(time);
     }
 
     //Hide 처리
@@ -274,7 +280,7 @@ public class CommunicationManager : MonoBehaviour
         //사라지게 하는 시간을 리턴받고,
         float time = UI.HideTarget(target);
         //딜레이를 제공한다.
-        Delay(time);
+        DelayAndGoNext(time);
     }
 
     //SetEmotion 처리
@@ -314,7 +320,7 @@ public class CommunicationManager : MonoBehaviour
                                         ProCamera2D.Instance.FollowVertical = false;
                                     });
         //딜레이
-        Delay(delay);
+        DelayAndGoNext(delay);
     }
 
     //ResetCamera 처리
@@ -338,7 +344,7 @@ public class CommunicationManager : MonoBehaviour
     }
 
     //딜레이 후에 다음 커뮤니케이션 실행
-    public void Delay(float time)
+    public void DelayAndGoNext(float time)
     {
         Invoke("Next", time);
     }
@@ -360,7 +366,7 @@ public class CommunicationManager : MonoBehaviour
         //사라지게 하는 시간을 리턴받고,
         float time = UI.HideAll();
         //딜레이를 제공한다.
-        Delay(time);
+        DelayAndGoNext(time);
     }
 
     //룸의 특정 위치로 이동
@@ -368,6 +374,13 @@ public class CommunicationManager : MonoBehaviour
     {
         MapManager.Instance.OpenScene(room, pos);
         Next();
+    }
+
+    // 25.04.19) NPC가 특정 위치까지 걷기
+    public void WalkTo(CommunicationTarget targetNpc, Vector2 pos)
+    {
+        float t = npcMovements[targetNpc].MoveTo(pos.x);
+        DelayAndGoNext(t);
     }
 
     //다음 커뮤니케이션 실행
@@ -463,13 +476,13 @@ public class CommunicationData
     public CommunicationType type;
     [ShowIf("@type == CommunicationType.TargetText || type == CommunicationType.Show || type == CommunicationType.Hide || type == CommunicationType.SetEmotion")]
     public CommunicationTarget target;
-    [ShowIf("@type == CommunicationType.SetEmotion")]
+    [ShowIf("@type == CommunicationType.SetEmotion || type == CommunicationType.WalkTo")]
     public Emotion emotion;
     [ShowIf("@type == CommunicationType.PlayerText || type == CommunicationType.TargetText"), ReadOnly]
     public string text;                 // 24.12.21.    가독성 개선 목적으로 인스펙터에 노출되게 변경
     [ShowIf("@type == CommunicationType.Show")]
     public CommunicationLocation location;
-    [ShowIf("@type == CommunicationType.MoveCameraTo")]
+    [ShowIf("@type == CommunicationType.MoveCameraTo || type == CommunicationType.WalkTo")]
     public Vector2 position;
     [ShowIf("@type == CommunicationType.Function")]
     public UnityEvent function;
@@ -517,7 +530,7 @@ public enum CommunicationType
     Flag,                       //플래그를 변경한다.
     HideAll,                    // 24.12.22) 화면 상에 보이는 모든 대상을 '동시에' 숨긴다.
     MoveRoom,                   //특정 룸으로 이동시킨다.
-
+    WalkTo,                     // 25.04.19) 캐릭터를 설정한 x좌표까지 걷게 한다.
 }
 
 public enum CommunicationTarget

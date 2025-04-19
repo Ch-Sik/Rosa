@@ -1,0 +1,86 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Sirenix.OdinInspector;
+
+public class NpcMovement : MonoBehaviour
+{
+    [Tooltip("이 스크립트가 어떤 NPC의 움직임을 담당하는지.")]
+    [SerializeField] private List<CommunicationTarget> character;
+
+    [SerializeField] private bool isMoving = false;
+    [SerializeField] private float _startPositionX;
+    [SerializeField] private float _goalPositionX;
+
+    [SerializeField] private float _moveSpeed = 3f;
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private Animator anim;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        Debug.Assert(rb != null, "NpcMovement: rigidbody가 지정되어 있지 않음!");
+        rb.isKinematic = true;
+
+        // 맵 하나 당 동일 인물은 하나만 있다는 가정. 덮어쓰는 등의 상황은 고려하지 않음.
+        foreach (var ch in character)
+        {
+            CommunicationManager.Instance.npcMovements.Add(ch, this);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        foreach(var ch in character)
+        {
+            CommunicationManager.Instance.npcMovements.Remove(ch);
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        HandleMove();
+    }
+
+    void HandleMove()
+    {
+        if (!isMoving) return;
+        if (Mathf.Abs(transform.position.x - _goalPositionX) > 0.2f)
+        {
+            float dir = (_goalPositionX - transform.position.x) > 0 ? 1 : -1;
+            rb.velocity = Vector2.right * dir * _moveSpeed;
+            anim.SetBool("isWalking", true);
+        }
+        else
+        {
+            isMoving = false;
+            rb.velocity = Vector2.zero;
+            anim.SetBool("isWalking", false);
+        }
+    }
+
+    // 리턴 값은 움직이는 데 걸릴 예상 시간
+    [Button]
+    public float MoveTo(float destWorldPosX)
+    {
+        _startPositionX = transform.position.x;
+        _goalPositionX = destWorldPosX;
+        isMoving = true;
+
+        LookAtX(_goalPositionX);
+        
+        float eta = Mathf.Abs(_goalPositionX - _startPositionX) / _moveSpeed;
+        return eta;
+    }
+
+    private void LookAtX(float destX)
+    {
+        LR dir = (destX - _startPositionX) > 0 ? LR.RIGHT : LR.LEFT;
+        Vector3 scale = transform.localScale;
+        // AnyPortrait로 제작된 NPC 이미지는 기본 왼쪽을 바라보고 있음 (localScale.x > 0일때 왼쪽)
+        // 그래서 -1 곱해서 보정 필요
+        scale.x = Mathf.Abs(scale.x) * dir.toFloat() * -1;
+        transform.localScale = scale;
+    }
+}
