@@ -55,6 +55,8 @@ public class PlayerAnimation : MonoBehaviour
 
     void UpdateAnimParameters()
     {
+        if (PlayerRef.Instance.movement.isMovingByScript) return;
+
         anim.SetBool("isGrounded", playerMove.isGrounded);
         anim.SetBool("isWalking", 
             playerControl.currentMoveState == PlayerMoveState.DEFAULT 

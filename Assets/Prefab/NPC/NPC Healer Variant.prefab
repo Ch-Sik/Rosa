@@ -152,7 +152,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8596496723311285380, guid: 3da8282057bed0c4b9ad84ecdc4952f8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2878958082207564048}
+    - targetCorrespondingSourceObject: {fileID: 8596496723311285380, guid: 3da8282057bed0c4b9ad84ecdc4952f8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3247644840905722007}
+    - targetCorrespondingSourceObject: {fileID: 8596496723311285380, guid: 3da8282057bed0c4b9ad84ecdc4952f8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7499237667020665717}
   m_SourcePrefab: {fileID: 100100000, guid: 3da8282057bed0c4b9ad84ecdc4952f8, type: 3}
+--- !u!95 &5936475766475747645 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6746229859482880300, guid: 3da8282057bed0c4b9ad84ecdc4952f8, type: 3}
+  m_PrefabInstance: {fileID: 1152346536615360529}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6398694374443025349 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6282890574302002132, guid: 3da8282057bed0c4b9ad84ecdc4952f8, type: 3}
@@ -175,3 +186,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f0a5065882f4a84d90a45608d701efb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3247644840905722007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8696751221422910613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e418adbc94f444292bedf2cc9cfefa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  character: 020000000300000004000000
+  isMoving: 0
+  _startPositionX: 0
+  _goalPositionX: 0
+  _moveSpeed: 3
+  rb: {fileID: 7499237667020665717}
+  anim: {fileID: 5936475766475747645}
+--- !u!50 &7499237667020665717
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8696751221422910613}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

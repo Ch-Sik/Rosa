@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [FoldoutGroup("좌우 이동 관련")]
     [Tooltip("플레이어 이동 속도")]
     [SerializeField] float moveSpeed = 1f;
+    public float MoveSpeed { get { return moveSpeed; } }
 
     [FoldoutGroup("좌우 이동 관련")]
     [Tooltip("시작 시 플레이어 스프라이트의 방향")]
@@ -147,6 +148,8 @@ public class PlayerMovement : MonoBehaviour
     [FoldoutGroup("활강 관련")] [SerializeField] float glidingGravityScale = 0.1f;
 
     // 플래그
+    [FoldoutGroup("플래그")]
+    [ReadOnly] public bool isMovingByScript = false;
     [FoldoutGroup("플래그")]
     [ReadOnly] public bool isGrounded = false;
     [FoldoutGroup("플래그")]

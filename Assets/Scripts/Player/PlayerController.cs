@@ -115,15 +115,18 @@ public class PlayerController : MonoBehaviour
     #region PlayerMove ActionMap 핸들러
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (playerMove.isMovingByScript) return;
+
         moveVector = context.ReadValue<Vector2>();
         // 지상, 또는 공중에 있을 경우 좌우 이동
-
         playerMove.Walk(moveVector);
     }
 
     // Grounded에서 다른 상태로 넘어갔을 때 moveVector 초기화용
     public void OnCancelMove(InputAction.CallbackContext context)
     {
+        if (playerMove.isMovingByScript) return;
+
         moveVector = context.ReadValue<Vector2>();
         // 무브 캔슬
         playerMove.Walk(moveVector);

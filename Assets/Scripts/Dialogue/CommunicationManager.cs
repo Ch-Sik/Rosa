@@ -1,6 +1,7 @@
 using Com.LuisPedroFonseca.ProCamera2D;
 using DG.Tweening;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ public class CommunicationManager : MonoBehaviour
 
     // 25.04.19 추가
     // 캐릭터 움직이게 하기 위한 참조
-    public Dictionary<CommunicationTarget, NpcMovement> npcMovements;
+    [ShowInInspector] public Dictionary<CommunicationTarget, NpcMovement> npcMovements = new Dictionary<CommunicationTarget, NpcMovement>();
 
     //CSV 파싱 뜰 데이터
     public List<Dictionary<string, object>> CSV = new List<Dictionary<string, object>>();
@@ -120,7 +121,7 @@ public class CommunicationManager : MonoBehaviour
     //현재 대화 중일 때, 다음 턴에도 대화가 예상된다면 UI관리 Boolean형 데이터를 전달한다.
     public bool FlexibleTextingHelper()
     {
-        if (i + 1 > data.Count)
+        if (i + 1 >= data.Count)
             return true;
 
         if (data[i + 1].type == CommunicationType.TargetText ||
@@ -377,9 +378,28 @@ public class CommunicationManager : MonoBehaviour
     }
 
     // 25.04.19) NPC가 특정 위치까지 걷기
-    public void WalkTo(CommunicationTarget targetNpc, Vector2 pos)
+    // 25.04.21) 플레이어도 동일한 방식으로 움직일 수 있도록 추가
+    public void WalkTo(CommunicationTarget targetCharacter, Vector2 pos)
     {
-        float t = npcMovements[targetNpc].MoveTo(pos.x);
+        float t = 0;        // 걷는데 필요한 예상 시간
+        if (targetCharacter == CommunicationTarget.Player)
+        {
+            float moveDist = pos.x - PlayerRef.Instance.transform.position.x;
+            t = moveDist / PlayerRef.Instance.movement.MoveSpeed;
+            PlayerRef.Instance.movement.isMovingByScript = true;
+            PlayerRef.Instance.movement.Walk(Vector2.right * (moveDist > 0 ? 1 : -1));
+            PlayerRef.Instance.animation.anim.SetBool("isWalking", true);
+            DOVirtual.DelayedCall(t, () =>
+            {
+                PlayerRef.Instance.movement.isMovingByScript = false;
+                PlayerRef.Instance.movement.Walk(Vector2.zero);
+                PlayerRef.Instance.animation.anim.SetBool("isWalking", false);
+            });
+        }
+        else
+        {
+            t = npcMovements[targetCharacter].MoveTo(pos.x);
+        }
         DelayAndGoNext(t);
     }
 
@@ -474,9 +494,9 @@ public class CommunicationManager : MonoBehaviour
 public class CommunicationData
 {
     public CommunicationType type;
-    [ShowIf("@type == CommunicationType.TargetText || type == CommunicationType.Show || type == CommunicationType.Hide || type == CommunicationType.SetEmotion")]
+    [ShowIf("@type == CommunicationType.TargetText || type == CommunicationType.Show || type == CommunicationType.Hide || type == CommunicationType.SetEmotion || type == CommunicationType.WalkTo")]
     public CommunicationTarget target;
-    [ShowIf("@type == CommunicationType.SetEmotion || type == CommunicationType.WalkTo")]
+    [ShowIf("@type == CommunicationType.SetEmotion")]
     public Emotion emotion;
     [ShowIf("@type == CommunicationType.PlayerText || type == CommunicationType.TargetText"), ReadOnly]
     public string text;                 // 24.12.21.    가독성 개선 목적으로 인스펙터에 노출되게 변경
