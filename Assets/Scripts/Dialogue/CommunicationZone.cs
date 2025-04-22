@@ -37,7 +37,9 @@ public class CommunicationZone : MonoBehaviour
             return;
         }
 
-        if (Mathf.Abs(PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x) > 0.2f)
+        // 25.04.22) communicationStartTransform이 없어도 동작하도록 수정
+        if (communicationStartTransform != null 
+            && Mathf.Abs(PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x) > 0.2f)
         {
             int direction = PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x < 0 ? 1 : -1;
             PlayerRef.Instance.movement.Walk(Vector2.one * direction);
