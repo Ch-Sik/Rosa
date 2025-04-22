@@ -19165,6 +19165,9 @@ MonoBehaviour:
   bgmClip:
   - {fileID: 8300000, guid: 803b2206d578cd9478602d190a79aa00, type: 3}
   - {fileID: 8300000, guid: 2eef0d024c253b0449386e687f904fde, type: 3}
+  activateBossWhenDialogueFinish: 1
+  bossAI: {fileID: 1152961466}
+  targetCommunicationID: 0
 --- !u!1001 &1152961464
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19231,6 +19234,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06b3ad9f2e397194baf2d5658d9bd26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1152961466 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6135092714716350500, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+  m_PrefabInstance: {fileID: 1152961464}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e43e7170fb45b4b81dcd16d0ff55d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1173365843

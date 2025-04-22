@@ -3,20 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Panda;
+using DG.Tweening;
 
 public class BossRoomManager : MonoBehaviour
 {
     [SerializeField] Blackboard bossBlackboard;
     [SerializeField] AudioClip[] bgmClip;       // 각 페이즈 별 브금 클립
 
-    [SerializeField] bool activateBossWhenDialogueFinish;
-    [SerializeField, ShowIf("activateBossWhenDialogueFinish")] 
+    [SerializeField, FoldoutGroup("보스전 시작 대화")] 
+    bool doEngageCommunication;
+    [SerializeField, FoldoutGroup("보스전 시작 대화"), ShowIf("doEngageCommunication")] 
     PandaBehaviour bossAI;
-    [SerializeField, ShowIf("activateBossWhenDialogueFinish")]
-    int targetCommunicationID;
-    
-    BGMPlayer bgmPlayer;
+    [SerializeField, FoldoutGroup("보스전 시작 대화"), ShowIf("doEngageCommunication")]
+    int engageCommunicationID;
+    [Tooltip("대화 끝난 후 몇 초 후에 보스가 움직이도록 할 것인지")]
+    [SerializeField, FoldoutGroup("보스전 시작 대화"), ShowIf("doEngageCommunication")]
+    float engageCommunicationEndDelay;
 
+    [SerializeField, FoldoutGroup("보스전 끝 대화")]
+    bool doFinishCommunication;
+    [SerializeField, FoldoutGroup("보스전 끝 대화"), ShowIf("doFinishCommunication")]
+    int finishCommunicationID;
+    [Tooltip("보스 사망 후 몇 초 후에 대화가 자동으로 뜨게 할 것인지")]
+    [SerializeField, FoldoutGroup("보스전 끝 대화"), ShowIf("doFinishCommunication")]
+    float finishCommunicationStartDelay;
+
+    BGMPlayer bgmPlayer;
 
     // Start is called before the first frame update
     void Start()
@@ -24,7 +36,7 @@ public class BossRoomManager : MonoBehaviour
         Debug.Assert(bossBlackboard != null);
         bossBlackboard.OnBlackboardUpdated += OnBossBlackboardUpdated;
 
-        if(activateBossWhenDialogueFinish)
+        if(doEngageCommunication)
         {
             Debug.Assert(bossAI != null);
             bossAI.enabled = false;
@@ -34,9 +46,9 @@ public class BossRoomManager : MonoBehaviour
 
     void OnBossroomEnterCommunicationFinish(int communicationID)
     {
-        if(communicationID == targetCommunicationID)
+        if(communicationID == engageCommunicationID)
         {
-            ActivateBoss();
+            DOVirtual.DelayedCall(engageCommunicationEndDelay, ActivateBoss);
             CommunicationManager.Instance.OnCommunicationFinish -= OnBossroomEnterCommunicationFinish;
         }
     }
@@ -89,12 +101,18 @@ public class BossRoomManager : MonoBehaviour
     void OnBossDead()
     {
         bgmPlayer.PlayDefaultBGM();
+        if(doFinishCommunication)
+        {
+            DOVirtual.DelayedCall(finishCommunicationStartDelay, () => {
+                CommunicationManager.Instance.StartCommunication(finishCommunicationID);
+            });
+        }
     }
 
     [Button("테스트: 보스 즉시 사망")]
     void Test_KillBossImmediatly()
     {
-        bossBlackboard.gameObject.GetComponent<MonsterDamageReceiver>().GetHitt(999, 0);
+        bossBlackboard.gameObject.GetComponent<MonsterState>().TakeDamage(999);
     }
 
     void OnDestroy()

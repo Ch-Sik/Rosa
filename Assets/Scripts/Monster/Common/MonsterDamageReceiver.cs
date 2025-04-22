@@ -164,14 +164,11 @@ public class MonsterDamageReceiver : DamageReceiver
         {
             return false;
         }
-        // 무적이 아닐 경우, 데미지 입고 사망 여부 판단
+        // 무적이 아닐 경우, 데미지 입음.
+        // 사망 여부 판단은 monsterState.TakeDamage에서 진행
         else
         {
             monsterState.TakeDamage(damage);
-            if (monsterState.HP < damage)
-            {
-                blackboard.Set(BBK.isDead, true);
-            }
             return true;
         }
     }
@@ -252,7 +249,8 @@ public class MonsterDamageReceiver : DamageReceiver
     private void OnDie()
     {
         isAlive = false;
-        if(pandaBT != null)
+        blackboard.Set(BBK.isDead, true);
+        if (pandaBT != null)
             pandaBT.enabled = false;
         if (useRagdoll)
         {

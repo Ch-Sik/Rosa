@@ -13926,9 +13926,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bossBlackboard: {fileID: 2078816005}
   bgmClip: []
-  activateBossWhenDialogueFinish: 1
+  doEngageCommunication: 1
   bossAI: {fileID: 2078816004}
-  targetCommunicationID: 104
+  engageCommunicationID: 104
+  engageCommunicationEndDelay: 1
+  doFinishCommunication: 1
+  finishCommunicationID: 105
+  finishCommunicationStartDelay: 2
 --- !u!4 &576410174
 Transform:
   m_ObjectHideFlags: 0
