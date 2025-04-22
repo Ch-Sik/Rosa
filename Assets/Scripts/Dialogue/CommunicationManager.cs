@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -46,6 +47,13 @@ public class CommunicationManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
+
+    public delegate void CommunicationEvent(int id);
+    public CommunicationEvent OnCommunicationStart;
+    public CommunicationEvent OnCommunicationFinish;
+
+    // 25.04.22) 대화 ID 보관하도록 수정
+    int communicationID;
 
     //캐릭터 스프라이트 입력 그룹
     public List<CharacterEmotion> characterDatas = new List<CharacterEmotion>();
@@ -155,9 +163,13 @@ public class CommunicationManager : MonoBehaviour
     public bool StartCommunication(int ID)
     {
         if (!communicationDatas.ContainsKey(ID))
+        {
+            communicationID = -1;
             return false;
+        }
 
-        CommunicationSO data = communicationDatas[ID];
+        communicationID = ID;
+        CommunicationSO data = communicationDatas[communicationID];
 
         //데이터 리셋
         ResetDatas();
@@ -188,6 +200,9 @@ public class CommunicationManager : MonoBehaviour
         //시작
         Invoke("StartCommunication", time);
 
+        // 25.04.22) 이벤트 관리 추가
+        OnCommunicationStart?.Invoke(communicationID);
+
         return true;
     }
 
@@ -210,6 +225,8 @@ public class CommunicationManager : MonoBehaviour
         NpcLookatPlayer.EnableGlobally = true;
         //조작시작
         ResetPlayerState();
+
+        OnCommunicationFinish?.Invoke(communicationID);
     }
 
     //계속해서 무한 while하는 커뮤니케이션 함수
