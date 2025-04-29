@@ -883,6 +883,7 @@ GameObject:
   - component: {fileID: 1018947826}
   - component: {fileID: 1018947827}
   - component: {fileID: 1018947828}
+  - component: {fileID: 1018947829}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -939,7 +940,7 @@ MonoBehaviour:
   cam: {fileID: 210034125}
   room: {fileID: 0}
   startPoint: {fileID: 2061483551}
-  startRoom: {fileID: 11400000, guid: 2e54b6a3986115b4f8114830236b3049, type: 2}
+  startRoom: {fileID: 11400000, guid: 81db357a53aa0ee44842f00476be74c9, type: 2}
   currentRoom: {fileID: 0}
   oldRooms: []
   chapter: {fileID: 1838996231}
@@ -964,6 +965,18 @@ MonoBehaviour:
   mapPathName: Maps
   playerPathName: Player
   optionPathName: Option
+--- !u!114 &1018947829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018947824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f7649215f3c6ef42a3855b4ef42322a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1047433009
 GameObject:
   m_ObjectHideFlags: 0

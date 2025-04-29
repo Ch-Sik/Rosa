@@ -18860,9 +18860,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1491223369553115776, guid: 5d52fc23ccea53448a52eecd4178192e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3774371672050960871, guid: 5d52fc23ccea53448a52eecd4178192e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5527571824175907980, guid: 5d52fc23ccea53448a52eecd4178192e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.221
+      objectReference: {fileID: 0}
+    - target: {fileID: 5527571824175907980, guid: 5d52fc23ccea53448a52eecd4178192e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.383
+      objectReference: {fileID: 0}
     - target: {fileID: 5856812743541822961, guid: 5d52fc23ccea53448a52eecd4178192e, type: 3}
       propertyPath: decision.initialID
-      value: 105
+      value: 104
       objectReference: {fileID: 0}
     - target: {fileID: 6870776015516184483, guid: 5d52fc23ccea53448a52eecd4178192e, type: 3}
       propertyPath: m_Name
@@ -19165,9 +19181,13 @@ MonoBehaviour:
   bgmClip:
   - {fileID: 8300000, guid: 803b2206d578cd9478602d190a79aa00, type: 3}
   - {fileID: 8300000, guid: 2eef0d024c253b0449386e687f904fde, type: 3}
-  activateBossWhenDialogueFinish: 1
+  doEngageCommunication: 1
   bossAI: {fileID: 1152961466}
-  targetCommunicationID: 0
+  engageCommunicationID: 104
+  engageCommunicationEndDelay: 1
+  doFinishCommunication: 1
+  finishCommunicationID: 105
+  finishCommunicationStartDelay: 4
 --- !u!1001 &1152961464
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19176,6 +19196,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 581648490301033017, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_Size.x
+      value: 23.149609
+      objectReference: {fileID: 0}
+    - target: {fileID: 581648490301033017, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.6791935
+      objectReference: {fileID: 0}
     - target: {fileID: 3659263110564341233, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 19.669397
