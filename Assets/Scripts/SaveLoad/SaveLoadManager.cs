@@ -38,6 +38,8 @@ public class SaveLoadManager : MonoBehaviour
 
     public bool useSaveLoad = true;
     public bool useProjectSave = true;      //컴퓨터에 저장할지 프로젝트에 저장할지
+    public bool IsNewGame { get  { return _isNewGame; } }
+    private bool _isNewGame = true;           // 새 게임인지 아닌지를 표시
 
     [FoldoutGroup("Paths"), ReadOnly] public string pathName = "SaveFile";
     [FoldoutGroup("Paths"), ReadOnly] public string flagPathName = "Flag";
@@ -45,12 +47,30 @@ public class SaveLoadManager : MonoBehaviour
     [FoldoutGroup("Paths"), ReadOnly] public string playerPathName = "Player";
     [FoldoutGroup("Paths"), ReadOnly] public string optionPathName = "Option";
 
+    // 25.04.29) newtonsoft json으로 변경된 것으로 인해 발생한 self-loop문제 처리
+    private JsonSerializerSettings serializeSetting;
 
+    public void DisableNewGameFlag()
+    {
+        _isNewGame = false;
+    }
+
+    // SaveLoadManager.Start()는 TestScene01 씬 로드시에 한번만 호출되어야 함.
     private void Start()
     {
+        DontDestroyOnLoad(gameObject);
+
         Debug.Log($"세이브 사용이 {useSaveLoad}로 설정되어 있습니다.");
+
+        // 25.04.29) newtonsoft json으로 변경된 것으로 인해 발생한 self-loop문제 처리
+        serializeSetting = new JsonSerializerSettings();
+        serializeSetting.Formatting = Formatting.Indented;
+        serializeSetting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
         MakeDirectoryHierarchy();
+        Debug.Log($"세이브 위치: {GetPath(flagPathName)}");
     }
+
 
     #region Utils
     //Path 병합해서 전달
@@ -64,13 +84,6 @@ public class SaveLoadManager : MonoBehaviour
 #else
             return $"{Application.persistentDataPath}/{pathName}/{path}";
 #endif
-    }
-
-    private void MakeDirectory(string path)
-    {
-        //폴더가 존재하지 않는 경우 생성
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
     }
 
     private void MakeDirectoryHierarchy()
@@ -88,11 +101,20 @@ public class SaveLoadManager : MonoBehaviour
         MakeDirectory(GetPath(playerPathName));
         MakeDirectory(GetPath(optionPathName));
     }
+    private void MakeDirectory(string path)
+    {
+        //폴더가 존재하지 않는 경우 생성
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+    }
     #endregion
 
-    #region Map
+    #region Room state
+
+    // SaveMap() 함수 테스트용.
+    // MapManager.Instance.SaveSceneState()를 통해 SaveLoadManager.SaveMap()을 간접 호출;
     [Button]
-    public void SaveCurrentMap()
+    public void SaveCurrentRoomState()
     {
         MapManager.Instance.SaveSceneState();
     }
@@ -107,13 +129,14 @@ public class SaveLoadManager : MonoBehaviour
         Data.SaveSender(senders);
 
         string filePath = GetPath(mapPathName) + $"/{sceneName}.json";
-        string json = JsonConvert.SerializeObject(Data);
+        string json = JsonConvert.SerializeObject(Data, serializeSetting);
         File.WriteAllText(filePath, json);
+        Debug.Log($"[Saved] Map 데이터 저장됨 to {filePath}");
     }
 
-    public bool CanLoadMap(string sceneName) { return File.Exists(GetPath(mapPathName) + $"/{sceneName}.json"); }
+    public bool CanLoadSceneState(string sceneName) { return File.Exists(GetPath(mapPathName) + $"/{sceneName}.json"); }
 
-    public MapSaveData LoadMap(string sceneName)
+    public MapSaveData LoadSceneState(string sceneName)
     {
         string filePath = GetPath(mapPathName) + $"/{sceneName}.json";
         if (!File.Exists(filePath))
@@ -140,7 +163,7 @@ public class SaveLoadManager : MonoBehaviour
     public void SaveFlag(Dictionary<string, int> flags)
     {
         string filePath = GetPath(flagPathName) + "/flag.json";
-        string json = JsonConvert.SerializeObject(flags);
+        string json = JsonConvert.SerializeObject(flags, serializeSetting);
         File.WriteAllText(filePath, json);
         Debug.Log($"[Flag Data] {filePath}에 저장 완료."
             + "\nJSON 파일 내용:\n"
@@ -151,7 +174,7 @@ public class SaveLoadManager : MonoBehaviour
     {
         string filePath = GetPath(flagPathName) + "/flag.json";
         if (!File.Exists(filePath)) {
-            Debug.LogError($"[Flag Data] {filePath}를 찾을 수 없다.");
+            Debug.LogWarning($"[Flag Data] {filePath}를 찾을 수 없다.");
             return null;
         }
 
@@ -163,37 +186,34 @@ public class SaveLoadManager : MonoBehaviour
     }
     #endregion
 
-    #region Player
+    #region Player position
     [Button]
-    public void SavePlayerData()
+    public void SavePlayerPosition()
     {
-        PlayerSaveData Data = new PlayerSaveData()
-        {
-            lastScene = MapManager.Instance.currentRoom.scene.SceneName,
-            lastPos = PlayerRef.Instance.transform.position
-        };
+        PlayerPositionSave data = new PlayerPositionSave();
+        data.room = MapManager.Instance.CurrentRoom.scene.SceneName;
+        data.position = PlayerRef.Instance.transform.position;
 
         string filePath = GetPath(playerPathName) + "/player.json";
-        string json = JsonConvert.SerializeObject(Data);
+        string json = JsonConvert.SerializeObject(data, serializeSetting);
         File.WriteAllText(filePath, json);
     }
 
     [Button]
-    public void LoadPlayerData()
+    public PlayerPositionSave LoadPlayerPosition()
     {
         string filePath = GetPath(playerPathName) + "/player.json";
         if (!File.Exists(filePath)) {
             //초기 파일 생성
-            //Debug.LogError($"[Player Data] {filePath}를 찾을 수 없다.");
-            return;
+            Debug.LogError($"플레이어 위치 세이브데이터를 다음 경로에서 찾을 수 없음: {filePath}");
+            return null;
         }
 
         string json = File.ReadAllText(filePath);
-        PlayerSaveData Data = JsonConvert.DeserializeObject<PlayerSaveData>(json);
+        PlayerPositionSave data = JsonConvert.DeserializeObject<PlayerPositionSave>(json);
+        Debug.Log($"플레이어 위치 정보 로드됨 : {data.room}, Pos : {data.position}");
 
-        Debug.Log($"Data : {Data.lastScene}, Pos : {Data.lastPos}");
-
-        MapManager.Instance.OpenSceneBySceneNameWithPosition(Data.lastScene, Data.lastPos);
+        return data;
     }
     #endregion
 
@@ -213,7 +233,7 @@ public class SaveLoadManager : MonoBehaviour
         OptionSaveData Data = new OptionSaveData(option);
 
         string filePath = GetPath(optionPathName) + "/option.json";
-        string json = JsonConvert.SerializeObject(Data);
+        string json = JsonConvert.SerializeObject(Data, serializeSetting);
         File.WriteAllText(filePath, json);
     }
 
@@ -278,13 +298,6 @@ public class FlagSaveData
     public int value;
 
     public FlagSaveData(string k, int v) { key = k; value = v; }
-}
-
-[Serializable]
-public class PlayerSaveData
-{
-    public string lastScene;
-    public Vector2 lastPos;
 }
 
 [Serializable]

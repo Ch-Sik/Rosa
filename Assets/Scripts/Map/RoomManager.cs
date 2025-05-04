@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 #endif
 
-public class Room : MonoBehaviour
+public class RoomManager : MonoBehaviour
 {
     public bool showGizmos = false;
 
@@ -42,7 +42,7 @@ public class Room : MonoBehaviour
 
     private void Awake()
     {
-        MapManager.Instance.room = this;
+        MapManager.Instance.currentRoomManager = this;
     }
 
     private void Start()
@@ -51,7 +51,7 @@ public class Room : MonoBehaviour
         Init();
 
         if (MapManager.Instance != null)
-            MapManager.Instance.room = this;
+            MapManager.Instance.currentRoomManager = this;
 
         safePositions = new HashSet<Vector2Int>(GetSafeLandingPosition());
     }

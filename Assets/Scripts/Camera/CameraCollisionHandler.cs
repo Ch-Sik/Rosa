@@ -23,12 +23,12 @@ public class CameraCollisionHandler : MonoBehaviour
 
         IEnumerator c()
         {
-            if(MapManager.Instance.room.roomCenterTransfrom == null)
+            if(MapManager.Instance.currentRoomManager.roomCenterTransfrom == null)
                 yield break;
 
             // 카메라를 일시적으로 맵 중앙으로 이동시킴
             Transform originalTarget = proCamera2D.CameraTargets[0].TargetTransform;
-            proCamera2D.CameraTargets[0].TargetTransform = MapManager.Instance.room.roomCenterTransfrom;
+            proCamera2D.CameraTargets[0].TargetTransform = MapManager.Instance.currentRoomManager.roomCenterTransfrom;
 
             yield return new WaitForFixedUpdate(); // 최소 1 Fixed Frame 대기
             yield return new WaitForSeconds(0.05f); // 

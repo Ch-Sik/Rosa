@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e66c76671cd64cb449192b5c4468e16e, type: 3}
-  m_Name: 2-6
+  m_Name: 2-6 1
   m_EditorClassIdentifier: 
   scene:
     m_SceneAsset: {fileID: 102900000, guid: 8ca1a119d2fe9db4b986429774e6c3fd, type: 3}
-    m_SceneName: 2-6
+    m_SceneName: 2-6 UnUsed
   flagName: 
   flagIndex: 0
   title: 
@@ -36,13 +36,7 @@ MonoBehaviour:
     - {x: 176, y: 6}
     - {x: 176, y: 7}
     - {x: 176, y: 8}
-    connectedPorts:
-    - flag: 
-      flagIndex: 0
-      scene:
-        m_SceneAsset: {fileID: 102900000, guid: 75da499da3be62240b8ba4015a1d08b2, type: 3}
-        m_SceneName: 2-7
-      index: 0
+    connectedPorts: []
   lefPorts:
   - flag: 
     index: 0
@@ -52,10 +46,4 @@ MonoBehaviour:
     - {x: 4, y: -2}
     - {x: 4, y: -1}
     - {x: 4, y: 0}
-    connectedPorts:
-    - flag: 
-      flagIndex: 0
-      scene:
-        m_SceneAsset: {fileID: 102900000, guid: c2793de53db67df43af49cf3485f0238, type: 3}
-        m_SceneName: 2-5
-      index: 0
+    connectedPorts: []

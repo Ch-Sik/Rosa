@@ -10,34 +10,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e66c76671cd64cb449192b5c4468e16e, type: 3}
-  m_Name: 2-8b
+  m_Name: 3-2
   m_EditorClassIdentifier: 
   scene:
-    m_SceneAsset: {fileID: 102900000, guid: 38b8b1bb09aeedf45a9b89c412abbcad, type: 3}
-    m_SceneName: 2-8b
+    m_SceneAsset: {fileID: 102900000, guid: a80e36b2f4401014ea7d7d40f9960b5c, type: 3}
+    m_SceneName: 3-2
   flagName: 
   flagIndex: 0
-  title: 
+  title: 3-2
   subTitle: 
-  size: {x: 37, y: 25}
-  offset: {x: 4, y: -9}
+  size: {x: 119, y: 103}
+  offset: {x: -5, y: -15}
   topPorts: []
   botPorts: []
-  rigPorts: []
+  rigPorts:
+  - flag: 
+    index: 0
+    direction: 2
+    ports:
+    - {x: 113, y: 72}
+    - {x: 113, y: 73}
+    - {x: 113, y: 74}
+    - {x: 113, y: 75}
+    connectedPorts: []
   lefPorts:
   - flag: 
     index: 0
     direction: 3
     ports:
-    - {x: 4, y: -3}
-    - {x: 4, y: -2}
-    - {x: 4, y: -1}
-    - {x: 4, y: 0}
-    - {x: 4, y: 1}
-    connectedPorts:
-    - flag: 
-      flagIndex: 0
-      scene:
-        m_SceneAsset: {fileID: 102900000, guid: 75da499da3be62240b8ba4015a1d08b2, type: 3}
-        m_SceneName: 2-7
-      index: 0
+    - {x: -5, y: -3}
+    - {x: -5, y: -2}
+    - {x: -5, y: -1}
+    - {x: -5, y: 0}
+    connectedPorts: []

@@ -3787,6 +3787,11 @@ MonoBehaviour:
   onWait: 0
   isReverse: 0
   curReverseState: 0
+  breachHeight: 3
+  breachUpTime: 1
+  breachDownTime: 0.7
+  timeBetweenDown: 1
+  timeBetweenBreach: 1
   cinematicsSettings: []
 --- !u!1001 &598914453
 PrefabInstance:
@@ -4330,6 +4335,11 @@ MonoBehaviour:
   onWait: 0
   isReverse: 0
   curReverseState: 0
+  breachHeight: 3
+  breachUpTime: 1
+  breachDownTime: 0.7
+  timeBetweenDown: 1
+  timeBetweenBreach: 1
   cinematicsSettings: []
 --- !u!1001 &730831596
 PrefabInstance:

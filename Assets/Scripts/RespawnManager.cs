@@ -25,13 +25,13 @@ public class RespawnManager : MonoBehaviour
 
     private void Update()
     {
-        if (MapManager.Instance.room == null)
+        if (MapManager.Instance.currentRoomManager == null)
             return;
 
         curPosition = new Vector2Int((int)(player.transform.position.x),
                                                 (int)(player.transform.position.y - 0.8f));
 
-        if (!MapManager.Instance.room.safePositions.Contains(curPosition))
+        if (!MapManager.Instance.currentRoomManager.safePositions.Contains(curPosition))
             return;
 
         SwitchRespawnPoint(curPosition);

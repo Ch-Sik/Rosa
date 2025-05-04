@@ -37,14 +37,20 @@ public class MapManager : MonoBehaviour
     public Transform player;
     public ProCamera2D cam;
     //시작할 씬
-    public Room room;
-    public Transform startPoint;
+    public RoomManager currentRoomManager;
+    // 25.04.29) startPoint를 transform 대신 수치 입력의 Vector3로 대체
+    public bool drawStartpointGizmo;
+    public Vector3 startPoint;
     public SORoom startRoom;
+    
+    public SORoom CurrentRoom { get { return currentRoom; } }
     //현재 열린 씬
-    public SORoom currentRoom;
+    private SORoom currentRoom;
+
     public List<SORoom> oldRooms = new List<SORoom>();
-    public TextMeshProUGUI chapter;
-    public TextMeshProUGUI position;
+    public TextMeshProUGUI chapterDebugUI;
+    // 25.05.04) 디버그용 좌표 출력 UI 제거
+    // public TextMeshProUGUI positionDebugUI;
     [ShowInInspector] private Dictionary<string, SORoom> rooms;
 
     public Image fadePanel;
@@ -53,7 +59,7 @@ public class MapManager : MonoBehaviour
 
     private void Update()
     {
-        position.text = $"{player.position.x.ToString("F1")} , {player.position.y.ToString("F1")}";
+        // positionDebugUI.text = $"{player.position.x.ToString("F1")} , {player.position.y.ToString("F1")}";
     }
 
     private void Awake()
@@ -61,22 +67,7 @@ public class MapManager : MonoBehaviour
         LoadAllRooms();
     }
 
-    private void Start()
-    {
-        if (startRoom == null)
-            startRoom = FindStartRoom();
-        if (startRoom == null)
-            return;
-        Init(startRoom);
-    }
-
-    private void Init(SORoom startRoom)
-    {
-        Enter(startRoom);
-
-        startPoint.GetComponent<SpriteRenderer>().enabled = false;
-    }
-
+    // 각 방의 정보를 들고 있는 ScriptableObject를 일괄 로드
     private int LoadAllRooms()
     {
         int cnt = 0;
@@ -87,19 +78,51 @@ public class MapManager : MonoBehaviour
         cnt = _rooms.Length;
 
         for (int i = 0; i < _rooms.Length; i++)
+        {
             if (rooms.ContainsKey(_rooms[i].scene.SceneName))
+            {
                 Debug.LogError($"[Duplicated Scene Name Error] 동일 이름의 씬이 둘 이상 존재하기에 딕셔너리 충돌 에러 발생 : {_rooms[i].scene.SceneName}");
-        else
-            rooms.Add(_rooms[i].scene.SceneName, _rooms[i]);
+            }
+            else
+            {
+                rooms.Add(_rooms[i].scene.SceneName, _rooms[i]);
+            }
+        }
 
+        Debug.Log($"rooms 딕셔너리 로드 완료. Count: {rooms.Count}");
         return cnt;
+    }
+
+    private void Start()
+    {
+        // 새로하기 상황일 경우
+        if (SaveLoadManager.Instance.IsNewGame)
+        {
+            if(startRoom == null)
+                startRoom = FindStartRoom();
+            if (startRoom == null)
+            {
+                Debug.LogError("시작할 방을 찾을 수 없음");
+                return;
+            }
+            Enter(startRoom);
+        }
+        // 이어하기 상황일 경우
+        else
+        {
+            // TODO: 마지막으로 저장했을 때의 캐릭터 좌표 불러와서 startPosition에 저장
+            PlayerPositionSave saveData = SaveLoadManager.Instance.LoadPlayerPosition();
+            Debug.Log($"플레이어 위치 세이브데이터 로드: {saveData.room}\n위치: {saveData.position}");
+            startRoom = rooms[saveData.room];
+            Enter(startRoom, saveData.position);
+        }
     }
 
     private SORoom FindStartRoom()
     {
-        this.room = GetComponent<Room>();
+        this.currentRoomManager = GetComponent<RoomManager>();
         // if (this.room == null) return null;
-        SORoom room = this.room.roomData;
+        SORoom room = this.currentRoomManager.roomData;
 
         return room;
     }
@@ -117,6 +140,7 @@ public class MapManager : MonoBehaviour
             Invoke("MoveStartPoint", 0.3f);
         })
         .AppendInterval(1)
+        .AppendCallback(MoveToStartPoint)
         .Append(fadePanel.DOFade(0, 0.5f));
     }
 
@@ -133,9 +157,10 @@ public class MapManager : MonoBehaviour
         .Append(fadePanel.DOFade(0, 0.5f));
     }
 
-    public void MoveStartPoint()
+    public void MoveToStartPoint()
     {
-        player.position = startPoint.position;
+        player.position = startPoint;
+        player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
     }
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
@@ -364,7 +389,7 @@ public class MapManager : MonoBehaviour
             if (isClimbing)
                 PlayerRef.Instance.movement.wallClimbEnabled = true;
 
-            chapter.text = room.scene.SceneName;
+            chapterDebugUI.text = room.scene.SceneName;
 
             // 25.03.03 추가
             // 로드 후 이벤트 발생시킴
@@ -402,18 +427,18 @@ public class MapManager : MonoBehaviour
         //현재 룸에 대한 저장
         List<int> senders = new List<int>();
 
-        senders = room.GetAllGimmicksStates();
+        senders = currentRoomManager.GetAllGimmicksStates();
         SaveLoadManager.Instance.SaveMap(currentRoom.scene.SceneName, senders);
     }
 
     public void LoadSceneState()
     {
-        if (SaveLoadManager.Instance.CanLoadMap(currentRoom.scene.SceneName))
+        if (SaveLoadManager.Instance.CanLoadSceneState(currentRoom.scene.SceneName))
         {
-            MapSaveData Data = SaveLoadManager.Instance.LoadMap(currentRoom.scene.SceneName);
+            MapSaveData Data = SaveLoadManager.Instance.LoadSceneState(currentRoom.scene.SceneName);
 
             if (Data != null)
-                room.SetAllGimmickStates(Data.LoadSenders());
+                currentRoomManager.SetAllGimmickStates(Data.LoadSenders());
         }
     }
 
@@ -434,4 +459,13 @@ public class MapManager : MonoBehaviour
         return true;
     }
     #endregion
+
+    private void OnDrawGizmos()
+    {
+        if(drawStartpointGizmo)
+        {
+            Gizmos.color = Color.black;
+            Gizmos.DrawCube(startPoint, Vector3.one);
+        }
+    }
 }
