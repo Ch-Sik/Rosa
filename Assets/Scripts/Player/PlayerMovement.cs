@@ -46,9 +46,6 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("하향 점프 플렛폼 적용 시간")]
     [SerializeField] float downJumpPlatformDuration = 0.1f;
 
-    
-
-
 
     // 벽이동 관련 파라미터
     [FoldoutGroup("벽이동 관련")]
@@ -90,6 +87,10 @@ public class PlayerMovement : MonoBehaviour
 
     // 대시 관련
     [FoldoutGroup("대시 관련")]
+    [Tooltip("대시 활성화 여부")]
+    [SerializeField, ReadOnly] bool dashEnabled = false;
+
+    [FoldoutGroup("대시 관련")]
     [Tooltip("대시 속도")]
     [SerializeField] float dashSpeed = 5f;
 
@@ -106,6 +107,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, ReadOnly] float dashLeftCooldown;
 
     // 버섯점프 관련
+    [FoldoutGroup("버섯 점프 관련")]
+    [Tooltip("버섯 점프 활성화 여부")]
+    [SerializeField, ReadOnly] bool mushJumpEnabled = false;
+
     [FoldoutGroup("버섯 점프 관련")]
     [Tooltip("버섯을 설치할 때 플레이어 앞으로 얼마나 떨어지게 설치할건지")]
     [SerializeField] float mushroomOffset = 1.0f;
@@ -142,10 +147,18 @@ public class PlayerMovement : MonoBehaviour
     [FoldoutGroup("큐브 관련")]
     [SerializeField] float grabSpeedCoef = 0.5f;
 
+    // 활강 관련
+    [FoldoutGroup("활강 관련")]
+    [Tooltip("활강 활성화 여부")]
+    [SerializeField, ReadOnly] bool glidingEnabled = false;
 
     [FoldoutGroup("활강 관련")]
     float defaultGravityScale = 2.8f;
-    [FoldoutGroup("활강 관련")] [SerializeField] float glidingGravityScale = 0.1f;
+
+    [FoldoutGroup("활강 관련")] 
+    [SerializeField] float glidingGravityScale = 0.1f;
+
+
 
     // 플래그
     [FoldoutGroup("플래그")]
@@ -250,6 +263,7 @@ public class PlayerMovement : MonoBehaviour
     {
         GetComponents();
         InitFields();
+        LoadFlags();
     }
 
 
@@ -269,6 +283,13 @@ public class PlayerMovement : MonoBehaviour
         climbableLayer = LayerMask.NameToLayer("Climbable");
         defaultGravityScale = rb.gravityScale;
         defaultMoveSpeed = moveSpeed;
+    }
+
+    void LoadFlags()
+    {
+        dashEnabled = FlagManager.Instance.GetFlag("dashEnabled") == 1 ? true : false;
+        mushJumpEnabled = FlagManager.Instance.GetFlag("mushJumpEnabled") == 1 ? true : false;
+        glidingEnabled = FlagManager.Instance.GetFlag("glidingEnabled") == 1 ? true : false;
     }
     #endregion
 
@@ -769,6 +790,12 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void MushJump()
     {
+        if(!mushJumpEnabled)
+        {
+            Debug.Log("버섯 점프 미습득");
+            return;
+        }
+
         //큐브를 옮기는 중이라면, 큐브를 놓아버림
         if (isGrabCube)
             PlayerRef.Instance.grabCube.UnGrab();
@@ -778,6 +805,14 @@ public class PlayerMovement : MonoBehaviour
         moveSpeed = mushJumpMoveSpeed;
         rb.velocity = new Vector2(rb.velocity.x, mushJumpPower);
         playerRef.animation.SetJumpTrigger();
+    }
+
+    [Button, FoldoutGroup("버섯 점프 관련")]
+    public void EnableMushJump()
+    {
+        Debug.Log("버섯 점프 습득!");
+        FlagManager.Instance.SetFlag("mushJumpEnabled", 1);
+        mushJumpEnabled = true;
     }
     #endregion
 
@@ -828,6 +863,11 @@ public class PlayerMovement : MonoBehaviour
     #region 활강 관련
     internal void Gliding()
     {
+        if (!glidingEnabled)
+        {
+            Debug.Log("활강 미습득");
+            return;
+        }
         if (isGrounded) return;
         if (isWallJumping) return;
         if (isJumpingUp) FinishJumpUp();
@@ -855,13 +895,25 @@ public class PlayerMovement : MonoBehaviour
     {
         rb.velocity = new Vector2(rb.velocity.x, 0);
     }
+
+    [Button, FoldoutGroup("활강 관련")]
+    public void EnableGliding()
+    {
+        Debug.Log("활강 습득!");
+        FlagManager.Instance.SetFlag("glidingEnabled", 1);
+        glidingEnabled = true;
+    }
     #endregion
 
     #region 대시 관련
 
-
     public void Dash()
     {
+        if (!dashEnabled)
+        {
+            Debug.Log("대시 미습득");
+            return;
+        }
 
         if(isDashing || (dashCooldownTimer != null && dashCooldownTimer.duration < dashCooldown))
         {
@@ -891,6 +943,14 @@ public class PlayerMovement : MonoBehaviour
 
         rb.gravityScale = originGravityScale;
         rb.velocity = Vector2.zero;
+    }
+
+    [Button, FoldoutGroup("대시 관련")]
+    public void EnableDash()
+    {
+        Debug.Log("대시 습득!");
+        FlagManager.Instance.SetFlag("dashEnabled", 1);
+        dashEnabled = true;
     }
 
     #endregion
