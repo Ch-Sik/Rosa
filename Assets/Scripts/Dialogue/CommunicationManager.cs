@@ -2,7 +2,6 @@ using Com.LuisPedroFonseca.ProCamera2D;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +63,7 @@ public class CommunicationManager : MonoBehaviour
     public string folderName = "Dialogue";                          //폴더이름 수식
     public float endDelay = 1.5f;                                   //종료 딜레이
     public CommunicationUI UI;                                      //UI관리
-    public TestLanguage language;                                   //게임 언어 수식
+    public CommunicationTextLanguage language;                                   //게임 언어 수식
     public int i = 0;                                               //전역으로 사용할 반복자
     public bool isTalking = false;                                  //말하는 중인지 파악
     public bool isCommunicating = false;                            //대화 중인지 파악
@@ -257,6 +256,7 @@ public class CommunicationManager : MonoBehaviour
         //커뮤니케이션 타입에 따른 함수에 파라미터 전달
         switch (data[i].type)
         {
+            case CommunicationType.None: Next(); return;
             case CommunicationType.Show: Show(target, data[i].location); return;
             case CommunicationType.Hide: Hide(target); return;
             case CommunicationType.SetEmotion: SetEmotion(target, data[i].emotion); return;
@@ -264,13 +264,16 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); return;
             case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); return;
             case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); Next();  return;
-            case CommunicationType.Function: Function(data[i].function); return;
+            // 25.05.13) CommunicationManager에서 임의 함수를 호출할 수 있는 기능 삭제
+            //case CommunicationType.Function: Function(data[i].function); return;
+            case CommunicationType.Function_DO_NOT_USE: Debug.LogError("CommunicationType.Function 사용 금지!"); return;
             case CommunicationType.Delay: DelayAndGoNext(data[i].delay); return;
             case CommunicationType.Sfx: Sfx(data[i].sfx); return;
-            case CommunicationType.Flag: SetFlag(data[i].flagKey, data[i].flagValue); return;
+            case CommunicationType.Flag: SetFlag(data[i].key, data[i].flagValue); return;
             case CommunicationType.HideAll: HideAll(); return;
-            case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].roomPosition); return;
+            case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].position); return;
             case CommunicationType.WalkTo: WalkTo(target, data[i].position); return;        // 25.04.19 추가
+            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(data[i].key); Next(); return;
         }
     }
 
@@ -420,6 +423,26 @@ public class CommunicationManager : MonoBehaviour
         DelayAndGoNext(t);
     }
 
+    // 25.05.13) 플레이어 액션 해금 기능 추가
+    public void UnlockPlayerAction(string actionToUnlock)
+    {
+        switch(actionToUnlock)
+        {
+            case "Dash":
+                PlayerRef.Instance.movement.EnableDash();
+                break;
+            case "MushJump":
+                PlayerRef.Instance.movement.EnableMushJump();
+                break;
+            case "Gliding":
+                PlayerRef.Instance.movement.EnableGliding();
+                break;
+            default:
+                Debug.LogError("CommunicationManager.UnlockPlayerAction) 잘못된 키값 들어옴");
+                break;
+        }
+    }
+
     //다음 커뮤니케이션 실행
     public void Next()
     {
@@ -457,8 +480,8 @@ public class CommunicationManager : MonoBehaviour
     {
         switch (language)
         {
-            case TestLanguage.KOR: return "KOR";
-            case TestLanguage.ENG: return "ENG";
+            case CommunicationTextLanguage.KOR: return "KOR";
+            case CommunicationTextLanguage.ENG: return "ENG";
             default: return "ENG";
         }
     }
@@ -499,178 +522,11 @@ public class CommunicationManager : MonoBehaviour
             isCommunicating = false;
             return false;
         }
-
-        return false;
     }
     #endregion
 }
 
-
-
-[Serializable]
-public class CommunicationData
-{
-    public CommunicationType type;
-    [ShowIf("@type == CommunicationType.TargetText || type == CommunicationType.Show || type == CommunicationType.Hide || type == CommunicationType.SetEmotion || type == CommunicationType.WalkTo")]
-    public CommunicationTarget target;
-    [ShowIf("@type == CommunicationType.SetEmotion")]
-    public Emotion emotion;
-    [ShowIf("@type == CommunicationType.PlayerText || type == CommunicationType.TargetText"), ReadOnly]
-    public string text;                 // 24.12.21.    가독성 개선 목적으로 인스펙터에 노출되게 변경
-    [ShowIf("@type == CommunicationType.Show")]
-    public CommunicationLocation location;
-    [ShowIf("@type == CommunicationType.MoveCameraTo || type == CommunicationType.WalkTo")]
-    public Vector2 position;
-    [ShowIf("@type == CommunicationType.Function")]
-    public UnityEvent function;
-    [ShowIf("@type == CommunicationType.Delay")]
-    public float delay;
-    [ShowIf("@type == CommunicationType.Sfx")]
-    public AudioClip sfx;
-    [ShowIf("@type == CommunicationType.Flag")]
-    public string flagKey;
-    [ShowIf("@type == CommunicationType.Flag")]
-    public int flagValue;
-    [ShowIf("@type == CommunicationType.MoveRoom")]
-    public SORoom room;
-    [ShowIf("@type == CommunicationType.MoveRoom")]
-    public Vector2 roomPosition;
-
-    CommunicationData()
-    {
-        type = CommunicationType.None;
-        target = CommunicationTarget.None;
-        emotion = Emotion.Normal;
-        text = "";
-        location = CommunicationLocation.Left;
-        position = Vector2.zero;
-        delay = 0;
-        sfx = null;
-        room = null;
-        roomPosition = Vector2.zero;
-    }
-}
-
-public enum CommunicationType
-{
-    None,
-    Show,                       //UI창에서 대상을 생성한다.
-    Hide,                       //UI창에서 대상을 없앤다.
-    SetEmotion,                 //대상의 이모션을 변경한다.
-    TargetText,                 //대상의 채팅을 출력한다.
-    PlayerText,                 //플레이어의 채팅을 출력한다.
-    MoveCameraTo,               //특정 위치로 카메라를 이동시킨다.
-    ReturnCameraToPlayer,       //카메라를 원위치 시킨다.
-    Function,                   //특정 함수를 작동시킨다.
-    Delay,                      //커뮤니케이션에 딜레이를 준다.
-    Sfx,                        //특정 소리를 발생시킨다.
-    Flag,                       //플래그를 변경한다.
-    HideAll,                    // 24.12.22) 화면 상에 보이는 모든 대상을 '동시에' 숨긴다.
-    MoveRoom,                   //특정 룸으로 이동시킨다.
-    WalkTo,                     // 25.04.19) 캐릭터를 설정한 x좌표까지 걷게 한다.
-}
-
-public enum CommunicationTarget
-{
-    None,
-    Player,
-    Healer,
-    Healer_noName,
-    Healer_boss,
-    Salamander,
-    Salamander_noName,
-    Watchmaker,
-    Watchmaker_noName,
-    Bear,
-    Crane,
-    Wolf,
-    A,
-    B,
-    C
-}
-
-public enum CommunicationLocation
-{
-    Left,
-    Right
-}
-
-[Serializable]
-public class CharacterEmotion
-{
-    public CommunicationTarget target;
-    public string Name;
-    public Sprite Normal;
-    public Sprite Happy1;
-    public Sprite Happy2;
-    public Sprite Embarrassed1;
-    public Sprite Embarrassed2;
-    public Sprite Serious1;
-    public Sprite Serious2;
-    public Sprite Sad;
-    public Sprite Sigh;
-    public Sprite Mad;
-    public Sprite Special;
-
-    public Sprite GetEmotionImage(Emotion emotion)
-    {
-        Sprite ret = null;
-        switch (emotion)
-        {
-            case Emotion.Normal: ret = Normal; break;
-            case Emotion.Happy1: ret = Happy1; break;
-            case Emotion.Happy2: ret = Happy2; break;
-            case Emotion.Embarrassed1: ret = Embarrassed1; break;
-            case Emotion.Embarrassed2: ret = Embarrassed2; break;
-            case Emotion.Serious1: ret = Serious1; break;
-            case Emotion.Serious2: ret = Serious2; break;
-            case Emotion.Sad: ret = Sad; break;
-            case Emotion.Sigh: ret = Sigh; break;
-            case Emotion.Mad: ret = Mad; break;
-            case Emotion.Special: ret = Special; break;
-            default: return Normal;
-        }
-        Debug.Assert(ret != null, "CharacterEmotion: 해당 표정 스프라이트가 지정되어있지 않음");
-        return ret;
-    }
-
-    public CharacterEmotion DeepCopy()
-    {
-        return new CharacterEmotion()
-        {
-            Name = this.Name,
-            target = this.target,
-            Normal = this.Normal,
-            Happy1 = this.Happy1,
-            Happy2 = this.Happy2,
-            Embarrassed1 = this.Embarrassed1,
-            Embarrassed2 = this.Embarrassed2,
-            Serious1 = this.Serious1,
-            Serious2 = this.Serious2,
-            Sad = this.Sad,
-            Sigh = this.Sigh,
-            Mad = this.Mad,
-            Special = this.Special,
-        };
-    }
-}
-
-public enum Emotion
-{
-    Normal,
-    Happy1,
-    Happy2,
-    Embarrassed1,
-    Embarrassed2,
-    Serious1,
-    Serious2,
-    Sad,
-    Sigh,
-    Mad,
-    Special
-}
-
-public enum TestLanguage
+public enum CommunicationTextLanguage
 {
     KOR,
     ENG
