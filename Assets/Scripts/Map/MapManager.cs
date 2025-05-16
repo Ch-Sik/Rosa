@@ -286,9 +286,9 @@ public class MapManager : MonoBehaviour
             case PortDirection.Bot:
                 return new Vector3(0, 2);
             case PortDirection.Rig:
-                return new Vector3(-2, 0);
+                return new Vector3(-2, 0.5f);
             case PortDirection.Lef:
-                return new Vector3(2, 0);
+                return new Vector3(2, 0.5f);
 
             default: return Vector3.zero;
         }
