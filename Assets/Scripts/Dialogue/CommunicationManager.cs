@@ -464,7 +464,18 @@ public class CommunicationManager : MonoBehaviour
         CommunicationSO[] arr = Resources.LoadAll<CommunicationSO>(folderName).ToArray();
 
         for (int i = 0; i < arr.Length; i++)
-            communicationDatas.Add(arr[i].ID, arr[i]);
+        {
+            try
+            {
+                communicationDatas.Add(arr[i].ID, arr[i]);
+            }
+            catch {
+                Debug.LogError("CommunicationManager: 딕셔너리에 대화 데이터 입력 실패. 아마도 중복된 키값(ID) 때문\n"
+                    + $"ID: {arr[i].ID}, textFileName: {arr[i].textFileName}");
+            }
+        }
+
+        Debug.Log("CommunicationManager: 대화 정보 로드 완료");
     }
 
     //List 형태로 관리되고 있는 데이터를 Dictionary형태로 전환함
@@ -473,6 +484,7 @@ public class CommunicationManager : MonoBehaviour
         for (int i = 0; i < characterDatas.Count; i++)
             if (!characters.ContainsKey(characterDatas[i].target))
                 characters.Add(characterDatas[i].target, characterDatas[i].DeepCopy());
+        Debug.Log("CommunicationManager: 캐릭터 초상화 정보 로드 완료");
     }
 
     //현재 설정된 언어를 추적하여 언어에 따른 키를 반환함.

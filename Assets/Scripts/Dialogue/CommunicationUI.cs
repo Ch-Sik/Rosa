@@ -244,7 +244,7 @@ public class TargetImage
         }
         catch(Exception e)
         {
-            Debug.LogError("캐릭터 스프라이트가 설정되어있지 않음");
+            Debug.LogError($"캐릭터 스프라이트가 설정되어있지 않음, target: {target}, emotion: {emotion}");
             return;
         }
 
