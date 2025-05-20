@@ -19,6 +19,7 @@ using System.Collections.Generic;
 
 using AnyPortrait;
 using System.CodeDom.Compiler;
+using System.Text;
 
 namespace AnyPortrait
 {
@@ -131,6 +132,7 @@ namespace AnyPortrait
 
 		private apGUIContentWrapper _guiContent_BakeBtn_Normal = null;
 		private apGUIContentWrapper _guiContent_BakeBtn_Optimized = null;
+		private apGUIContentWrapper _guiContent_Btn_Checklist = null;
 
 		private GUIStyle _guiStyle_Category = null;
 		private GUIStyle _guiStyle_SyncBtn = null;
@@ -371,110 +373,29 @@ namespace AnyPortrait
 				_guiContent_BakeBtn_Optimized = apGUIContentWrapper.Make(4, _editor.GetText(TEXT.DLG_OptimizedBakeTo), _editor.ImageSet.Get(apImageSet.PRESET.BakeBtn_Optimized));
 			}
 
+			if(_guiContent_Btn_Checklist == null)
+			{
+				//"Bake 옵션 검토하기"
+				_guiContent_Btn_Checklist = apGUIContentWrapper.Make(4, _editor.GetText(TEXT.ValidateOptions), _editor.ImageSet.Get(apImageSet.PRESET.Compatibility_Open));
+			}
+
 			//Bake 설정
 			//EditorGUILayout.LabelField(_editor.GetText(TEXT.DLG_BakeSetting));//"Bake Setting"
 			//GUILayout.Space(5);
 
 			EditorGUILayout.ObjectField(_editor.GetText(TEXT.DLG_Portrait), _targetPortrait, typeof(apPortrait), true);//"Portait"
 
-			GUILayout.Space(5);
-
-			//"Bake Scale"
-			float prevBakeScale = _targetPortrait._bakeScale;
-			_targetPortrait._bakeScale = EditorGUILayout.FloatField(_editor.GetText(TEXT.DLG_BakeScale), _targetPortrait._bakeScale);
-
-			//"Z Per Depth"
-			float prevBakeZSize = _targetPortrait._bakeZSize;
-			_targetPortrait._bakeZSize = EditorGUILayout.FloatField(_editor.GetText(TEXT.DLG_ZPerDepth), _targetPortrait._bakeZSize);
-
-			if (_targetPortrait._bakeZSize < 0.5f)
-			{
-				_targetPortrait._bakeZSize = 0.5f;
-			}
-
-			if (prevBakeScale != _targetPortrait._bakeScale ||
-				prevBakeZSize != _targetPortrait._bakeZSize)
-			{
-				apEditorUtil.SetDirty(_editor);
-			}
-
+			//(v1.6.0 Bake Scale을 Setting 탭으로 이동)
 
 			//Bake 버튼
-			GUILayout.Space(10);
+			GUILayout.Space(5);
 
 
 			//[ Bake ] 기능 실행
-			if (GUILayout.Button(_guiContent_BakeBtn_Normal.Content, GUILayout.Height(45)))//"Bake"//_editor.GetText(TEXT.DLG_Bake)
+			if (GUILayout.Button(_guiContent_BakeBtn_Normal.Content, GUILayout.Height(60)))//"Bake"//_editor.GetText(TEXT.DLG_Bake)
 			{
-				GUI.FocusControl(null);
-
-				//CheckChangedProperties(nextRootScale, nextZScale);
-				apEditorUtil.SetDirty(_editor);
-
-
-				//추가 22.1.7 : SRP 옵션이 적절한지 물어보고 자동으로 변경한다.
-				CheckSRPOption();
-
-
-				//-------------------------------------
-				// Bake 함수를 실행한다. << 중요오오오오
-				//-------------------------------------
-
-				apBakeResult bakeResult = _editor.Controller.Bake();
-
-				if (bakeResult != null)
-				{
-					_editor.Notification("[" + _targetPortrait.name + "] is Baked", false, false);
-
-					if (bakeResult.NumUnlinkedExternalObject > 0)
-					{
-						EditorUtility.DisplayDialog(_editor.GetText(TEXT.BakeWarning_Title),
-							_editor.GetTextFormat(TEXT.BakeWarning_Body, bakeResult.NumUnlinkedExternalObject),
-							_editor.GetText(TEXT.Okay));
-					}
-
-					//추가 3.29 : Bake 후에 Ambient를 체크하자
-					CheckAmbientAndCorrection();
-
-					//추가 22.1.6 : Bake 후에 URP 설정 체크를 하자 > 일단 보류. 문제가 확인되지 않는다.
-					//CheckURP2022SettingsIfAnyClippedMeshes();
-
-					//추가 22.5.16 : Bake가 끝난 후에 자동으로 선택하자
-					Selection.activeGameObject = _targetPortrait.gameObject;
-
-					//자동 저장
-					if(_editor._isSaveProjectWhenBaked)
-					{
-						apEditorUtil.SaveUnityProject();
-					}
-
-
-					//[v1.5.0]
-					//Bake 직후에 애니메이션 편집 중 / 루트 유닛 상태에서
-					//애니메이션 업데이트 중 Control Param 업데이트를 다시 해준다.
-					//컨트롤 파라미터 값이 원래대로 돌아가는 문제가 있다.
-					if (_editor.Select.SelectionType == apSelection.SELECTION_TYPE.Overall)
-					{
-						if (_editor.Select.RootUnitAnimClip != null)
-						{
-							_editor.Select.RootUnitAnimClip.UpdateControlParam_Editor();
-						}
-					}
-					if (_editor.Select.SelectionType == apSelection.SELECTION_TYPE.Animation)
-					{
-						if (_editor.Select.AnimClip != null)
-						{
-							_editor.Select.AnimClip.UpdateControlParam_Editor();
-						}
-					}
-
-					_editor.SetRepaint();
-				}
-				else
-				{
-					//추가 20.11.7 : Bake가 실패한 경우
-					_editor.Notification("Bake is canceled", false, false);
-				}
+				// < Bake를 실행한다. >
+				ProcessBake();
 			}
 
 
@@ -565,69 +486,10 @@ namespace AnyPortrait
 			}
 			
 			// [ Optimized Bake ] 기능 실행
-			if (GUILayout.Button(_guiContent_BakeBtn_Optimized.Content, GUILayout.Height(45)))
+			if (GUILayout.Button(_guiContent_BakeBtn_Optimized.Content, GUILayout.Height(60)))
 			{
-				GUI.FocusControl(null);
-
-				if (apVersion.I.IsDemo)
-				{
-					//데모 제한 다이얼로그
-					EditorUtility.DisplayDialog(_editor.GetText(TEXT.DemoLimitation_Title),
-													_editor.GetText(TEXT.DemoLimitation_Body),
-													_editor.GetText(TEXT.Okay));
-				}
-				else
-				{
-					// < 풀버전 전용 코드 >
-					#region ONLY_FULLVERSION
-
-					//CheckChangedProperties(nextRootScale, nextZScale);
-
-					//추가 22.1.7 : SRP 옵션이 적절한지 물어보고 자동으로 변경한다.
-					CheckSRPOption();
-
-
-					//Optimized Bake를 하자
-					apBakeResult bakeResult = _editor.Controller.Bake_Optimized(_targetPortrait, _targetPortrait._bakeTargetOptPortrait);
-
-					if (bakeResult != null)
-					{
-						if (bakeResult.NumUnlinkedExternalObject > 0)
-						{
-							EditorUtility.DisplayDialog(_editor.GetText(TEXT.BakeWarning_Title),
-								_editor.GetTextFormat(TEXT.BakeWarning_Body, bakeResult.NumUnlinkedExternalObject),
-								_editor.GetText(TEXT.Okay));
-						}
-
-						_editor.Notification("[" + _targetPortrait.name + "] is Baked (Optimized)", false, false);
-
-						//추가 3.29 : Bake 후에 Ambient를 체크하자
-						CheckAmbientAndCorrection();
-
-						//추가 22.1.6 : Bake 후에 URP 설정 체크를 하자 > 일단 보류. 문제가 확인되지 않는다.
-						//CheckURP2022SettingsIfAnyClippedMeshes();
-
-						if (_targetPortrait._bakeTargetOptPortrait != null)
-						{
-							//추가 22.5.16 : Bake가 끝난 후에 자동으로 선택하자
-							Selection.activeGameObject = _targetPortrait._bakeTargetOptPortrait.gameObject;
-						}
-
-						//자동 저장
-						if(_editor._isSaveProjectWhenBaked)
-						{
-							apEditorUtil.SaveUnityProject();
-						}
-
-					}
-					else
-					{
-						//Bake가 취소되었다. (20.11.7)
-						_editor.Notification("Bake is canceled (Optimized)", false, false);
-					}
-
-					#endregion
-				}
+				// < 최적화된 Bake를 실행한다. >
+				ProcessOptimziedBake();				
 
 				
 			}
@@ -636,9 +498,19 @@ namespace AnyPortrait
 
 			DrawDelimeter(width - 5);
 
-			//TODO : 언어
-			bool isPrevSaveOption = _editor._isSaveProjectWhenBaked;
+
+			//v1.6.0 : Bake 옵션 호환성 테스트
+
+			if(GUILayout.Button(_guiContent_Btn_Checklist.Content, GUILayout.Height(34)))
+			{
+				apDialog_BakeCompatibility.ShowDialog(_editor, _targetPortrait);
+			}
+
+			GUILayout.Space(5);
+
 			//"Bake 후 자동 저장"
+			bool isPrevSaveOption = _editor._isSaveProjectWhenBaked;
+			
 			EditorGUILayout.BeginHorizontal(GUILayout.Width(width));
 			GUILayout.Space(2);
 			EditorGUILayout.LabelField(_editor.GetText(TEXT.DLG_SaveScenesAfterBake), GUILayout.Width(width - 40));
@@ -650,6 +522,8 @@ namespace AnyPortrait
 			{
 				_editor.SaveEditorPref();
 			}
+
+			
 		}
 
 
@@ -761,6 +635,63 @@ namespace AnyPortrait
 			//사용자가 기본값으로서 저장된 값이 있는지 확인한다.
 			bool isDefaultSaved = _editor.ProjectSettingData.IsCommonSettingSaved;
 			
+
+			//v1.6.0 : Bake Scale / Z-PerDepth를 여기에 설정한다.
+			//"Bake Scale"
+			bool isBakeScaleChanged = false;
+			float nextBakeScale = Layout_DelayedFloat(	_editor.GetText(TEXT.DLG_BakeScale),
+														_targetPortrait._bakeScale,
+														width,
+														isDefaultSaved,
+														_editor.ProjectSettingData.Common_BakeScale,
+														out isBakeScaleChanged
+														);
+
+			if(isBakeScaleChanged)
+			{
+				apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.Portrait_SettingChanged,
+													_editor,
+													_targetPortrait,
+													//null, 
+													false,
+													apEditorUtil.UNDO_STRUCT.ValueOnly);
+				_targetPortrait._bakeScale = nextBakeScale;
+				apEditorUtil.SetDirty(_editor);
+			}
+			
+			
+
+			
+
+			//"Z Per Depth"
+			bool isBakeZSizeChanged = false;
+			float nextBakeZSize = Layout_DelayedFloat(	_editor.GetText(TEXT.DLG_ZPerDepth),
+														_targetPortrait._bakeZSize,
+														width,
+														isDefaultSaved,
+														_editor.ProjectSettingData.Common_BakeZSize,
+														out isBakeZSizeChanged);
+
+			if(isBakeZSizeChanged)
+			{
+				apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.Portrait_SettingChanged,
+													_editor,
+													_targetPortrait,
+													//null, 
+													false,
+													apEditorUtil.UNDO_STRUCT.ValueOnly);
+				_targetPortrait._bakeZSize = nextBakeZSize;
+
+				if (_targetPortrait._bakeZSize < 0.1f)
+				{
+					_targetPortrait._bakeZSize = 0.1f;
+				}
+				apEditorUtil.SetDirty(_editor);
+			}
+
+			DrawDelimeter(width);
+			
+
 
 			//2. Sorting Layer
 			int curSortingLayerIndex = FindSortingLayerIndex(_targetPortrait._sortingLayerID);
@@ -1945,6 +1876,156 @@ namespace AnyPortrait
 
 		// Functions
 		//------------------------------------------------------------------------------
+		//Bake 함수
+		private void ProcessBake()
+		{
+			GUI.FocusControl(null);
+
+			//CheckChangedProperties(nextRootScale, nextZScale);
+			apEditorUtil.SetDirty(_editor);
+
+
+			//추가 22.1.7 : SRP 옵션이 적절한지 물어보고 자동으로 변경한다.
+			//CheckSRPOption();
+			bool isValid = ValidateEnvironment();
+			if(!isValid)
+			{
+				//호환성 문제로 Bake를 중지한다.
+				_editor.Notification("Bake is canceled", false, false);
+				return;
+			}
+
+
+			//-------------------------------------
+			// Bake 함수를 실행한다. << 중요오오오오
+			//-------------------------------------
+
+			apBakeResult bakeResult = _editor.Controller.Bake();
+
+			if(bakeResult == null)
+			{
+				//추가 20.11.7 : Bake가 실패한 경우
+				_editor.Notification("Bake is canceled", false, false);
+				return;
+			}
+
+			_editor.Notification("[" + _targetPortrait.name + "] is Baked", false, false);
+
+			if (bakeResult.NumUnlinkedExternalObject > 0)
+			{
+				EditorUtility.DisplayDialog(_editor.GetText(TEXT.BakeWarning_Title),
+					_editor.GetTextFormat(TEXT.BakeWarning_Body, bakeResult.NumUnlinkedExternalObject),
+					_editor.GetText(TEXT.Okay));
+			}
+
+			//추가 3.29 : Bake 후에 Ambient를 체크하자
+			CheckAmbientAndCorrection();
+
+			//추가 22.1.6 : Bake 후에 URP 설정 체크를 하자 > 일단 보류. 문제가 확인되지 않는다.
+			//CheckURP2022SettingsIfAnyClippedMeshes();
+
+			//추가 22.5.16 : Bake가 끝난 후에 자동으로 선택하자
+			Selection.activeGameObject = _targetPortrait.gameObject;
+
+			//자동 저장
+			if(_editor._isSaveProjectWhenBaked)
+			{
+				apEditorUtil.SaveUnityProject();
+			}
+
+
+			//[v1.5.0]
+			//Bake 직후에 애니메이션 편집 중 / 루트 유닛 상태에서
+			//애니메이션 업데이트 중 Control Param 업데이트를 다시 해준다.
+			//컨트롤 파라미터 값이 원래대로 돌아가는 문제가 있다.
+			if (_editor.Select.SelectionType == apSelection.SELECTION_TYPE.Overall)
+			{
+				if (_editor.Select.RootUnitAnimClip != null)
+				{
+					_editor.Select.RootUnitAnimClip.UpdateControlParam_Editor();
+				}
+			}
+			if (_editor.Select.SelectionType == apSelection.SELECTION_TYPE.Animation)
+			{
+				if (_editor.Select.AnimClip != null)
+				{
+					_editor.Select.AnimClip.UpdateControlParam_Editor();
+				}
+			}
+
+			_editor.SetRepaint();
+		}
+
+		private void ProcessOptimziedBake()
+		{
+			GUI.FocusControl(null);
+
+			if (apVersion.I.IsDemo)
+			{
+				//데모 제한 다이얼로그
+				EditorUtility.DisplayDialog(_editor.GetText(TEXT.DemoLimitation_Title),
+												_editor.GetText(TEXT.DemoLimitation_Body),
+												_editor.GetText(TEXT.Okay));
+
+				return;
+			}
+			
+			// < 풀버전 전용 코드 >
+			#region ONLY_FULLVERSION
+
+			//CheckChangedProperties(nextRootScale, nextZScale);
+
+			//추가 22.1.7 : SRP 옵션이 적절한지 물어보고 자동으로 변경한다.
+			// CheckSRPOption();
+			bool isValid = ValidateEnvironment();
+			if(!isValid)
+			{
+				//호환성 문제로 Bake를 중지한다.
+				_editor.Notification("Bake is canceled (Optimized)", false, false);
+				return;
+			}
+
+			//Optimized Bake를 하자
+			apBakeResult bakeResult = _editor.Controller.Bake_Optimized(_targetPortrait, _targetPortrait._bakeTargetOptPortrait);
+
+			if(bakeResult == null)
+			{
+				//Bake가 취소되었다. (20.11.7)
+				_editor.Notification("Bake is canceled (Optimized)", false, false);
+				return;
+			}
+
+			if (bakeResult.NumUnlinkedExternalObject > 0)
+			{
+				EditorUtility.DisplayDialog(_editor.GetText(TEXT.BakeWarning_Title),
+					_editor.GetTextFormat(TEXT.BakeWarning_Body, bakeResult.NumUnlinkedExternalObject),
+					_editor.GetText(TEXT.Okay));
+			}
+
+			_editor.Notification("[" + _targetPortrait.name + "] is Baked (Optimized)", false, false);
+
+			//추가 3.29 : Bake 후에 Ambient를 체크하자
+			CheckAmbientAndCorrection();
+
+			//추가 22.1.6 : Bake 후에 URP 설정 체크를 하자 > 일단 보류. 문제가 확인되지 않는다.
+			//CheckURP2022SettingsIfAnyClippedMeshes();
+
+			if (_targetPortrait._bakeTargetOptPortrait != null)
+			{
+				//추가 22.5.16 : Bake가 끝난 후에 자동으로 선택하자
+				Selection.activeGameObject = _targetPortrait._bakeTargetOptPortrait.gameObject;
+			}
+
+			//자동 저장
+			if(_editor._isSaveProjectWhenBaked)
+			{
+				apEditorUtil.SaveUnityProject();
+			}
+
+			#endregion
+		}
+
+
 		private void MakeAmbientLightToBlack()
 		{	
 			RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
@@ -2017,152 +2098,298 @@ namespace AnyPortrait
 			apDialog_AmbientCorrection.ShowDialog(_editor, (int)position.x, (int)position.y);
 		}
 
+
+
+		
 		
 
 
+		// /// <summary>
+		// /// 추가 22.1.6 : Bake후에 URP 설정을 사용하고 있고 클리핑 메시를 사용하고 있었다면 안내 메시지를 보여주자. Sort 관련 에러인데 일단 패스
+		// /// </summary>
+		// private void CheckURP2022SettingsIfAnyClippedMeshes()
+		// {
+		// 	if(_editor == null || _targetPortrait == null)
+		// 	{
+		// 		return;
+		// 	}
+		// 	if(!_editor._isShowURPWarningMsg)
+		// 	{
+		// 		//메시지 안보기로 했다면
+		// 		return;
+		// 	}
+
+		// 	//유니티 2022부터 체크
+		// 	if(!apEditorUtil.IsUseURPRenderPipeline2022())
+		// 	{
+		// 		//URP를 사용하지 않는다면 당연히 그냥 넘어감
+		// 		return;
+		// 	}
+
+		// 	//Bake된 메시들 중에서
+		// 	bool isAnyClippedMeshes = false;
+		// 	int nOptMeshes = _targetPortrait._optMeshes != null ? _targetPortrait._optMeshes.Count : 0;
+		// 	apOptMesh optMesh = null;
+		// 	for (int i = 0; i < nOptMeshes; i++)
+		// 	{
+		// 		optMesh = _targetPortrait._optMeshes[i];
+		// 		if(optMesh._isMaskChild)
+		// 		{
+		// 			isAnyClippedMeshes = true;
+		// 			break;
+		// 		}
+		// 	}
+
+		// 	if(!isAnyClippedMeshes)
+		// 	{
+		// 		//클리핑 메시가 없다면
+		// 		return;
+		// 	}
+
+		// 	//다이얼로그 표시
+		// 	apDialog_URPSettingNotice.ShowDialog(_editor, (int)position.x, (int)position.y);
+		// }
+
 		/// <summary>
-		/// 추가 22.1.6 : Bake후에 URP 설정을 사용하고 있고 클리핑 메시를 사용하고 있었다면 안내 메시지를 보여주자
+		/// SRP 옵션 등이 제대로 설정되었는지 물어보고 설정한다.
+		/// Bake 진행시 true, 중단시 false를 리턴한다.
+		/// 안내 메시지 다이얼로그를 추가로 열지는 여기서 판단한다.
 		/// </summary>
-		private void CheckURP2022SettingsIfAnyClippedMeshes()
-		{
-			if(_editor == null || _targetPortrait == null)
-			{
-				return;
-			}
-			if(!_editor._isShowURPWarningMsg)
-			{
-				//메시지 안보기로 했다면
-				return;
-			}
-
-			//유니티 2022부터 체크
-			if(!apEditorUtil.IsUseURPRenderPipeline2022())
-			{
-				//URP를 사용하지 않는다면 당연히 그냥 넘어감
-				return;
-			}
-
-			//Bake된 메시들 중에서
-			bool isAnyClippedMeshes = false;
-			int nOptMeshes = _targetPortrait._optMeshes != null ? _targetPortrait._optMeshes.Count : 0;
-			apOptMesh optMesh = null;
-			for (int i = 0; i < nOptMeshes; i++)
-			{
-				optMesh = _targetPortrait._optMeshes[i];
-				if(optMesh._isMaskChild)
-				{
-					isAnyClippedMeshes = true;
-					break;
-				}
-			}
-
-			if(!isAnyClippedMeshes)
-			{
-				//클리핑 메시가 없다면
-				return;
-			}
-
-			//다이얼로그 표시
-			apDialog_URPSettingNotice.ShowDialog(_editor, (int)position.x, (int)position.y);
-		}
-
-		/// <summary>
-		/// SRP 옵션이 제대로 설정되었는지 물어보고 설정한다.
-		/// </summary>
-		private void CheckSRPOption()
+		private bool ValidateEnvironment()
 		{
 			if (_editor == null || _targetPortrait == null)
 			{
-				return;
+				//진행?
+				return true;
 			}
 
-			if (!_editor._option_CheckSRPWhenBake)
+			if (!_editor._option_ValidateEnvironmentWhenBake)
 			{
-				//확인하지 않기로 했다면
-				return;
+				//확인하지 않기로 했다면 > 그냥 진행
+				return true;
 			}
 
-			//이 옵션은 2020_1부터 체크한다. 그 전에는 URP를 정상적으로 확인하기가 어렵다.
-//#if UNITY_2020_1_OR_NEWER
+			//검사를 하자
+			apEditorUtil.CHECK_ENV_RENDER_PIPELINE result_RP = AnyPortrait.apEditorUtil.CHECK_ENV_RENDER_PIPELINE.None;
+			apEditorUtil.CHECK_ENV_VALID_MATERIAL result_Material = AnyPortrait.apEditorUtil.CHECK_ENV_VALID_MATERIAL.None;
+			apEditorUtil.CHECK_ENV_COLOR_SPACE result_ColorSpace = apEditorUtil.CHECK_ENV_COLOR_SPACE.None;
+			apEditorUtil.CHECK_ENV_CAMERA result_Camera = apEditorUtil.CHECK_ENV_CAMERA.None;
+			apEditorUtil.RENDER_PIPELINE_ENV_RESULT curProjectRP = apEditorUtil.RENDER_PIPELINE_ENV_RESULT.Unknown;
+			ColorSpace curProjectColorSpace = ColorSpace.Gamma;
+			int curCameraCount = 0;
 
-			//옵션을 체크한다.
-			apEditorUtil.RENDER_PIPELINE_ENV_RESULT renderPipelineResult = apEditorUtil.CheckUseURPRenderPipeline();
+			apEditorUtil.ValidateBakeOptionOnProject(	_targetPortrait,
+														_editor,
+														out result_RP,
+														out result_Material,
+														out result_ColorSpace,
+														out result_Camera,
+														out curProjectRP,
+														out curProjectColorSpace,
+														out curCameraCount);
 			
-			if(renderPipelineResult == apEditorUtil.RENDER_PIPELINE_ENV_RESULT.Unknown)
+
+			//모두 정상적이라면 Bake를 할 수 있게 생략한다.
+			if(result_RP == apEditorUtil.CHECK_ENV_RENDER_PIPELINE.None
+			&& result_Material == apEditorUtil.CHECK_ENV_VALID_MATERIAL.None
+			&& result_ColorSpace == apEditorUtil.CHECK_ENV_COLOR_SPACE.None
+			&& result_Camera == apEditorUtil.CHECK_ENV_CAMERA.None)
 			{
-				//모르는 거면 패스
-				return;
+				//정상적이다. > Bake를 진행한다.
+				return true;
 			}
 
+			//호환 문제 메시지를 보여준다.
+			apStringWrapper strBody = new apStringWrapper(500);
 
-			
+			//"일부 옵션이 프로젝트의 설정과 호환되지 않습니다.\n다음의 제안을 확인해보세요."
+			strBody.Append(_editor.GetText(TEXT.DLG_BakeCompatibilityWarn_Body), false);
 
-			//서로 다르다.
-			//Default를 URP로 바꿔야 하는 경우
-			//bool isCurURPUsed = _editor._isUseSRP;//이전
-			bool isCurURPUsed = _editor.ProjectSettingData.Project_IsUseSRP;//변경 v1.4.2
-
-			if(!isCurURPUsed 
-				&& renderPipelineResult == apEditorUtil.RENDER_PIPELINE_ENV_RESULT.URP)
+			switch(result_RP)
 			{
-				//Default > SRP 물어보기
-				int iBtn = EditorUtility.DisplayDialogComplex(
-										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_Title),
-										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_ToURP_Body),
-										_editor.GetText(TEXT.ChangeNow),//변경										
-										_editor.GetText(TEXT.Ignore),//무시하기
-										_editor.GetText(TEXT.DLG_DoNotShowThisMessage)//메시지 숨기기
-										);
+				case apEditorUtil.CHECK_ENV_RENDER_PIPELINE.NeedChangeToURP:
+					{
+						//Render Pipeline Option to URP
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetText(TEXT.RenderPipeline), false);
+						strBody.Append(" : URP", false);
+					}
+					break;
 
-				if(iBtn == 0)
-				{
-					//변경한다. (-> SRP)
-
-					//이전
-					//_editor._isUseSRP = true;
-					//_editor.SaveEditorPref();
-
-					//변경 v1.4.2
-					_editor.ProjectSettingData.SetUseSRP(true);
-				}
-				else if(iBtn == 2)
-				{
-					//(옵션 끈다)
-					_editor._option_CheckSRPWhenBake = false;
-					_editor.SaveEditorPref();
-				}
-			}
-			else if(isCurURPUsed && renderPipelineResult == apEditorUtil.RENDER_PIPELINE_ENV_RESULT.BuiltIn)
-			{
-				//URP를 Default로 바꿔야 하는 경우
-				//SRP > Default 물어보기
-				int iBtn = EditorUtility.DisplayDialogComplex(
-										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_Title),
-										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_ToDefault_Body),
-										_editor.GetText(TEXT.ChangeNow),										
-										_editor.GetText(TEXT.Ignore),
-										_editor.GetText(TEXT.DLG_DoNotShowThisMessage)
-										);
-
-				if(iBtn == 0)
-				{
-					//변경한다. (-> Default)
+				case apEditorUtil.CHECK_ENV_RENDER_PIPELINE.NeedChangeToBuiltIn:
+					{
+						//렌더 파이프라인 옵션을 Default로 변경
+						//strBody.Append("\n- 렌더 파이프라인 옵션을 Default로 변경", false);
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetText(TEXT.RenderPipeline), false);
+						strBody.Append(" : Default", false);
+					}
 					
-					//이전
-					//_editor._isUseSRP = false;
-					//_editor.SaveEditorPref();
+					break;
 
-					//변경 v1.4.2
-					_editor.ProjectSettingData.SetUseSRP(false);
-				}
-				else if(iBtn == 2)
-				{
-					//옵션 끈다
-					_editor._option_CheckSRPWhenBake = false;
-					_editor.SaveEditorPref();
-				}
+				case apEditorUtil.CHECK_ENV_RENDER_PIPELINE.UnknownRP:
+					{
+						//호환성이 확인되지 않는 렌더 파이프라인
+						//strBody.Append("\n- 호환성이 확인되지 않는 렌더 파이프라인", false);
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetText(TEXT.RenderPipeline), false);
+						strBody.Append(" : (Unknown)", false);
+					}
+					break;
 			}
-//#endif
+
+			switch(result_Material)
+			{
+				case apEditorUtil.CHECK_ENV_VALID_MATERIAL.InvalidMaterials:
+					{
+						//URP용 Shader로 변경 필요
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetText(TEXT.DLG_BakeCompatibilityWarn_ShadersForURP), false);
+					}
+					break;
+			}
+
+			switch(result_ColorSpace)
+			{
+				case apEditorUtil.CHECK_ENV_COLOR_SPACE.NeedChangeToLinear:
+					{
+						//Linear Color Space에 맞게 옵션 변경 필요
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetUIWord(UIWORD.ColorSpace), false);
+						strBody.Append(" : Linear", false);
+					}
+					break;
+
+				case apEditorUtil.CHECK_ENV_COLOR_SPACE.NeedChangeToGamma:
+					{ 
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetUIWord(UIWORD.ColorSpace), false);
+						strBody.Append(" : Gamma", false);
+					}
+					break;
+			}
+
+			switch(result_Camera)
+			{
+				case apEditorUtil.CHECK_ENV_CAMERA.RecommendToMultiCamera:
+					{
+						//2개 이상의 카메라를 지원하기 위한 옵션 변경 필요
+						strBody.Append("\n > ", false);
+						strBody.Append(_editor.GetText(TEXT.DLG_BakeCompatibilityWarn_MultiCamera), false);
+					}
+					break;
+			}
+
+			strBody.MakeString();
+
+			int iBtn = EditorUtility.DisplayDialogComplex(	_editor.GetText(TEXT.DLG_BakeCompatibilityWarn_Title),//"Bake 호환성 경고"
+															strBody.ToString(),
+															_editor.GetText(TEXT.FixIssues),//"호환성 검토"
+															_editor.GetText(TEXT.Cancel),
+															_editor.GetText(TEXT.IgnoreAndBake)//"무시하고 Bake"
+															);
+
+			if(iBtn == 0)
+			{
+				//문제 확인 버튼을 눌렀다.
+				//Debug.LogError("TODO : 호환성 문제 다이얼로그 보여줘야함");
+				apDialog_BakeCompatibility.ShowDialog(_editor, _targetPortrait);
+				return false;//Bake 중단
+			}
+			else if(iBtn == 1)
+			{
+				//취소 버튼을 눌렀다.
+				return false;//Bake 중단
+			}
+			else
+			{
+				//무시하고 Bake 버튼을 눌렀다.
+				return true;
+			}
+
+			
+
+// 			//이 옵션은 2020_1부터 체크한다. 그 전에는 URP를 정상적으로 확인하기가 어렵다.
+// //#if UNITY_2020_1_OR_NEWER
+
+// 			//옵션을 체크한다.
+// 			apEditorUtil.RENDER_PIPELINE_ENV_RESULT renderPipelineResult = apEditorUtil.CheckUseURPRenderPipeline();
+			
+// 			if(renderPipelineResult == apEditorUtil.RENDER_PIPELINE_ENV_RESULT.Unknown)
+// 			{
+// 				//모르는 거면 패스
+// 				return;
+// 			}
+
+
+			
+
+// 			//서로 다르다.
+// 			//Default를 URP로 바꿔야 하는 경우
+// 			//bool isCurURPUsed = _editor._isUseSRP;//이전
+// 			bool isCurURPUsed = _editor.ProjectSettingData.Project_IsUseSRP;//변경 v1.4.2
+
+// 			if(!isCurURPUsed 
+// 				&& renderPipelineResult == apEditorUtil.RENDER_PIPELINE_ENV_RESULT.URP)
+// 			{
+// 				//Default > SRP 물어보기
+// 				int iBtn = EditorUtility.DisplayDialogComplex(
+// 										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_Title),
+// 										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_ToURP_Body),
+// 										_editor.GetText(TEXT.ChangeNow),//변경										
+// 										_editor.GetText(TEXT.Ignore),//무시하기
+// 										_editor.GetText(TEXT.DLG_DoNotShowThisMessage)//메시지 숨기기
+// 										);
+
+// 				if(iBtn == 0)
+// 				{
+// 					//변경한다. (-> SRP)
+
+// 					//이전
+// 					//_editor._isUseSRP = true;
+// 					//_editor.SaveEditorPref();
+
+// 					//변경 v1.4.2
+// 					_editor.ProjectSettingData.SetUseSRP(true);
+// 				}
+// 				else if(iBtn == 2)
+// 				{
+// 					//(옵션 끈다)
+// 					_editor._option_CheckSRPWhenBake = false;
+// 					_editor.SaveEditorPref();
+// 				}
+// 			}
+// 			else if(isCurURPUsed && renderPipelineResult == apEditorUtil.RENDER_PIPELINE_ENV_RESULT.BuiltIn)
+// 			{
+// 				//URP를 Default로 바꿔야 하는 경우
+// 				//SRP > Default 물어보기
+// 				int iBtn = EditorUtility.DisplayDialogComplex(
+// 										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_Title),
+// 										_editor.GetText(TEXT.RenderPipelineOptionUnmatch_ToDefault_Body),
+// 										_editor.GetText(TEXT.ChangeNow),										
+// 										_editor.GetText(TEXT.Ignore),
+// 										_editor.GetText(TEXT.DLG_DoNotShowThisMessage)
+// 										);
+
+// 				if(iBtn == 0)
+// 				{
+// 					//변경한다. (-> Default)
+					
+// 					//이전
+// 					//_editor._isUseSRP = false;
+// 					//_editor.SaveEditorPref();
+
+// 					//변경 v1.4.2
+// 					_editor.ProjectSettingData.SetUseSRP(false);
+// 				}
+// 				else if(iBtn == 2)
+// 				{
+// 					//옵션 끈다
+// 					_editor._option_CheckSRPWhenBake = false;
+// 					_editor.SaveEditorPref();
+// 				}
+// 			}
+// //#endif
 			
 			
 		}

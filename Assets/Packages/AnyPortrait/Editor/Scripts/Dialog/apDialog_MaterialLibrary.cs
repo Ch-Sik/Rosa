@@ -86,20 +86,51 @@ namespace AnyPortrait
 
 		private Dictionary<Shader, SHADER_TYPE> _shaderTypes = new Dictionary<Shader, SHADER_TYPE>();
 
+		//Enum과 아래의 _packageNames의 순서가 동일해야함
+		private enum PRESET_PACKAGE : int
+		{
+			//v1.6.0에 추가됨
+			v16_Lit,
+			v16_URP_2021,
+			v16_URP_2023,
+			v16_KeepAlpha,
+			v16_VR,
+			
+
+			//이전 프리셋들
+			Legacy_Advanced,
+			Legacy_LWRP_Unlit,
+			Legacy_LWRP_2DLit,
+			Legacy_VR,
+			Legacy_KeepAlpha,
+			Legacy_Mergeable,
+			Legacy_URP,
+			Legacy_URP_2021,
+			Legacy_URP_2023,
+		}
 		private string[] _packageNames = new string[] 
 		{
-			"Advanced Presets",//0
-			"LWRP Unlit Preset",//1
-			"LWRP 2D Lit Preset (Experimental)",//2
-			"VR Presets",//3
-			"KeepAlpha Presets",//4
-			"Mergeable Presets",//5 : <추가 22.1.5
-			"URP Presets",//<<6 : 추가 20.1.24
-			"URP (2021) Presets",//7 : 추가 21.12.20
-			"URP (2023) Presets",//8 : 추가 v1.5.0
+			//v1.6.0에 추가된 프리셋
+			"Lit Presets",
+			"URP (2021) Presets",
+			"URP (2023) Presets",
+			"KeepAlpha Presets",
+			"VR Presets",
+			
+
+			//이전 프리셋들
+			"Legacy/Advanced Presets",
+			"Legacy/LWRP Unlit Preset",
+			"Legacy/LWRP 2D Lit Preset (Experimental)",
+			"Legacy/VR Presets",
+			"Legacy/KeepAlpha Presets",
+			"Legacy/Mergeable Presets",
+			"Legacy/URP Presets",
+			"Legacy/URP (2021) Presets",
+			"Legacy/URP (2023) Presets",
 		};
 
-		private int _packageIndex = 0;
+		private PRESET_PACKAGE _curPackage = PRESET_PACKAGE.v16_Lit;
 
 
 		// 쉐이더 에셋을 못찾은 경우, 검색 기능을 이용해서 복구할 수 있다.
@@ -131,6 +162,16 @@ namespace AnyPortrait
 
 		private bool _isShaderInfoCreated = false;
 		private List<ShaderAssetInfo> _shaderInfoTable = null;
+
+
+		private bool _isFoldOut_ReservedProps = false;//v1.6.0 : 이게 True면 Reserved Properties가 펼쳐진다.
+		private bool _isFoldOut_UserProps = true;
+
+		private GUIStyle _guiStyleProp_Label = null;
+		private GUIStyle _guiStyleProp_TextField = null;
+		private GUIStyle _guiStyle_LabelCenter = null;
+		private GUIStyle _guiStyle_LabelLeftCenter = null;
+
 
 
 
@@ -238,7 +279,11 @@ namespace AnyPortrait
 			//추가 22.1.5:
 			_img_MatTypeIcons.Add(apMaterialSet.ICON.UnlitMergeable, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_MergeableUnlit));
 			_img_MatTypeIcons.Add(apMaterialSet.ICON.LitMergeable, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_MergeableLit));
-		
+
+			//추가 v1.6.0
+			_img_MatTypeIcons.Add(apMaterialSet.ICON.UnlitMask, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_UnlitMask));
+			_img_MatTypeIcons.Add(apMaterialSet.ICON.LitMask, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_LitMask));
+
 			_img_BasicSettings = _editor.ImageSet.Get(apImageSet.PRESET.MaterialSet_BasicSettings);
 			_img_Shaders = _editor.ImageSet.Get(apImageSet.PRESET.MaterialSet_Shaders);
 			_img_ShaderProperties = _editor.ImageSet.Get(apImageSet.PRESET.MaterialSet_ShaderProperties);
@@ -312,6 +357,9 @@ namespace AnyPortrait
 			//v1.5.0 추가
 			_isShaderInfoCreated = false;
 			_shaderInfoTable = null;
+
+			_isFoldOut_ReservedProps = false;
+			_isFoldOut_UserProps = true;
 
 			Undo.undoRedoPerformed -= OnUndoRedoPerformed;
 			Undo.undoRedoPerformed += OnUndoRedoPerformed;
@@ -504,7 +552,7 @@ namespace AnyPortrait
 
 				//변경 19.8.5 : 패키지 설치하기 UI 변경
 				//EditorGUILayout.LabelField("Preset Packages");
-				_packageIndex = EditorGUILayout.Popup(_packageIndex, _packageNames, GUILayout.Width(leftWidth - 10));
+				_curPackage = (PRESET_PACKAGE)EditorGUILayout.Popup((int)_curPackage, _packageNames, GUILayout.Width(leftWidth - 10));
 				if(GUILayout.Button(_editor.GetText(TEXT.UnpackPreset), GUILayout.Width(leftWidth - 10), GUILayout.Height(20)))//"Unpack Preset"
 				{
 					string packagePath = "";
@@ -512,51 +560,63 @@ namespace AnyPortrait
 
 					//기존 : 고정 경로
 					//변경 20.4.21 : 가변 경로 가능. 기본 경로는 "Assets/AnyPortrait/"
-
-					switch (_packageIndex)
+					switch (_curPackage)
 					{
-						case 0://Advanced Presets
-							//packagePath = "Assets/AnyPortrait/Editor/Packages/Advanced Shaders.unitypackage";
+						case PRESET_PACKAGE.v16_Lit:
+							packagePath = basePath + "Editor/Packages/Lit (v16) Shaders.unitypackage";
+							break;
+
+						case PRESET_PACKAGE.v16_URP_2021:
+							packagePath = basePath + "Editor/Packages/URP 2021 (v16) Shaders.unitypackage";
+							break;
+
+						case PRESET_PACKAGE.v16_URP_2023:
+							packagePath = basePath + "Editor/Packages/URP 2023 (v16) Shaders.unitypackage";
+							break;
+
+						case PRESET_PACKAGE.v16_KeepAlpha:
+							packagePath = basePath + "Editor/Packages/KeepAlpha (v16) Shaders.unitypackage";
+							break;
+
+						case PRESET_PACKAGE.v16_VR:
+							packagePath = basePath + "Editor/Packages/VR (v16) Shaders.unitypackage";
+							break;
+
+						case PRESET_PACKAGE.Legacy_Advanced:
 							packagePath = basePath + "Editor/Packages/Advanced Shaders.unitypackage";
 							break;
 
-						case 1://LWRP Unlit Preset
-							//packagePath = "Assets/AnyPortrait/Editor/Packages/LWRP Unlit Shaders.unitypackage";
+						case PRESET_PACKAGE.Legacy_LWRP_Unlit:
 							packagePath = basePath + "Editor/Packages/LWRP Unlit Shaders.unitypackage";
 							break;
 
-						case 2://LWRP 2D Lit Preset
-							//packagePath = "Assets/AnyPortrait/Editor/Packages/LWRP 2D Lit Shaders.unitypackage";
+						case PRESET_PACKAGE.Legacy_LWRP_2DLit:
 							packagePath = basePath + "Editor/Packages/LWRP 2D Lit Shaders.unitypackage";
 							break;
 
-						case 3://VR Preset
-							//packagePath = "Assets/AnyPortrait/Editor/Packages/VR Shaders.unitypackage";
+						case PRESET_PACKAGE.Legacy_VR:
 							packagePath = basePath + "Editor/Packages/VR Shaders.unitypackage";
 							break;
 
-						case 4://KeepAlpha Preset
-							//packagePath = "Assets/AnyPortrait/Editor/Packages/KeepAlpha Shaders.unitypackage";
+						case PRESET_PACKAGE.Legacy_KeepAlpha:
 							packagePath = basePath + "Editor/Packages/KeepAlpha Shaders.unitypackage";
 							break;
 
 							//추가 22.1.5
-						case 5://Mergeable Presets
+						case PRESET_PACKAGE.Legacy_Mergeable:
 							packagePath = basePath + "Editor/Packages/Mergeable Shaders.unitypackage";
 							break;
 
 						//추가 20.1.24
-						case 6://URP Presets
-							//packagePath = "Assets/AnyPortrait/Editor/Packages/URP Shaders.unitypackage";
+						case PRESET_PACKAGE.Legacy_URP:
 							packagePath = basePath + "Editor/Packages/URP Shaders.unitypackage";
 							break;
 
-						case 7://URP (2021) Presets (추가 21.12.20)
+						case PRESET_PACKAGE.Legacy_URP_2021:
 							packagePath = basePath + "Editor/Packages/URP 2021 Shaders.unitypackage";
 							break;
-
 						
-						case 8://URP (2023) Presets (추가 v1.5.0)
+						case PRESET_PACKAGE.Legacy_URP_2023:
 							packagePath = basePath + "Editor/Packages/URP 2023 Shaders.unitypackage";
 							break;
 					}
@@ -565,45 +625,65 @@ namespace AnyPortrait
 					AssetDatabase.Refresh();
 					AssetDatabase.SaveAssets();
 
-					switch (_packageIndex)
+					switch (_curPackage)
 					{
-						case 0://Advanced Presets
+						case PRESET_PACKAGE.v16_Lit:
+							_editor.MaterialLibrary.MakeReserved_Lit_V16(false);
+							break;
+
+						case PRESET_PACKAGE.v16_URP_2021:
+							_editor.MaterialLibrary.MakeReserved_URP_V16_21(false);
+							break;
+
+						case PRESET_PACKAGE.v16_URP_2023:
+							_editor.MaterialLibrary.MakeReserved_URP_V16_23(false);
+							break;
+
+						case PRESET_PACKAGE.v16_KeepAlpha:
+							_editor.MaterialLibrary.MakeReserved_KeepAlpha_V16(false);
+							break;
+
+						case PRESET_PACKAGE.v16_VR:
+							_editor.MaterialLibrary.MakeReserved_VR_V16(false);
+							break;
+
+						case PRESET_PACKAGE.Legacy_Advanced:
 							_editor.MaterialLibrary.MakeReserved_Advanced(false);
 							break;
 
-						case 1://LWRP Unlit Preset
+						case PRESET_PACKAGE.Legacy_LWRP_Unlit:
 							_editor.MaterialLibrary.MakeReserved_LWRPUnlit(false);
 							break;
 
-						case 2://LWRP 2D Lit Preset
+						case PRESET_PACKAGE.Legacy_LWRP_2DLit:
 							_editor.MaterialLibrary.MakeReserved_LWRP_2DLit(false);
 							break;
 
-						case 3://VR Preset
+						case PRESET_PACKAGE.Legacy_VR:
 							_editor.MaterialLibrary.MakeReserved_VR(false);
 							break;
 
-						case 4://KeepAlpha Preset
+						case PRESET_PACKAGE.Legacy_KeepAlpha:
 							_editor.MaterialLibrary.MakeReserved_KeepAlpha(false);
 							break;
 
 						//추가 22.1.5
-						case 5://Mergeable Presets
+						case PRESET_PACKAGE.Legacy_Mergeable:
 							_editor.MaterialLibrary.MakeReserved_Mergeable(false);
 							break;
 
 						//추가 20.1.24
-						case 6://URP Preset
+						case PRESET_PACKAGE.Legacy_URP:
 							_editor.MaterialLibrary.MakeReserved_URP(false);
 							break;
 
 						//추가 21.12.20
-						case 7://URP 21 Preset
+						case PRESET_PACKAGE.Legacy_URP_2021:
 							_editor.MaterialLibrary.MakeReserved_URP21(false);
 							break;
 
 						//추가 v1.5.0
-						case 8://URP 23 Preset
+						case PRESET_PACKAGE.Legacy_URP_2023:
 							_editor.MaterialLibrary.MakeReserved_URP23(false);
 							break;
 					}
@@ -820,9 +900,11 @@ namespace AnyPortrait
 				return;
 			}
 
+			List<apMaterialSet> presets = _editor.MaterialLibrary.Presets;
+
 			for (int i = 0; i < nPresets; i++)
 			{
-				curMatSet = _editor.MaterialLibrary.Presets[i];
+				curMatSet = presets[i];
 				DrawMaterialSetInList(curMatSet, width, true);
 			}
 		}
@@ -1075,6 +1157,38 @@ namespace AnyPortrait
 				apEditorUtil.ReleaseGUIFocus();
 			}
 
+			//v1.6.0 추가 : 설명을 추가하자
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(width_BasicOption));
+			GUILayout.Space(5);
+			EditorGUILayout.LabelField(_editor.GetText(TEXT.DLG_Description), GUILayout.Width(width_BasicSetting_Label));
+
+			if(_isPreset)
+			{
+				//프리셋이면 일반 Label
+				EditorGUILayout.LabelField(_selectedMaterialSet._descTags, GUILayout.Width(width_BasicSetting_Value));
+			}
+			else
+			{
+				//재질이면 편집 가능한 텍스트 박스
+				EditorGUI.BeginChangeCheck();
+				string nextDesc = EditorGUILayout.DelayedTextField(_selectedMaterialSet._descTags, GUILayout.Width(width_BasicSetting_Value));
+				if (EditorGUI.EndChangeCheck())
+				{
+					//변경된 경우
+					apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
+														_editor, 
+														_portrait, 
+														//_portrait, 
+														false,
+														apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+					_selectedMaterialSet._descTags = nextDesc;
+				}
+			}
+			
+			EditorGUILayout.EndHorizontal();
+			
+
 			if(!_isPreset)
 			{
 				//프리셋이 아니라면,
@@ -1302,6 +1416,10 @@ namespace AnyPortrait
 					_selectedMaterialSet._shaderPath_L_Clipped_Multiplicative = GetShaderPath(_selectedMaterialSet._shader_L_Clipped_Multiplicative);
 
 					_selectedMaterialSet._shaderPath_AlphaMask =				GetShaderPath(_selectedMaterialSet._shader_AlphaMask);
+
+					//재질 세트의 Reserved Property도 갱신
+					_selectedMaterialSet.CheckAndAddReservedProperties();
+					_selectedMaterialSet.CheckAndRemoveDuplicatedProperties();
 				}
 
 				Repaint();
@@ -1321,22 +1439,33 @@ namespace AnyPortrait
 			apMaterialSet.PropertySet propSet = null;
 			apMaterialSet.PropertySet removePropSet = null;//<<삭제할 PropSet
 
-			int height_1Line = 22;
-			int height_1Line_Comp = 18;
+			// int height_1Line = 22;
+			// int height_1Line_Comp = 18;
 
-			int size_2Line_Texture = 80;
-			GUIStyle guiStyleProp_Label = new GUIStyle(GUI.skin.label);
-			guiStyleProp_Label.margin = GUI.skin.button.margin;
+			// int size_2Line_Texture = 80;
+			if(_guiStyleProp_Label == null)
+			{
+				_guiStyleProp_Label = new GUIStyle(GUI.skin.label);
+				_guiStyleProp_Label.margin = GUI.skin.button.margin;
+			}
+			
+			if(_guiStyleProp_TextField == null)
+			{
+				_guiStyleProp_TextField = new GUIStyle(GUI.skin.textField);
+				_guiStyleProp_TextField.margin = GUI.skin.button.margin;
+			}
 
-			GUIStyle guiStyleProp_TextField = new GUIStyle(GUI.skin.textField);
-			guiStyleProp_TextField.margin = GUI.skin.button.margin;
+			if(_guiStyle_LabelCenter == null)
+			{
+				_guiStyle_LabelCenter = new GUIStyle(GUI.skin.label);
+				_guiStyle_LabelCenter.alignment = TextAnchor.MiddleCenter;
+			}			
 
-			GUIStyle guiStyle_LabelCenter = new GUIStyle(GUI.skin.label);
-			guiStyle_LabelCenter.alignment = TextAnchor.MiddleCenter;
-
-			GUIStyle guiStyle_LabelLeftCenter = new GUIStyle(GUI.skin.label);
-			guiStyle_LabelLeftCenter.alignment = TextAnchor.MiddleLeft;
-
+			if(_guiStyle_LabelLeftCenter == null)
+			{
+				_guiStyle_LabelLeftCenter = new GUIStyle(GUI.skin.label);
+				_guiStyle_LabelLeftCenter.alignment = TextAnchor.MiddleLeft;
+			}
 
 			//v1.5.1 : 값을 참조하는 기본 재질을 입력하면 일일이 값을 입력하지 않아도 된다.
 			EditorGUI.BeginChangeCheck();
@@ -1401,707 +1530,113 @@ namespace AnyPortrait
 
 			GUILayout.Space(15);
 			
-			
-			//Color prevColor = GUI.backgroundColor;
+			// 프로퍼티 리스트
+
 			int nPropertySets = _selectedMaterialSet._propertySets != null ? _selectedMaterialSet._propertySets.Count : 0;
-			for (int iProp = 0; iProp < nPropertySets; iProp++)
+
+			//개수를 파악하자
+			int nProp_Reserved = 0;
+			int nProp_UserDefined = 0;
+
+			for (int i = 0; i < nPropertySets; i++)
 			{
-				propSet = _selectedMaterialSet._propertySets[iProp];
-
-				//배경을 그리자
-				int yOffset = 10;
-				if(iProp == 0)
+				propSet = _selectedMaterialSet._propertySets[i];
+				if(propSet._isReserved)
 				{
-					//yOffset = 2;
-					yOffset = 7;
-				}
-
-				//배경 박스의 크기와 색상
-				Rect lastRect = GUILayoutUtility.GetLastRect();
-				Color bgColor = GUI.backgroundColor;
-				int propHeight = 40;
-				if (propSet._isReserved //프로퍼티가 Reserved이거나
-					|| (_isPreset && _selectedPresetType != apMaterialLibrary.PRESET_TYPE.NoneOrCustom)//Reserved 타입의 프리셋이라면
-					)
-				{
-					bgColor = new Color(bgColor.r * 0.9f, bgColor.g * 0.9f, bgColor.b * 0.9f, 1.0f);
-
-					if(propSet._propType == apMaterialSet.SHADER_PROP_TYPE.Texture
-						&& propSet._isOptionEnabled
-						&& propSet._isCommonTexture
-						&& !propSet._isReserved)
-					{
-						//텍스쳐 타입 + Common Texture인 경우 보여주기 위해 Height를 증가
-						propHeight += size_2Line_Texture + 9;
-					}
-				}
-				else if (!propSet._isOptionEnabled)
-				{
-					bgColor = new Color(bgColor.r * 0.8f, bgColor.g * 0.8f, bgColor.b * 0.8f, 1.0f);
+					nProp_Reserved += 1;
 				}
 				else
 				{
-					switch (propSet._propType)
-					{
-						case apMaterialSet.SHADER_PROP_TYPE.Float://초록색
-							bgColor = new Color(bgColor.r * 0.7f, bgColor.g * 1.0f, bgColor.b * 0.7f, 1.0f);
-							//if(propSet._isOptionEnabled)	{ propHeight = 64; }
-							
-							break;
-
-						case apMaterialSet.SHADER_PROP_TYPE.Int://노란색
-							bgColor = new Color(bgColor.r * 1.0f, bgColor.g * 1.0f, bgColor.b * 0.7f, 1.0f);
-							//if(propSet._isOptionEnabled)	{ propHeight = 64; }
-							break;
-
-						case apMaterialSet.SHADER_PROP_TYPE.Vector://파란색
-							bgColor = new Color(bgColor.r * 0.7f, bgColor.g * 0.9f, bgColor.b * 1.0f, 1.0f);
-							//if(propSet._isOptionEnabled)	{ propHeight = 64; }
-							break;
-
-						case apMaterialSet.SHADER_PROP_TYPE.Texture://청록색
-							bgColor = new Color(bgColor.r * 0.7f, bgColor.g * 1.0f, bgColor.b * 0.9f, 1.0f);
-							if(propSet._isOptionEnabled)
-							{
-								if(propSet._isCommonTexture)
-								{
-									propHeight += size_2Line_Texture + 4 + 5;
-								}
-								else
-								{
-									if (!_isPreset)
-									{
-										propHeight += propSet._imageTexturePairs.Count * (size_2Line_Texture + 5 + 4) + 5;
-									}
-								}
-							}
-							break;
-
-						case apMaterialSet.SHADER_PROP_TYPE.Color://보라색
-							bgColor = new Color(bgColor.r * 1.0f, bgColor.g * 0.7f, bgColor.b * 1.0f, 1.0f);
-							//if(propSet._isOptionEnabled)	{ propHeight = 64; }
-							break;
-
-						case apMaterialSet.SHADER_PROP_TYPE.Keyword://붉은색
-							bgColor = new Color(bgColor.r * 1.0f, bgColor.g * 0.7f, bgColor.b * 0.7f, 1.0f);
-							break;
-					}
+					nProp_UserDefined += 1;
 				}
-
-				//배경 박스
-				GUI.backgroundColor = bgColor;
-				GUI.Box(new Rect(lastRect.x, lastRect.y + yOffset, width, propHeight), "");
-				GUI.backgroundColor = prevColor;
-				
-				//첫번째 줄
-				EditorGUILayout.BeginHorizontal(GUILayout.Width(width), GUILayout.Height(height_1Line));
-				GUILayout.Space(5);
-
-				//- Reserved 아이콘 또는 Enabled 토글
-				if (propSet._isReserved//Reserved 프로퍼티이거나
-					|| (_isPreset && _selectedPresetType != apMaterialLibrary.PRESET_TYPE.NoneOrCustom)//Reserved 프리셋이라면
-					)
-				{
-					EditorGUILayout.LabelField(new GUIContent("", _img_Reserved), GUILayout.Width(30), GUILayout.Height(height_1Line_Comp));
-				}
-				else
-				{
-					bool nextEnabledOption = EditorGUILayout.Toggle(propSet._isOptionEnabled, GUILayout.Width(30), GUILayout.Height(height_1Line_Comp));
-					if(nextEnabledOption != propSet._isOptionEnabled)
-					{
-						apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
-														_editor, 
-														_portrait, 
-														//_portrait, 
-														false,
-														apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-						propSet._isOptionEnabled = nextEnabledOption;
-						apEditorUtil.ReleaseGUIFocus();
-					}
-				}
-
-				GUILayout.Space(5);
-
-				//- Property 이름
-				string nextPropName = EditorGUILayout.DelayedTextField(propSet._name, guiStyleProp_TextField, GUILayout.Width(170), GUILayout.Height(height_1Line_Comp));
-				if(!string.Equals(nextPropName, propSet._name))
-				{
-					if(!_isPreset)
-					{
-						// [ 일반 재질 세트 ]
-						//Portrait 데이터
-						apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
-														_editor, 
-														_portrait, 
-														//_portrait, 
-														false,
-														apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-						propSet._name = nextPropName;
-					}
-					else
-					{
-						// [ 프리셋 ]
-						if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-						{
-							// [ 편집 가능한 프리셋 ]
-							propSet._name = nextPropName;
-							isNeedToEditorSave = true;
-						}
-						else
-						{
-							// [ 편집 불가능한 프리셋 ]
-							nextPropName = propSet._name;//변경된 이름 복구
-							//Reserved -> 경고 메시지
-							ShowWarningIfReservedPresetChanged();
-						}
-					}
-					
-					apEditorUtil.ReleaseGUIFocus();
-					apEditorUtil.SetDirty(_editor);
-				}
-
-				apMaterialSet.SHADER_PROP_TYPE nextPropType = (apMaterialSet.SHADER_PROP_TYPE)EditorGUILayout.EnumPopup(propSet._propType, GUILayout.Width(80), GUILayout.Height(height_1Line_Comp));
-				if(nextPropType != propSet._propType)
-				{
-					apMaterialSet.SHADER_PROP_TYPE prevPropType = propSet._propType;
-					if(!_isPreset)
-					{
-						// [ 일반 재질 세트 ]
-						bool isChange = true;
-						if(prevPropType == apMaterialSet.SHADER_PROP_TYPE.Texture)
-						{
-							//Texture > 다른 속성인 경우 한번 물어보자
-							//"Change type", 
-							//"If you change from a [Texture] type to a different type, the Texture Asset property is initialized.\nDo you want to change the type?",
-							isChange = EditorUtility.DisplayDialog(	_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Title), 
-																	_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Body),
-																	_editor.GetText(TEXT.Okay),
-																	_editor.GetText(TEXT.Cancel)
-																	);
-						}
-
-						if (isChange)
-						{
-							//Portrait 데이터
-							apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
-																_editor, 
-																_portrait, 
-																//_portrait, 
-																false,
-																apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-							propSet._propType = nextPropType;
-
-							//Type이 바뀌었다면 링크 한번더.
-							_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-							Repaint();
-						}
-					}
-					else
-					{
-						// [ 프리셋 ]
-						if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-						{
-							// [ 편집 가능한 프리셋 ]
-							bool isChange = true;
-							if(prevPropType == apMaterialSet.SHADER_PROP_TYPE.Texture)
-							{
-								//Texture > 다른 속성인 경우 한번 물어보자
-								//"Change type", 
-								//"If you change from a [Texture] type to a different type, the Texture Asset property is initialized.\nDo you want to change the type?",
-								isChange = EditorUtility.DisplayDialog(	_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Title), 
-																		_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Body),
-																		_editor.GetText(TEXT.Okay),
-																		_editor.GetText(TEXT.Cancel)
-																		);
-							}
-
-							if (isChange)
-							{
-								//Reserved가 아닌 Preset
-								propSet._propType = nextPropType;
-								isNeedToEditorSave = true;
-
-								//Type이 바뀌었다면 링크 한번더.
-								_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-								Repaint();
-							}
-						}
-						else
-						{
-							// [ 편집 불가능한 프리셋 ]
-							// 경고 메시지
-							ShowWarningIfReservedPresetChanged();
-						}
-					}
-
-					apEditorUtil.ReleaseGUIFocus();
-					apEditorUtil.SetDirty(_editor);
-				}
-				GUILayout.Space(5);
-
-
-				//값을 넣자
-				if (!propSet._isReserved)
-				{
-					GUILayout.Space(2);
-					int width_Value = width - (365);
-
-					if (propSet._isOptionEnabled)
-					{
-						switch (propSet._propType)
-						{
-							//1. Float 타입인 경우
-							case apMaterialSet.SHADER_PROP_TYPE.Float:
-								{
-									float nextFloat = EditorGUILayout.DelayedFloatField(propSet._value_Float, GUILayout.Width(width_Value));
-									if (Mathf.Abs(nextFloat - propSet._value_Float) > 0.0001f)
-									{
-										if (!_isPreset)
-										{
-											// [ 일반 재질 세트 ]
-											apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
-																				_editor, 
-																				_portrait, 
-																				//_portrait, 
-																				false,
-																				apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-											propSet._value_Float = nextFloat;
-											apEditorUtil.ReleaseGUIFocus();
-										}
-										else
-										{
-											// [ 프리셋 ]
-											if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-											{
-												// [ 편집 가능한 프리셋 ]
-												propSet._value_Float = nextFloat;
-												isNeedToEditorSave = true;
-												apEditorUtil.ReleaseGUIFocus();
-											}
-										}
-									}
-								}
-								break;
-							
-							//2. Int 타입인 경우
-							case apMaterialSet.SHADER_PROP_TYPE.Int:
-								{
-									int nextInt = EditorGUILayout.DelayedIntField(propSet._value_Int, GUILayout.Width(width_Value));
-									if (nextInt != propSet._value_Int)
-									{
-										if (!_isPreset)
-										{
-											// [ 일반 재질 세트 ]
-											apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
-																				_editor, 
-																				_portrait, 
-																				//_portrait, 
-																				false,
-																				apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-											propSet._value_Int = nextInt;
-											apEditorUtil.ReleaseGUIFocus();
-										}
-										else
-										{
-											// [ 프리셋 ]
-											if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-											{
-												// [ 편집 가능한 프리셋 ]
-												propSet._value_Int = nextInt;
-												isNeedToEditorSave = true;
-												apEditorUtil.ReleaseGUIFocus();
-											}
-										}
-									}
-								}
-								break;
-
-							//3. Vector 타입인 경우
-							case apMaterialSet.SHADER_PROP_TYPE.Vector:
-								{
-									int width_Value_V1 = (width_Value / 4) - 3;
-									float vecX = EditorGUILayout.DelayedFloatField(propSet._value_Vector.x, GUILayout.Width(width_Value_V1));
-									float vecY = EditorGUILayout.DelayedFloatField(propSet._value_Vector.y, GUILayout.Width(width_Value_V1));
-									float vecZ = EditorGUILayout.DelayedFloatField(propSet._value_Vector.z, GUILayout.Width(width_Value_V1));
-									float vecW = EditorGUILayout.DelayedFloatField(propSet._value_Vector.w, GUILayout.Width(width_Value_V1));
-
-									if (Mathf.Abs(vecX - propSet._value_Vector.x) > 0.0001f
-										|| Mathf.Abs(vecY - propSet._value_Vector.y) > 0.0001f
-										|| Mathf.Abs(vecZ - propSet._value_Vector.z) > 0.0001f
-										|| Mathf.Abs(vecW - propSet._value_Vector.w) > 0.0001f)
-									{
-										if (!_isPreset)
-										{
-											// [ 일반 재질 세트 ]
-											apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged,
-																				_editor,
-																				_portrait,
-																				//_portrait, 
-																				false,
-																				apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-											propSet._value_Vector.x = vecX;
-											propSet._value_Vector.y = vecY;
-											propSet._value_Vector.z = vecZ;
-											propSet._value_Vector.w = vecW;
-											apEditorUtil.ReleaseGUIFocus();
-										}
-										else
-										{
-											// [ 프리셋 ]
-											if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-											{
-												// [ 편집 가능한 프리셋 ]
-												propSet._value_Vector.x = vecX;
-												propSet._value_Vector.y = vecY;
-												propSet._value_Vector.z = vecZ;
-												propSet._value_Vector.w = vecW;
-												isNeedToEditorSave = true;
-												apEditorUtil.ReleaseGUIFocus();
-											}
-										}
-									}
-									
-								}
-								break;
-
-							//4. Texture 타입인 경우
-							case apMaterialSet.SHADER_PROP_TYPE.Texture:
-								{
-									//"Common Texture", "Texture per Image"
-									bool isBtn = apEditorUtil.ToggledButton_2Side(	_editor.GetText(TEXT.CommonTexture),
-																								_editor.GetText(TEXT.TexturePerImage), 
-																								propSet._isCommonTexture, true, width_Value, height_1Line_Comp);
-
-									if(isBtn)
-									{
-										if (!_isPreset)
-										{
-											// [ 일반 재질 세트 ]
-											apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged,
-																				_editor,
-																				_portrait,
-																				//_portrait, 
-																				false,
-																				apEditorUtil.UNDO_STRUCT.ValueOnly);
-
-											propSet._isCommonTexture = !propSet._isCommonTexture;
-
-											//Common Texture 타입이 바뀌었다면 링크 한번더.
-											_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-											apEditorUtil.ReleaseGUIFocus();
-										}
-										else
-										{
-											// [ 프리셋 ]
-											if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-											{
-												// [ 편집 가능한 프리셋 ]
-												propSet._isCommonTexture = !propSet._isCommonTexture;
-
-												//Common Texture 타입이 바뀌었다면 링크 한번더.
-												_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-
-												isNeedToEditorSave = true;
-												apEditorUtil.ReleaseGUIFocus();
-											}
-										}
-									}
-								}
-								break;
-
-							//5. Color 타입인 경우
-							case apMaterialSet.SHADER_PROP_TYPE.Color:
-								{
-									Color nextColor = propSet._value_Color;
-									try
-									{
-										nextColor = EditorGUILayout.ColorField(propSet._value_Color, GUILayout.Width(width_Value));
-									}
-									catch (Exception) { }
-
-									if (Mathf.Abs(nextColor.r - propSet._value_Color.r) > 0.001f
-											|| Mathf.Abs(nextColor.g - propSet._value_Color.g) > 0.001f
-											|| Mathf.Abs(nextColor.b - propSet._value_Color.b) > 0.001f
-											|| Mathf.Abs(nextColor.a - propSet._value_Color.a) > 0.001f)
-									{
-										//색상은 그냥 대입
-										if (!_isPreset)
-										{
-											// [ 일반 재질 세트 ]
-											//apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged, _editor, _portrait, _portrait, false);
-											propSet._value_Color = nextColor;
-											
-											apEditorUtil.SetDirty(_editor);
-										}
-										else
-										{
-											// [ 프리셋 ]
-											if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-											{
-												// [ 편집 가능한 프리셋 ]
-												propSet._value_Color = nextColor;
-												//isNeedToEditorSave = true;
-											}
-										}
-									}
-								}
-								break;
-
-							//추가 v1.5.1 : Keyword 타입인 경우
-							case apMaterialSet.SHADER_PROP_TYPE.Keyword:
-								{
-									bool isBtn = apEditorUtil.ToggledButton_2Side(	_editor.GetText(TEXT.DLG_Enable),
-																								_editor.GetText(TEXT.DLG_Disable), 
-																								propSet._value_Bool, true, width_Value, height_1Line_Comp);
-
-									if(isBtn)
-									{
-										//값 적용
-										if (!_isPreset)
-										{
-											// [ 일반 재질 세트 ]
-											apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged,
-																				_editor,
-																				_portrait,
-																				//_portrait, 
-																				false,
-																				apEditorUtil.UNDO_STRUCT.ValueOnly);
-											propSet._value_Bool = !propSet._value_Bool;
-											
-											apEditorUtil.SetDirty(_editor);
-											apEditorUtil.ReleaseGUIFocus();
-										}
-										else
-										{
-											// [ 프리셋 ]
-											if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-											{
-												// [ 편집 가능한 프리셋 ]
-												propSet._value_Bool = !propSet._value_Bool;
-
-												isNeedToEditorSave = true;
-												apEditorUtil.ReleaseGUIFocus();
-											}
-										}
-									}
-								}
-								break;
-						}
-
-						
-					}
-					else
-					{
-						GUILayout.Space(width_Value + 4);
-					}
-					GUILayout.Space(4);
-					
-					
-				}
-
-				//프로퍼티 삭제 버튼
-				bool isPropRemovable = false;
-				if(!propSet._isReserved)
-				{
-					//편집 가능한 프로퍼티여야 하고 (Reserved가 아닌 프로퍼티)
-					if(!_isPreset)
-					{
-						//일반 재질 세트이면 프로퍼티 삭제 가능
-						isPropRemovable = true;
-					}
-					else
-					{
-						if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-						{
-							//프리셋인데 편집 가능하다면 프로퍼티 삭제 가능
-							isPropRemovable = true;
-						}
-					}
-				}
-				if(isPropRemovable)
-				{
-					//Reserved Property가 아닌 경우
-					//- 삭제 가능
-					if(GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(height_1Line_Comp)))
-					{
-						//현재 파라미터 삭제
-						//"Remove Property"
-						//"Do you want to remove the property [" + propSet._name + "] ?"
-						bool result = EditorUtility.DisplayDialog(_editor.GetText(TEXT.DLG_RemoveMatSetProperty_Title), 
-																	_editor.GetTextFormat(TEXT.DLG_RemoveMatSetProperty_Body, propSet._name), 
-																	_editor.GetText(TEXT.Remove),
-																	_editor.GetText(TEXT.Cancel));
-
-						if(result)
-						{
-							removePropSet = propSet;
-						}
-
-						apEditorUtil.ReleaseGUIFocus();
-					}
-				}
-
-				EditorGUILayout.EndHorizontal();
-
-
-				//텍스쳐 타입이라면 1줄로 끝나지 않는다.
-				if (!propSet._isReserved 
-					&& propSet._isOptionEnabled 
-					&& propSet._propType == apMaterialSet.SHADER_PROP_TYPE.Texture
-					&& ((_isPreset && propSet._isCommonTexture) || !_isPreset)
-					)
-				{
-					GUILayout.Space(5);
-					if(propSet._isCommonTexture)
-					{
-						//1줄만 적용
-						EditorGUILayout.BeginHorizontal(GUILayout.Width(width), GUILayout.Height(size_2Line_Texture));
-						GUILayout.Space(10);
-						EditorGUILayout.BeginVertical(GUILayout.Width(240), GUILayout.Height(size_2Line_Texture));
-						EditorGUILayout.LabelField(_editor.GetText(TEXT.CommonTexture), guiStyle_LabelLeftCenter, GUILayout.Width(240), GUILayout.Height(size_2Line_Texture));//"Common Texture"
-						EditorGUILayout.EndVertical();
-						
-						GUILayout.Space(20);
-						EditorGUILayout.LabelField(" >> ", guiStyle_LabelCenter, GUILayout.Width(width - 500), GUILayout.Height(size_2Line_Texture));
-						GUILayout.Space(20);
-
-						try
-						{
-							//EditorGUILayout.BeginVertical(GUILayout.Width(size_2Line_Texture), GUILayout.Height(size_2Line_Texture));
-							Texture nextTextureAsset = EditorGUILayout.ObjectField(propSet._value_CommonTexture, typeof(Texture), false, GUILayout.Width(size_2Line_Texture), GUILayout.Height(size_2Line_Texture)) as Texture;
-							//EditorGUILayout.EndVertical();
-
-							
-
-							if (nextTextureAsset != propSet._value_CommonTexture)
-							{
-								//이미지 대입하고 다시 Link
-								if (!_isPreset)
-								{
-									// [ 일반 재질 세트 ]
-									//apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged, _editor, _portrait, _portrait, false);
-									propSet._value_CommonTexture = nextTextureAsset;
-									if(nextTextureAsset == null)
-									{
-										//아예 Path까지 날려서 복구를 못하게 해야한다.
-										propSet._commonTexturePath = "";
-									}
-
-									//Common Texture 타입이 바뀌었다면 링크 한번더.
-									_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-									
-									apEditorUtil.SetDirty(_editor);
-								}
-								else
-								{
-									// [ 프리셋 ]
-									if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-									{
-										// [ 편집 가능한 프리셋 ]
-										propSet._value_CommonTexture = nextTextureAsset;
-										if(nextTextureAsset == null)
-										{
-											//아예 Path까지 날려서 복구를 못하게 해야한다.
-											propSet._commonTexturePath = "";
-										}
-
-										//Common Texture 타입이 바뀌었다면 링크 한번더.
-										_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-										apEditorUtil.SetDirty(_editor);
-									}
-								}
-							}
-						}
-						catch (Exception) { }
-						EditorGUILayout.EndHorizontal();
-					}
-					else
-					{
-						//Image 개수에 따라 적용
-						apMaterialSet.PropertySet.ImageTexturePair pair = null;
-						for (int iPair = 0; iPair < propSet._imageTexturePairs.Count; iPair++)
-						{
-							pair = propSet._imageTexturePairs[iPair];
-							if(pair._targetTextureData == null)
-							{
-								continue;
-							}
-
-							EditorGUILayout.BeginHorizontal(GUILayout.Width(width), GUILayout.Height(size_2Line_Texture));
-							GUILayout.Space(10);
-							EditorGUILayout.BeginVertical(GUILayout.Width(240), GUILayout.Height(size_2Line_Texture));
-							EditorGUILayout.LabelField(pair._targetTextureData._name, GUILayout.Width(240), GUILayout.Height(20));
-							EditorGUILayout.LabelField(new GUIContent(pair._targetTextureData._image, ""), GUILayout.Width(240), GUILayout.Height(size_2Line_Texture - 22));
-							EditorGUILayout.EndVertical();
-
-							GUILayout.Space(20);
-							EditorGUILayout.LabelField(" >> ", guiStyle_LabelCenter, GUILayout.Width(width - 500), GUILayout.Height(size_2Line_Texture));
-							GUILayout.Space(20);
-
-							try
-							{
-								Texture nextPairTextureAsset = (Texture)EditorGUILayout.ObjectField(pair._textureAsset, typeof(Texture), true, GUILayout.Width(size_2Line_Texture), GUILayout.Height(size_2Line_Texture));
-
-								if (nextPairTextureAsset != pair._textureAsset)
-								{
-									if (!_isPreset)
-									{
-										// [ 일반 재질 세트 ]
-										//apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged, _editor, _portrait, _portrait, false);
-										pair._textureAsset = nextPairTextureAsset;
-
-										if(nextPairTextureAsset == null)
-										{
-											//아예 Path까지 날려서 복구를 못하게 해야한다.
-											pair._textureAssetPath = "";
-										}
-
-										//Common Texture 타입이 바뀌었다면 링크 한번더.
-										_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-										
-										apEditorUtil.SetDirty(_editor);
-									}
-									else
-									{
-										// [ 프리셋 ]
-										if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
-										{
-											// [ 편집 가능한 프리셋 ]
-											pair._textureAsset = nextPairTextureAsset;
-
-											if (nextPairTextureAsset == null)
-											{
-												//아예 Path까지 날려서 복구를 못하게 해야한다.
-												pair._textureAssetPath = "";
-											}
-
-											//Common Texture 타입이 바뀌었다면 링크 한번더.
-											_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
-
-											apEditorUtil.SetDirty(_editor);
-										}
-									}
-								}
-							}
-							catch (Exception) { }
-
-							EditorGUILayout.EndHorizontal();
-
-							GUILayout.Space(5);
-						}
-					}
-				}
-
-
-
-				GUILayout.Space(20);
 			}
+
+			//변경 v1.6.0
+			// - Reserved와 사용자 지정 프로퍼티를 분리하여 출력한다.
+			// - Reserved는 Foldout이 가능하다.
+
+			//"Reserved Properties"
+			_isFoldOut_ReservedProps = EditorGUILayout.Foldout(_isFoldOut_ReservedProps, _editor.GetText(TEXT.ReservedProperties) + " (" + nProp_Reserved + ")");
+
+			if(_isFoldOut_ReservedProps)
+			{
+				GUILayout.Space(20);
+
+				//1. Reserved 프로퍼티 리스트
+				int iRealProp = 0;
+				for (int iProp = 0; iProp < nPropertySets; iProp++)
+				{
+					propSet = _selectedMaterialSet._propertySets[iProp];
+
+					if(!propSet._isReserved)
+					{
+						//Reserved가 아니면 제외
+						continue;
+					}
+
+					bool isRemoveProp = false;
+					bool isNeedToEditorSaveRequest = false;
+					DrawUI_Property(iRealProp, propSet, width, out isRemoveProp, out isNeedToEditorSaveRequest);
+					iRealProp += 1;
+
+					if(isRemoveProp)
+					{
+						removePropSet = propSet;
+					}
+
+					if(isNeedToEditorSaveRequest)
+					{
+						isNeedToEditorSave = true;
+					}
+
+					GUILayout.Space(20);
+				}
+			}
+			
+
+			GUILayout.Space(10);
+
+
+			//"User Defined Properties"
+			_isFoldOut_UserProps = EditorGUILayout.Foldout(_isFoldOut_UserProps, _editor.GetText(TEXT.CustomProperties) + " (" + nProp_UserDefined + ")");
+
+			if(_isFoldOut_UserProps)
+			{
+				GUILayout.Space(20);
+				//2. User Defined 프로퍼티 리스트
+				int iRealProp = 0;
+				for (int iProp = 0; iProp < nPropertySets; iProp++)
+				{
+					propSet = _selectedMaterialSet._propertySets[iProp];
+
+					if(propSet._isReserved)
+					{
+						//Reserved에서 제외
+						continue;
+					}
+
+					bool isRemoveProp = false;
+					bool isNeedToEditorSaveRequest = false;
+					DrawUI_Property(iRealProp, propSet, width, out isRemoveProp, out isNeedToEditorSaveRequest);
+					iRealProp += 1;
+
+					if(isRemoveProp)
+					{
+						removePropSet = propSet;
+					}
+
+					if(isNeedToEditorSaveRequest)
+					{
+						isNeedToEditorSave = true;
+					}
+
+					GUILayout.Space(20);
+				}
+			}
+			GUILayout.Space(5);
+
+
+
 
 			if (removePropSet != null && _selectedMaterialSet._propertySets.Contains(removePropSet) && !removePropSet._isReserved)
 			{
@@ -2161,7 +1696,7 @@ namespace AnyPortrait
 										GUILayout.Height(25)))
 				{
 					//Debug.LogError("TODO : 프로퍼티를 리스트에서 추가하기 구현");
-					_loadKey_OnShaderPropSelected = apDialog_SelectShaderProp.ShowDialog(_editor, _selectedMaterialSet, OnShaderPropSelected);
+					_loadKey_OnShaderPropSelected = apDialog_SelectShaderProp.ShowDialog_OnMaterialLibrary(_editor, _selectedMaterialSet, OnShaderPropSelected);
 				}
 
 				EditorGUILayout.EndHorizontal();
@@ -2206,10 +1741,9 @@ namespace AnyPortrait
 				}
 				else
 				{
-					//Shader를 분석하자.
+					//Shader를 분석하자.					
 					Material testMaterial = new Material(srcShader);
-					
-					
+
 					//VR 계산을 위한 프로퍼티를 가지고 있는가
 					bool isVRProperty = testMaterial.HasProperty("_MaskTex_L") && testMaterial.HasProperty("_MaskTex_R");
 
@@ -2262,7 +1796,15 @@ namespace AnyPortrait
 				
 			try
 			{
-				nextShader = (Shader)EditorGUILayout.ObjectField(label, srcShader, typeof(Shader), false, GUILayout.Width(width - 35));
+				EditorGUI.BeginChangeCheck();
+				Shader changedShader = (Shader)EditorGUILayout.ObjectField(label, srcShader, typeof(Shader), false, GUILayout.Width(width - 35));
+				if(EditorGUI.EndChangeCheck())
+				{
+					if(srcShader != changedShader)
+					{
+						nextShader = changedShader;
+					}
+				}
 			}
 			catch(Exception/* ex*/)
 			{
@@ -2614,6 +2156,710 @@ namespace AnyPortrait
 		//속성 비교
 		//----------------------------------------------------------------------------------
 
+
+		// UI
+		//----------------------------------------------------------------------------------
+		private void DrawUI_Property(	int index,
+										apMaterialSet.PropertySet propSet,
+										int width,
+										out bool isRemove,
+										out bool isNeedToEditorSave)
+		{
+			isRemove = false;
+			isNeedToEditorSave = false;
+			//배경을 그리자
+			int yOffset = 10;
+			if(index == 0)
+			{
+				//yOffset = 2;
+				//yOffset = 7;
+			}
+
+			Color prevColor = GUI.backgroundColor;
+
+			int size_2Line_Texture = 80;
+			int height_1Line = 22;
+			int height_1Line_Comp = 18;
+
+			//배경 박스의 크기와 색상
+			Rect lastRect = GUILayoutUtility.GetLastRect();
+			Color bgColor = GUI.backgroundColor;
+			int propHeight = 40;
+			if (propSet._isReserved //프로퍼티가 Reserved이거나
+				|| (_isPreset && _selectedPresetType != apMaterialLibrary.PRESET_TYPE.NoneOrCustom)//Reserved 타입의 프리셋이라면
+				)
+			{
+				bgColor = new Color(bgColor.r * 0.9f, bgColor.g * 0.9f, bgColor.b * 0.9f, 1.0f);
+
+				if(propSet._propType == apMaterialSet.SHADER_PROP_TYPE.Texture
+					&& propSet._isOptionEnabled
+					&& propSet._isCommonTexture
+					&& !propSet._isReserved)
+				{
+					//텍스쳐 타입 + Common Texture인 경우 보여주기 위해 Height를 증가
+					propHeight += size_2Line_Texture + 9;
+				}
+			}
+			else if (!propSet._isOptionEnabled)
+			{
+				bgColor = new Color(bgColor.r * 0.8f, bgColor.g * 0.8f, bgColor.b * 0.8f, 1.0f);
+			}
+			else
+			{
+				switch (propSet._propType)
+				{
+					case apMaterialSet.SHADER_PROP_TYPE.Float://초록색
+						bgColor = new Color(bgColor.r * 0.7f, bgColor.g * 1.0f, bgColor.b * 0.7f, 1.0f);
+						break;
+
+					case apMaterialSet.SHADER_PROP_TYPE.Int://노란색
+						bgColor = new Color(bgColor.r * 1.0f, bgColor.g * 1.0f, bgColor.b * 0.7f, 1.0f);
+						break;
+
+					case apMaterialSet.SHADER_PROP_TYPE.Vector://파란색
+						bgColor = new Color(bgColor.r * 0.7f, bgColor.g * 0.9f, bgColor.b * 1.0f, 1.0f);
+						break;
+
+					case apMaterialSet.SHADER_PROP_TYPE.Texture://청록색
+						bgColor = new Color(bgColor.r * 0.7f, bgColor.g * 1.0f, bgColor.b * 0.9f, 1.0f);
+						if(propSet._isOptionEnabled)
+						{
+							if(propSet._isCommonTexture)
+							{
+								propHeight += size_2Line_Texture + 4 + 5;
+							}
+							else
+							{
+								if (!_isPreset)
+								{
+									propHeight += propSet._imageTexturePairs.Count * (size_2Line_Texture + 5 + 4) + 5;
+								}
+							}
+						}
+						break;
+
+					case apMaterialSet.SHADER_PROP_TYPE.Color://보라색
+						bgColor = new Color(bgColor.r * 1.0f, bgColor.g * 0.7f, bgColor.b * 1.0f, 1.0f);
+						//if(propSet._isOptionEnabled)	{ propHeight = 64; }
+						break;
+
+					case apMaterialSet.SHADER_PROP_TYPE.Keyword://붉은색
+						bgColor = new Color(bgColor.r * 1.0f, bgColor.g * 0.7f, bgColor.b * 0.7f, 1.0f);
+						break;
+				}
+			}
+
+			//배경 박스
+			GUI.backgroundColor = bgColor;
+			GUI.Box(new Rect(lastRect.x, lastRect.y + yOffset, width, propHeight), "");
+			GUI.backgroundColor = prevColor;
+			
+			//첫번째 줄
+			EditorGUILayout.BeginHorizontal(GUILayout.Width(width), GUILayout.Height(height_1Line));
+			GUILayout.Space(5);
+
+			//- Reserved 아이콘 또는 Enabled 토글
+			if (propSet._isReserved//Reserved 프로퍼티이거나
+				|| (_isPreset && _selectedPresetType != apMaterialLibrary.PRESET_TYPE.NoneOrCustom)//Reserved 프리셋이라면
+				)
+			{
+				EditorGUILayout.LabelField(new GUIContent("", _img_Reserved), GUILayout.Width(30), GUILayout.Height(height_1Line_Comp));
+			}
+			else
+			{
+				bool nextEnabledOption = EditorGUILayout.Toggle(propSet._isOptionEnabled, GUILayout.Width(30), GUILayout.Height(height_1Line_Comp));
+				if(nextEnabledOption != propSet._isOptionEnabled)
+				{
+					apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
+													_editor, 
+													_portrait, 
+													//_portrait, 
+													false,
+													apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+					propSet._isOptionEnabled = nextEnabledOption;
+					apEditorUtil.ReleaseGUIFocus();
+				}
+			}
+
+			GUILayout.Space(5);
+
+			//- Property 이름
+			string nextPropName = EditorGUILayout.DelayedTextField(propSet._name, _guiStyleProp_TextField, GUILayout.Width(170), GUILayout.Height(height_1Line_Comp));
+			if(!string.Equals(nextPropName, propSet._name))
+			{
+				if(!_isPreset)
+				{
+					// [ 일반 재질 세트 ]
+					//Portrait 데이터
+					apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
+													_editor, 
+													_portrait, 
+													//_portrait, 
+													false,
+													apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+					propSet._name = nextPropName;
+				}
+				else
+				{
+					// [ 프리셋 ]
+					if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+					{
+						// [ 편집 가능한 프리셋 ]
+						propSet._name = nextPropName;
+						isNeedToEditorSave = true;
+					}
+					else
+					{
+						// [ 편집 불가능한 프리셋 ]
+						nextPropName = propSet._name;//변경된 이름 복구
+						//Reserved -> 경고 메시지
+						ShowWarningIfReservedPresetChanged();
+					}
+				}
+				
+				apEditorUtil.ReleaseGUIFocus();
+				apEditorUtil.SetDirty(_editor);
+			}
+
+			apMaterialSet.SHADER_PROP_TYPE nextPropType = (apMaterialSet.SHADER_PROP_TYPE)EditorGUILayout.EnumPopup(propSet._propType, GUILayout.Width(80), GUILayout.Height(height_1Line_Comp));
+			if(nextPropType != propSet._propType)
+			{
+				apMaterialSet.SHADER_PROP_TYPE prevPropType = propSet._propType;
+				if(!_isPreset)
+				{
+					// [ 일반 재질 세트 ]
+					bool isChange = true;
+					if(prevPropType == apMaterialSet.SHADER_PROP_TYPE.Texture)
+					{
+						//Texture > 다른 속성인 경우 한번 물어보자
+						//"Change type", 
+						//"If you change from a [Texture] type to a different type, the Texture Asset property is initialized.\nDo you want to change the type?",
+						isChange = EditorUtility.DisplayDialog(	_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Title), 
+																_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Body),
+																_editor.GetText(TEXT.Okay),
+																_editor.GetText(TEXT.Cancel)
+																);
+					}
+
+					if (isChange)
+					{
+						//Portrait 데이터
+						apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
+															_editor, 
+															_portrait, 
+															//_portrait, 
+															false,
+															apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+						propSet._propType = nextPropType;
+
+						//Type이 바뀌었다면 링크 한번더.
+						_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+						Repaint();
+					}
+				}
+				else
+				{
+					// [ 프리셋 ]
+					if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+					{
+						// [ 편집 가능한 프리셋 ]
+						bool isChange = true;
+						if(prevPropType == apMaterialSet.SHADER_PROP_TYPE.Texture)
+						{
+							//Texture > 다른 속성인 경우 한번 물어보자
+							//"Change type", 
+							//"If you change from a [Texture] type to a different type, the Texture Asset property is initialized.\nDo you want to change the type?",
+							isChange = EditorUtility.DisplayDialog(	_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Title), 
+																	_editor.GetText(TEXT.DLG_ShaderPropChangeWarning_Body),
+																	_editor.GetText(TEXT.Okay),
+																	_editor.GetText(TEXT.Cancel)
+																	);
+						}
+
+						if (isChange)
+						{
+							//Reserved가 아닌 Preset
+							propSet._propType = nextPropType;
+							isNeedToEditorSave = true;
+
+							//Type이 바뀌었다면 링크 한번더.
+							_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+							Repaint();
+						}
+					}
+					else
+					{
+						// [ 편집 불가능한 프리셋 ]
+						// 경고 메시지
+						ShowWarningIfReservedPresetChanged();
+					}
+				}
+
+				apEditorUtil.ReleaseGUIFocus();
+				apEditorUtil.SetDirty(_editor);
+			}
+			GUILayout.Space(5);
+
+
+			//값을 넣자
+			if (!propSet._isReserved)
+			{
+				GUILayout.Space(2);
+				int width_Value = width - (365);
+
+				if (propSet._isOptionEnabled)
+				{
+					switch (propSet._propType)
+					{
+						//1. Float 타입인 경우
+						case apMaterialSet.SHADER_PROP_TYPE.Float:
+							{
+								float nextFloat = EditorGUILayout.DelayedFloatField(propSet._value_Float, GUILayout.Width(width_Value));
+								if (Mathf.Abs(nextFloat - propSet._value_Float) > 0.0001f)
+								{
+									if (!_isPreset)
+									{
+										// [ 일반 재질 세트 ]
+										apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
+																			_editor, 
+																			_portrait, 
+																			//_portrait, 
+																			false,
+																			apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+										propSet._value_Float = nextFloat;
+										apEditorUtil.ReleaseGUIFocus();
+									}
+									else
+									{
+										// [ 프리셋 ]
+										if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+										{
+											// [ 편집 가능한 프리셋 ]
+											propSet._value_Float = nextFloat;
+											isNeedToEditorSave = true;
+											apEditorUtil.ReleaseGUIFocus();
+										}
+									}
+								}
+							}
+							break;
+						
+						//2. Int 타입인 경우
+						case apMaterialSet.SHADER_PROP_TYPE.Int:
+							{
+								int nextInt = EditorGUILayout.DelayedIntField(propSet._value_Int, GUILayout.Width(width_Value));
+								if (nextInt != propSet._value_Int)
+								{
+									if (!_isPreset)
+									{
+										// [ 일반 재질 세트 ]
+										apEditorUtil.SetRecord_Portrait(	apUndoGroupData.ACTION.MaterialSetChanged, 
+																			_editor, 
+																			_portrait, 
+																			//_portrait, 
+																			false,
+																			apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+										propSet._value_Int = nextInt;
+										apEditorUtil.ReleaseGUIFocus();
+									}
+									else
+									{
+										// [ 프리셋 ]
+										if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+										{
+											// [ 편집 가능한 프리셋 ]
+											propSet._value_Int = nextInt;
+											isNeedToEditorSave = true;
+											apEditorUtil.ReleaseGUIFocus();
+										}
+									}
+								}
+							}
+							break;
+
+						//3. Vector 타입인 경우
+						case apMaterialSet.SHADER_PROP_TYPE.Vector:
+							{
+								int width_Value_V1 = (width_Value / 4) - 3;
+								float vecX = EditorGUILayout.DelayedFloatField(propSet._value_Vector.x, GUILayout.Width(width_Value_V1));
+								float vecY = EditorGUILayout.DelayedFloatField(propSet._value_Vector.y, GUILayout.Width(width_Value_V1));
+								float vecZ = EditorGUILayout.DelayedFloatField(propSet._value_Vector.z, GUILayout.Width(width_Value_V1));
+								float vecW = EditorGUILayout.DelayedFloatField(propSet._value_Vector.w, GUILayout.Width(width_Value_V1));
+
+								if (Mathf.Abs(vecX - propSet._value_Vector.x) > 0.0001f
+									|| Mathf.Abs(vecY - propSet._value_Vector.y) > 0.0001f
+									|| Mathf.Abs(vecZ - propSet._value_Vector.z) > 0.0001f
+									|| Mathf.Abs(vecW - propSet._value_Vector.w) > 0.0001f)
+								{
+									if (!_isPreset)
+									{
+										// [ 일반 재질 세트 ]
+										apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged,
+																			_editor,
+																			_portrait,
+																			//_portrait, 
+																			false,
+																			apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+										propSet._value_Vector.x = vecX;
+										propSet._value_Vector.y = vecY;
+										propSet._value_Vector.z = vecZ;
+										propSet._value_Vector.w = vecW;
+										apEditorUtil.ReleaseGUIFocus();
+									}
+									else
+									{
+										// [ 프리셋 ]
+										if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+										{
+											// [ 편집 가능한 프리셋 ]
+											propSet._value_Vector.x = vecX;
+											propSet._value_Vector.y = vecY;
+											propSet._value_Vector.z = vecZ;
+											propSet._value_Vector.w = vecW;
+											isNeedToEditorSave = true;
+											apEditorUtil.ReleaseGUIFocus();
+										}
+									}
+								}
+								
+							}
+							break;
+
+						//4. Texture 타입인 경우
+						case apMaterialSet.SHADER_PROP_TYPE.Texture:
+							{
+								//"Common Texture", "Texture per Image"
+								bool isBtn = apEditorUtil.ToggledButton_2Side(	_editor.GetText(TEXT.CommonTexture),
+																							_editor.GetText(TEXT.TexturePerImage), 
+																							propSet._isCommonTexture, true, width_Value, height_1Line_Comp);
+
+								if(isBtn)
+								{
+									if (!_isPreset)
+									{
+										// [ 일반 재질 세트 ]
+										apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged,
+																			_editor,
+																			_portrait,
+																			//_portrait, 
+																			false,
+																			apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+										propSet._isCommonTexture = !propSet._isCommonTexture;
+
+										//Common Texture 타입이 바뀌었다면 링크 한번더.
+										_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+										apEditorUtil.ReleaseGUIFocus();
+									}
+									else
+									{
+										// [ 프리셋 ]
+										if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+										{
+											// [ 편집 가능한 프리셋 ]
+											propSet._isCommonTexture = !propSet._isCommonTexture;
+
+											//Common Texture 타입이 바뀌었다면 링크 한번더.
+											_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+
+											isNeedToEditorSave = true;
+											apEditorUtil.ReleaseGUIFocus();
+										}
+									}
+								}
+							}
+							break;
+
+						//5. Color 타입인 경우
+						case apMaterialSet.SHADER_PROP_TYPE.Color:
+							{
+								Color nextColor = propSet._value_Color;
+								try
+								{
+									nextColor = EditorGUILayout.ColorField(propSet._value_Color, GUILayout.Width(width_Value));
+								}
+								catch (Exception) { }
+
+								if (Mathf.Abs(nextColor.r - propSet._value_Color.r) > 0.001f
+										|| Mathf.Abs(nextColor.g - propSet._value_Color.g) > 0.001f
+										|| Mathf.Abs(nextColor.b - propSet._value_Color.b) > 0.001f
+										|| Mathf.Abs(nextColor.a - propSet._value_Color.a) > 0.001f)
+								{
+									//색상은 그냥 대입
+									if (!_isPreset)
+									{
+										// [ 일반 재질 세트 ]
+										//apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged, _editor, _portrait, _portrait, false);
+										propSet._value_Color = nextColor;
+										
+										apEditorUtil.SetDirty(_editor);
+									}
+									else
+									{
+										// [ 프리셋 ]
+										if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+										{
+											// [ 편집 가능한 프리셋 ]
+											propSet._value_Color = nextColor;
+											//isNeedToEditorSave = true;
+										}
+									}
+								}
+							}
+							break;
+
+						//추가 v1.5.1 : Keyword 타입인 경우
+						case apMaterialSet.SHADER_PROP_TYPE.Keyword:
+							{
+								bool isBtn = apEditorUtil.ToggledButton_2Side(	_editor.GetText(TEXT.DLG_Enable),
+																							_editor.GetText(TEXT.DLG_Disable), 
+																							propSet._value_Bool, true, width_Value, height_1Line_Comp);
+
+								if(isBtn)
+								{
+									//값 적용
+									if (!_isPreset)
+									{
+										// [ 일반 재질 세트 ]
+										apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged,
+																			_editor,
+																			_portrait,
+																			//_portrait, 
+																			false,
+																			apEditorUtil.UNDO_STRUCT.ValueOnly);
+										propSet._value_Bool = !propSet._value_Bool;
+										
+										apEditorUtil.SetDirty(_editor);
+										apEditorUtil.ReleaseGUIFocus();
+									}
+									else
+									{
+										// [ 프리셋 ]
+										if (_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+										{
+											// [ 편집 가능한 프리셋 ]
+											propSet._value_Bool = !propSet._value_Bool;
+
+											isNeedToEditorSave = true;
+											apEditorUtil.ReleaseGUIFocus();
+										}
+									}
+								}
+							}
+							break;
+					}
+
+					
+				}
+				else
+				{
+					GUILayout.Space(width_Value + 4);
+				}
+				GUILayout.Space(4);
+				
+				
+			}
+
+			//프로퍼티 삭제 버튼
+			bool isPropRemovable = false;
+			if(!propSet._isReserved)
+			{
+				//편집 가능한 프로퍼티여야 하고 (Reserved가 아닌 프로퍼티)
+				if(!_isPreset)
+				{
+					//일반 재질 세트이면 프로퍼티 삭제 가능
+					isPropRemovable = true;
+				}
+				else
+				{
+					if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+					{
+						//프리셋인데 편집 가능하다면 프로퍼티 삭제 가능
+						isPropRemovable = true;
+					}
+				}
+			}
+			if(isPropRemovable)
+			{
+				//Reserved Property가 아닌 경우
+				//- 삭제 가능
+				if(GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(height_1Line_Comp)))
+				{
+					//현재 파라미터 삭제
+					//"Remove Property"
+					//"Do you want to remove the property [" + propSet._name + "] ?"
+					bool result = EditorUtility.DisplayDialog(_editor.GetText(TEXT.DLG_RemoveMatSetProperty_Title), 
+																_editor.GetTextFormat(TEXT.DLG_RemoveMatSetProperty_Body, propSet._name), 
+																_editor.GetText(TEXT.Remove),
+																_editor.GetText(TEXT.Cancel));
+
+					if(result)
+					{
+						//removePropSet = propSet;
+						isRemove = true;//삭제 요청
+					}
+
+					apEditorUtil.ReleaseGUIFocus();
+				}
+			}
+
+			EditorGUILayout.EndHorizontal();
+
+
+			//텍스쳐 타입이라면 1줄로 끝나지 않는다.
+			if (!propSet._isReserved 
+				&& propSet._isOptionEnabled 
+				&& propSet._propType == apMaterialSet.SHADER_PROP_TYPE.Texture
+				&& ((_isPreset && propSet._isCommonTexture) || !_isPreset)
+				)
+			{
+				GUILayout.Space(5);
+				if(propSet._isCommonTexture)
+				{
+					//1줄만 적용
+					EditorGUILayout.BeginHorizontal(GUILayout.Width(width), GUILayout.Height(size_2Line_Texture));
+					GUILayout.Space(10);
+					EditorGUILayout.BeginVertical(GUILayout.Width(240), GUILayout.Height(size_2Line_Texture));
+					EditorGUILayout.LabelField(_editor.GetText(TEXT.CommonTexture), _guiStyle_LabelLeftCenter, GUILayout.Width(240), GUILayout.Height(size_2Line_Texture));//"Common Texture"
+					EditorGUILayout.EndVertical();
+					
+					GUILayout.Space(20);
+					EditorGUILayout.LabelField(" >> ", _guiStyle_LabelCenter, GUILayout.Width(width - 500), GUILayout.Height(size_2Line_Texture));
+					GUILayout.Space(20);
+
+					try
+					{
+						//EditorGUILayout.BeginVertical(GUILayout.Width(size_2Line_Texture), GUILayout.Height(size_2Line_Texture));
+						Texture nextTextureAsset = EditorGUILayout.ObjectField(propSet._value_CommonTexture, typeof(Texture), false, GUILayout.Width(size_2Line_Texture), GUILayout.Height(size_2Line_Texture)) as Texture;
+						//EditorGUILayout.EndVertical();
+
+						
+
+						if (nextTextureAsset != propSet._value_CommonTexture)
+						{
+							//이미지 대입하고 다시 Link
+							if (!_isPreset)
+							{
+								// [ 일반 재질 세트 ]
+								//apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged, _editor, _portrait, _portrait, false);
+								propSet._value_CommonTexture = nextTextureAsset;
+								if(nextTextureAsset == null)
+								{
+									//아예 Path까지 날려서 복구를 못하게 해야한다.
+									propSet._commonTexturePath = "";
+								}
+
+								//Common Texture 타입이 바뀌었다면 링크 한번더.
+								_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+								
+								apEditorUtil.SetDirty(_editor);
+							}
+							else
+							{
+								// [ 프리셋 ]
+								if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+								{
+									// [ 편집 가능한 프리셋 ]
+									propSet._value_CommonTexture = nextTextureAsset;
+									if(nextTextureAsset == null)
+									{
+										//아예 Path까지 날려서 복구를 못하게 해야한다.
+										propSet._commonTexturePath = "";
+									}
+
+									//Common Texture 타입이 바뀌었다면 링크 한번더.
+									_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+									apEditorUtil.SetDirty(_editor);
+								}
+							}
+						}
+					}
+					catch (Exception) { }
+					EditorGUILayout.EndHorizontal();
+				}
+				else
+				{
+					//Image 개수에 따라 적용
+					apMaterialSet.PropertySet.ImageTexturePair pair = null;
+					for (int iPair = 0; iPair < propSet._imageTexturePairs.Count; iPair++)
+					{
+						pair = propSet._imageTexturePairs[iPair];
+						if(pair._targetTextureData == null)
+						{
+							continue;
+						}
+
+						EditorGUILayout.BeginHorizontal(GUILayout.Width(width), GUILayout.Height(size_2Line_Texture));
+						GUILayout.Space(10);
+						EditorGUILayout.BeginVertical(GUILayout.Width(240), GUILayout.Height(size_2Line_Texture));
+						EditorGUILayout.LabelField(pair._targetTextureData._name, GUILayout.Width(240), GUILayout.Height(20));
+						EditorGUILayout.LabelField(new GUIContent(pair._targetTextureData._image, ""), GUILayout.Width(240), GUILayout.Height(size_2Line_Texture - 22));
+						EditorGUILayout.EndVertical();
+
+						GUILayout.Space(20);
+						EditorGUILayout.LabelField(" >> ", _guiStyle_LabelCenter, GUILayout.Width(width - 500), GUILayout.Height(size_2Line_Texture));
+						GUILayout.Space(20);
+
+						try
+						{
+							Texture nextPairTextureAsset = (Texture)EditorGUILayout.ObjectField(pair._textureAsset, typeof(Texture), true, GUILayout.Width(size_2Line_Texture), GUILayout.Height(size_2Line_Texture));
+
+							if (nextPairTextureAsset != pair._textureAsset)
+							{
+								if (!_isPreset)
+								{
+									// [ 일반 재질 세트 ]
+									//apEditorUtil.SetRecord_Portrait(apUndoGroupData.ACTION.MaterialSetChanged, _editor, _portrait, _portrait, false);
+									pair._textureAsset = nextPairTextureAsset;
+
+									if(nextPairTextureAsset == null)
+									{
+										//아예 Path까지 날려서 복구를 못하게 해야한다.
+										pair._textureAssetPath = "";
+									}
+
+									//Common Texture 타입이 바뀌었다면 링크 한번더.
+									_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+									
+									apEditorUtil.SetDirty(_editor);
+								}
+								else
+								{
+									// [ 프리셋 ]
+									if(_selectedPresetType == apMaterialLibrary.PRESET_TYPE.NoneOrCustom)
+									{
+										// [ 편집 가능한 프리셋 ]
+										pair._textureAsset = nextPairTextureAsset;
+
+										if (nextPairTextureAsset == null)
+										{
+											//아예 Path까지 날려서 복구를 못하게 해야한다.
+											pair._textureAssetPath = "";
+										}
+
+										//Common Texture 타입이 바뀌었다면 링크 한번더.
+										_editor.Controller.LinkMaterialSetAssets(_selectedMaterialSet, _isPreset, _portrait);
+
+										apEditorUtil.SetDirty(_editor);
+									}
+								}
+							}
+						}
+						catch (Exception) { }
+
+						EditorGUILayout.EndHorizontal();
+
+						GUILayout.Space(5);
+					}
+				}
+			}
+		}
 
 
 		//v1.5.0 추가

@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -88,7 +88,7 @@ namespace AnyPortrait
 		public List<apBackupUnit> _childFields = null;
 
 		public int _level = 0;
-
+		
 
 		//인코딩을 위한 Wrapper를 이용하자
 		//불필요한 메모리 누수를 막을 수 있다.
@@ -106,6 +106,14 @@ namespace AnyPortrait
 		private const string STR_SLASH =  "/";
 		private const string STR_REPLACE_SLASH = "<S$#_+_D=#>";//"/"를 가진 String을 만나면 이걸로 변환을 하자.		
 		private const string STR_CORRECTED_VERSION = "FIX";
+
+
+		//v1.6.0에서 빌드 효율성을 위해서 기본 어셈블리가 변경되었다.
+		//이전 버전에서 저장된 백업을 열기 위해서는 어셈블리 경로를 변경해야한다.
+		private const string ASSEMBLY_NAMESPACE = "AnyPortrait.";
+		private const string ASSEMBLY_ROOT__PREV_VERSION = "Assembly-CSharp";
+		private const string ASSEMBLY_ROOT__NEW_VERSION = "com.rainyrizzle.anyportrait";
+
 
 		public apBackupUnit()
 		{
@@ -1142,6 +1150,15 @@ namespace AnyPortrait
 				cursor += typeNameLength;
 
 				_typeName_Partial = table.GetTypeName(typeNameIndex);
+
+				//v1.6.0에서 기본 어셈블리가 "Assembly-CSharp"에서 "com.rainyrizzle.anyportrait"로 변경되었다.
+				if(_typeName_Partial.Contains(ASSEMBLY_NAMESPACE))
+				{
+					//AnyPortrait NameSpace로 시작하는 경우엔 Assembly 호환을 위해 타입을 변경
+					_typeName_Partial = _typeName_Partial.Replace(ASSEMBLY_ROOT__PREV_VERSION, ASSEMBLY_ROOT__NEW_VERSION);
+				}
+				
+
 				System.Type parseType = table.GetTypeParsed(typeNameIndex);
 
 

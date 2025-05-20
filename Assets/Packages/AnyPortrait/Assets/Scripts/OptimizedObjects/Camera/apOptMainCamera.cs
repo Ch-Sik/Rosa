@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -186,7 +186,7 @@ namespace AnyPortrait
 
 		public int SetCameras(params Camera[] cameras)
 		{
-			if(cameras == null)
+			if (cameras == null)
 			{
 				return 0;
 			}
@@ -211,22 +211,38 @@ namespace AnyPortrait
 			for (int i = 0; i < nParamCameras; i++)
 			{
 				_cal_curSceneCamera = cameras[i];
-				if (_cal_curSceneCamera != null && IsLookPortrait(_cal_curSceneCamera))
-				{
-					//바라보고 있는 카메라다. > 일단 모두 추가
-					CameraData newCamData = new CameraData(_cal_curSceneCamera);
-					_cameraDataList.Add(newCamData);
-					_cam2CameraData.Add(_cal_curSceneCamera, newCamData);
 
-					//이전
-					//if (_parentPortrait._isForceCamSortModeToOrthographic)
-					//수정 21.1.15 : Billboard가 아닌 경우에도 Orthographic으로 고정되는 문제. 빌보드일때만 고정하자
-					if (_parentPortrait._isForceCamSortModeToOrthographic
-						&& _parentPortrait._billboardType != apPortrait.BILLBOARD_TYPE.None)
-					{
-						//강제로 Orthographic으로 고정한다.
-						_cal_curSceneCamera.transparencySortMode = TransparencySortMode.Orthographic;
-					}
+				if(_cal_curSceneCamera == null)
+				{
+					continue;
+				}
+
+				//비활성화되어 있다면
+				if(!_cal_curSceneCamera.isActiveAndEnabled)
+				{
+					//Debug.LogError("비활성화된 카메라 : " + _cal_curSceneCamera.gameObject.name);
+					continue;
+				}
+
+				if(!IsLookPortrait(_cal_curSceneCamera))
+				{
+					//카메라가 Portrait를 대상으로 하지 않음
+					continue;
+				}
+
+				//바라보고 있는 카메라다. > 일단 모두 추가
+				CameraData newCamData = new CameraData(_cal_curSceneCamera);
+				_cameraDataList.Add(newCamData);
+				_cam2CameraData.Add(_cal_curSceneCamera, newCamData);
+
+				//이전
+				//if (_parentPortrait._isForceCamSortModeToOrthographic)
+				//수정 21.1.15 : Billboard가 아닌 경우에도 Orthographic으로 고정되는 문제. 빌보드일때만 고정하자
+				if (_parentPortrait._isForceCamSortModeToOrthographic
+					&& _parentPortrait._billboardType != apPortrait.BILLBOARD_TYPE.None)
+				{
+					//강제로 Orthographic으로 고정한다.
+					_cal_curSceneCamera.transparencySortMode = TransparencySortMode.Orthographic;
 				}
 			}
 

@@ -1801,15 +1801,23 @@ namespace AnyPortrait
 
 					if (GUILayout.Button("Add / Check Animator", GUILayout.Height(25)))
 					{
-						Undo.RegisterCompleteObjectUndo(_targetPortrait, "Mecanim Setting Changed");
+						string strUndoName = "Mecanim Setting Changed";
+						Undo.RegisterCompleteObjectUndo(_targetPortrait, strUndoName);
+						int undoID = Undo.GetCurrentGroup();
+
+						Undo.RegisterCompleteObjectUndo(_targetPortrait.gameObject, strUndoName);
 
 						Animator animator = _targetPortrait.gameObject.GetComponent<Animator>();
 						if (animator == null)
 						{
-							animator = _targetPortrait.gameObject.AddComponent<Animator>();
+							//animator = _targetPortrait.gameObject.AddComponent<Animator>();//이전
+
+							//v1.6.0 : Undo API 이용
+							animator = Undo.AddComponent<Animator>(_targetPortrait.gameObject);
 						}
 						_targetPortrait._animator = animator;
 
+						Undo.CollapseUndoOperations(undoID);
 						EditorUtility.SetDirty(_targetPortrait);
 					}
 				}
@@ -3673,7 +3681,7 @@ namespace AnyPortrait
 		{
 			if(_targetPortrait != null)
 			{
-				Undo.RecordObject(_targetPortrait, "Portrait Changed");
+				Undo.RegisterCompleteObjectUndo(_targetPortrait, "Portrait Changed");
 				EditorUtility.SetDirty(_targetPortrait);
 			}
 		}

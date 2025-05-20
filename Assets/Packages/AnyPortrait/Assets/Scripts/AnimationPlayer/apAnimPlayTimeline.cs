@@ -125,9 +125,37 @@ namespace AnyPortrait
 				_playUnit.Mecanim_Unlink();
 			}
 
-			public void UpdateTimelineClipAndPlayUnit()
+			public void UpdateTimelineClipAndPlayUnit(out bool isNeedEndEventCall)
 			{
-				_playUnit.Mecanim_Update(_weight, _timeRatio, _playOrder, _layerIndex, _blendMethod, 1.0f);
+				isNeedEndEventCall = false;
+				bool isLastFramePlayed = _playUnit.Mecanim_Update(_weight, _timeRatio, _playOrder, _layerIndex, _blendMethod, 1.0f);
+
+				if(isLastFramePlayed)
+				{
+					//Loop 타입이 아니고 마지막 프레임 도달 이벤트가 호출되지 않았다면
+					if(!_playUnit.IsLoop && !_playUnit.IsLastFramePlayedEventCalled())
+					{
+						//마지막 프레임 도달 이벤트를 호출해야한다.
+						isNeedEndEventCall = true;
+					}
+				}
+			}
+
+			/// <summary>
+			/// 종료 이벤트가 호출되었는가 (Loop가 아닌 경우 Unlink 이전에 미리 호출될 수 있기 때문)
+			/// </summary>
+			/// <returns></returns>
+			public bool IsEndEventCalled()
+			{
+				return _playUnit.IsLastFramePlayedEventCalled();
+			}
+
+			/// <summary>
+			/// 종료 이벤트가 호출되었음을 설정한다.
+			/// </summary>
+			public void SetEndEventCalled()
+			{
+				_playUnit.SetLastFramePlayedEventCalled();
 			}
 		}
 
@@ -515,6 +543,16 @@ namespace AnyPortrait
 						if(_c_curClipData._isCalculatedPrev)
 						{
 							//이전 프레임에서는 계산이 되었던 ClipData다.
+							
+							//v1.6.0 : 종료 이벤트가 호출되지 않았다면 지금 호출하자
+							if(!_c_curClipData.IsEndEventCalled())
+							{
+								animPlayManager.OnAnimPlayUnitEnded(_c_curClipData._playUnit, apPortrait.ANIM_ENDED_TYPE.Deactivated);
+								_c_curClipData.SetEndEventCalled();
+							}
+
+
+							//Unlink하여 재생을 종료하자
 							_c_curClipData.Unlink();
 						}
 					}
@@ -531,7 +569,15 @@ namespace AnyPortrait
 						}
 
 						//업데이트 <중요!>
-						_c_curClipData.UpdateTimelineClipAndPlayUnit();
+						bool isNeedEndEventCall = false;
+						_c_curClipData.UpdateTimelineClipAndPlayUnit(out isNeedEndEventCall);
+
+						//v1.6.0 종료 이벤트를 호출하자 (마지막 프레임에 도달)
+						if(isNeedEndEventCall)
+						{
+							animPlayManager.OnAnimPlayUnitEnded(_c_curClipData._playUnit, apPortrait.ANIM_ENDED_TYPE.LastFrameReached);
+							_c_curClipData.SetEndEventCalled();
+						}
 					}
 
 					//Prev 갱신

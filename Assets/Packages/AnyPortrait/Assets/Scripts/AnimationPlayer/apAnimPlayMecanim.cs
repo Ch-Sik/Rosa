@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -136,13 +136,40 @@ namespace AnyPortrait
 				_playUnit.Mecanim_Unlink();
 			}
 
-			
-
-			public void UpdateAnimClipAndPlayUnit()
+			public void UpdateAnimClipAndPlayUnit(out bool isNeedEndEventCall)
 			{
-				_playUnit.Mecanim_Update(_weight, _timeRatio, _playOrder, _playedLayer, _blendMethod, _speed);
+				bool isFrameEnded = _playUnit.Mecanim_Update(_weight, _timeRatio, _playOrder, _playedLayer, _blendMethod, _speed);
+				
+				isNeedEndEventCall = false;
+				if(isFrameEnded)
+				{
+					//프레임이 종료된 경우, Loop가 아니라면 이벤트를 호출해야한다.
+					if(!_playUnit.IsLoop && !_playUnit.IsLastFramePlayedEventCalled())
+					{
+						//Debug.Log("End Event [" + _animClip._name + "]");
+						isNeedEndEventCall = true;
+					}
+				}
+			}
+
+			/// <summary>
+			/// 종료 이벤트가 호출되었는가 (Loop가 아닌 경우 Unlink 이전에 미리 호출될 수 있기 때문)
+			/// </summary>
+			/// <returns></returns>
+			public bool IsEndEventCalled()
+			{
+				return _playUnit.IsLastFramePlayedEventCalled();
+			}
+
+			/// <summary>
+			/// 종료 이벤트를 호출했다.
+			/// </summary>
+			public void SetEndEventCalled()
+			{
+				_playUnit.SetLastFramePlayedEventCalled();
 			}
 		}
+
 		private List<MecanimClipData> _clipData = new List<MecanimClipData>();
 		//빠른 접근용
 		private Dictionary<AnimationClip, MecanimClipData> _clipDataByAsset = new Dictionary<AnimationClip, MecanimClipData>();
@@ -462,11 +489,13 @@ namespace AnyPortrait
 
 
 				//"현재 Clip" 먼저 처리
+				
 				if (_curClipInfos != null && _curClipInfos.Length > 0)
 				{
 					for (int iClip = 0; iClip < _curClipInfos.Length; iClip++)
 					{
-						_curClipAsset = _curClipInfos[iClip].clip;
+						AnimatorClipInfo animClipInfo = _curClipInfos[iClip];
+						_curClipAsset = animClipInfo.clip;
 						if(_curClipAsset == _portrait._emptyAnimClipForMecanim ||
 							_curClipAsset == null)
 						{
@@ -480,13 +509,12 @@ namespace AnyPortrait
 							continue;
 						}
 						//업데이트를 하자 <Current>
-						
 						_curClipData.SetData(	iLayer, 
 												_curOrder, 
 												_curMecanimLayer._blendType, 
 												_curStateInfo.speed,
 												_curStateInfo.speedMultiplier,
-												_curLayerWeight * _curClipInfos[iClip].weight,
+												_curLayerWeight * animClipInfo.weight,
 												_curNormalizedTime);
 
 						_curOrder++;
@@ -536,9 +564,6 @@ namespace AnyPortrait
 						_curOrder++;
 					}
 				}
-				
-
-				
 			}
 
 
@@ -555,6 +580,17 @@ namespace AnyPortrait
 					if(_curClipData._isCalculatedPrev)
 					{
 						//이전 프레임에서는 계산이 되었던 ClipData이다.
+
+						//[v1.6.0] 종료 이벤트를 호출해야하는지 확인하고 먼저 호출한다.
+						if(!_curClipData.IsEndEventCalled())
+						{
+							//아직 종료 이벤트를 호출하지 않았다.
+							//Debug.Log("End Event [" + _curClipData._animClip._name + "]");
+							_animPlayManager.OnAnimPlayUnitEnded(_curClipData._playUnit, apPortrait.ANIM_ENDED_TYPE.Deactivated);
+							_curClipData.SetEndEventCalled();
+						}
+
+						//Link를 해제하여 재생을 종료한다.
 						_curClipData.Unlink();
 					}
 				}
@@ -574,7 +610,15 @@ namespace AnyPortrait
 					}
 
 					//이제 업데이트를 합시다.
-					_curClipData.UpdateAnimClipAndPlayUnit();
+					bool isNeedEndEventCall = false;
+					_curClipData.UpdateAnimClipAndPlayUnit(out isNeedEndEventCall);
+
+					if(isNeedEndEventCall)
+					{
+						//마지막 프레임에 도달했다는 종료 이벤트를 호출해야한다.
+						_animPlayManager.OnAnimPlayUnitEnded(_curClipData._playUnit, apPortrait.ANIM_ENDED_TYPE.LastFrameReached);
+						_curClipData.SetEndEventCalled();//종료 이벤트를 호출했다.						
+					}
 				}
 
 				//Prev를 갱신한다

@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -239,7 +239,7 @@ namespace AnyPortrait
 		}
 
 		public void AddRecord(int undoID, string undoName, bool isAnyAddedOrRemoved)
-		{	
+		{				
 			if(isAnyAddedOrRemoved)
 			{
 				//카운터 증가
@@ -250,6 +250,7 @@ namespace AnyPortrait
 				}
 			}
 			Undo.RecordObject(this, undoName);
+			
 
 			//이전
 			//SnapshotRecord newRecord = new SnapshotRecord(undoID, undoName, isAnyAddedOrRemoved, _lastCreatedCounter);
@@ -270,10 +271,8 @@ namespace AnyPortrait
 			}
 			_record.SetData(undoID, undoName, isAnyAddedOrRemoved, _lastCreatedCounter);
 
-
-
-			//이것까지 합친다.
-			Undo.CollapseUndoOperations(undoID);
+			// //이것까지 합친다.
+			// Undo.CollapseUndoOperations(undoID);
 		}
 
 		/// <summary>
@@ -281,14 +280,6 @@ namespace AnyPortrait
 		/// </summary>
 		public void SetAnyAddedOrRemovedToLastRecord()
 		{
-			//Debug.Log("SetAnyAddedOrRemovedToLastRecord");
-
-			//이전
-			//if(_records.Count == 0)
-			//{
-			//	return;
-			//}
-
 			//변경 21.7.17
 			if(_record == null
 				|| !_record._isDataSaved)
@@ -312,8 +303,6 @@ namespace AnyPortrait
 				//이미 해당 "생성/삭제의 기록"으로 등록되었다.
 				return;
 			}
-
-
 
 			//카운터 증가
 			_lastCreatedCounter += 1;
@@ -341,44 +330,6 @@ namespace AnyPortrait
 
 		public UNDO_RESULT OnUndoRedoPerformed()
 		{
-			//이전 방식 : 리스트 이용
-			//SnapshotRecord lastRecord = null;
-			//if(_records != null && _records.Count > 0)
-			//{
-			//	lastRecord = _records[_records.Count - 1];
-			//}
-
-
-			////복구된 스탭샷이 없다면
-			//if(lastRecord == null)
-			//{
-			//	if(_lastCreatedCounter > 0)
-			//	{
-			//		//구조가 바뀌었을 수 있다.					
-			//		//Debug.LogError("실행 취소 : 레코드 없음 <구조 변화> (CID : " + _lastCreatedCounter + " )");
-			//		_lastCreatedCounter = 0;
-			//		return UNDO_RESULT.StructChanged;
-			//	}
-
-			//	//크게 변경된 것은 없었을 것
-			//	//Debug.Log("실행 취소 : 레코드 없음 (CID : " + _lastCreatedCounter + " )");
-			//	return UNDO_RESULT.DataChanged;
-			//}
-
-			//if(lastRecord._createdCounter != _lastCreatedCounter)
-			//{
-			//	//"생성 카운터"가 변경되었다.
-			//	//Debug.LogError("실행 취소 : [" + lastRecord._undoID + " : " + lastRecord._undoName + "] <구조 변화> (CID : " + _lastCreatedCounter + " > " + lastRecord._createdCounter + " )");
-			//	_lastCreatedCounter = lastRecord._createdCounter;
-			//	return UNDO_RESULT.StructChanged;
-			//}
-			//else
-			//{
-			//	//Debug.Log("실행 취소 : [" + lastRecord._undoID + " : " + lastRecord._undoName + "] (CID : " + _lastCreatedCounter + " )");
-			//	return UNDO_RESULT.DataChanged;
-			//}
-
-
 			//변경 21.7.17 : 단일 데이터 방식으로 변경
 			//복구된 스냅샷이 없다면
 			if(_record == null || !_record._isDataSaved)

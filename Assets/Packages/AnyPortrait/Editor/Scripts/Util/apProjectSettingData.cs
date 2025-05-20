@@ -42,6 +42,10 @@ namespace AnyPortrait
 		//2. 캐릭터 공통 설정들
 		private bool _isCommonSettingSaved = false;//공통 설정이 저장되었는가
 
+		//Bake Scale / Depth
+		private float _cmn_BakeScale = 0.01f;
+		private float _cmn_BakeZSize = 1.0f;
+
 		//Sorting Layer
 		private int _cmn_SortingLayerID = 0;
 		private int _cmn_SortingOrder = 0;
@@ -135,6 +139,9 @@ namespace AnyPortrait
 
 
 			//캐릭터별 설정의 공통값
+			//Bake Scale/Depth
+			BakeScale,
+			BakeZSize,
 
 			//Sorting Layer
 			SortingLayerID,
@@ -258,6 +265,9 @@ namespace AnyPortrait
 
 			//기본값은 원래의 Portrait 멤버 변수의 초기값을 이용해야한다.
 			//버전 호환성 때문 (저장이 일부만 되었을 경우 초기값을 기준으로 판단해야한다.)
+			_cmn_BakeScale = 0.01f;
+			_cmn_BakeZSize = 1.0f;
+
 			_cmn_SortingLayerID = 0;
 			_cmn_SortingOrder = 0;
 			_cmn_SortingLayerOption = apPortrait.SORTING_ORDER_OPTION.SetOrder;
@@ -326,6 +336,8 @@ namespace AnyPortrait
 
 
 			//캐릭터별 설정의 공통값
+			AddKeyStrID(KEY_TYPES.BakeScale, "BakeScale");
+			AddKeyStrID(KEY_TYPES.BakeZSize, "BakeZSize");
 
 			//Sorting Layer
 			AddKeyStrID(KEY_TYPES.SortingLayerID, "SortingLayerID");
@@ -429,6 +441,10 @@ namespace AnyPortrait
 				SavePref_Bool(sw, KEY_TYPES.UseSRP, _prj_IsUseSRP);
 
 				//캐릭터 공통 설정들
+				//- Bake Scale / Z-Depth
+				SavePref_Float(sw, KEY_TYPES.BakeScale, _cmn_BakeScale);
+				SavePref_Float(sw, KEY_TYPES.BakeZSize, _cmn_BakeZSize);
+
 				//- Sorting Layer
 				SavePref_Int(sw, KEY_TYPES.SortingLayerID, _cmn_SortingLayerID);
 				SavePref_Int(sw, KEY_TYPES.SortingOrder, _cmn_SortingOrder);
@@ -632,6 +648,10 @@ namespace AnyPortrait
 						case KEY_TYPES.UseSRP: _prj_IsUseSRP = LoadPref_Bool(ref strValue); break;
 
 						//캐릭터 공통 설정들
+						//- Bake Scale / Z-Depth
+						case KEY_TYPES.BakeScale:	_cmn_BakeScale = LoadPref_Float(ref strValue); break;
+						case KEY_TYPES.BakeZSize:	_cmn_BakeZSize = LoadPref_Float(ref strValue); break;
+
 						//- Sorting Layer
 						case KEY_TYPES.SortingLayerID: _cmn_SortingLayerID = LoadPref_Int(ref strValue); break;
 						case KEY_TYPES.SortingOrder: _cmn_SortingOrder = LoadPref_Int(ref strValue); break;
@@ -795,6 +815,15 @@ namespace AnyPortrait
 			if (!_isCommonSettingSaved)
 			{
 				_isCommonSettingSaved = true;
+				isAnyChanged = true;
+			}
+
+			//Bake Scale / Z-Depth
+			if(Mathf.Abs(_cmn_BakeScale - portrait._bakeScale) > 0.0001f
+				|| Mathf.Abs(_cmn_BakeZSize - portrait._bakeZSize) > 0.0001f)
+			{
+				_cmn_BakeScale = portrait._bakeScale;
+				_cmn_BakeZSize = portrait._bakeZSize;
 				isAnyChanged = true;
 			}
 
@@ -980,6 +1009,9 @@ namespace AnyPortrait
 			_isCommonSettingSaved = false;
 
 			//기본값은 원래의 Portrait 멤버 변수의 초기값을 이용
+			_cmn_BakeScale = 0.01f;
+			_cmn_BakeZSize = 1.0f;
+
 			_cmn_SortingLayerID = 0;
 			_cmn_SortingOrder = 0;
 			_cmn_SortingLayerOption = apPortrait.SORTING_ORDER_OPTION.SetOrder;
@@ -1045,6 +1077,10 @@ namespace AnyPortrait
 			{
 				return;
 			}
+
+			//Bake Scale
+			portrait._bakeScale = _cmn_BakeScale;
+			portrait._bakeZSize = _cmn_BakeZSize;
 
 			//Sorting Option
 			portrait._sortingLayerID = _cmn_SortingLayerID;
@@ -1128,6 +1164,9 @@ namespace AnyPortrait
 
 
 			//기본값은 원래의 Portrait 멤버 변수의 초기값을 이용
+			portrait._bakeScale = 0.01f;
+			portrait._bakeZSize = 1.0f;
+
 			portrait._sortingLayerID = 0;
 			portrait._sortingOrder = 0;
 			portrait._sortingOrderOption = apPortrait.SORTING_ORDER_OPTION.SetOrder;
@@ -1182,6 +1221,11 @@ namespace AnyPortrait
 		// 프로젝트 설정
 		public bool Project_IsColorSpaceGamma { get { return _prj_IsColorSpaceGamma; } }
 		public bool Project_IsUseSRP { get { return _prj_IsUseSRP; } }
+
+		//Bake Scale / Depth
+		public float Common_BakeScale { get { return _cmn_BakeScale; } }
+		public float Common_BakeZSize { get { return _cmn_BakeZSize; } }
+		
 
 		//Sorting Layer
 		public int Common_SortingLayerID { get { return _cmn_SortingLayerID; } }

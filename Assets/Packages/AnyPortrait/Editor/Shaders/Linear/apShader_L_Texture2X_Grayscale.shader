@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) 2017-2021. RainyRizzle. All rights reserved
 *	Contact to : https://www.rainyrizzle.com/ , contactrainyrizzle@gmail.com
 *
@@ -31,7 +31,7 @@ Shader "AnyPortrait/Editor/Linear/Grayscale Texture"
 		//----------------------------------------------------------------------------------
 		Pass
 		{
-			ColorMask RGB
+			//ColorMask RGB
 			ZWrite off
 
 			LOD 200

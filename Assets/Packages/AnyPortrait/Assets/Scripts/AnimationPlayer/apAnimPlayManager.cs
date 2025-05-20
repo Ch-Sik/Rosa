@@ -121,6 +121,10 @@ namespace AnyPortrait
 		//추가 22.5.18 : 업데이트 과정에서 Portrait의 Root Unit이 바뀌었는지 확인하는 플래그 변수
 		private bool _isRootUnitChanged = false;
 
+		//추가 v1.6.0 : 애니메이션 종료가 발생했을 경우, 업데이트 마무리에 이벤트를 호출할 수도 있다.
+		private bool _isAnyAnimationEnded = false;		
+		private Dictionary<apAnimPlayData, apPortrait.ANIM_ENDED_TYPE> _endedAnimPlayDataList = null;
+
 
 		// Init
 		//-------------------------------------------------------
@@ -169,9 +173,12 @@ namespace AnyPortrait
 				_isMecanim = false;
 			}
 
-
-
-			
+			_isAnyAnimationEnded = false;
+			if(_endedAnimPlayDataList == null)
+			{
+				_endedAnimPlayDataList = new Dictionary<apAnimPlayData, apPortrait.ANIM_ENDED_TYPE>();
+			}
+			_endedAnimPlayDataList.Clear();
 
 			_isInitAndLink = true;
 		}
@@ -210,7 +217,7 @@ namespace AnyPortrait
 			if (nPlayDataList > 0)
 			{
 
-				for (int i = 0; i < _animPlayDataList.Count; i++)
+				for (int i = 0; i < nPlayDataList; i++)
 				{
 					animPlayData = _animPlayDataList[i];
 					animPlayData._isValid = false;//일단 유효성 초기화 (나중에 값 넣으면 자동으로 true)
@@ -424,6 +431,9 @@ namespace AnyPortrait
 
 			_isRootUnitChanged = false;//추가 22.5.18
 
+			//추가 v1.6.0 : 애니메이션 종료 이벤트도 받을 준비를 하자
+			_isAnyAnimationEnded = false;
+
 
 			//변경 : 메카님 여부에 따라 업데이트 방식이 다르다
 			//> 1. 기본 방식 : AnimQueue를 업데이트 한다.
@@ -460,6 +470,8 @@ namespace AnyPortrait
 			//컨트롤러 초기화 먼저
 			_portrait._controller.ReadyToLayerUpdate();
 
+			//추가 v1.6.0 : 애니메이션 종료 이벤트도 받을 준비를 하자
+			_isAnyAnimationEnded = false;
 
 			if(syncPlay._nSyncSet_AnimClip > 0)
 			{
@@ -476,7 +488,6 @@ namespace AnyPortrait
 					curSyncSet.SyncAndUpdate();					
 				}
 			}
-
 
 			//컨트롤러 적용
 			_portrait._controller.CompleteLayerUpdate();
@@ -1130,6 +1141,9 @@ namespace AnyPortrait
 				return;
 			}
 
+			//이벤트 플래그도 초기화
+			_isAnyAnimationEnded = false;
+
 			//컨트롤러 초기화 먼저
 			_portrait._controller.ReadyToLayerUpdate();
 
@@ -1349,6 +1363,42 @@ namespace AnyPortrait
 		}
 
 
+		//v1.5.2
+		public float GetAnimationTimeLength(string animClipName)
+		{
+			apAnimPlayData animPlayData = GetAnimPlayData_Opt(animClipName);
+			if(animPlayData == null)
+			{
+				Debug.LogError("No AnimCip : " + animClipName);
+				return -1.0f;
+			}
+			return animPlayData.TimeLength;
+		}
+
+		public float GetAnimationDuration(string animClipName)
+		{
+			apAnimPlayData animPlayData = GetAnimPlayData_Opt(animClipName);
+			if(animPlayData == null)
+			{
+				Debug.LogError("No AnimCip : " + animClipName);
+				return -1.0f;
+			}
+			return animPlayData.Duration;
+		}
+
+		public bool IsAnimationLoop(string animClipName)
+		{
+			apAnimPlayData animPlayData = GetAnimPlayData_Opt(animClipName);
+			if(animPlayData == null)
+			{
+				Debug.LogError("No AnimCip : " + animClipName);
+				return false;
+			}
+			return animPlayData.IsLoop;
+		}
+
+
+
 
 
 		/// <summary>
@@ -1422,12 +1472,78 @@ namespace AnyPortrait
 		/// </summary>
 		/// <param name="playUnit"></param>
 		/// <param name="playQueue"></param>
-		public void OnAnimPlayUnitEnded(apAnimPlayUnit playUnit, apAnimPlayQueue playQueue)
+		public void OnAnimPlayUnitEnded(apAnimPlayUnit playUnit, apPortrait.ANIM_ENDED_TYPE endedType)
 		{
-			//Play Unit이 재생을 종료했다
-			//1. apAnimPlayUnit을 사용하고 있던 Modifier와의 연동을 해제한다.
-			//??
+			if(playUnit == null
+			|| playUnit._linkedAnimClip == null)
+			{
+				return;
+			}
 
+			//추가 v1.6.0 : 애니메이션 종료 이벤트를 받자
+			//이벤트 호출 구독이 된 경우에 한해서
+			if(!_portrait.IsAnyAnimationEndedEventRegistered)
+			{
+				//애니메이션 종료 이벤트를 구독하지 않았다면 여기서 별도로 처리하진 않는다.
+				return;
+			}
+
+			apAnimPlayData playData = playUnit._linkedAnimClip._linkedPlayData;
+			if (playData == null)
+			{
+				playData = GetAnimPlayData_Opt(playUnit._linkedAnimClip);
+			}
+
+			if(playData == null)
+			{
+				return;
+			}
+
+
+			if(!_isAnyAnimationEnded)
+			{
+				if(_endedAnimPlayDataList == null)
+				{
+					_endedAnimPlayDataList = new Dictionary<apAnimPlayData, apPortrait.ANIM_ENDED_TYPE>();
+				}
+				_endedAnimPlayDataList.Clear();
+				_isAnyAnimationEnded = true;
+			}
+
+			if(!_endedAnimPlayDataList.ContainsKey(playData))
+			{
+				_endedAnimPlayDataList.Add(playData, endedType);
+			}
+			//이 함수가 호출되는 시점이 애매하다.
+			// //Play Unit이 재생을 종료했다
+			// Debug.Log("애니메이션 종료 함수 콜백");
+			// if(playUnit == null
+			// 	|| playUnit._linkedAnimClip == null)
+			// {
+			// 	return;
+			// }
+
+			// //종료 콜백을 리턴하자
+			// if(_portrait == null)
+			// {
+			// 	return;
+			// }
+
+
+			// if(_portrait.IsAnyAnimationEndedEvent)
+			// {
+			// 	apAnimPlayData playData = playUnit._linkedAnimClip._linkedPlayData;
+			// 	if(playData == null)
+			// 	{
+			// 		playData = GetAnimPlayData_Opt(playUnit._linkedAnimClip);
+			// 	}
+
+			// 	if(playData != null)
+			// 	{
+			// 		//종료 이벤트를 호출한다.
+			// 		_portrait.InvokeAnimEndEvent(playData);
+			// 	}
+			// }
 		}
 
 		/// <summary>
@@ -1438,6 +1554,46 @@ namespace AnyPortrait
 			//Debug.Log("Anim End And Refresh Order");
 			RefreshPlayOrders();
 		}
+
+		//종료된 이벤트가 있다면 이벤트를 호출한다. Portrait의 업데이트에서 호출하도록 한다.
+		public void InvokeEndPlayUnitEvents()
+		{
+			if(!_isAnyAnimationEnded)
+			{
+				return;
+			}
+			int nEndedPlayUnits = _endedAnimPlayDataList != null ? _endedAnimPlayDataList.Count : 0;
+			if(nEndedPlayUnits > 0 && _portrait.IsAnyAnimationEndedEventRegistered)
+			{
+				//이벤트를 호출하자
+				apAnimPlayData playData = null;
+				apPortrait.ANIM_ENDED_TYPE endedType = apPortrait.ANIM_ENDED_TYPE.Deactivated;
+				foreach (KeyValuePair<apAnimPlayData, apPortrait.ANIM_ENDED_TYPE> endPair in _endedAnimPlayDataList)
+				{
+					playData = endPair.Key;
+					endedType = endPair.Value;
+
+					if(playData == null)
+					{
+						//Debug.LogError("PlyUnit is Null");
+						continue;
+					}
+
+					if (playData != null)
+					{
+						//종료 이벤트를 호출한다.
+						_portrait.InvokeAnimEndEvent(playData, endedType);
+					}
+				}
+			}
+
+			_isAnyAnimationEnded = false;
+			if(_endedAnimPlayDataList != null)
+			{
+				_endedAnimPlayDataList.Clear();
+			}
+		}
+
 
 		//추가 3.8 : 타임라인 관련 함수들
 		//Timeline이 유니티 2017의 기능이므로 그 전에는 막혀있다.

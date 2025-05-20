@@ -513,7 +513,8 @@ namespace AnyPortrait
 						continue;
 					}
 
-					if(_cal_CurOptTransform._childMesh._isMaskChild
+					if(//_cal_CurOptTransform._childMesh._isMaskChild	//이전
+						_cal_CurOptTransform._childMesh.IsMaskClipped()		//변경 v1.6.0
 						&& excludeClippedChildMeshes)
 					{
 						//옵션에 의해 클리핑되는 메시는 제외한다.
@@ -573,7 +574,8 @@ namespace AnyPortrait
 						continue;
 					}
 
-					if(_cal_CurOptTransform._childMesh._isMaskChild
+					if(	//_cal_CurOptTransform._childMesh._isMaskChild	//이전
+						_cal_CurOptTransform._childMesh.IsMaskClipped()	//변경 v1.6.0
 						&& excludeClippedChildMeshes)
 					{
 						//옵션에 의해 클리핑되는 메시는 제외한다.
@@ -633,7 +635,8 @@ namespace AnyPortrait
 						continue;
 					}
 
-					if(_cal_CurOptTransform._childMesh._isMaskChild
+					if(	//_cal_CurOptTransform._childMesh._isMaskChild
+						_cal_CurOptTransform._childMesh.IsMaskClipped()
 						&& excludeClippedChildMeshes)
 					{
 						//옵션에 의해 클리핑되는 메시는 제외한다.
@@ -695,7 +698,8 @@ namespace AnyPortrait
 						continue;
 					}
 
-					if(_cal_CurOptTransform._childMesh._isMaskChild
+					if(	//_cal_CurOptTransform._childMesh._isMaskChild
+						_cal_CurOptTransform._childMesh.IsMaskClipped()	//v1.6.0
 						&& excludeClippedChildMeshes)
 					{
 						//옵션에 의해 클리핑되는 메시는 제외한다.
@@ -764,7 +768,8 @@ namespace AnyPortrait
 						continue;
 					}
 
-					if(_cal_CurOptTransform._childMesh._isMaskChild
+					if(//_cal_CurOptTransform._childMesh._isMaskChild
+						_cal_CurOptTransform._childMesh.IsMaskClipped()	//v1.6.0
 						&& excludeClippedChildMeshes)
 					{
 						//옵션에 의해 클리핑되는 메시는 제외한다.
@@ -838,7 +843,8 @@ namespace AnyPortrait
 						continue;
 					}
 
-					if(_cal_CurOptTransform._childMesh._isMaskChild
+					if(	//_cal_CurOptTransform._childMesh._isMaskChild
+						_cal_CurOptTransform._childMesh.IsMaskClipped()	//v1.6.0
 						&& excludeClippedChildMeshes)
 					{
 						//옵션에 의해 클리핑되는 메시는 제외한다.

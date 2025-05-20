@@ -233,6 +233,25 @@ namespace AnyPortrait
 				}
 			}
 
+			/// <summary>
+			/// Link가 필요한 상황인가
+			/// </summary>
+			public bool IsNeedLink()
+			{
+				if(_textureDataID >= 0)
+				{
+					if(_linkedTextureData == null)
+					{
+						return true;
+					}
+					if(_linkedTextureData._uniqueID != _textureDataID)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+
 			public void CopyFromSrc(ExtraValue srcValue)
 			{
 				_isDepthChanged = srcValue._isDepthChanged;
@@ -357,17 +376,6 @@ namespace AnyPortrait
 
 		// Init - ID에 맞게 세팅
 		//--------------------------------------------------------
-		//이건 날립니더
-		//public void Link_VertexMorph(apMeshGroup meshGroup, apTransform_Mesh meshTransform, apRenderUnit renderUnit)
-		//{
-		//	_meshGroup = meshGroup;
-		//	_transform_Mesh = meshTransform;
-		//	_renderUnit = renderUnit;
-
-		//	//RefreshVertices();
-
-		//}
-
 		/// <summary>
 		/// MeshTransform과 ModMesh를 연결한다.
 		/// </summary>
@@ -415,10 +423,7 @@ namespace AnyPortrait
 
 			//RefreshModifiedValues(meshGroupOfMod._parentPortrait);//이전
 			LinkValues(meshGroupOfMod._parentPortrait);//변경 20.3.30
-
-			
 		}
-
 
 
 		public void Link_Bone()

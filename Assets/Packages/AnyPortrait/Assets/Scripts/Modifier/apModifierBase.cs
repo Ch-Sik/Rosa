@@ -259,42 +259,6 @@ namespace AnyPortrait
 			
 			apModifierParamSetGroup curParamSetGroup = null;
 
-			//if (isSkipUnselectedAnimPSGs)
-			//{
-			//	//Anim 모디파이어에서 특정 PSG는 생략한다.
-			//	//(애니메이션 모디파이어가 아니거나 대상이 되는 애니메이션 PSG만 처리함)
-			//	for (int i = 0; i < _paramSetGroup_controller.Count; i++)
-			//	{
-			//		curParamSetGroup = _paramSetGroup_controller[i];
-
-			//		//여기서는 조건에 의한 스킵은 하지 말자.
-			//		//단순히 잘못된 데이터를 삭ㅈ하는 것인데 필요할 때가 있다.
-			//		//if (curParamSetGroup._keyAnimClip != linkRefreshRequest.AnimClip)
-			//		//{
-			//		//	//선택된 AnimClip 외에는 스킵하자
-			//		//	continue;
-			//		//}
-
-			//		curParamSetGroup.RemoveInvalidParamSet();
-			//	}
-			//}
-			//else
-			//{
-			//	for (int i = 0; i < _paramSetGroup_controller.Count; i++)
-			//	{
-			//		curParamSetGroup = _paramSetGroup_controller[i];
-			//		curParamSetGroup.RemoveInvalidParamSet();
-			//	}
-			//}
-
-			//여기서 문제가 발생함
-			//이전
-			//for (int i = 0; i < _paramSetGroup_controller.Count; i++)
-			//{
-			//	curParamSetGroup = _paramSetGroup_controller[i];
-			//	curParamSetGroup.RemoveInvalidParamSet();
-			//}
-
 			//변경 21.4.18 : 선택되지 않은 애니메이션에 대해서는 InvalidParamSet 체크를 하지 않는다.
 			if (isSkipUnselectedAnimPSGs)
 			{

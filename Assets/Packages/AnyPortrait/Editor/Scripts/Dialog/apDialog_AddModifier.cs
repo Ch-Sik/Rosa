@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -166,6 +166,7 @@ namespace AnyPortrait
 
 			GUIStyle guiStyle_None = new GUIStyle(GUIStyle.none);
 			guiStyle_None.normal.textColor = GUI.skin.label.normal.textColor;
+			guiStyle_None.alignment = TextAnchor.MiddleLeft;
 
 			GUIStyle guiStyle_Selected = new GUIStyle(GUIStyle.none);
 			if (EditorGUIUtility.isProSkin)
@@ -176,6 +177,7 @@ namespace AnyPortrait
 			{
 				guiStyle_Selected.normal.textColor = Color.white;
 			}
+			guiStyle_Selected.alignment = TextAnchor.MiddleLeft;
 			
 
 			GUIStyle guiStyle_Center = new GUIStyle(GUIStyle.none);
@@ -212,22 +214,6 @@ namespace AnyPortrait
 				if (_modifiers[i] == _curSelectedMod)
 				{
 					Rect lastRect = GUILayoutUtility.GetLastRect();
-
-					#region [미사용 코드]
-					//prevColor = GUI.backgroundColor;
-
-					//if (EditorGUIUtility.isProSkin)
-					//{
-					//	GUI.backgroundColor = new Color(0.0f, 1.0f, 1.0f, 1.0f);
-					//}
-					//else
-					//{
-					//	GUI.backgroundColor = new Color(0.4f, 0.8f, 1.0f, 1.0f);
-					//}
-
-					//GUI.Box(new Rect(lastRect.x, lastRect.y + 20, width, 20), "");
-					//GUI.backgroundColor = prevColor; 
-					#endregion
 
 					//변경 v1.4.2
 					apEditorUtil.DrawListUnitBG(lastRect.x + 1, lastRect.y + 20, width - 2, 20, apEditorUtil.UNIT_BG_STYLE.Main);

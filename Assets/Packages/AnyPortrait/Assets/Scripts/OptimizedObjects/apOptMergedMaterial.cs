@@ -1069,7 +1069,8 @@ namespace AnyPortrait
 			}
 
 			//마스크 자식/부모면 안된다.
-			if(mesh._isMaskChild
+			if(//mesh._isMaskChild				
+				mesh.IsMaskClipped()//v1.6.0
 				|| mesh._isMaskParent //부모는 괜찮지 않을까
 				)
 			{

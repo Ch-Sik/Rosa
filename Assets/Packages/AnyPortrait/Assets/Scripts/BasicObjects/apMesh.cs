@@ -272,13 +272,16 @@ namespace AnyPortrait
 
 
 		public void LinkEdgeAndVertex()
-		{			
+		{
+			//유효성 테스트를 해야한다.
+
+
 			int nEdges = _edges != null ? _edges.Count : 0;
 			if(nEdges > 0)			
 			{
 				apMeshEdge edge = null;
-				bool isValidVert1 = false;
-				bool isValidVert2 = false;
+				//bool isValidVert1 = false;
+				//bool isValidVert2 = false;
 
 				for (int iEdge = 0; iEdge < nEdges; iEdge++)
 				{
@@ -286,28 +289,32 @@ namespace AnyPortrait
 					int vID1 = edge._vertID_1;
 					int vID2 = edge._vertID_2;
 					
-					//v1.5.0, 무조건 vertex를 할당하지 말고 조건에 안맞는 경우만 할당하자
-					isValidVert1 = false;
-					isValidVert2 = false;
+					////v1.5.0, 무조건 vertex를 할당하지 말고 조건에 안맞는 경우만 할당하자
+					//isValidVert1 = false;
+					//isValidVert2 = false;
 					
-					if(edge._vert1 != null && edge._vert1._uniqueID == vID1)
-					{
-						isValidVert1 = true;						
-					}
+					//if(edge._vert1 != null && edge._vert1._uniqueID == vID1)
+					//{
+					//	isValidVert1 = true;						
+					//}
 
-					if(edge._vert2 != null && edge._vert2._uniqueID == vID2)
-					{
-						isValidVert2 = true;						
-					}
+					//if(edge._vert2 != null && edge._vert2._uniqueID == vID2)
+					//{
+					//	isValidVert2 = true;						
+					//}
 					
-					if(!isValidVert1)
-					{
-						edge._vert1 = GetVertexByUniqueID(vID1);
-					}
-					if(!isValidVert2)
-					{
-						edge._vert2 = GetVertexByUniqueID(vID2);
-					}
+					//if(!isValidVert1)
+					//{
+					//	edge._vert1 = GetVertexByUniqueID(vID1);
+					//}
+					//if(!isValidVert2)
+					//{
+					//	edge._vert2 = GetVertexByUniqueID(vID2);
+					//}
+
+					//v1.6.0 무조건 할당한다. Undo에서 가짜 레퍼런스가 발생할 수 있다.
+					edge._vert1 = GetVertexByUniqueID(vID1);
+					edge._vert2 = GetVertexByUniqueID(vID2);
 				}
 			}
 			
@@ -1426,22 +1433,11 @@ namespace AnyPortrait
 
 						}
 					}
-					//if(curResult._vertices.Count >= maxLevel)
-					//{
-					//	Debug.LogError("잘못된 Result : " + curResult._vertices.Count);
-					//	curResult._isValid = false;
-					//}
 				}
 				results.RemoveAll(delegate(MakePolygonResult a)
 				{
 					return !a._isValid;
 				});
-				//if (nRemoved > 0)
-				//{
-				//	Debug.LogError("[" + nRemoved + "] 개의 유효하지 않은 Polygon 조회 결과가 삭제됨");
-				//}
-
-
 
 
 				if (results.Count > 2)
@@ -1459,10 +1455,6 @@ namespace AnyPortrait
 
 				//Result를 받아서 폴리곤을 만들어보자
 				int nResult = results.Count;
-				//if(nResult > 2)
-				//{
-				//	nResult = 2;
-				//}
 
 
 				for (int iResult = 0; iResult < nResult; iResult++)
@@ -1608,21 +1600,33 @@ namespace AnyPortrait
 
 			//폴리곤들이 만들어졌다.
 			//이걸 이제 Tri들의 조합으로 만들어보자
-			for (int iPoly = 0; iPoly < _polygons.Count; iPoly++)
+			
+			int nPolygons = _polygons != null ? _polygons.Count : 0;
+			apMeshPolygon curPoly = null;
+			apMeshTri tri = null;
+			
+			for (int iPoly = 0; iPoly < nPolygons; iPoly++)
 			{
-				_polygons[iPoly].MakeHiddenEdgeAndTri();
+				curPoly = _polygons[iPoly];
+				curPoly.MakeHiddenEdgeAndTri();
 
-				for (int iTri = 0; iTri < _polygons[iPoly]._tris.Count; iTri++)
+				int nTri = curPoly._tris != null ? curPoly._tris.Count : 0;
+				if(nTri == 0)
 				{
-					apMeshTri tri = _polygons[iPoly]._tris[iTri];
-					_indexBuffer.Add(tri._verts[0]._index);
-					_indexBuffer.Add(tri._verts[1]._index);
-					_indexBuffer.Add(tri._verts[2]._index);
-
-					//_indexBuffer.Add(tri._verts[2]._index);
-					//_indexBuffer.Add(tri._verts[1]._index);
-					//_indexBuffer.Add(tri._verts[0]._index);
+					continue;
 				}
+				for (int iTri = 0; iTri < nTri; iTri++)
+				{
+					tri = curPoly._tris[iTri];
+					int iVert0 = tri._verts[0]._index;
+					int iVert1 = tri._verts[1]._index;
+					int iVert2 = tri._verts[2]._index;
+					_indexBuffer.Add(iVert0);
+					_indexBuffer.Add(iVert1);
+					_indexBuffer.Add(iVert2);
+				}
+
+				
 			}
 			SortVertexData();
 		}
@@ -1953,8 +1957,6 @@ namespace AnyPortrait
 				_edges[i]._isOutline = true;
 				_edges[i]._nTri = 0;
 			}
-
-
 
 
 			_indexBuffer.Clear();

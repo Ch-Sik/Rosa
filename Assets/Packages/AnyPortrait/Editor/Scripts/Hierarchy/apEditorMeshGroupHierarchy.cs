@@ -117,6 +117,20 @@ namespace AnyPortrait
 		private apGUIContentWrapper _guiContent_RestoreTmpWorkVisible_OFF = null;
 		private int _curUnitPosY = 0;
 
+		//미리 아이콘 몇개 로드
+		private Texture2D _iconImg_Mesh = null;
+		private Texture2D _iconImg_Mesh_Clipped = null;
+		private Texture2D _iconImg_Mesh_SendMask = null;
+		private Texture2D _iconImg_Mesh_ReceiveMask = null;
+
+		private Texture2D _iconImg_MeshGroup = null;
+
+		private Texture2D _iconImg_Bone_Normal = null;
+		private Texture2D _iconImg_Bone_IKHead = null;
+		private Texture2D _iconImg_Bone_IKChained = null;
+		private Texture2D _iconImg_Bone_IKSingle = null;
+
+
 		// Init
 		//------------------------------------------------------------------------
 		public apEditorMeshGroupHierarchy(apEditor editor)
@@ -254,7 +268,10 @@ namespace AnyPortrait
 
 			apMeshGroup meshGroup = Editor.Select.MeshGroup;
 			
-
+			if(_iconImg_MeshGroup == null)
+			{
+				_iconImg_MeshGroup = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup_16px);
+			}
 			//수정
 			if(meshGroup._boneListSets.Count > 0)
 			{
@@ -271,7 +288,7 @@ namespace AnyPortrait
 					//Bone을 가지고 있는 Child MeshGroup Transform을 Sub 루트로 삼는다.
 					//나중에 구분하기 위해 meshGroupTransform을 SavedObj에 넣는다.
 					_rootUnit_Bones_Sub.Add(
-						AddUnit_Label(Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup_16px),//변경 22.6.10 : 16px로 변경
+						AddUnit_Label(	_iconImg_MeshGroup,//변경 22.6.10 : 16px로 변경
 										boneSet._meshGroupTransform._nickName,
 										CATEGORY.SubName_Bone,
 										boneSet._meshGroupTransform, //<Saved Obj
@@ -626,17 +643,57 @@ namespace AnyPortrait
 			bool isModRegisted = false;
 			apModifierBase modifier = Editor.Select.Modifier;
 
+
+			if(_iconImg_Mesh == null)
+			{
+				_iconImg_Mesh = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Mesh_16px);
+			}
+
+			if(_iconImg_Mesh_Clipped == null)
+			{
+				_iconImg_Mesh_Clipped = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Clipping);
+			}
+
+			if (_iconImg_Mesh_SendMask == null)
+			{
+				_iconImg_Mesh_SendMask = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshSendMask_16px);
+			}
+
+			if (_iconImg_Mesh_ReceiveMask == null)
+			{
+				_iconImg_Mesh_ReceiveMask = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshReceiveMask_16px);
+			}
+
+			if (_iconImg_MeshGroup == null)
+			{
+				_iconImg_MeshGroup = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup_16px);
+			}
+
+
 			for (int i = 0; i < childMeshTransforms.Count; i++)
 			{
 				apTransform_Mesh meshTransform = childMeshTransforms[i];
 				Texture2D iconImage = null;
+
+				//v1.6.0 마스크 정보에 따라 아이콘이 달라진다.
+				int nReceiveMask = meshTransform._linkedReceivedMasks != null ? meshTransform._linkedReceivedMasks.Count : 0;
+				int nSendMask = meshTransform._sendMaskDataList != null ? meshTransform._sendMaskDataList.Count : 0;
+
 				if (meshTransform._isClipping_Child)
 				{
-					iconImage = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Clipping);
+					iconImage = _iconImg_Mesh_Clipped;
+				}
+				else if(nReceiveMask > 0)
+				{
+					iconImage = _iconImg_Mesh_ReceiveMask;
+				}
+				else if(nSendMask > 0)
+				{
+					iconImage = _iconImg_Mesh_SendMask;
 				}
 				else
 				{
-					iconImage = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Mesh_16px);//변경 22.6.10 : 16px로 변경
+					iconImage = _iconImg_Mesh;
 				}
 
 				isModRegisted = false;
@@ -677,7 +734,7 @@ namespace AnyPortrait
 					isModRegisted = IsModRegistered(meshGroupTransform);
 				}
 
-				apEditorHierarchyUnit newUnit = AddUnit_ToggleButton_Visible(Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup_16px),//변경 22.6.10 : 16px로 변경
+				apEditorHierarchyUnit newUnit = AddUnit_ToggleButton_Visible(_iconImg_MeshGroup,
 													meshGroupTransform._nickName,
 													CATEGORY.MeshGroup_Item,
 													meshGroupTransform,
@@ -714,16 +771,33 @@ namespace AnyPortrait
 				return;
 			}
 
-			Texture2D iconImage_Normal = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_Rigging);
-			Texture2D iconImage_IKHead = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKHead);
-			Texture2D iconImage_IKChained = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKChained);
-			Texture2D iconImage_IKSingle = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKSingle);
+			if(_iconImg_Bone_Normal == null)
+			{
+				_iconImg_Bone_Normal = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_Rigging);
+			}
+			
+			if (_iconImg_Bone_IKHead == null)
+			{
+				_iconImg_Bone_IKHead = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKHead);
+			}
+
+			if (_iconImg_Bone_IKChained == null)
+			{
+				_iconImg_Bone_IKChained = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKChained);
+			}
+
+			if (_iconImg_Bone_IKSingle == null)
+			{
+				_iconImg_Bone_IKSingle = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKSingle);
+			}
+
+
 
 			//Root 부터 재귀적으로 호출한다.
 			for (int i = 0; i < targetMeshGroup._boneList_Root.Count; i++)
 			{
 				AddBoneUnit(targetMeshGroup._boneList_Root[i], parentUnit,
-					iconImage_Normal, iconImage_IKHead, iconImage_IKChained, iconImage_IKSingle);
+					_iconImg_Bone_Normal, _iconImg_Bone_IKHead, _iconImg_Bone_IKChained, _iconImg_Bone_IKSingle);
 			}
 
 		}
@@ -1248,18 +1322,57 @@ namespace AnyPortrait
 			bool isModRegistered = false;
 			apModifierBase modifier = Editor.Select.Modifier;
 
+			if(_iconImg_Mesh == null)
+			{
+				_iconImg_Mesh = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Mesh_16px);
+			}
+
+			if(_iconImg_Mesh_Clipped == null)
+			{
+				_iconImg_Mesh_Clipped = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Clipping);
+			}
+
+			if (_iconImg_Mesh_SendMask == null)
+			{
+				_iconImg_Mesh_SendMask = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshSendMask_16px);
+			}
+
+			if (_iconImg_Mesh_ReceiveMask == null)
+			{
+				_iconImg_Mesh_ReceiveMask = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshReceiveMask_16px);
+			}
+
+			if (_iconImg_MeshGroup == null)
+			{
+				_iconImg_MeshGroup = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup_16px);
+			}
+
+
 			for (int i = 0; i < childMeshTransforms.Count; i++)
 			{
 				apTransform_Mesh meshTransform = childMeshTransforms[i];
 
 				Texture2D iconImage = null;
+
+				//v1.6.0 마스크 정보에 따라 아이콘이 달라진다.
+				int nReceiveMask = meshTransform._linkedReceivedMasks != null ? meshTransform._linkedReceivedMasks.Count : 0;
+				int nSendMask = meshTransform._sendMaskDataList != null ? meshTransform._sendMaskDataList.Count : 0;
+
 				if (meshTransform._isClipping_Child)
 				{
-					iconImage = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Clipping);
+					iconImage = _iconImg_Mesh_Clipped;
+				}
+				else if(nReceiveMask > 0)
+				{
+					iconImage = _iconImg_Mesh_ReceiveMask;
+				}
+				else if(nSendMask > 0)
+				{
+					iconImage = _iconImg_Mesh_SendMask;
 				}
 				else
 				{
-					iconImage = Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Mesh_16px);//변경 22.6.10 : 16px로 변경
+					iconImage = _iconImg_Mesh;
 				}
 
 				resultMeshTransforms.Add(meshTransform);
@@ -1303,7 +1416,7 @@ namespace AnyPortrait
 				}
 
 				apEditorHierarchyUnit existUnit = RefreshUnit(CATEGORY.MeshGroup_Item,
-													Editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup_16px),//변경 22.6.10 : 16px로 변경
+													_iconImg_MeshGroup,//변경 22.6.10 : 16px로 변경
 													meshGroupTransform,
 													meshGroupTransform._nickName,
 													//Editor.Select.SubMeshGroupInGroup, 
@@ -1361,16 +1474,32 @@ namespace AnyPortrait
 			//	Debug.Log("Mesh Group Hierarchy - Bone Refresh [" + Editor.Select.Bone._name + "]");
 			//}
 
-			Texture2D iconImage_Normal = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_Rigging);
-			Texture2D iconImage_IKHead = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKHead);
-			Texture2D iconImage_IKChained = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKChained);
-			Texture2D iconImage_IKSingle = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKSingle);
+			if(_iconImg_Bone_Normal == null)
+			{
+				_iconImg_Bone_Normal = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_Rigging);
+			}
+			
+			if (_iconImg_Bone_IKHead == null)
+			{
+				_iconImg_Bone_IKHead = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKHead);
+			}
+
+			if (_iconImg_Bone_IKChained == null)
+			{
+				_iconImg_Bone_IKChained = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKChained);
+			}
+
+			if (_iconImg_Bone_IKSingle == null)
+			{
+				_iconImg_Bone_IKSingle = Editor.ImageSet.Get(apImageSet.PRESET.Rig_HierarchyIcon_IKSingle);
+			}
 
 			for (int i = 0; i < rootBones.Count; i++)
 			{
 				apBone rootBone = rootBones[i];
 
-				SearchAndRefreshBone(rootBone, parentUnit, resultBones, iconImage_Normal, iconImage_IKHead, iconImage_IKChained, iconImage_IKSingle);
+				SearchAndRefreshBone(rootBone, parentUnit, resultBones, 
+					_iconImg_Bone_Normal, _iconImg_Bone_IKHead, _iconImg_Bone_IKChained, _iconImg_Bone_IKSingle);
 			}
 		}
 

@@ -1081,11 +1081,15 @@ namespace AnyPortrait
 			_editor._option_IsTurnOffAnimAutoKey = Layout_Toggle_AdvOpt(TEXT.Setting_InitAutoKeyframeOption, _editor._option_IsTurnOffAnimAutoKey, apEditor.DefaultIsTurnOffAnimAutoKey);
 
 
-#if UNITY_2020_1_OR_NEWER
-			//추가 22.1.7 : Bake시 SRP를 체크한다. (2020부터)
-			bool prevIsCheckSRPOption = _editor._option_CheckSRPWhenBake;
-			_editor._option_CheckSRPWhenBake = Layout_Toggle_AdvOpt(TEXT.Setting_CheckScriptableRenderPipelineWhenBake, _editor._option_CheckSRPWhenBake, apEditor.DefaultCheckSRPWhenBake);
-#endif
+			//추가 22.1.7 : Bake시 SRP를 체크한다. (2020부터) > 변경 v1.6.0 : SRP를 포함하여 다양한 설정 체크
+			//이전
+			// bool prevIsCheckSRPOption = _editor._option_CheckSRPWhenBake;
+			// _editor._option_CheckSRPWhenBake = Layout_Toggle_AdvOpt(TEXT.Setting_CheckScriptableRenderPipelineWhenBake, _editor._option_CheckSRPWhenBake, apEditor.DefaultCheckSRPWhenBake);
+
+			//변경 v1.6.0
+			bool prevIsValidateEnv = _editor._option_ValidateEnvironmentWhenBake;
+			_editor._option_ValidateEnvironmentWhenBake = Layout_Toggle_AdvOpt(TEXT.Setting_CheckOptionForProjectWhenBake, _editor._option_ValidateEnvironmentWhenBake, apEditor.DefaultValidateEnvWhenBake);
+
 
 			//추가 22.7.13 : 보기 프리셋의 자동 해제 여부
 			bool prevIsTurnOffVisibilityPreset = _editor._option_TurnOffVisibilityPresetWhenSelectObject;
@@ -1222,10 +1226,10 @@ namespace AnyPortrait
 				prevIsTurnOffVisibilityPreset != _editor._option_TurnOffVisibilityPresetWhenSelectObject ||
 				prevIsAutoScrollWhenObjSelect != _editor._option_AutoScrollWhenObjectSelected ||
 				prevIsObjMovableWithoutClickGizmo != _editor._option_ObjMovableWithoutClickGizmo
-#if UNITY_2020_1_OR_NEWER
-								||
-								prevIsCheckSRPOption != _editor._option_CheckSRPWhenBake
-#endif
+// #if UNITY_2020_1_OR_NEWER
+// 				|| prevIsCheckSRPOption != _editor._option_CheckSRPWhenBake
+// #endif
+				|| prevIsValidateEnv != _editor._option_ValidateEnvironmentWhenBake
 				|| prevNewCPModBlended != _editor._option_NewControlParamModMeshBoneBlended
 
 					)
@@ -1689,7 +1693,8 @@ namespace AnyPortrait
 				SavePref_Bool(sw, "ShowPrevViewBtns", _editor._option_ShowPrevViewMenuBtns);
 				SavePref_Bool(sw, "SetAutoOneImage", _editor._option_SetAutoImageToMeshIfOnlyOneImageExist);
 				SavePref_Bool(sw, "TurnOffAnimAutoKey", _editor._option_IsTurnOffAnimAutoKey);
-				SavePref_Bool(sw, "CheckSRPWhenBake", _editor._option_CheckSRPWhenBake);
+				//SavePref_Bool(sw, "CheckSRPWhenBake", _editor._option_CheckSRPWhenBake);//삭제
+				SavePref_Bool(sw, "ValidateEnvironmentWhenBake", _editor._option_ValidateEnvironmentWhenBake);//변경 v1.6.0
 				SavePref_Bool(sw, "TurnOffVisibPresetWhenSelectObj", _editor._option_TurnOffVisibilityPresetWhenSelectObject);
 				SavePref_Bool(sw, "AutoScrollWhenSelect", _editor._option_AutoScrollWhenObjectSelected);
 				SavePref_Bool(sw, "ObjMovableWithoutClickGizmo", _editor._option_ObjMovableWithoutClickGizmo);
@@ -1964,7 +1969,8 @@ namespace AnyPortrait
 							else if(string.Equals(strKey, "ShowPrevViewBtns"))					{ _editor._option_ShowPrevViewMenuBtns = LoadPref_Bool(strValue); }
 							else if(string.Equals(strKey, "SetAutoOneImage"))					{ _editor._option_SetAutoImageToMeshIfOnlyOneImageExist = LoadPref_Bool(strValue); }
 							else if(string.Equals(strKey, "TurnOffAnimAutoKey"))				{ _editor._option_IsTurnOffAnimAutoKey = LoadPref_Bool(strValue); }
-							else if(string.Equals(strKey, "CheckSRPWhenBake"))					{ _editor._option_CheckSRPWhenBake = LoadPref_Bool(strValue); }
+							//else if(string.Equals(strKey, "CheckSRPWhenBake"))					{ _editor._option_CheckSRPWhenBake = LoadPref_Bool(strValue); }//삭제
+							else if(string.Equals(strKey, "ValidateEnvironmentWhenBake"))		{ _editor._option_ValidateEnvironmentWhenBake = LoadPref_Bool(strValue); }//변경 ㅍ1.6.0
 							else if(string.Equals(strKey, "TurnOffVisibPresetWhenSelectObj"))	{ _editor._option_TurnOffVisibilityPresetWhenSelectObject = LoadPref_Bool(strValue); }
 							else if(string.Equals(strKey, "AutoScrollWhenSelect"))				{ _editor._option_AutoScrollWhenObjectSelected = LoadPref_Bool(strValue); }
 							else if(string.Equals(strKey, "ObjMovableWithoutClickGizmo"))		{ _editor._option_ObjMovableWithoutClickGizmo = LoadPref_Bool(strValue); }

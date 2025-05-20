@@ -92,8 +92,22 @@ namespace AnyPortrait
 			Clear();
 			_isAnyUnitChanged = false;
 
+			if(_requests_Live == null)
+			{
+				_requests_Live = new List<apAnimPlayRequest>();
+			}
 			_requests_Live.Clear();
+
+			if(_requests_Total == null)
+			{
+				_requests_Total = new List<apAnimPlayRequest>();
+			}
 			_requests_Total.Clear();
+
+			if(_requests_Remained == null)
+			{
+				_requests_Remained = new List<apAnimPlayRequest>();
+			}
 			_requests_Remained.Clear();
 
 			AddRequestPool();//<<Pool을 만든다.
@@ -108,6 +122,10 @@ namespace AnyPortrait
 		/// </summary>
 		public void Clear()
 		{
+			if(_animPlayUnits == null)
+			{
+				_animPlayUnits = new List<apAnimPlayUnit>();
+			}
 			_animPlayUnits.Clear();
 			_nPlayedUnit = 0;
 			_isInitPlayUnit = false;
@@ -231,8 +249,6 @@ namespace AnyPortrait
 			}
 			if (existPlayUnit != null)
 			{
-
-
 				//Debug.Log("아직 재생중인 PlayUnit을 다시 재생하는 요청이 왔다. [" + existPlayUnit._linkedAnimClip._name + "]");
 				existPlayUnit.SetSubOption(blendMethod, isAutoEndIfNotloop, GetNextPlayUnitRequestOrder(), GetNextRequestLinkKey());
 
@@ -279,10 +295,11 @@ namespace AnyPortrait
 			//현재 플레이 중인 AnimPlayUnit들의 LinkKey를 넣어준다.
 			//Debug.Log("Add Play Unit Link Key");
 
+			apAnimPlayUnit playUnit = null;
 			for (int i = 0; i < _animPlayUnits.Count; i++)
 			{
-				//Debug.Log(_animPlayUnits[i]._linkedAnimClip._name + " : " + _animPlayUnits[i].LinkKey + " / " + _animPlayUnits[i].PlayStatus);
-				request.AddPrevPlayUnitKeyLink(_animPlayUnits[i].LinkKey, _animPlayUnits[i].UnitWeight);
+				playUnit = _animPlayUnits[i];
+				request.AddPrevPlayUnitKeyLink(playUnit.LinkKey, playUnit.UnitWeight);
 			}
 
 			apAnimPlayUnit newPlayUnit = MakePlayUnit(playData, blendMethod, isAutoEndIfNotloop);
@@ -312,21 +329,6 @@ namespace AnyPortrait
 				//Debug.Log("겹치는 Queue Request를 그냥 바로 삭제");
 				PushRequest(overlapQueuedRequest);
 			}
-
-			#region [미사용 코드]
-			//TODO : 이 AnimClip을 CalculatedParam에 연결해야한다.
-			//Debug.LogError("TODO : 이 AnimClip을 CalculatedParam에 연결해야한다");
-
-			////플레이 유닛은 플레이 시작
-			////나머지는 End로 만든다.
-			//for (int i = 0; i < _animPlayUnits.Count; i++)
-			//{
-			//	if (newPlayUnit != _animPlayUnits[i])
-			//	{
-			//		_animPlayUnits[i].SetEnd();
-			//	}
-			//} 
-			#endregion
 
 			_nPlayedUnit = _animPlayUnits.Count;
 
@@ -368,17 +370,19 @@ namespace AnyPortrait
 			//마지막 연결이 
 			apAnimPlayRequest lastRequest = null;
 
-			if (_requests_Live.Count > 0)
+			int nLive = _requests_Live.Count;
+			if (nLive > 0)
 			{
 				//1. Request가 있는 경우/
 				//Chain을 시도한다.
 				//마지막 Request를 찾는다. (End가 아닌거면 다 됨)
-				
-				for (int i = _requests_Live.Count - 1; i >= 0; i--)
+				apAnimPlayRequest playRequest = null;
+				for (int i = nLive - 1; i >= 0; i--)
 				{
-					if(_requests_Live[i].Status != apAnimPlayRequest.STATUS.End)
+					playRequest = _requests_Live[i];
+					if(playRequest.Status != apAnimPlayRequest.STATUS.End)
 					{
-						lastRequest = _requests_Live[i];
+						lastRequest = playRequest;
 						break;
 					}
 				}
@@ -524,13 +528,7 @@ namespace AnyPortrait
 			//추가 : Chain 처리를 해주자
 			if(lastRequest != null)
 			{
-				//if(lastRequest._chainedRequest_Next != null)
-				//{
-				//	Debug.LogError("마지막 Unit을 Chain하려고 했으나 이미 연결되어 있다;;;");
-				//}
-
 				//LastRequest.Next <-> Request.Prev
-
 				lastRequest._chainedRequest_Next = request;
 				request._chainedRequest_Prev = lastRequest;
 			}
@@ -559,9 +557,12 @@ namespace AnyPortrait
 			request.SetCurrentPlayedUnits(this);
 
 			//현재 플레이 중인 AnimPlayUnit들의 LinkKey를 넣어준다.
-			for (int i = 0; i < _animPlayUnits.Count; i++)
+			int nPlayUnits = _animPlayUnits.Count;
+			apAnimPlayUnit playUnit = null;
+			for (int i = 0; i < nPlayUnits; i++)
 			{
-				request.AddPrevPlayUnitKeyLink(_animPlayUnits[i].LinkKey, _animPlayUnits[i].UnitWeight);
+				playUnit = _animPlayUnits[i];
+				request.AddPrevPlayUnitKeyLink(playUnit.LinkKey, playUnit.UnitWeight);
 			}
 
 			apAnimPlayUnit newPlayUnit = MakePlayUnit(playData, blendMethod, isAutoEndIfNotloop);
@@ -603,17 +604,19 @@ namespace AnyPortrait
 		{
 			apAnimPlayRequest lastRequest = null;
 
-			if (_requests_Live.Count > 0)
+			int nLive = _requests_Live.Count;
+			if (nLive > 0)
 			{
 				//1. Request가 있는 경우/
 				//Chain을 시도한다.
 				//마지막 Request를 찾는다. (End가 아닌거면 다 됨)
-				
-				for (int i = _requests_Live.Count - 1; i >= 0; i--)
+				apAnimPlayRequest playRequest = null;
+				for (int i = nLive - 1; i >= 0; i--)
 				{
-					if(_requests_Live[i].Status != apAnimPlayRequest.STATUS.End)
+					playRequest = _requests_Live[i];
+					if(playRequest.Status != apAnimPlayRequest.STATUS.End)
 					{
-						lastRequest = _requests_Live[i];
+						lastRequest = playRequest;
 						break;
 					}
 				}
@@ -1127,10 +1130,23 @@ namespace AnyPortrait
 					_isUpdated = true;
 					if (_tmpCurPlayUnit.IsRemovable)
 					{
+						//애니메이션 종료 이벤트를 먼저 보내고
+						//Debug.Log("애니메이션 종료됨 : " + _tmpCurPlayUnit._linkedAnimClip._name);
+						if(!_tmpCurPlayUnit.IsLastFramePlayedEventCalled())
+						{
+							//마지막 프레임에 도달하면 호출되는 "애니메이션 종료됨" 이벤트가 호출되지 않은 상태로 종료했다면
+							//여기서 마저 호출하자
+							_playManager.OnAnimPlayUnitEnded(_tmpCurPlayUnit, apPortrait.ANIM_ENDED_TYPE.Deactivated);
+							_tmpCurPlayUnit.SetLastFramePlayedEventCalled();
+						}
+						
+						//종료와 관련된 처리를 하자
 						//TODO : 이 객체와 연결된 CalculatedParam에 AnimClip이 사라졌음을 알려야한다.
 						//Debug.LogError("TODO : 이 객체와 연결된 CalculatedParam에 AnimClip이 사라졌음을 알려야한다");
 						_tmpCurPlayUnit.SetWeight(0.0f, true);
 						_isAnyUnitChanged = true;
+
+						
 					}
 				}
 
@@ -1153,6 +1169,7 @@ namespace AnyPortrait
 				//Debug.Log("----------------- Request Update[" + _requests_Live.Count + "] ---------------------");
 				//Request를 업데이트하고
 				//각 Request별로 연관된 PlayUnit의 Weight를 지정해주자
+				int nLive = _requests_Live.Count;
 				for (int iCur = 0; iCur < _requests_Live.Count; iCur++)
 				{
 					curRequest = _requests_Live[iCur];
@@ -1788,9 +1805,18 @@ namespace AnyPortrait
 		}
 
 
-		public void OnAnimPlayUnitEnded(apAnimPlayUnit playUnit)
+		//이부분 호출이 조금 이상하다.
+		// public void OnAnimPlayUnitEnded(apAnimPlayUnit playUnit)
+		// {
+		// 	_playManager.OnAnimPlayUnitEnded(playUnit, this);
+		// }
+
+		//Loop가 아닌 애니메이션 한정해서 End 프레임 (또는 역방향의 Start 프레임)에 도달하면 호출되는 이벤트
+		public void OnNotLoopAnimPlayUnitEnded(apAnimPlayUnit playUnit)
 		{
-			_playManager.OnAnimPlayUnitEnded(playUnit, this);
+			//Debug.Log("Not Loop Anim Play Unit Ended [" + playUnit._linkedAnimClip._name + "]");
+			//마지막 프레임에 도달(LastFrameReached)했을 때 호출된다.
+			_playManager.OnAnimPlayUnitEnded(playUnit, apPortrait.ANIM_ENDED_TYPE.LastFrameReached);
 		}
 
 		// Get / Set

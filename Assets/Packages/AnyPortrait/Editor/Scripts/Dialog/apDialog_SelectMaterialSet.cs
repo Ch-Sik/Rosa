@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -128,7 +128,7 @@ namespace AnyPortrait
 			if (isPresetTarget)
 			{
 				//프리셋이면 MaterialLibrary에서 가져오자
-				srcMatSets = _editor.MaterialLibrary.Presets;
+				srcMatSets = _editor.MaterialLibrary.Presets;				
 			}
 			else
 			{
@@ -149,6 +149,24 @@ namespace AnyPortrait
 			{
 				_materialSets.Add(srcMatSets[i]);
 			}
+
+			//MaterialSet의 이름에 "Legacy"가 들어가면 뒤쪽에 위치하도록 _materialSets을 다시 정렬한다.
+			_materialSets.Sort((a, b) =>
+			{
+				bool aIsLegacy = a._name.Contains("Legacy");
+				bool bIsLegacy = b._name.Contains("Legacy");
+
+				if (aIsLegacy && !bIsLegacy)
+				{
+					return 1; // a가 Legacy이고 b는 Legacy가 아니면 a를 뒤로 보냄
+				}
+				else if (!aIsLegacy && bIsLegacy)
+				{
+					return -1; // b가 Legacy이고 a는 Legacy가 아니면 b를 뒤로 보냄
+				}
+				return a._uniqueID.CompareTo(b._uniqueID); // 둘 다 Legacy이면 ID로 정렬
+			});
+
 		
 			_curSelectedMatSet = null;
 
@@ -175,6 +193,9 @@ namespace AnyPortrait
 			_img_MatSetType.Add(apMaterialSet.ICON.UnlitMergeable, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_MergeableUnlit));
 			_img_MatSetType.Add(apMaterialSet.ICON.LitMergeable, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_MergeableLit));
 
+			//v1.6.0 추가
+			_img_MatSetType.Add(apMaterialSet.ICON.UnlitMask, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_UnlitMask));
+			_img_MatSetType.Add(apMaterialSet.ICON.LitMask, _editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_LitMask));
 		}
 
 		
@@ -204,6 +225,7 @@ namespace AnyPortrait
 			
 			GUIStyle guiStyle_None = new GUIStyle(GUIStyle.none);
 			guiStyle_None.normal.textColor = GUI.skin.label.normal.textColor;
+			guiStyle_None.alignment = TextAnchor.MiddleLeft;//v1.6.0
 
 			GUIStyle guiStyle_Selected = new GUIStyle(GUIStyle.none);
 			if(EditorGUIUtility.isProSkin)
@@ -214,6 +236,7 @@ namespace AnyPortrait
 			{
 				guiStyle_Selected.normal.textColor = Color.white;
 			}
+			guiStyle_Selected.alignment = TextAnchor.MiddleLeft;//v1.6.0
 			
 
 			GUIStyle guiStyle_Center = new GUIStyle(GUIStyle.none);

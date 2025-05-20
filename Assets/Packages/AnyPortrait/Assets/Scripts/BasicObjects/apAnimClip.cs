@@ -133,6 +133,7 @@ namespace AnyPortrait
 		}
 
 		public float TimeLength { get { return (float)Mathf.Max(_endFrame - _startFrame, 0) * TimePerFrame; } }
+		public float SpeedRatio { get { return _speedRatio; } }
 
 		///// <summary>
 		///// 재생된 결과가 반영되는 가중치값
@@ -154,6 +155,8 @@ namespace AnyPortrait
 		/// </summary>
 		[NonSerialized]
 		public apAnimPlayUnit _parentPlayUnit = null;
+
+		[NonSerialized] public apAnimPlayData _linkedPlayData = null;
 
 
 		//에디터에서
@@ -454,6 +457,10 @@ namespace AnyPortrait
 			}
 		}
 
+		public void LinkPlayData(apAnimPlayData linkedPlayData)
+		{
+			_linkedPlayData = linkedPlayData;
+		}
 
 
 
@@ -1622,9 +1629,13 @@ namespace AnyPortrait
 		{
 			if (targetTimelineLayer == null && targetTimelineLayers == null)
 			{
-				for (int i = 0; i < _timelines.Count; i++)
+				int nTimelines = _timelines != null ? _timelines.Count : 0;
+				if(nTimelines > 0)
 				{
-					_timelines[i].RefreshLayers(null);
+					for (int i = 0; i < nTimelines; i++)
+					{
+						_timelines[i].RefreshLayers(null);
+					}
 				}
 			}
 			else if(targetTimelineLayers != null && targetTimelineLayers.Count > 0)
@@ -1632,17 +1643,22 @@ namespace AnyPortrait
 				//추가 20.6.19
 				//[다중] 선택된 경우, 여러 개의 타임라인 레이어들을 갱신할 수 있다.
 				apAnimTimelineLayer curLayer = null;
-				for (int i = 0; i < targetTimelineLayers.Count; i++)
+				int nTargetLayers = targetTimelineLayers != null ? targetTimelineLayers.Count : 0;
+				if(nTargetLayers > 0)
 				{
-					curLayer = targetTimelineLayers[i];
-					if(curLayer == null || curLayer._parentTimeline == null || !_timelines.Contains(curLayer._parentTimeline))
+					for (int i = 0; i < targetTimelineLayers.Count; i++)
 					{
-						//유효하지 않은 경우
-						//UnityEngine.Debug.LogError("유효하지 않은 Refresh Layer 발견");
-						continue;
+						curLayer = targetTimelineLayers[i];
+						if(curLayer == null || curLayer._parentTimeline == null || !_timelines.Contains(curLayer._parentTimeline))
+						{
+							//유효하지 않은 경우
+							//UnityEngine.Debug.LogError("유효하지 않은 Refresh Layer 발견");
+							continue;
+						}
+						curLayer._parentTimeline.RefreshLayers(curLayer);
 					}
-					curLayer._parentTimeline.RefreshLayers(curLayer);
 				}
+				
 			}
 			else if(targetTimelineLayer != null)
 			{

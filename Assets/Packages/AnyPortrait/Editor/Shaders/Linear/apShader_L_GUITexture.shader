@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) 2017-2018. RainyRizzle. All rights reserved
 *	contact to : https://www.rainyrizzle.com/ , contactrainyrizzle@gmail.com
 *
@@ -32,7 +32,7 @@ Shader "AnyPortrait/Editor/Linear/GUI Color (Vertex Color 2X)"
 		//----------------------------------------------------------------------------------
 		Pass
 		{
-			ColorMask RGB
+			//ColorMask RGB
 			ZWrite off
 
 			LOD 200

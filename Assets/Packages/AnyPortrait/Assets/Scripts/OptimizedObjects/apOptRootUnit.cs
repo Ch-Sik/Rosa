@@ -342,11 +342,11 @@ namespace AnyPortrait
 				//추가 20.4.2 : UpdateCalculate_Post() 함수의 일부 코드가 뒤로 빠졌다.
 				_rootOptTransform.UpdateMeshes();
 			}
-			else
-			{
-				//메시는 갱신되지 않는 프레임이라면, 마스크 메시만 갱신하자
-				_rootOptTransform.UpdateMaskMeshes();
-			}
+			// else
+			// {
+			// 	//메시는 갱신되지 않는 프레임이라면, 마스크 메시만 갱신하자
+			// 	_rootOptTransform.UpdateMaskMeshes();
+			// }
 			
 
 
@@ -405,6 +405,7 @@ namespace AnyPortrait
 
 
 
+		[Obsolete]
 		public void UpdateTransformsOnlyMaskMesh()
 		{
 			if (_rootOptTransform == null)
@@ -525,18 +526,14 @@ namespace AnyPortrait
 				//추가 20.4.2 : UpdateCalculate_Post() 함수의 일부 코드가 뒤로 빠졌다.
 				_rootOptTransform.UpdateMeshes();
 			}
-			else
-			{
-				//메시는 갱신되지 않는 프레임이라면, 마스크 메시만 갱신하자
-				_rootOptTransform.UpdateMaskMeshes();
-			}
+
+			//삭제 v1.6.0 : 마스크 업데이트는 MaskRenderCamera에서 일괄 처리한다.
+			// else
+			// {
+			// 	//메시는 갱신되지 않는 프레임이라면, 마스크 메시만 갱신하자
+			// 	_rootOptTransform.UpdateMaskMeshes();
+			// }
 		}
-
-
-
-
-
-
 
 
 
@@ -600,6 +597,7 @@ namespace AnyPortrait
 
 		}
 
+		[Obsolete("This function is deprecated due to changes in the Mask operation logic. Use apPortrait's [ResetMeshesCommandBuffers()] instead.")]
 		public void ResetCommandBuffer(bool isRegistToCamera)
 		{
 			if (_rootOptTransform == null)
@@ -774,7 +772,6 @@ namespace AnyPortrait
 		{
 			return string.Equals(a._name, s_GetOptBone_Name);
 		}
-
 
 
 		public apOptTransform GetTransform(string name)

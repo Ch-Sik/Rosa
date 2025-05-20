@@ -1,23 +1,23 @@
 ﻿NAMEUnlit (Legacy)
 UNID0
 ICON0
-GNABAssets/Packages/AnyPortrait/Assets/Shaders/apShader_Transparent.shader
-GNADAssets/Packages/AnyPortrait/Assets/Shaders/apShader_Transparent_Additive.shader
-GNSAAssets/Packages/AnyPortrait/Assets/Shaders/apShader_Transparent_SoftAdditive.shader
-GNMPAssets/Packages/AnyPortrait/Assets/Shaders/apShader_Transparent_Multiplicative.shader
-GCABAssets/Packages/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask.shader
-GCADAssets/Packages/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask_Additive.shader
-GCSAAssets/Packages/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask_SoftAdditive.shader
-GCMPAssets/Packages/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask_Multiplicative.shader
-LNABAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent.shader
-LNADAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent_Additive.shader
-LNSAAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent_SoftAdditive.shader
-LNMPAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent_Multiplicative.shader
-LCABAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask.shader
-LCADAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask_Additive.shader
-LCSAAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask_SoftAdditive.shader
-LCMPAssets/Packages/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask_Multiplicative.shader
-MASKAssets/Packages/AnyPortrait/Assets/Shaders/apShader_AlphaMask.shader
+GNABAssets/AnyPortrait/Assets/Shaders/apShader_Transparent.shader
+GNADAssets/AnyPortrait/Assets/Shaders/apShader_Transparent_Additive.shader
+GNSAAssets/AnyPortrait/Assets/Shaders/apShader_Transparent_SoftAdditive.shader
+GNMPAssets/AnyPortrait/Assets/Shaders/apShader_Transparent_Multiplicative.shader
+GCABAssets/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask.shader
+GCADAssets/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask_Additive.shader
+GCSAAssets/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask_SoftAdditive.shader
+GCMPAssets/AnyPortrait/Assets/Shaders/apShader_ClippedWithMask_Multiplicative.shader
+LNABAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent.shader
+LNADAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent_Additive.shader
+LNSAAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent_SoftAdditive.shader
+LNMPAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_Transparent_Multiplicative.shader
+LCABAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask.shader
+LCADAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask_Additive.shader
+LCSAAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask_SoftAdditive.shader
+LCMPAssets/AnyPortrait/Assets/Shaders/Linear/apShader_L_ClippedWithMask_Multiplicative.shader
+MASKAssets/AnyPortrait/Assets/Shaders/apShader_AlphaMask.shader
 AMBCtrue
 REFM
 PROP4
@@ -89,23 +89,23 @@ PCTP
 NAMEUnlit (v2)
 UNID2
 ICON0
-GNABAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Alpha.shader
-GNADAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Add.shader
-GNSAAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Soft.shader
-GNMPAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Mul.shader
-GCABAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Alpha.shader
-GCADAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Add.shader
-GCSAAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Soft.shader
-GCMPAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Mul.shader
-LNABAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Alpha.shader
-LNADAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Add.shader
-LNSAAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Soft.shader
-LNMPAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Mul.shader
-LCABAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Alpha.shader
-LCADAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Add.shader
-LCSAAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Soft.shader
-LCMPAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Mul.shader
-MASKAssets/Packages/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_AlphaMask.shader
+GNABAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Alpha.shader
+GNADAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Add.shader
+GNSAAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Soft.shader
+GNMPAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_T_Mul.shader
+GCABAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Alpha.shader
+GCADAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Add.shader
+GCSAAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Soft.shader
+GCMPAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_C_Mul.shader
+LNABAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Alpha.shader
+LNADAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Add.shader
+LNSAAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Soft.shader
+LNMPAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_T_Mul.shader
+LCABAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Alpha.shader
+LCADAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Add.shader
+LCSAAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Soft.shader
+LCMPAssets/AnyPortrait/Assets/Shaders/Unlit 2/Linear/apShader_L_Unlit2_C_Mul.shader
+MASKAssets/AnyPortrait/Assets/Shaders/Unlit 2/apShader_Unlit2_AlphaMask.shader
 AMBCfalse
 REFM
 PROP4

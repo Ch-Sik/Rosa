@@ -479,7 +479,8 @@ namespace AnyPortrait
 					if (targetLinkParam._isOtherComponentExist)
 					{
 						//알 수 없는 컴포넌트 -> 링크 깨짐 그룹
-						targetLinkParam._prevGameObject.transform.parent = group3_Unlinked.transform;
+						//targetLinkParam._prevGameObject.transform.parent = group3_Unlinked.transform;//이전
+						apEditorUtil.SetParentWithRecord(targetLinkParam._prevGameObject.transform, group3_Unlinked.transform);//Undo
 
 						//Count+1 : Unlink
 						bakeResult.Add_UnlinkedExternalObject(targetLinkParam._prevGameObject.name);
@@ -487,7 +488,8 @@ namespace AnyPortrait
 					else
 					{
 						//걍 재활용 실패 -> 삭제 예정
-						targetLinkParam._prevGameObject.transform.parent = group2_Remove.transform;
+						//targetLinkParam._prevGameObject.transform.parent = group2_Remove.transform;//이전
+						apEditorUtil.SetParentWithRecord(targetLinkParam._prevGameObject.transform, group2_Remove.transform);//Undo
 
 						//Count+1 : Removed
 						bakeResult.AddCount_RemovedOptGameObject();
@@ -515,7 +517,9 @@ namespace AnyPortrait
 					}
 					else
 					{
-						targetLinkParam._prevGameObject.transform.parent = group3_Unlinked.transform;
+						//targetLinkParam._prevGameObject.transform.parent = group3_Unlinked.transform;//이전
+						apEditorUtil.SetParentWithRecord(targetLinkParam._prevGameObject.transform, group3_Unlinked.transform);//Undo
+
 						targetLinkParam._isReGroupCompleted = true;//재배치 끝
 					}
 				}
@@ -570,7 +574,8 @@ namespace AnyPortrait
 					if (targetLinkParam._isOtherComponentExist)
 					{
 						//알 수 없는 컴포넌트 -> 링크 깨짐 그룹
-						targetLinkParam._prevGameObject.transform.parent = group3_Unlinked.transform;
+						//targetLinkParam._prevGameObject.transform.parent = group3_Unlinked.transform;//이전
+						apEditorUtil.SetParentWithRecord(targetLinkParam._prevGameObject.transform, group3_Unlinked.transform);//Undo
 
 						bakeResult.Add_UnlinkedExternalObject(targetLinkParam._prevGameObject.name);
 					}
@@ -578,7 +583,7 @@ namespace AnyPortrait
 					{
 						//걍 재활용 실패 -> 삭제 예정
 						//따로 처리는 안합니더
-						//targetLinkParam._prevGameObject.transform.parent = group2_Remove.transform;
+						//targetLinkParam._prevGameObject.transform.parent = group2_Remove.transform;//처리 안함
 					}
 					
 					targetLinkParam._isReGroupCompleted = true;//재배치 끝
@@ -614,7 +619,8 @@ namespace AnyPortrait
 		{
 			if (!targetLinkParam._isRecycled)
 			{
-				targetLinkParam._prevGameObject.transform.parent = parentGameObject.transform;
+				//targetLinkParam._prevGameObject.transform.parent = parentGameObject.transform;//이전
+				apEditorUtil.SetParentWithRecord(targetLinkParam._prevGameObject.transform, parentGameObject.transform);//Undo
 				targetLinkParam._isReGroupCompleted = true;
 				
 				//Bake Result도 추가

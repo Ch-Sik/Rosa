@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) 2017-2018. RainyRizzle. All rights reserved
 *	contact to : https://www.rainyrizzle.com/ , contactrainyrizzle@gmail.com
 *
@@ -35,7 +35,7 @@ Shader "AnyPortrait/Editor/Linear/Colored Texture VColor Add(2X) Additive"
 		//----------------------------------------------------------------------------------
 		Pass
 		{
-			ColorMask RGB
+			//ColorMask RGB
 			ZWrite off
 
 			LOD 200

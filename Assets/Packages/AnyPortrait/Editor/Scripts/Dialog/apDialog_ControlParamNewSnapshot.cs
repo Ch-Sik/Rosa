@@ -214,6 +214,9 @@ namespace AnyPortrait
 				guiStyle_None.normal.textColor = Color.black;
 			}
 
+			guiStyle_None.alignment = TextAnchor.MiddleLeft;
+			guiStyle_Selected.alignment = TextAnchor.MiddleLeft;
+
 			int height_ListItem = 25;
 			
 

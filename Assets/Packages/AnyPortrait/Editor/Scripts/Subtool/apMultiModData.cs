@@ -902,10 +902,11 @@ namespace AnyPortrait
 			apAnimTimelineLayer curTimelineLayer = null;
 			apModifierBase linkedModifier = null;
 
-			
+			//Debug.Log("WorkKeyframe Count : " + nWorkKeyframes);
 			for (int iWK = 0; iWK < nWorkKeyframes; iWK++)
 			{
 				curWorkKeyframe = workKeyframes[iWK];
+
 				if(curWorkKeyframe == null ||
 					curWorkKeyframe._parentTimelineLayer == null)
 				{
@@ -913,6 +914,7 @@ namespace AnyPortrait
 				}
 
 				curTimelineLayer = curWorkKeyframe._parentTimelineLayer;
+
 				if(curTimelineLayer._parentTimeline == null
 					|| curTimelineLayer._parentTimeline._linkType == apAnimClip.LINK_TYPE.ControlParam
 					|| curTimelineLayer._parentTimeline._linkedModifier == null
@@ -962,6 +964,19 @@ namespace AnyPortrait
 						linkUnit.SetAnimKeyframe(curWorkKeyframe);
 					}
 				}
+				//else
+				//{
+				//	Debug.LogError(">> Mod 연결 불가 3");
+				//	if(curTimelineLayer._linkedBone == null)
+				//	{
+				//		Debug.LogError(">> Layer-Liniked Bone 없음");
+				//	}
+				//	if(curWorkKeyframe._linkedModBone_Editor == null)
+				//	{
+				//		Debug.LogError(">> Frame-Liniked Bone 없음");
+				//	}
+				//	continue;
+				//}
 			}
 
 			

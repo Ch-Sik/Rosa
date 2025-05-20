@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -194,6 +194,28 @@ namespace AnyPortrait
 		private const string RESERVED_PROP__MERGED_TEX_8 = "_MergedTex8";
 		private const string RESERVED_PROP__MERGED_TEX_9 = "_MergedTex9";
 
+		//추가 v1.6.0 : 범용 마스크 처리 때문에 예약된 프로퍼티가 추가되었다.
+		private const string RESERVED_PROP__MASKRATIO = "_MaskRatio";
+		private const string RESERVED_PROP__MASKRATIO_1 = "_MaskRatio_1";
+		private const string RESERVED_PROP__MASKRATIO_2 = "_MaskRatio_2";
+		private const string RESERVED_PROP__MASKRATIO_3 = "_MaskRatio_3";
+		private const string RESERVED_PROP__MASKRATIO_4 = "_MaskRatio_4";
+
+		private const string RESERVED_PROP__MASKTEX_1 = "_MaskTex_1";
+		private const string RESERVED_PROP__MASKTEX_2 = "_MaskTex_2";
+		private const string RESERVED_PROP__MASKTEX_3 = "_MaskTex_3";
+		private const string RESERVED_PROP__MASKTEX_4 = "_MaskTex_4";
+
+		private const string RESERVED_PROP__MASK_SSOFFSET_1 = "_MaskScreenSpaceOffset_1";
+		private const string RESERVED_PROP__MASK_SSOFFSET_2 = "_MaskScreenSpaceOffset_2";
+		private const string RESERVED_PROP__MASK_SSOFFSET_3 = "_MaskScreenSpaceOffset_3";
+		private const string RESERVED_PROP__MASK_SSOFFSET_4 = "_MaskScreenSpaceOffset_4";
+
+		private const string RESERVED_PROP__MASKOP_1 = "_MaskOp_1";
+		private const string RESERVED_PROP__MASKOP_2 = "_MaskOp_2";
+		private const string RESERVED_PROP__MASKOP_3 = "_MaskOp_3";
+		private const string RESERVED_PROP__MASKOP_4 = "_MaskOp_4";
+
 
 		//추가 21.12.24 : 병합 가능한지 여부 : 병합용 텍스쳐가 있어야 하며, 알파블렌딩이어야 한다.
 		[SerializeField]
@@ -228,7 +250,13 @@ namespace AnyPortrait
 		// Bake
 		//---------------------------------------------------
 #if UNITY_EDITOR
-		public void Bake(apTransform_Mesh srcMeshTransform, apPortrait portrait, bool isLinearSpace, int textureDataID, int srcTextureDataID, apMaterialLibrary materialLibrary)
+		public void Bake(	apTransform_Mesh srcMeshTransform,
+							apPortrait portrait,
+							bool isLinearSpace,
+							int textureDataID,
+							int srcTextureDataID,
+							bool isAnyReceivedMaskData,
+							apMaterialLibrary materialLibrary)
 		{
 			Clear();
 
@@ -253,7 +281,10 @@ namespace AnyPortrait
 			apMaterialSet defaultMatSet = portrait.GetDefaultMaterialSet();
 			apMaterialSet libraryMatSet = materialLibrary.Presets[0];//<<Library의 첫번째 프리셋
 
-			bool isClippedChild = srcMeshTransform._isClipping_Child;
+			//bool isClippedChild = srcMeshTransform._isClipping_Child;//이전
+			
+			//변경 v1.6.0 : Clipped Child가 아니라도, Received Mask 데이터가 있으면 Clipping Shader를 사용해야한다.
+			bool isClippedChild = srcMeshTransform._isClipping_Child || isAnyReceivedMaskData;
 
 			if (srcMeshTransform._isCustomShader)
 			{
@@ -355,7 +386,8 @@ namespace AnyPortrait
 					}
 
 					//변경 21.12.22 : const 변수로 바뀌었으며, "병합용" 텍스쳐가 추가되었다.
-					if(	string.Equals(srcProp._name, RESERVED_PROP__COLOR) ||
+					//변경 v1.6.0 : 마스크 관련 프로퍼티가 추가되었다.
+					if (string.Equals(srcProp._name, RESERVED_PROP__COLOR) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MAIN_TEX) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MASK_TEX) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MASK_SCREEN_SPACE_OFFSET) ||
@@ -369,6 +401,27 @@ namespace AnyPortrait
 						string.Equals(srcProp._name, RESERVED_PROP__MERGED_TEX_7) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MERGED_TEX_8) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MERGED_TEX_9) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_4) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_4) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_4) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_4) ||
 
 						string.IsNullOrEmpty(srcProp._name))
 
@@ -503,6 +556,27 @@ namespace AnyPortrait
 							string.Equals(refPropName, RESERVED_PROP__MERGED_TEX_8) ||
 							string.Equals(refPropName, RESERVED_PROP__MERGED_TEX_9) ||
 
+							string.Equals(refPropName, RESERVED_PROP__MASKRATIO) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKRATIO_1) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKRATIO_2) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKRATIO_3) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKRATIO_4) ||
+
+							string.Equals(refPropName, RESERVED_PROP__MASKTEX_1) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKTEX_2) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKTEX_3) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKTEX_4) ||
+
+							string.Equals(refPropName, RESERVED_PROP__MASK_SSOFFSET_1) ||
+							string.Equals(refPropName, RESERVED_PROP__MASK_SSOFFSET_2) ||
+							string.Equals(refPropName, RESERVED_PROP__MASK_SSOFFSET_3) ||
+							string.Equals(refPropName, RESERVED_PROP__MASK_SSOFFSET_4) ||
+
+							string.Equals(refPropName, RESERVED_PROP__MASKOP_1) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKOP_2) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKOP_3) ||
+							string.Equals(refPropName, RESERVED_PROP__MASKOP_4) ||
+
 							string.IsNullOrEmpty(refPropName))
 						{
 							//이 값은 사용할 수 없다. Reserved임
@@ -636,6 +710,29 @@ namespace AnyPortrait
 						string.Equals(srcProp._name, RESERVED_PROP__MERGED_TEX_7) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MERGED_TEX_8) ||
 						string.Equals(srcProp._name, RESERVED_PROP__MERGED_TEX_9) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKRATIO_4) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKTEX_4) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASK_SSOFFSET_4) ||
+
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_1) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_2) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_3) ||
+						string.Equals(srcProp._name, RESERVED_PROP__MASKOP_4) ||
+
+
 						string.IsNullOrEmpty(srcProp._name))
 					{
 						//이 값은 사용할 수 없다. Reserved임
@@ -794,7 +891,7 @@ namespace AnyPortrait
 			//추가 21.12.24
 			//이게 병합 가능한 재질인지 확인하자
 			//기본 속성은 있어야 한다.
-			//클리핑 속성은 없어야 한다.
+			//클리핑 속성은 없어야 한다. > v1.6.0 : 없어야 하는 마스크 속성 추가됨
 			//병합 속성 9개 모두 있어야 한다.
 			_isMergable = false;
 
@@ -812,6 +909,25 @@ namespace AnyPortrait
 				&& shaderPropNames.Contains(RESERVED_PROP__MERGED_TEX_7)
 				&& shaderPropNames.Contains(RESERVED_PROP__MERGED_TEX_8)
 				&& shaderPropNames.Contains(RESERVED_PROP__MERGED_TEX_9)
+
+				//마스크 확장 프로퍼티도 있으면 안된다.
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKRATIO)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKRATIO_1)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKRATIO_2)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKRATIO_3)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKRATIO_4)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKTEX_1)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKTEX_2)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKTEX_3)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKTEX_4)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASK_SSOFFSET_1)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASK_SSOFFSET_2)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASK_SSOFFSET_3)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASK_SSOFFSET_4)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKOP_1)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKOP_2)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKOP_3)
+				&& !shaderPropNames.Contains(RESERVED_PROP__MASKOP_4)
 				)
 			{
 				_isMergable = true;

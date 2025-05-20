@@ -646,6 +646,9 @@ namespace AnyPortrait
 					_guiStyle_Selected.normal.textColor = Color.white;
 					_guiStyle_None.normal.textColor = Color.black;
 				}
+
+				_guiStyle_None.alignment = TextAnchor.MiddleLeft;
+				_guiStyle_Selected.alignment = TextAnchor.MiddleLeft;
 			}
 
 			if(_guiStyle_HotkeyBox == null)

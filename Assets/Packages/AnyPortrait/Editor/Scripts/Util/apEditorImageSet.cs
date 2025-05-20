@@ -46,6 +46,7 @@ namespace AnyPortrait
 			ToolBtn_OnionRecord,
 			ToolBtn_OnionView,
 			ToolBtn_MeshVisible,
+			ToolBtn_MeshVisibleWithMask,
 			ToolBtn_TabOpen,
 			ToolBtn_TabFolded,
 			ToolBtn_MaterialLibrary,
@@ -90,6 +91,8 @@ namespace AnyPortrait
 			Hierarchy_MeshGroup_16px,
 			Hierarchy_Animation_16px,
 			Hierarchy_Param_16px,
+			Hierarchy_MeshSendMask_16px,
+			Hierarchy_MeshReceiveMask_16px,
 
 			Hierarchy_All,
 			Hierarchy_None,
@@ -275,6 +278,8 @@ namespace AnyPortrait
 			MeshEdit_MirrorAxis_Y,
 			MeshEdit_MirrorCopy_X,
 			MeshEdit_MirrorCopy_Y,
+			MeshEdit_MirrorMove_X,
+			MeshEdit_MirrorMove_Y,
 
 			MeshEdit_Area,
 			MeshEdit_AreaEditing,
@@ -559,6 +564,7 @@ namespace AnyPortrait
 			GUI_ViewStat_BoneOutline,
 			GUI_ViewStat_DisablePhysics,
 			GUI_ViewStat_MeshHidden,
+			GUI_ViewStat_MaskMeshHidden,
 			GUI_ViewStat_OnionSkin,
 			GUI_ViewStat_PresetVisible,
 			GUI_ViewStat_Rotoscoping,
@@ -581,16 +587,18 @@ namespace AnyPortrait
 			MaterialSetIcon_LitSpecular,
 			MaterialSetIcon_LitSpecularEmission,
 			MaterialSetIcon_LitRim,
-			MaterialSetIcon_LitRamp,
+			MaterialSetIcon_LitRamp,			
 			MaterialSetIcon_FX,
 			MaterialSetIcon_Cartoon,
 			MaterialSetIcon_Custom1,
 			MaterialSetIcon_Custom2,
 			MaterialSetIcon_Custom3,
-			MaterialSetIcon_UnlitVR,
+			MaterialSetIcon_UnlitVR,			
 			MaterialSetIcon_LitVR,
 			MaterialSetIcon_MergeableUnlit,
 			MaterialSetIcon_MergeableLit,
+			MaterialSetIcon_UnlitMask,
+			MaterialSetIcon_LitMask,
 			MaterialSet_BasicSettings,
 			MaterialSet_ShaderProperties,
 			MaterialSet_Shaders,
@@ -631,6 +639,26 @@ namespace AnyPortrait
 
 			Unity_Transform,
 			Controller_Snapshot,
+
+			SendMaskDataIcon_Alpha,
+			SendMaskDataIcon_MainTexWithColor,
+			SendMaskDataIcon_MainTexOnly,
+			SendMaskDataIcon_Custom,
+			SendMaskDataIcon_Error,
+			SendMaskDataIcon_Clipping,
+			SendMaskDataIcon_Shared,
+			SendMaskDataIcon_Chain,
+
+			MGSetting_Clipping,
+			MGSetting_OpenMask,
+			MGSetting_RenderAsMask,
+
+			Compatibility_Okay,
+			Compatibility_Warning,
+			Compatibility_Open,
+			Compatibility_20px_Fix,
+			Compatibility_20px_Manual,
+			Compatibility_20px_MatLib,
 
 			
 		}
@@ -743,6 +771,7 @@ namespace AnyPortrait
 			CheckImageAndLoad(PRESET.ToolBtn_OnionRecord, "ButtonIcon_OnionRecord", true);
 			CheckImageAndLoad(PRESET.ToolBtn_OnionView, "ButtonIcon_OnionView", true);
 			CheckImageAndLoad(PRESET.ToolBtn_MeshVisible, "ButtonIcon_Mesh", true);
+			CheckImageAndLoad(PRESET.ToolBtn_MeshVisibleWithMask, "ButtonIcon_MeshWithMask", true);
 			CheckImageAndLoad(PRESET.ToolBtn_TabOpen,	"ButtonIcon_TabOpen", true);
 			CheckImageAndLoad(PRESET.ToolBtn_TabFolded,	"ButtonIcon_TabFolded", true);
 			CheckImageAndLoad(PRESET.ToolBtn_MaterialLibrary,	"ButtonIcon_MaterialLibrary", true);
@@ -782,6 +811,8 @@ namespace AnyPortrait
 			CheckImageAndLoad(PRESET.Hierarchy_MeshGroup_16px,	"HierarchyIcon_MeshGroup_16px");
 			CheckImageAndLoad(PRESET.Hierarchy_Animation_16px,	"HierarchyIcon_Animation_16px");
 			CheckImageAndLoad(PRESET.Hierarchy_Param_16px,		"HierarchyIcon_Param_16px");
+			CheckImageAndLoad(PRESET.Hierarchy_MeshSendMask_16px,	"HierarchyIcon_MeshSendMask_16px");//추가 v1.6.0
+			CheckImageAndLoad(PRESET.Hierarchy_MeshReceiveMask_16px,	"HierarchyIcon_MeshReceiveMask_16px");
 
 			CheckImageAndLoad(PRESET.Hierarchy_Modifier, "HierarchyIcon_Modifier");
 			CheckImageAndLoad(PRESET.Hierarchy_Bone, "HierarchyIcon_Bone");
@@ -980,6 +1011,8 @@ namespace AnyPortrait
 			CheckImageAndLoad(PRESET.MeshEdit_MirrorAxis_Y,		"MeshEdit_MirrorAxis_Y");
 			CheckImageAndLoad(PRESET.MeshEdit_MirrorCopy_X,		"MeshEdit_MirrorCopy_X");
 			CheckImageAndLoad(PRESET.MeshEdit_MirrorCopy_Y,		"MeshEdit_MirrorCopy_Y");
+			CheckImageAndLoad(PRESET.MeshEdit_MirrorMove_X,		"MeshEdit_MirrorMove_X");
+			CheckImageAndLoad(PRESET.MeshEdit_MirrorMove_Y,		"MeshEdit_MirrorMove_Y");
 
 			CheckImageAndLoad(PRESET.MeshEdit_Area,				"MeshEdit_Area");
 			CheckImageAndLoad(PRESET.MeshEdit_AreaEditing,		"MeshEdit_AreaEditing");
@@ -1279,6 +1312,7 @@ namespace AnyPortrait
 			CheckImageAndLoad(PRESET.GUI_ViewStat_BoneOutline,		"GUI_ViewStat_BoneOutline");
 			CheckImageAndLoad(PRESET.GUI_ViewStat_DisablePhysics,	"GUI_ViewStat_DisablePhysics");
 			CheckImageAndLoad(PRESET.GUI_ViewStat_MeshHidden,		"GUI_ViewStat_MeshHidden");
+			CheckImageAndLoad(PRESET.GUI_ViewStat_MaskMeshHidden,	"GUI_ViewStat_MaskMeshHidden");
 			CheckImageAndLoad(PRESET.GUI_ViewStat_OnionSkin,		"GUI_ViewStat_OnionSkin");
 			CheckImageAndLoad(PRESET.GUI_ViewStat_PresetVisible,	"GUI_ViewStat_PresetVisible");
 			CheckImageAndLoad(PRESET.GUI_ViewStat_Rotoscoping,		"GUI_ViewStat_Rotoscoping");
@@ -1311,6 +1345,9 @@ namespace AnyPortrait
 			CheckImageAndLoad(PRESET.MaterialSetIcon_LitVR,		"MaterialSetIcon_LitVR");
 			CheckImageAndLoad(PRESET.MaterialSetIcon_MergeableUnlit,	"MaterialSetIcon_MergeableUnlit");
 			CheckImageAndLoad(PRESET.MaterialSetIcon_MergeableLit,		"MaterialSetIcon_MergeableLit");
+
+			CheckImageAndLoad(PRESET.MaterialSetIcon_UnlitMask,		"MaterialSetIcon_UnlitMask");
+			CheckImageAndLoad(PRESET.MaterialSetIcon_LitMask,		"MaterialSetIcon_LitMask");
 
 			CheckImageAndLoad(PRESET.MaterialSet_BasicSettings,		"MaterialSet_BasicSettings");
 			CheckImageAndLoad(PRESET.MaterialSet_ShaderProperties,	"MaterialSet_ShaderProperties");
@@ -1353,6 +1390,26 @@ namespace AnyPortrait
 
 			CheckImageAndLoad(PRESET.Unity_Transform,		"Unity_Transform");
 			CheckImageAndLoad(PRESET.Controller_Snapshot,	"Controller_Snapshot");
+
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_Alpha,				"SendMaskDataIcon_Alpha");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_MainTexWithColor,		"SendMaskDataIcon_MainTexWithColor");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_MainTexOnly,			"SendMaskDataIcon_MainTexOnly");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_Custom,				"SendMaskDataIcon_Custom");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_Error,				"SendMaskDataIcon_Error");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_Clipping,				"SendMaskDataIcon_Clipping");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_Shared,				"SendMaskDataIcon_Shared");
+			CheckImageAndLoad(PRESET.SendMaskDataIcon_Chain,				"SendMaskDataIcon_Chain");
+
+			CheckImageAndLoad(PRESET.MGSetting_Clipping,		"MGSetting_Clipping");
+			CheckImageAndLoad(PRESET.MGSetting_OpenMask,		"MGSetting_OpenMask");
+			CheckImageAndLoad(PRESET.MGSetting_RenderAsMask,	"MGSetting_RenderAsMask");
+
+			CheckImageAndLoad(PRESET.Compatibility_Okay,		"Compatibility_Okay");
+			CheckImageAndLoad(PRESET.Compatibility_Warning,		"Compatibility_Warning");
+			CheckImageAndLoad(PRESET.Compatibility_Open,		"Compatibility_Open");
+			CheckImageAndLoad(PRESET.Compatibility_20px_Fix,	"Compatibility_20px_Fix");
+			CheckImageAndLoad(PRESET.Compatibility_20px_Manual,	"Compatibility_20px_Manual");
+			CheckImageAndLoad(PRESET.Compatibility_20px_MatLib,	"Compatibility_20px_MatLib");
 			
 			
 			

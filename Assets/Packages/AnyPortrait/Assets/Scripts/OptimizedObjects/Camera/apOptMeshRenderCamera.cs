@@ -30,7 +30,6 @@ namespace AnyPortrait
 	{
 		// Members
 		//-----------------------------------------------
-		
 		public class CameraRenderData
 		{
 			//기본 데이터
@@ -101,7 +100,7 @@ namespace AnyPortrait
 				_multiCamController = _camera.gameObject.GetComponent<apOptMultiCameraController>();
 				if(_multiCamController == null)
 				{
-					_multiCamController = _camera.gameObject.AddComponent<apOptMultiCameraController>();
+					_multiCamController = _camera.gameObject.AddComponent<apOptMultiCameraController>();					
 					_multiCamController.Init();
 				}
 
@@ -640,6 +639,7 @@ namespace AnyPortrait
 				return;
 			}
 
+			Debug.LogError("SetPreRenderedEvent : " + _renderCameraType + " / " + _nCameras);
 			for (int i = 0; i < _nCameras; i++)
 			{
 				_cameraRenderDataList[i].MakeAndLinkMultiCameraController(funcMeshPreRendered);

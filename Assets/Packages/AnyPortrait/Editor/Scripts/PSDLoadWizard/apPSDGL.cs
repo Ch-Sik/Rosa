@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -847,11 +847,12 @@ namespace AnyPortrait
 					bool isRenderTexture = false;
 					if (iPass == 1)
 					{
+						//두번째 패스는 Render Texture에 한다.
 						isRenderTexture = true;
 					}
 					
 					//변경 21.5.19
-					_matBatch.BeginPass_Mask(GL.TRIANGLES, textureColor, mesh.LinkedTextureData._image, 0.0f, renderUnit.ShaderType, isRenderTexture, false, Vector4.zero);
+					_matBatch.BeginPass_Mask(GL.TRIANGLES, textureColor, mesh.LinkedTextureData._image, 0.0f, renderUnit.ShaderType, true, isRenderTexture, false, Vector4.zero);
 					//_matBatch.SetClippingSize(_glScreenClippingSize);
 					//GL.Begin(GL.TRIANGLES);
 
@@ -985,8 +986,7 @@ namespace AnyPortrait
 					_matBatch.BeginPass_Clipped(GL.TRIANGLES, clipRenderUnit._meshTransform._meshColor2X_Default, 
 												clipMesh.LinkedTextureData._image, 
 												0.0f, 
-												clipRenderUnit.ShaderType, 
-												renderUnit._meshTransform._meshColor2X_Default);
+												clipRenderUnit.ShaderType/*, renderUnit._meshTransform._meshColor2X_Default*/);
 					
 					//_matBatch.SetClippingSize(_glScreenClippingSize);
 					//GL.Begin(GL.TRIANGLES);

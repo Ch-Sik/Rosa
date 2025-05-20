@@ -903,6 +903,8 @@ namespace AnyPortrait
 						{
 							//본이 선택되었다.
 							//변경 20.6.30 : 통합된 함수
+							//Debug.Log("Gizmo Bone 선택");
+
 							Editor.Select.SelectSubObject(null, null, resultBone, multiSelect, apSelection.TF_BONE_SELECT.Exclusive);
 
 							isBoneSelected = true;
@@ -2361,173 +2363,6 @@ namespace AnyPortrait
 				return;
 			}
 
-
-
-			#region [미사용 코드] 단일 선택 및 처리
-			//apAnimTimeline animTimeline = Editor.Select.AnimTimeline;
-			//apAnimTimelineLayer animTimelineLayer = Editor.Select.AnimTimelineLayer_Main;
-			//apModifierBase linkedModifier = Editor.Select.AnimTimeline._linkedModifier;
-			//apAnimKeyframe workKeyframe = Editor.Select.AnimWorkKeyframe_Main;
-
-			//if(workKeyframe == null)
-			//{
-			//	//추가 : 5.29
-			//	//키프레임이 없을 때 "AutoKey"가 켜져 있다면, 키프레임을 빠르게 만든다.
-			//	//Bone IK에 의해 Keyframe이 생성된 것과 달리 이때는 Link를 해야한다. (파라미터 확인)
-			//	if(Editor._isAnimAutoKey && animTimelineLayer != null)
-			//	{
-			//		apAnimKeyframe autoCreatedKeyframe = Editor.Controller.AddAnimKeyframe(Editor.Select.AnimClip.CurFrame, animTimelineLayer, true, false, false, true);
-			//		if(autoCreatedKeyframe != null)
-			//		{
-			//			Editor.Select.AutoSelectAnimTimelineLayer(true);
-			//			workKeyframe = Editor.Select.AnimWorkKeyframe_Main;
-			//		}
-			//	}
-			//}
-
-
-			//apModifiedMesh modMesh = Editor.Select.ModMesh_Main;
-			//apModifiedBone modBone = Editor.Select.ModBone_Main;
-			//apRenderUnit targetRenderUnit = Editor.Select.RenderUnitOfMod_Main;
-			//apMeshGroup targetMeshGroup = Editor.Select.AnimClip._targetMeshGroup;
-
-			//if (linkedModifier == null || workKeyframe == null)
-			//{
-			//	//수정할 타겟이 없다.
-			//	return;
-			//}
-
-			//bool isTargetTransform = modMesh != null && targetRenderUnit != null && (modMesh._transform_Mesh != null || modMesh._transform_MeshGroup != null);
-			//bool isTargetBone = linkedModifier.IsTarget_Bone && modBone != null && Editor.Select.Bone != null;
-
-			//if (!isTargetTransform && !isTargetBone)
-			//{
-			//	//둘다 해당사항이 없다.
-			//	Debug.LogError("Rotate Failed - " + isTargetTransform + " / " + isTargetBone);
-			//	return;
-			//}
-
-
-			////Undo
-			//if(isFirstRotate)
-			//{
-			//	apEditorUtil.SetRecord_Modifier(apUndoGroupData.ACTION.Anim_Gizmo_RotateTransform, Editor, linkedModifier, targetRenderUnit, false);
-			//}
-
-
-			//if (isTargetTransform)
-			//{
-			//	apMatrix resultMatrix = null;
-
-			//	apMatrix matx_ToParent = null;
-			//	//apMatrix matx_LocalModified = null;
-			//	apMatrix matx_ParentWorld = null;
-
-
-			//	if (modMesh._isMeshTransform)
-			//	{
-			//		if (modMesh._transform_Mesh != null)
-			//		{
-			//			resultMatrix = modMesh._transform_Mesh._matrix_TFResult_World;
-
-			//			matx_ToParent = modMesh._transform_Mesh._matrix_TF_ToParent;
-			//			//matx_LocalModified = modMesh._transform_Mesh._matrix_TF_LocalModified;
-			//			matx_ParentWorld = modMesh._transform_Mesh._matrix_TF_ParentWorld;
-			//		}
-			//	}
-			//	else
-			//	{
-			//		if (modMesh._transform_MeshGroup != null)
-			//		{
-			//			resultMatrix = modMesh._transform_MeshGroup._matrix_TFResult_World;
-
-			//			matx_ToParent = modMesh._transform_MeshGroup._matrix_TF_ToParent;
-			//			//matx_LocalModified = modMesh._transform_MeshGroup._matrix_TF_LocalModified;
-			//			matx_ParentWorld = modMesh._transform_MeshGroup._matrix_TF_ParentWorld;
-			//		}
-			//	}
-
-			//	if (resultMatrix == null)
-			//	{
-			//		return;
-			//	}
-
-
-			//	apMatrix nextWorldMatrix = new apMatrix(resultMatrix);
-			//	nextWorldMatrix.SetRotate(resultMatrix._angleDeg + deltaAngleW);//각도 변경
-
-			//	//ToParent x LocalModified x ParentWorld = Result
-			//	//LocalModified = ToParent-1 x (Result' x ParentWorld-1) < 결합법칙 성립 안되므로 연산 순서 중요함
-			//	apMatrix nextLocalModifiedMatrix = apMatrix.RReverseInverse(matx_ToParent, apMatrix.RInverse(nextWorldMatrix, matx_ParentWorld));
-
-			//	//변경 20.1.21 : 각도 제한이 "무조건" > "옵션에 따라"로 변경
-			//	float nextLocalAngle = nextLocalModifiedMatrix._angleDeg;
-			//	//180각도 제한 옵션 확인후 각도 수정
-			//	if(Editor._isAnimRotation180Lock)
-			//	{
-			//		nextLocalAngle = apUtil.AngleTo180(nextLocalAngle);
-			//	}
-
-			//	modMesh._transformMatrix.SetTRS(	nextLocalModifiedMatrix._pos,
-			//											nextLocalAngle,
-			//											modMesh._transformMatrix._scale);
-
-			//	modMesh.RefreshValues_Check(Editor._portrait);
-
-			//	//apCalculatedLog.InverseResult calResult = modMesh.CalculatedLog.World2ModLocalPos_TransformRotationScaling(deltaAngleW, Vector2.zero);
-
-			//	//modMesh._transformMatrix.SetRotate(modMesh._transformMatrix._angleDeg + deltaAngleW);
-
-
-			//	////Pos 보정
-			//	//if (calResult != null && calResult._isSuccess)
-			//	//{
-			//	//	modMesh._transformMatrix.SetPos(calResult._posL_next);
-			//	//}
-
-
-			//	//modMesh._transformMatrix.MakeMatrix();
-
-			//	//이전 코드 : 전체 Refresh
-			//	//Editor.Select.AnimClip.UpdateMeshGroup_Editor(true, 0.0f, true);
-
-			//	//변경 : 일부만 강제 Refresh하고 나머지는 정상 Update 하도록 지시
-			//	if (targetMeshGroup != null)
-			//	{
-			//		//targetMeshGroup.AddForceUpdateTarget(modMesh._renderUnit);
-			//		targetMeshGroup.RefreshForce();
-			//	}
-			//}
-			//else if (isTargetBone)
-			//{
-			//	apBone bone = Editor.Select.Bone;
-
-
-			//	//Default Angle은 -180 ~ 180 범위 안에 들어간다.
-			//	//float nextAngle = bone._defaultMatrix._angleDeg + deltaAngleW;
-			//	float nextAngle = modBone._transformMatrix._angleDeg + deltaAngleW;
-
-
-			//	//변경 20.1.21 : 각도 제한이 "무조건" > "옵션에 따라"로 변경
-			//	if(Editor._isAnimRotation180Lock)
-			//	{
-			//		nextAngle = apUtil.AngleTo180(nextAngle);
-			//	}
-
-			//	modBone._transformMatrix.SetRotate(nextAngle);
-
-			//	if (targetMeshGroup != null)
-			//	{
-			//		//if (modBone._renderUnit != null)
-			//		//{
-			//		//	targetMeshGroup.AddForceUpdateTarget(modBone._renderUnit);
-			//		//}
-			//		targetMeshGroup.RefreshForce();
-			//	}
-			//} 
-			#endregion
-
-
 			//변경 20.6.30 : 다중 처리
 			//여러개의 레이어 및 키프레임들을 대상으로 편집해야한다.
 			//공통으로 유지해야하는건 Timeline이면 된다.
@@ -2683,44 +2518,6 @@ namespace AnyPortrait
 						matx_ParentWorld = curModMesh._transform_MeshGroup._matrix_TF_ParentWorld;
 					}
 
-					//삭제 20.11.2
-					//if(resultMatrix == null)
-					//{
-					//	continue;
-					//}
-
-					#region [미사용 코드] 이전 방식
-					//if(_tmpNextWorldMatrix == null)
-					//{
-					//	_tmpNextWorldMatrix = new apMatrix(resultMatrix);
-					//}
-					//else
-					//{
-					//	_tmpNextWorldMatrix.SetMatrix(resultMatrix, false);
-					//}
-
-					//_tmpNextWorldMatrix.SetRotate(resultMatrix._angleDeg + deltaAngleW, true);//각도 변경
-
-					////ToParent x LocalModified x ParentWorld = Result
-					////LocalModified = ToParent-1 x (Result' x ParentWorld-1) < 결합법칙 성립 안되므로 연산 순서 중요함
-					//apMatrix nextLocalModifiedMatrix = apMatrix.RReverseInverse(matx_ToParent, apMatrix.RInverse(_tmpNextWorldMatrix, matx_ParentWorld, true));
-
-					////변경 20.1.21 : 각도 제한이 "무조건" > "옵션에 따라"로 변경
-					//float nextLocalAngle = nextLocalModifiedMatrix._angleDeg;
-					////180각도 제한 옵션 확인후 각도 수정
-					//if(Editor._isAnimRotation180Lock)
-					//{
-					//	nextLocalAngle = apUtil.AngleTo180(nextLocalAngle);
-					//}
-
-					//curModMesh._transformMatrix.SetTRS(	nextLocalModifiedMatrix._pos,
-					//									nextLocalAngle,
-					//									curModMesh._transformMatrix._scale,
-					//									true); 
-					#endregion
-
-
-
 					//변경 20.11.1 : localModified Matrix는 apMatrixCal의 CalculateLocalPos_ModMesh 함수로 인해서 값이 변하기 때문에 사용 불가
 					//따라서 WorldMatrix를 직접 계산해야한다.
 					//추가 : 각도를 바꿀때, 위치도 보존해야한다.
@@ -2762,10 +2559,6 @@ namespace AnyPortrait
 						//각도 제한이 없는 경우
 						curModMesh._transformMatrix.SetRotate(_tmpNextWorldMatrix._angleDeg, true);
 					}
-
-					
-					
-
 					//nCalculated_Mesh++;
 				}
 			}
@@ -8020,21 +7813,6 @@ namespace AnyPortrait
 			apModifierBase linkedModifier = Editor.Select.AnimTimeline._linkedModifier;
 
 			
-
-			//이전
-			//apAnimKeyframe workKeyframe = Editor.Select.AnimWorkKeyframe_Main;
-			//apModifiedMesh targetModMesh = Editor.Select.ModMesh_Main;
-			//apModifiedBone targetModBone = Editor.Select.ModBone_Main;
-			//apRenderUnit targetRenderUnit = Editor.Select.RenderUnitOfMod_Main;
-
-			//if (linkedModifier == null || workKeyframe == null)
-			//{
-			//	//수정할 타겟이 없다.
-			//	//추가 5.29 : AutoKey일 수 있으니 별도의 리턴 함수를 이용한다.
-			//	//return null;
-			//	return GetPivotReturnWhenAutoKey_Transform();
-			//}
-
 			//>> [GizmoMain]
 
 			//다중 선택 + [기즈모 메인]에 
@@ -8044,6 +7822,20 @@ namespace AnyPortrait
 			if (linkedModifier == null || Editor.Select.AnimWorkKeyframe_Main == null 
 				|| (Editor.Select.ModMesh_Main == null && Editor.Select.ModBone_Main == null))
 			{
+				// Debug.LogError("NoTarget");
+				// if(Editor.Select.AnimWorkKeyframe_Main == null)
+				// {
+				// 	Debug.LogError("> WorkKeyframe is Null");
+				// }
+				// if(Editor.Select.ModBone_Main == null)
+				// {
+				// 	Debug.LogError("> ModBone is Null");
+				// }
+				// if(Editor.Select.ModBone_Gizmo_Main != null)
+				// {
+				// 	Debug.LogError("> GizmoBone is Not Null");
+				// }
+
 				//수정할 타겟이 없다.
 				//AutoKey일 수 있으니 별도의 리턴 함수를 이용한다.
 				return GetPivotReturnWhenAutoKey_Transform();

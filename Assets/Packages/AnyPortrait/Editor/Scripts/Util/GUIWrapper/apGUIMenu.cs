@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -46,7 +46,8 @@ namespace AnyPortrait
 			InvertBackground,//추가 21.10.6
 			
 
-			Mesh,
+			Mesh_Show,
+			MeshMask_Show,
 			Bone_Show,
 			Bone_Outline,
 			Physics,
@@ -187,9 +188,14 @@ namespace AnyPortrait
 				newGenericMenu.AddSeparator(STR_EMPTY);
 				//"Show Meshes"
 				newGenericMenu.AddItem(	MakeTextHotkey(apHotKeyMapping.KEY_TYPE.ToggleMeshVisibility, _editor.GetUIWord(UIWORD.GUIMenu_ShowMeshes)), 
-										_editor._meshGUIRenderMode == apEditor.MESH_RENDER_MODE.Render, 
+										_editor._meshGUIRenderMode == apEditor.MESH_RENDER_MODE.RenderAll, 
 										callback, 
-										MakeParam(MENU_ITEM__GUIVIEW.Mesh));
+										MakeParam(MENU_ITEM__GUIVIEW.Mesh_Show));
+
+				newGenericMenu.AddItem(	MakeTextHotkey(apHotKeyMapping.KEY_TYPE.ToggleMeshVisibility, _editor.GetUIWord(UIWORD.GUIMenu_ShowMeshesWithoutMask)), 
+										_editor._meshGUIRenderMode == apEditor.MESH_RENDER_MODE.RenderWithOutMask, 
+										callback, 
+										MakeParam(MENU_ITEM__GUIVIEW.MeshMask_Show));
 
 				newGenericMenu.AddSeparator(STR_EMPTY);
 				//"Show Bones (B)"

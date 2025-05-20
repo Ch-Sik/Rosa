@@ -68,9 +68,18 @@ namespace AnyPortrait
 		[SerializeField]
 		public Shader _customShader = null;
 
-		public enum RENDER_TEXTURE_SIZE
+		public enum RENDER_TEXTURE_SIZE : int
 		{
-			s_64, s_128, s_256, s_512, s_1024
+			s_64 = 0,
+			s_128 = 1,
+			s_256 = 2,
+			s_512 = 3,
+			s_1024 = 4,
+			FullScreen = 5,
+			HalfScreen = 6,//면적 1/2
+			QuarterScreen = 7,//면적 1/4 (축 1/2)
+			MaxFHD = 8,//Full HD 이하 (1080p)
+			MaxHD = 9,//HD 이하 (720p)
 		}
 
 		[SerializeField]
@@ -287,6 +296,14 @@ namespace AnyPortrait
 		[SerializeField]
 		public List<CustomMaterialProperty> _customMaterialProperties = new List<CustomMaterialProperty>();
 
+		//[v1.6.0] 마스크 전달 정보
+		[SerializeField] public List<apSendMaskData> _sendMaskDataList = new List<apSendMaskData>();
+
+		//[1.6.0] 마스크를 받는 경우의 연결 정보
+		[NonSerialized] public List<apMaskLinkInfo> _linkedReceivedMasks = null;
+
+		//[v1.6.0] 마스크 전용 메시 (렌더링 안함)
+		[SerializeField] public bool _isMaskOnlyMesh = false;
 
 		// Init
 		//--------------------------------------------
@@ -644,36 +661,13 @@ namespace AnyPortrait
 				_clipChildMeshes = new List<ClipMeshSet>();
 			}
 			_clipChildMeshes.Clear();
-
-
-			//미사용 코드
-			//for (int i = 0; i < 3; i++)
-			//{
-			//	_clipChildMeshTransformIDs[i] = -1;
-			//	_clipChildMeshTransforms[i] = null;
-			//	_clipChildRenderUnits[i] = null;
-			//}
 		}
 
 
-		//삭제 v1.5.0 : ClipMeshSet에서 MeshTF만 저장하기로 하면서 이 클래스가 필요 없어졌다.
-		// private class RenderUnitTransformMeshSet
-		// {
-		// 	public apTransform_Mesh _meshTransform = null;
-		// 	public apRenderUnit _renderUnit = null;
-		// 	public RenderUnitTransformMeshSet(apTransform_Mesh meshTransform, apRenderUnit renderUnit)
-		// 	{
-		// 		_meshTransform = meshTransform;
-		// 		_renderUnit = renderUnit;
-		// 	}
-		// }
 		public void SortClipMeshTransforms()
 		{
 			if (_isClipping_Parent)
 			{
-				//이전
-				//List<RenderUnitTransformMeshSet> childList = new List<RenderUnitTransformMeshSet>();
-
 				//변경 v1.5.0 : RenderUnit 없이 MeshTF 만으로 Sort를 한다.
 				List<apTransform_Mesh> sortedChildMeshTFs = new List<apTransform_Mesh>();
 
@@ -688,16 +682,7 @@ namespace AnyPortrait
 						{
 							continue;
 						}
-						//이전
-						// if (!childList.Exists(delegate (RenderUnitTransformMeshSet a)
-						// {
-						// 	return a._meshTransform == clipMeshSet._meshTransform;
-						// }))
-						// {
-						// 	childList.Add(
-						// 		new RenderUnitTransformMeshSet(clipMeshSet._meshTransform,
-						// 										clipMeshSet._renderUnit));
-						// }
+						
 						//변경 v1.5.0
 						if(!sortedChildMeshTFs.Contains(clipMeshSet._meshTransform))
 						{
@@ -710,12 +695,6 @@ namespace AnyPortrait
 
 				if (nSortedChildMeshTFs > 1)
 				{
-					//이전
-					// childList.Sort(delegate (RenderUnitTransformMeshSet a, RenderUnitTransformMeshSet b)
-					// {
-					// 	//Depth의 오름차순
-					// 	return a._meshTransform._depth - b._meshTransform._depth;
-					// });
 					//변경 v1.5.0 : MeshTF 리스트로 변경
 					sortedChildMeshTFs.Sort(delegate (apTransform_Mesh a, apTransform_Mesh b)
 					{
@@ -733,21 +712,9 @@ namespace AnyPortrait
 				}
 				else
 				{
-					//이전
-					// RenderUnitTransformMeshSet childRenderUnitMeshSet = null;
-
-					// //리스트 순서대로 다시 재배치하자
-					// for (int i = 0; i < childList.Count; i++)
-					// {
-					// 	childRenderUnitMeshSet = childList[i];
-					// 	_clipChildMeshes.Add(new ClipMeshSet(childRenderUnitMeshSet._meshTransform, childRenderUnitMeshSet._renderUnit));
-					// 	childRenderUnitMeshSet._meshTransform._clipParentMeshTransform = this;
-					// 	childRenderUnitMeshSet._meshTransform._clipIndexFromParent = i;
-					// 	childRenderUnitMeshSet._meshTransform._isClipping_Child = true;
-					// }
-
 					//변경 v1.5.0 : MeshTF만으로 Child 구성하기
 					apTransform_Mesh curMeshTF = null;
+
 					//리스트 순서대로 다시 재배치하자
 					for (int i = 0; i < nSortedChildMeshTFs; i++)
 					{
@@ -768,16 +735,8 @@ namespace AnyPortrait
 				return -1;
 			}
 			return _clipChildMeshes.Count;
-			//int nID = 0;
-			//for (int i = 0; i < 3; i++)
-			//{
-			//	if(_clipChildMeshTransformIDs[i] >= 0)
-			//	{
-			//		nID++;
-			//	}
-			//}
-			//return nID;
 		}
+
 
 		public void AddClippedChildMesh(apTransform_Mesh meshTransform)
 		{

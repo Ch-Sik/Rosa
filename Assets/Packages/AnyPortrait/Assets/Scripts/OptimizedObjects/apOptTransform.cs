@@ -1266,6 +1266,7 @@ namespace AnyPortrait
 
 	
 
+		[Obsolete]
 		public void UpdateMaskMeshes()
 		{
 			if (_childMesh != null)
@@ -1794,6 +1795,7 @@ namespace AnyPortrait
 			}
 		}
 
+		[Obsolete]
 		public void ResetCommandBuffer(bool isRegistToCamera)
 		{
 			if (_childMesh != null)

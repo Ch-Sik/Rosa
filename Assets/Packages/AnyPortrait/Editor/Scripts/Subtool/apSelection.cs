@@ -1000,6 +1000,9 @@ namespace AnyPortrait
 		private apGUIContentWrapper _guiContent_Right_MeshGroup_ParamIconAndText = null;
 		private apGUIContentWrapper _guiContent_Right_MeshGroup_RemoveBone = null;
 		private apGUIContentWrapper _guiContent_Right_MeshGroup_RemoveModifier = null;
+		private apGUIContentWrapper _guiContent_Right_MeshGroup_OpenMaskDialog = null;
+		private apGUIContentWrapper _guiContent_Right_MeshGroup_WorkAsMaskOnly = null;
+		private apGUIContentWrapper _guiContent_Right_MeshGroup_Clipping = null;
 
 		private apGUIContentWrapper _guiContent_Modifier_ParamSetItem = null;
 		private apGUIContentWrapper _guiContent_Modifier_AddControlParameter = null;
@@ -1072,7 +1075,7 @@ namespace AnyPortrait
 		private apGUIContentWrapper _guiContent_MaterialSet_ON = null;
 		private apGUIContentWrapper _guiContent_MaterialSet_OFF = null;
 
-		private apGUIContentWrapper _guiContent_Right2MeshGroup_MaskParentName = null;
+		//private apGUIContentWrapper _guiContent_Right2MeshGroup_MaskParentName = null;
 		private apGUIContentWrapper _guiContent_Right2MeshGroup_DuplicateTransform = null;
 		private apGUIContentWrapper _guiContent_Right2MeshGroup_MigrateTransform = null;
 		private apGUIContentWrapper _guiContent_Right2MeshGroup_DetachObject = null;
@@ -4446,6 +4449,9 @@ namespace AnyPortrait
 			_guiContent_Right_MeshGroup_ParamIconAndText = null;
 			_guiContent_Right_MeshGroup_RemoveBone = null;
 			_guiContent_Right_MeshGroup_RemoveModifier = null;
+			_guiContent_Right_MeshGroup_OpenMaskDialog = null;
+			_guiContent_Right_MeshGroup_WorkAsMaskOnly = null;
+			_guiContent_Right_MeshGroup_Clipping = null;
 
 			_guiContent_Modifier_ParamSetItem = null;
 			_guiContent_Modifier_AddControlParameter = null;
@@ -4516,7 +4522,7 @@ namespace AnyPortrait
 			_guiContent_MaterialSet_ON = null;
 			_guiContent_MaterialSet_OFF = null;
 
-			_guiContent_Right2MeshGroup_MaskParentName = null;
+			//_guiContent_Right2MeshGroup_MaskParentName = null;
 			_guiContent_Right2MeshGroup_DuplicateTransform = null;
 			_guiContent_Right2MeshGroup_MigrateTransform = null;
 			_guiContent_Right2MeshGroup_DetachObject = null;

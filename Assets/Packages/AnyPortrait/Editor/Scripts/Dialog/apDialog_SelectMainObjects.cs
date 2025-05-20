@@ -347,6 +347,8 @@ namespace AnyPortrait
 				guiStyle_Selected.normal.textColor = Color.white;
 				guiStyle_None.normal.textColor = Color.black;
 			}
+			guiStyle_None.alignment = TextAnchor.MiddleLeft;//v1.6.0
+			guiStyle_Selected.alignment = TextAnchor.MiddleLeft;//v1.6.0
 
 
 			int height_ListItem = 24;

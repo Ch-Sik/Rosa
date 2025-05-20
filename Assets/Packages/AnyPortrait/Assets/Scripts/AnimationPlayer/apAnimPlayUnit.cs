@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -161,7 +161,8 @@ namespace AnyPortrait
 		private bool _isLoop = false;
 
 		private bool _isPlayStartEventCalled = false;
-		private bool _isEndEventCalled = false;
+		private bool _isEndEventCalled = false;//<<이건 용도가 애매해짐
+		private bool _isLastFramePlayedEventCalled = false;//<<Loop가 아닌 애니메이션이 마지막 프레임에 도달했을 때의 이벤트 호출 여부
 
 		//public float FadeInTime { get { return _fadeInTime; } }
 		//public float FadeOutTime { get { return _fadeOutTime; } }
@@ -199,9 +200,6 @@ namespace AnyPortrait
 
 		//[NonSerialized]
 		//private bool _isMecanimLoopingFrame = false;
-
-		
-
 
 
 		// Init
@@ -266,6 +264,7 @@ namespace AnyPortrait
 			_playStatus = PLAY_STATUS.Ready;
 			_isPlayStartEventCalled = false;
 			_isEndEventCalled = false;
+			_isLastFramePlayedEventCalled = false;//v1.6.0
 
 			
 			//_speedRatio = 1.0f;
@@ -332,148 +331,7 @@ namespace AnyPortrait
 
 		// Update
 		//-----------------------------------------------
-		#region [미사용 코드] UnitWeight를 계산하는건 외부에서 일괄적으로 한다. 자체적으로 하면 문제가 많다.
-		///// <summary>
-		///// Update 직전에 UnitWeight를 계산한다.
-		///// 유효하지 않을 경우 -1 리턴.
-		///// 꼭 Update 직전에 호출해야한다.
-		///// 실제 Clip 업데이트 전에 타이머/스테이트 처리등을 수행한다.
-		///// </summary>
-		///// <returns></returns>
-		//public float CalculateUnitWeight(float tDelta)
-		//{
-		//	_tmpIsEnd = false;
-
-		//	if(_linkedAnimClip._parentPlayUnit != this)
-		//	{
-		//		return -1.0f;
-		//	}
-
-		//	PLAY_STATUS requestedNextPlayStatus = _nextPlayStatus;
-
-		//	switch (_playStatus)
-		//	{
-		//		case PLAY_STATUS.Ready:
-		//			{
-		//				if (_isFirstFrame)
-		//				{
-		//					_unitWeight = 0.0f;
-		//					//_prevUnitWeight = 0.0f;
-		//				}
-		//				//if (!_isPause)
-		//				//{
-		//				//	if (_isDelayIn)
-		//				//	{
-		//				//		//딜레이 후에 플레이된다.
-		//				//		_tDelay += tDelta;
-		//				//		if (_tDelay > _delayToPlayTime)
-		//				//		{
-		//				//			_unitWeight = 0.0f;
-		//				//			_isDelayIn = false;
-		//				//			ChangeNextStatus(PLAY_STATUS.PlayWithFadeIn);//<<플레이 된다.
-		//				//		}
-		//				//	}
-		//				//}
-		//			}
-		//			break;
-
-
-		//		//case PLAY_STATUS.PlayWithFadeIn:
-		//		//	{
-		//		//		if(_isFirstFrame)
-		//		//		{
-		//		//			_tFade = 0.0f;
-		//		//			_prevUnitWeight = _unitWeight;
-		//		//		}
-		//		//		if (!_isPause)
-		//		//		{
-		//		//			_tFade += tDelta;
-
-		//		//			if (_tFade < _fadeInTime)
-		//		//			{
-		//		//				_unitWeight = (_prevUnitWeight * (_fadeInTime - _tFade) + 1.0f * _tFade) / _fadeInTime;
-		//		//			}
-		//		//			else
-		//		//			{
-		//		//				_unitWeight = 1.0f;
-		//		//				//Fade가 끝났으면 Play
-		//		//				ChangeNextStatus(PLAY_STATUS.Play);
-		//		//			}
-		//		//		}
-		//		//	}
-		//		//	break;
-
-		//		case PLAY_STATUS.Play:
-		//			{
-		//				if(_isFirstFrame)
-		//				{
-		//					_unitWeight = 1.0f;
-		//					//_prevUnitWeight = 1.0f;
-		//				}
-
-		//				if (!_isPause)
-		//				{
-		//					//if (_isDelayOut)
-		//					//{
-		//					//	//딜레이 후에 FadeOut된다.
-		//					//	_tDelay += tDelta;
-		//					//	if (_tDelay > _delayToEndTime)
-		//					//	{
-		//					//		_isDelayOut = false;
-		//					//		_unitWeight = 1.0f;
-		//					//		ChangeNextStatus(PLAY_STATUS.PlayWithFadeOut);//<<플레이 종료를 위한 FadeOut
-		//					//	}
-		//					//}
-		//				}
-		//			}
-		//			break;
-
-		//		case PLAY_STATUS.PlayWithFadeOut:
-		//			{
-		//				if(_isFirstFrame)
-		//				{
-		//					_tFade = 0.0f;
-		//					_prevUnitWeight = _unitWeight;
-		//				}
-
-		//				if (!_isPause)
-		//				{
-		//					_tFade += tDelta;
-
-		//					if (_tFade < _fadeOutTime)
-		//					{
-		//						_unitWeight = (_prevUnitWeight * (_fadeOutTime - _tFade) + 0.0f * _tFade) / _fadeOutTime;
-		//					}
-		//					else
-		//					{
-		//						_unitWeight = 0.0f;
-		//						ChangeNextStatus(PLAY_STATUS.End);
-		//					}
-		//				}
-		//			}
-		//			break;
-
-
-		//		case PLAY_STATUS.End:
-		//			{
-		//				//아무것도 안합니더
-		//				if(_isFirstFrame)
-		//				{
-		//					//Debug.Log("End");
-		//					_unitWeight = 0.0f;
-		//				}
-
-		//			}
-		//			break;
-		//	}
-
-		//	if(_playOrder == 0)
-		//	{
-		//		return 1.0f;
-		//	}
-		//	return _unitWeight;
-		//} 
-		#endregion
+		
 
 		/// <summary>
 		/// [Please do not use it]
@@ -556,12 +414,8 @@ namespace AnyPortrait
 							}
 							_isResetFrameOnReadyStatus = true;//True가 기본값
 						}
-						
 					}
 					break;
-
-
-				
 
 				case PLAY_STATUS.Play:
 					{
@@ -609,12 +463,31 @@ namespace AnyPortrait
 					break;
 			}
 
-			if (_tmpIsEnd && _isAutoEnd)
+			//업데이트 종료시의 처리
+			if(_tmpIsEnd)
 			{
-				//종료가 되었다면 (일단 Loop는 아니라는 것)
-				//조건에 따라 End로 넘어가자
-				SetEnd();
+				//v1.6.0
+				//Loop가 아닌 타입인 경우 Update Ended가 발생했다면
+				if(!_isLoop && !_isLastFramePlayedEventCalled)
+				{
+					//Debug.Log("애니메이션 종료 : " + _linkedAnimClip._name + " / " + _playStatus + " >> " + _nextPlayStatus);
+					_parentQueue.OnNotLoopAnimPlayUnitEnded(this);
+					_isLastFramePlayedEventCalled = true;
+				}
+
+				//자동 종료 옵션이 켜진 경우는 실제로 종료를 한다.
+				if (_isAutoEnd)
+				{
+					//종료가 되었다면 (일단 Loop는 아니라는 것)
+					//조건에 따라 End로 넘어가자
+					SetEnd();
+				}
 			}
+			
+			
+			
+
+			
 
 			//스테이트 처리
 			//if(_nextPlayStatus != _playStatus)
@@ -810,6 +683,7 @@ namespace AnyPortrait
 				
 				_isPlayStartEventCalled = false;
 				_isEndEventCalled = false;
+				_isLastFramePlayedEventCalled = false;//v1.6.0
 
 				//바로 시작
 				ChangeNextStatus(PLAY_STATUS.Play);
@@ -830,6 +704,7 @@ namespace AnyPortrait
 				
 				_isPlayStartEventCalled = false;
 				_isEndEventCalled = false;
+				_isLastFramePlayedEventCalled = false;//v1.6.0
 
 				
 				_linkedAnimClip.SetFrame_Opt(frame, true);//<<여기가 바뀜 + 자동으로 Clamp
@@ -850,6 +725,8 @@ namespace AnyPortrait
 			_isPause = false;
 			_isPlayStartEventCalled = false;
 			_isEndEventCalled = false;
+			_isLastFramePlayedEventCalled = false;//v1.6.0
+
 			ChangeNextStatus(PLAY_STATUS.Play);
 			_isFirstFrame = true;
 
@@ -866,6 +743,8 @@ namespace AnyPortrait
 			_isPause = false;
 			_isPlayStartEventCalled = false;
 			_isEndEventCalled = false;
+			_isLastFramePlayedEventCalled = false;//v1.6.0
+
 			ChangeNextStatus(PLAY_STATUS.Play);
 			_isFirstFrame = true;
 
@@ -928,6 +807,9 @@ namespace AnyPortrait
 			//_isWeightCalculated = true;
 
 			_isPlayStartEventCalled = false;
+
+			//Debug.Log("애니메이션 종료 : " + _linkedAnimClip._name + " / " + _playStatus + " >> " + _nextPlayStatus);
+
 			ChangeNextStatus(PLAY_STATUS.End);
 
 			if (isDirectStateChange)
@@ -956,6 +838,8 @@ namespace AnyPortrait
 			//_isWeightCalculated = true;
 
 			_isPlayStartEventCalled = false;
+			_isLastFramePlayedEventCalled = false;//v1.6.0
+
 			ChangeNextStatus(PLAY_STATUS.Ready);
 		}
 
@@ -968,7 +852,7 @@ namespace AnyPortrait
 			//연결된 Calculate와 연동을 끊는다.
 			if (!_isEndEventCalled)
 			{
-				_parentQueue.OnAnimPlayUnitEnded(this);
+				//_parentQueue.OnAnimPlayUnitEnded(this);
 				_isEndEventCalled = true;
 				_playStatus = PLAY_STATUS.End;
 			}
@@ -988,6 +872,8 @@ namespace AnyPortrait
 			_isPause = false;
 			_isPlayStartEventCalled = false;
 			_isEndEventCalled = false;
+			_isLastFramePlayedEventCalled = false;//v1.6.0
+
 			_isFirstFrame = true;
 			_mecanimTime = 0.0f;
 			_mecanimTimePrev = 0.0f;
@@ -1021,6 +907,7 @@ namespace AnyPortrait
 			_totalRequestWeights = 1.0f;
 			//_isWeightCalculated = true;
 			_isPlayStartEventCalled = false;
+			_isLastFramePlayedEventCalled = false;//v1.6.0
 
 			_mecanimTime = 0.0f;
 			_mecanimTimePrev = 0.0f;
@@ -1030,12 +917,15 @@ namespace AnyPortrait
 			
 		}
 
-		public void Mecanim_Update(float weight, float timeRatio, int playOrder, int playLayer, BLEND_METHOD blendMethod, float speed)
+		/// <summary>
+		/// 메카님에 의해서 애니메이션을 업데이트한다. 끝 프레임에 도달했을 때 true를 리턴한다. (재생 방향에 따라선 시작 프레임에서 true 리턴)
+		/// </summary>
+		public bool Mecanim_Update(float weight, float timeRatio, int playOrder, int playLayer, BLEND_METHOD blendMethod, float speed)
 		{
 			if(_linkedAnimClip == null)
 			{
 				//Debug.LogError("No AnimClip");
-				return;
+				return false;
 			}
 			_unitWeight = weight;
 			_totalRequestWeights = 1.0f;
@@ -1196,9 +1086,11 @@ namespace AnyPortrait
 			}
 
 			
-			_linkedAnimClip.UpdateMecanim_Opt(_mecanimDeltaTime, speed, isOverLastFrame, isOverFirstFrame);
+			bool isAnimEnded = _linkedAnimClip.UpdateMecanim_Opt(_mecanimDeltaTime, speed, isOverLastFrame, isOverFirstFrame);
 			
 			_mecanimTimePrev = _mecanimTime;
+
+			return isAnimEnded;
 		}
 
 
@@ -1344,6 +1236,18 @@ namespace AnyPortrait
 		{
 			_playOrder = playOrder;
 		}
+
+		// 외부에서 종료 이벤트 호출 대행용 함수
+		public bool IsLastFramePlayedEventCalled()
+		{
+			return _isLastFramePlayedEventCalled;
+		}
+
+		public void SetLastFramePlayedEventCalled()
+		{
+			_isLastFramePlayedEventCalled = true;
+		}
+		
 	}
 
 }

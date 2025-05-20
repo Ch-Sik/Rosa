@@ -334,6 +334,7 @@ namespace AnyPortrait
 		private string _str_Show = null;
 		private string _str_Outline = null;
 		private string _str_Hide = null;
+		private string _str_ShowWithoutMasks = null;
 
 		//메시 탭 이름
 		private string _str_Setting = null;
@@ -726,6 +727,7 @@ namespace AnyPortrait
 			_str_Show = "Show";
 			_str_Outline = "Outline";
 			_str_Hide = "Hide";
+			_str_ShowWithoutMasks = "Show Without Masks";
 
 			_str_Setting = "Setting";
 			_str_AddTool = "Add Tool";
@@ -760,6 +762,7 @@ namespace AnyPortrait
 		//-------------------------------------------
 		public static apStringFactory I { get { return s_instance; } }
 		public bool IsInitialize() { return _isInitialized; }
+		public void Uninitialize() { _isInitialized = false; }
 
 
 		//문자열들
@@ -1278,6 +1281,7 @@ namespace AnyPortrait
 		public string Show { get { return _str_Show; } }
 		public string Outline { get { return _str_Outline; } }
 		public string Hide { get { return _str_Hide; } }
+		public string ShowWithoutMasks { get { return _str_ShowWithoutMasks; } }
 
 		//메시 탭
 		public string Setting { get { return _str_Setting; } }

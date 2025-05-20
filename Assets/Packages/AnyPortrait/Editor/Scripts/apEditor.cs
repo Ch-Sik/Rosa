@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 
 using AnyPortrait;
+using UnityEngine.Rendering;
 
 namespace AnyPortrait
 {
@@ -27,6 +28,8 @@ namespace AnyPortrait
 	public partial class apEditor : EditorWindow
 	{
 		private static apEditor s_window = null;
+
+		
 
 		public static bool IsOpen()
 		{
@@ -66,6 +69,9 @@ namespace AnyPortrait
 				try
 				{	
 					s_window._isLockOnEnable = true;
+
+					//삭제할때는 리스트에 먼저 넣고 삭제한다.
+					s_window.SetClosedEditor();
 					s_window.Close();
 					s_window = null;
 				}
@@ -117,6 +123,7 @@ namespace AnyPortrait
 			{
 				try
 				{
+					s_window.SetClosedEditor();
 					s_window.Close();
 				}
 				catch (Exception ex)
@@ -167,6 +174,7 @@ namespace AnyPortrait
 			//로토스코핑 초기화 (21.2.28)
 			_isEnableRotoscoping = false;
 			_selectedRotoscopingData = null;
+
 			if(Rotoscoping != null)
 			{
 				Rotoscoping.DestroyAllImages();
@@ -174,88 +182,143 @@ namespace AnyPortrait
 
 			//가이드라인 (21.6.4)
 			_isEnableGuideLine = false;
+
+			s_isEditorResourcesLoaded = false;//v1.5.2
+
+			if(s_window == this)
+			{
+				s_window = null;
+			}
 		}
 
 
 
 		void OnEnable()
 		{
-			if (_isLockOnEnable)
+			if(IsClosedEditor())
 			{
-				Debug.Log("apEditor : OnEnable >> Locked");
+				//삭제되는 에디터에서의 OnEnable > 처리 생략
 				return;
 			}
-			//Debug.Log("apEditor : OnEnable");
-			if (this.maximized)
-			{
 
-			}
-			if (s_window != this && s_window != null)
+			try
 			{
-				try
+				if (_isLockOnEnable)
 				{
-					apEditor closedEditor = s_window;
-					s_window = null;
-					if (closedEditor != null)
-					{
-						closedEditor.Close();
-					}
-				}
-				catch (Exception)
-				{
-					//Debug.LogError("OnEnable -> Close Exception : " + ex);
+					//Debug.Log("apEditor : OnEnable >> Locked");
 					return;
 				}
 
-			}
-			s_window = this;
-			
 
-			autoRepaintOnSceneChange = true;
+				if (s_window != this && s_window != null)
+				{
+					//v1.5.2
+					//중요 > 도킹된 상태에서 Unmaximized가 되는 경우
+					//더미 윈도우에서 OnEnable이 발생한다.
+					if(s_window.maximized && !this.maximized)
+					{	
+						//Unmaxized 이벤트 발생
+
+						//이 에디터는 Unmaximize 과정에서 임시로 생성된 에디터이며,
+						//기존의 Static Window가 유효한 에디터 윈도우이다.
+						//따라서 이 윈도우(임시)는 닫아야 한다. (알아서 닫힐것)
+						
+						//다시 초기화하도록 플래그를 리셋한다.
+						apStringFactory.I.Uninitialize();
+						apGUIStyleWrapper.I.Uninitialize();
+						apGUILOFactory.I.Uninitialize();
+						return;
+					}
 
 
-			_isFirstOnGUI = true;
-			if (apEditorUtil.IsGammaColorSpace())
-			{
-				Notification(apVersion.I.APP_VERSION, false, false);
-			}
-			else
-			{
-				Notification(apVersion.I.APP_VERSION + " (Linear Color Space Mode)", false, false);
-			}
+					//그 외의 경우
 
-			//Debug.Log("Add Scene Delegate");
-			Undo.undoRedoPerformed += OnUndoRedoPerformed;
+					try
+					{
+						apEditor closedEditor = s_window;
+						//s_window = null;
 
-			//추가 3.25 : 씬이 바뀌면 작업을 초기화해야한다.
+						s_window = this;
+						//Debug.Log(">> Static Window 교체(빠른 교체) : " + s_window.GetInstanceID());
+						if (closedEditor != null)
+						{
+							closedEditor.SetClosedEditor();
+							closedEditor.Close();//생략
+						}
+					}
+					catch (Exception)
+					{
+						//Debug.LogError("OnEnable -> Close Exception : " + ex);
+						s_window = null;
+						return;
+					}
+				}
 
-			_currentScene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+				s_window = this;
+				//Debug.LogWarning(">> Static Window 교체(일반) : " + s_window.GetInstanceID());
+
+				if(!_isInit)
+				{
+					//Debug.LogError("초기화되지 않은 상태다");
+					Init(this);
+				}
+
+				
+
+
+				autoRepaintOnSceneChange = true;
+
+
+				_isFirstOnGUI = true;
+				if (apEditorUtil.IsGammaColorSpace())
+				{
+					Notification(apVersion.I.APP_VERSION, false, false);
+				}
+				else
+				{
+					Notification(apVersion.I.APP_VERSION + " (Linear Color Space Mode)", false, false);
+				}
+
+				//Debug.Log("Add Scene Delegate");
+				Undo.undoRedoPerformed += OnUndoRedoPerformed;
+
+				//추가 3.25 : 씬이 바뀌면 작업을 초기화해야한다.
+
+				_currentScene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
 
 #if UNITY_2018_1_OR_NEWER
-			EditorApplication.hierarchyChanged += OnEditorHierarchyChanged;
+				EditorApplication.hierarchyChanged += OnEditorHierarchyChanged;
 #else
-			EditorApplication.hierarchyWindowChanged += OnEditorHierarchyChanged;
+				EditorApplication.hierarchyWindowChanged += OnEditorHierarchyChanged;
 #endif
-			//EditorApplication.hierarchyWindowChanged += OnEditorHierarchyChanged;
+				//EditorApplication.hierarchyWindowChanged += OnEditorHierarchyChanged;
 
-			//SceneView.onSceneGUIDelegate += OnSceneViewEvent;
-			//EditorApplication.modifierKeysChanged += OnKeychanged;
-			PhysicsPreset.Load();
-			ControlParamPreset.Load();
-			AnimEventPreset.Load();//추가 22.6.13 : 애니메이션 이벤트 프리셋
+				//SceneView.onSceneGUIDelegate += OnSceneViewEvent;
+				//EditorApplication.modifierKeysChanged += OnKeychanged;
+				PhysicsPreset.Load();
+				ControlParamPreset.Load();
+				AnimEventPreset.Load();//추가 22.6.13 : 애니메이션 이벤트 프리셋
 
 
-			//로토스코핑 초기화 (21.2.28)
-			_isEnableRotoscoping = false;
-			_selectedRotoscopingData = null;
-			_iSyncRotoscopingAnimClipFrame = -1;
-			_isSyncRotoscopingToAnimClipFrame = false;
+				//로토스코핑 초기화 (21.2.28)
+				_isEnableRotoscoping = false;
+				_selectedRotoscopingData = null;
+				_iSyncRotoscopingAnimClipFrame = -1;
+				_isSyncRotoscopingToAnimClipFrame = false;
 
-			Rotoscoping.DestroyAllImages();
-			Rotoscoping.Load();//추가 21.2.27
+				Rotoscoping.DestroyAllImages();
+				Rotoscoping.Load();//추가 21.2.27
 
-			//가이드라인 (21.6.4)
-			_isEnableGuideLine = false;
+				//가이드라인 (21.6.4)
+				_isEnableGuideLine = false;
+			}
+			catch (Exception ex)
+			{
+				//Debug.LogError("Enable 에러 발생");
+				Debug.LogException(ex);
+			}
+
+			
 		}
 
 
@@ -281,9 +344,13 @@ namespace AnyPortrait
 		//윈도우가 포커스를 잃었을 때
 		void OnLostFocus()
 		{
-			//Debug.LogError("On Lost Focus");
 			//포커스를 잃는다면
-			
+			if(IsClosedEditor())
+			{
+				//삭제되는 에디터에서의 OnLostFocus > 처리 생략
+				return;
+			}
+
 			if(apTimer.I != null)
 			{
 				apTimer.I.OnLostFocus();
@@ -292,8 +359,23 @@ namespace AnyPortrait
 
 		//윈도우가 포커스를 복구했을 때
 		void OnFocus()
-		{
-			//Debug.LogWarning("On Focus");
+		{	
+			//만약 삭제되는 에디터라면 생략한다.
+			if(IsClosedEditor())
+			{
+				//삭제되는 에디터에서의 OnFocus > 처리 생략
+				return;
+			}
+
+			//int thisID = this.GetInstanceID();
+			//int sharedID = s_window != null ? s_window.GetInstanceID() : -1;
+
+			//bool isMax_This = this.maximized;
+			//bool isMax_Shared = s_window != null ? s_window.maximized : false;
+
+			//Debug.LogWarning("On Focus : " + thisID + " / " + sharedID);
+			//Debug.LogWarning("> Maximized : " + isMax_This + " / " + isMax_Shared);
+			
 
 			//이전에 포커스를 잃었다가 복구했다면
 			//타이머의 첫번째 Delta 시간을 0으로 리셋한다. Delta 시간이 과도하게 증가하는 것을 막기 위해
@@ -357,8 +439,6 @@ namespace AnyPortrait
 					ResetModifierPhysicsTimerRecursive(targetMeshGroup, targetMeshGroup);
 				}
 			}
-
-			
 		}
 
 		//에디터 포커스 회복시 물리 업데이트의 남은 시간을 리셋하기 위한 함수
@@ -457,10 +537,10 @@ namespace AnyPortrait
 			//Bone = 11,
 			//MeshPin = 12,//추가 22.2.26
 			
+
 			bool isResetHierarchyAll = false;
 			if (restoreResult._isAnyRestored)
 			{
-				//Debug.LogWarning("Undo에서 오브젝트가 추가되거나 삭제된 것을 되돌린다.");
 				isResetHierarchyAll = true;
 			}
 
@@ -501,8 +581,6 @@ namespace AnyPortrait
 				}
 			}
 
-			
-
 
 			//이전
 			//_portrait.LinkAndRefreshInEditor(restoreResult._isAnyRestored, null, null);
@@ -520,15 +598,13 @@ namespace AnyPortrait
 					VisiblityController.Save_AllRenderUnits(Select.AnimClip._targetMeshGroup);
 					VisiblityController.Save_AllBones(Select.AnimClip._targetMeshGroup);
 				}
-
-
-				//이전
-				//_portrait.LinkAndRefreshInEditor(restoreResult._isAnyRestored, apUtil.LinkRefresh.Set_AnimClip(Select.AnimClip));
-
-				//<여기가 문제>
-
-				//변경 20.7.2 : 조금 더 확실하게 복구
+				//Debug.LogWarning("--------------- [ 애니메이션 Undo 처리 ] -----------------");
+				
 				_portrait.LinkAndRefreshInEditor(true, apUtil.LinkRefresh.Set_AnimClip(Select.AnimClip));
+
+				RefreshTimelineLayers(REFRESH_TIMELINE_REQUEST.LinkKeyframeAndModifier, null, null);
+					
+				
 			}
 			else if (Select.SelectionType == apSelection.SELECTION_TYPE.MeshGroup &&
 					Select.MeshGroup != null)
@@ -543,7 +619,6 @@ namespace AnyPortrait
 				
 				//추가 21.7.1 : Depth를 렌더 유닛에 적용
 				Select.MeshGroup.TFDepthToRenderUnitsOnUndo();
-
 				
 				//_portrait.LinkAndRefreshInEditor(restoreResult._isAnyRestored, apUtil.LinkRefresh.Set_MeshGroup_ExceptAnimModifiers(Select.MeshGroup));
 				//변경 20.7.3 : 조금 더 확실하게 복구
@@ -713,6 +788,7 @@ namespace AnyPortrait
 					//DebugAnimModMeshValues();
 
 					apAnimClip animClip = Select.AnimClip;
+					//Debug.Log("Undo > AnimClip : RefreshTimelines");
 					animClip.RefreshTimelines(null, null);//변경 19.5.21 : 전체 Refresh일 경우 null입력
 					animClip.UpdateMeshGroup_Editor(true, 0.0f, true, true);
 
@@ -993,6 +1069,13 @@ namespace AnyPortrait
 				_hierarchy_AnimClip.ResetSubUnits();
 
 				_portraitsInScene.Clear();
+
+				//v1.6.0 : 렌더 텍스쳐 해제
+				if(_renderTex == null)
+				{
+					_renderTex = new apEditorRT();
+				}
+				RenderTex.ReleaseAll();
 			}
 			catch (Exception ex)
 			{
@@ -1126,7 +1209,6 @@ namespace AnyPortrait
 			Rotoscoping.Load();
 			Rotoscoping.Save();
 
-
 			_isMakePortraitRequest = false;
 			_isMakePortraitRequestFromBackupFile = false;
 
@@ -1140,7 +1222,6 @@ namespace AnyPortrait
 			_uiFoldType_Right1_Lower = UI_FOLD_TYPE.Unfolded;
 			_uiFoldType_Right2 = UI_FOLD_TYPE.Unfolded;
 
-
 			apDebugLog.I.Clear();
 
 			if(_boneGUIRenderMode == BONE_RENDER_MODE.None)
@@ -1148,7 +1229,7 @@ namespace AnyPortrait
 				//본을 숨겨둔 상태라면 보이게 만든다.
 				_boneGUIRenderMode = BONE_RENDER_MODE.Render;
 			}
-			_meshGUIRenderMode = MESH_RENDER_MODE.Render;
+			_meshGUIRenderMode = MESH_RENDER_MODE.RenderAll;
 
 			//if (_meshGenerator == null)
 			//{
@@ -1196,12 +1277,6 @@ namespace AnyPortrait
 			}
 			
 
-
-			
-
-
-
-
 			//추가 20.4.6 : 로딩 팝업 초기화
 			_isProgressPopup = false;
 			_isProgressPopup_StartRequest = false;
@@ -1229,8 +1304,6 @@ namespace AnyPortrait
 			
 			//추가 21.6.26 : Undo History 초기화
 			apUndoHistory.MakeNewGameObject();
-
-
 
 
 
@@ -1268,6 +1341,18 @@ namespace AnyPortrait
 			//Low CPU 입력
 			_isAnyMouseKeyboardInput = false;
 			_tAnyMouseKeyboardInput = 0.0f;
+
+
+			//v1.6.0 : 렌더 텍스쳐 객체 초기화
+			if(_renderTex == null)
+			{
+				_renderTex = new apEditorRT();
+			}
+			_renderTex.ReleaseAll();
+
+
+
+			_isInit = true;
 		}
 
 		
@@ -1447,7 +1532,6 @@ namespace AnyPortrait
 		//--------------------------------------------------------------------------------------------
 		void OnGUI()
 		{
-
 			if (Application.isPlaying)
 			{
 				int windowWidth = (int)position.width;
@@ -1467,6 +1551,7 @@ namespace AnyPortrait
 				EditorGUILayout.EndVertical();
 
 				_isUpdateAfterEditorRunning = true;
+				s_isEditorResourcesLoaded = false;
 				return;
 			}
 
@@ -1549,6 +1634,7 @@ namespace AnyPortrait
 				//다시 체크해야하는 경우
 				//- 언어를 바꾸었을때
 				//- Portrait를 바꾸었을때
+
 				if (!s_isEditorResourcesLoaded)
 				{
 					if(CheckEditorResources())
@@ -2023,7 +2109,7 @@ namespace AnyPortrait
 											(int)rectMainLeft.x,
 											//(int)rectMainLeft.y + leftUpperHeight + 38,
 											(int)rectMainLeft.y + leftUpperHeight + 39,
-											(int)position.width, (int)position.height, scroll_Left);
+											windowWidth, windowHeight, scroll_Left);
 
 						//ControllerGL의 Snap여부를 결정하자.
 						//일반적으로는 True이지만, ControlParam을 제어하는 AnimTimeline 작업시에는 False가 된다.
@@ -2181,14 +2267,18 @@ namespace AnyPortrait
 				apGL.ResetCursorEvent();
 
 				float fZoomRatio = (float)(_zoomListX100[_iZoomX100]) * 0.01f;
+				
 				apGL.SetWindowSize(mainCenterWidth, mainHeight,
 									_scroll_CenterWorkSpace,
 									fZoomRatio,
 									(int)rectMainCenter.x, (int)rectMainCenter.y,
-									(int)position.width, (int)position.height);
+									windowWidth, windowHeight);
 
 				//추가 v1.4.6 : RT 생성용 캘리브레이션 (왠만하면 1회만 수행됨) >> 보류. 여기서는 제대로 렌더링이 되지 않는다.
 				//apGL.CalibrateScreenRTSize(false, this);
+
+				//v1.6.0 : 렌더 텍스쳐에 크기 체크 요청 및 렌더 준비
+				RenderTex.ReadyToRender(windowWidth, windowHeight);
 
 
 				//추가 20.3.21 : 본 렌더링을 위해서 현재 설정을 갱신하자
@@ -2992,14 +3082,12 @@ namespace AnyPortrait
 					//무시하자
 				}
 				else
-				{
+				{	
 #if UNITY_2022_1_OR_NEWER
 					UnityEngine.Debug.LogException(ex);
 #else
 					UnityEngine.Debug.LogError("Exception : " + ex);
-#endif
-					
-					
+#endif			
 				}
 
 			}
@@ -3233,81 +3321,89 @@ namespace AnyPortrait
 
 					//변경 21.1.20 / 여백 추가, 길이 감소 140 > 100
 					GUILayout.Space(paddingY_Height20);//추가 21.1.20
+					EditorGUI.BeginChangeCheck();
 					apPortrait nextPortrait = EditorGUILayout.ObjectField(_portrait, typeof(apPortrait), true, apGUILOFactory.I.Width(100)) as apPortrait;
-
-					if (_portrait != nextPortrait)
+					if (EditorGUI.EndChangeCheck())
 					{
-						//바뀌었다.
-						if (nextPortrait != null)
+						if (_portrait != nextPortrait)
 						{
-							if (nextPortrait._isOptimizedPortrait)
+							//바뀌었다.
+							if (nextPortrait != null)
 							{
-								//Optimized Portrait는 편집이 불가능하다
-								EditorUtility.DisplayDialog(GetText(TEXT.OptPortrait_LoadError_Title),
-																GetText(TEXT.OptPortrait_LoadError_Body),
-																GetText(TEXT.Okay));
+								if (nextPortrait._isOptimizedPortrait)
+								{
+									//Optimized Portrait는 편집이 불가능하다
+									EditorUtility.DisplayDialog(GetText(TEXT.OptPortrait_LoadError_Title),
+																	GetText(TEXT.OptPortrait_LoadError_Body),
+																	GetText(TEXT.Okay));
+								}
+								else
+								{
+									//NextPortrait를 선택
+
+
+									//v1.4.2 : 프리팹 에셋 등의 추가 체크 필요
+									bool isValid = true;
+
+									apEditorUtil.CHECK_EDITABLE_RESULT checkResult = apEditorUtil.CheckEditablePortrait(nextPortrait);
+									switch (checkResult)
+									{
+										case apEditorUtil.CHECK_EDITABLE_RESULT.Invalid_NoGameObject:
+											//객체가 없는 경우
+											isValid = false;
+											break;
+
+										case apEditorUtil.CHECK_EDITABLE_RESULT.Invalid_PrefabAsset:
+											{
+												//프리팹 에셋인 경우 > 실행 불가
+												EditorUtility.DisplayDialog(GetText(TEXT.DLG_NotOpenEditorPrefabAsset_Title),
+																				GetText(TEXT.DLG_NotOpenEditorPrefabAsset_Body),
+																				GetText(TEXT.Okay));
+
+												isValid = false;
+											}
+											break;
+
+										case apEditorUtil.CHECK_EDITABLE_RESULT.Invalid_PrefabEditScene:
+											{
+												//프리팹 편집 화면이라면
+												EditorUtility.DisplayDialog(GetText(TEXT.DLG_NotOpenEditorOnPrefabEditingScreen_Title),
+																				GetText(TEXT.DLG_NotOpenEditorOnPrefabEditingScreen_Body),
+																				GetText(TEXT.Okay));
+
+												isValid = false;
+											}
+											break;
+									}
+
+									if (isValid)
+									{
+										//비동기 로딩
+										Selection.activeGameObject = null;
+										LoadPortraitAsync(nextPortrait);//이미 편집중인 Portrait가 있는 상태에서 새롭게	비동기 로딩
+									}
+								}
 							}
 							else
 							{
-								//NextPortrait를 선택
-								
+								_selection.SelectNone();
+								_portrait = null;
 
-								//v1.4.2 : 프리팹 에셋 등의 추가 체크 필요
-								bool isValid = true;
+								SyncHierarchyOrders();
 
-								apEditorUtil.CHECK_EDITABLE_RESULT checkResult = apEditorUtil.CheckEditablePortrait(nextPortrait);
-								switch (checkResult)
-								{
-									case apEditorUtil.CHECK_EDITABLE_RESULT.Invalid_NoGameObject:
-										//객체가 없는 경우
-										isValid = false;
-										break;
-
-									case apEditorUtil.CHECK_EDITABLE_RESULT.Invalid_PrefabAsset:
-										{
-											//프리팹 에셋인 경우 > 실행 불가
-											EditorUtility.DisplayDialog(	GetText(TEXT.DLG_NotOpenEditorPrefabAsset_Title),
-																			GetText(TEXT.DLG_NotOpenEditorPrefabAsset_Body),
-																			GetText(TEXT.Okay));
-
-											isValid = false;
-										}
-										break;
-
-									case apEditorUtil.CHECK_EDITABLE_RESULT.Invalid_PrefabEditScene:
-										{
-											//프리팹 편집 화면이라면
-											EditorUtility.DisplayDialog(	GetText(TEXT.DLG_NotOpenEditorOnPrefabEditingScreen_Title),
-																			GetText(TEXT.DLG_NotOpenEditorOnPrefabEditingScreen_Body),
-																			GetText(TEXT.Okay));
-
-											isValid = false;
-										}
-										break;
-								}
-
-								if (isValid)
-								{
-									//비동기 로딩
-									Selection.activeGameObject = null;
-									LoadPortraitAsync(nextPortrait);//이미 편집중인 Portrait가 있는 상태에서 새롭게	비동기 로딩
-								}
+								_hierarchy.ResetAllUnits();
+								_hierarchy_MeshGroup.ResetSubUnits();
+								_hierarchy_AnimClip.ResetSubUnits();
 							}
+
+							//v1.6.0 : 렌더 텍스쳐도 다시 초기화
+							RenderTex.ReleaseAll();
+
+
+							apEditorUtil.ReleaseGUIFocus();
 						}
-						else
-						{
-							_selection.SelectNone();
-							_portrait = null;
-
-							SyncHierarchyOrders();
-
-							_hierarchy.ResetAllUnits();
-							_hierarchy_MeshGroup.ResetSubUnits();
-							_hierarchy_AnimClip.ResetSubUnits();
-						}
-
-						apEditorUtil.ReleaseGUIFocus();
 					}
+					
 					EditorGUILayout.EndVertical();
 
 					if (_guiContent_TopBtn_Setting == null)
@@ -3555,22 +3651,50 @@ namespace AnyPortrait
 
 
 					//메시 렌더링
-					if (apEditorUtil.ToggledButton_2Side_VerticalMargin0(ImageSet.Get(apImageSet.PRESET.ToolBtn_MeshVisible),
-						_meshGUIRenderMode == MESH_RENDER_MODE.Render,
-						_selection.SelectionType == apSelection.SELECTION_TYPE.MeshGroup ||
-						_selection.SelectionType == apSelection.SELECTION_TYPE.Animation ||
-						_selection.SelectionType == apSelection.SELECTION_TYPE.Overall, tabBtnWidth, tabBtnHeight,
-						//"Enable/Disable Mesh Visiblity"
-						apStringFactory.I.GetHotkeyTooltip_MeshVisibility(HotKeyMap)
-						))
+					Texture2D iconImg_meshGUI = null;
+					if (_meshGUIRenderMode != MESH_RENDER_MODE.RenderWithOutMask)
 					{
-						if (_meshGUIRenderMode == MESH_RENDER_MODE.None)
+						iconImg_meshGUI = ImageSet.Get(apImageSet.PRESET.ToolBtn_MeshVisibleWithMask);
+					}
+					else
+					{
+						iconImg_meshGUI = ImageSet.Get(apImageSet.PRESET.ToolBtn_MeshVisible);
+					}
+
+
+					if (apEditorUtil.ToggledButton_2Side_Ctrl_VerticalMargin0(
+													iconImg_meshGUI,
+													_meshGUIRenderMode != MESH_RENDER_MODE.None,
+													_selection.SelectionType == apSelection.SELECTION_TYPE.MeshGroup ||
+													_selection.SelectionType == apSelection.SELECTION_TYPE.Animation ||
+													_selection.SelectionType == apSelection.SELECTION_TYPE.Overall, tabBtnWidth, tabBtnHeight,
+													//"Enable/Disable Mesh Visiblity"
+													apStringFactory.I.GetHotkeyTooltip_MeshVisibility(HotKeyMap),
+													Event.current.control,
+													Event.current.command
+													))
+					{
+#if UNITY_EDITOR_OSX
+						bool isCtrl = Event.current.command;
+#else
+						bool isCtrl = Event.current.control;
+#endif
+						switch (_meshGUIRenderMode)
 						{
-							_meshGUIRenderMode = MESH_RENDER_MODE.Render;
-						}
-						else
-						{
-							_meshGUIRenderMode = MESH_RENDER_MODE.None;
+							case MESH_RENDER_MODE.None:
+								if(isCtrl)	{ _meshGUIRenderMode = MESH_RENDER_MODE.RenderWithOutMask; }
+								else		{ _meshGUIRenderMode = MESH_RENDER_MODE.RenderAll; }
+								break;
+
+							case MESH_RENDER_MODE.RenderAll:
+								if(isCtrl)	{ _meshGUIRenderMode = MESH_RENDER_MODE.None; }
+								else		{ _meshGUIRenderMode = MESH_RENDER_MODE.RenderWithOutMask; }
+								break;
+
+							case MESH_RENDER_MODE.RenderWithOutMask:
+								if(isCtrl)	{ _meshGUIRenderMode = MESH_RENDER_MODE.RenderAll; }
+								else		{ _meshGUIRenderMode = MESH_RENDER_MODE.None; }
+								break;
 						}
 					}
 
@@ -4777,6 +4901,9 @@ namespace AnyPortrait
 								_hierarchy.ResetAllUnits();
 								_hierarchy_MeshGroup.ResetSubUnits();
 								_hierarchy_AnimClip.ResetSubUnits();
+
+								//v1.6.0 : 렌더 텍스쳐도 다시 초기화
+								RenderTex.ReleaseAll();
 							}
 
 						}
@@ -6404,11 +6531,14 @@ namespace AnyPortrait
 
 			//--------------------------------------------------
 			//추가 21.1.19 : GUI 버튼 + 상태 그리기
+			//이거 테스트
 			_guiButton_Menu.Draw();
 			_guiButton_RecordOnion.Draw();
 			_guiButton_MorphEditPin.Draw();
 			_guiButton_MorphEditVert.Draw();
+#if UNITY_2023_1_OR_NEWER
 			_guiButton_FixSpike.Draw();
+#endif
 
 			//순서
 			//LowCPU / Mesh / Bone / Physics / Onion Skin / Preset Visible / Rotoscoping
@@ -6531,16 +6661,11 @@ namespace AnyPortrait
 				apGL.EndPass();
 			}
 
-			
-
 			if(_guiHowToUse != null)
 			{
 				_guiHowToUse.DrawTips(new Vector2(width, height / 2));
 				apGL.EndPass();
 			}
-
-			
-
 
 			//통계 정보를 출력한다.
 			if (_guiOption_isStatisticsVisible)
@@ -6602,8 +6727,6 @@ namespace AnyPortrait
 						apGL.DrawTextGL(Select.Statistics_NumMesh.ToString(), new Vector2(120, posY), 150, Color.yellow);
 						posY -= 15;
 					}
-
-					
 
 
 					posY -= 5;
@@ -6704,6 +6827,9 @@ namespace AnyPortrait
 				_hierarchy.ResetAllUnits();
 				_hierarchy_MeshGroup.ResetSubUnits();
 				_hierarchy_AnimClip.ResetSubUnits();
+
+				//v1.6.0 : 렌더 텍스쳐 초기화
+				RenderTex.ReleaseAll();
 			}
 		}
 
@@ -7899,7 +8025,12 @@ namespace AnyPortrait
 					}
 
 					
-
+					//v1.6.0 : 렌더 텍스쳐 초기화
+					if(_renderTex == null)
+					{
+						_renderTex = new apEditorRT();
+					}
+					RenderTex.ReleaseAll();
 					
 
 					OnAnyObjectAddedOrRemoved();

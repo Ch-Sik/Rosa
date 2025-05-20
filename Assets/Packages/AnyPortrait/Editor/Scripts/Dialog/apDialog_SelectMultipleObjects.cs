@@ -79,6 +79,7 @@ namespace AnyPortrait
 		private string _positiveBtnText = "";
 		
 		private object _exceptObject = null;
+		private object _initSelectedObject = null;
 
 		// Show Window
 		//--------------------------------------------------------------
@@ -88,7 +89,8 @@ namespace AnyPortrait
 											FUNC_SELECT_MULTIPLE_OBJECTS funcResult, 
 											string positiveBtnText, 
 											object savedObject,
-											object exceptObject = null)
+											object exceptObject = null,
+											object initSelectedObject = null)
 		{
 			CloseDialog();
 
@@ -109,7 +111,7 @@ namespace AnyPortrait
 					break;
 
 				case REQUEST_TARGET.ChildMeshTransforms:
-					windowName = "Select Child Meshes";
+					windowName = "Select Meshes";
 					break;
 
 			}
@@ -126,7 +128,7 @@ namespace AnyPortrait
 				s_window.position = new Rect((editor.position.xMin + editor.position.xMax) / 2 - (width / 2),
 												(editor.position.yMin + editor.position.yMax) / 2 - (height / 2),
 												width, height);
-				s_window.Init(editor, loadKey, srcMeshGroup, requestTarget, funcResult, positiveBtnText, savedObject, exceptObject);
+				s_window.Init(editor, loadKey, srcMeshGroup, requestTarget, funcResult, positiveBtnText, savedObject, exceptObject, initSelectedObject);
 
 				return loadKey;
 			}
@@ -163,7 +165,8 @@ namespace AnyPortrait
 			FUNC_SELECT_MULTIPLE_OBJECTS funcResult, 
 			string positiveBtnText, 
 			object savedObject,
-			object exceptObject)
+			object exceptObject,
+			object initSelectedObject)
 		{
 			_editor = editor;
 			_loadKey = loadKey;
@@ -183,7 +186,14 @@ namespace AnyPortrait
 
 			_savedObject = savedObject;
 			_exceptObject = exceptObject;
+			_initSelectedObject = initSelectedObject;//초기에 선택될 메시
 
+
+			if(_selectedObjects == null)
+			{
+				_selectedObjects = new List<object>();
+			}
+			_selectedObjects.Clear();
 
 			_img_Mesh = _editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_Mesh);
 			_img_MeshGroup = _editor.ImageSet.Get(apImageSet.PRESET.Hierarchy_MeshGroup);
@@ -194,50 +204,64 @@ namespace AnyPortrait
 				_requestTarget == REQUEST_TARGET.MeshAndMeshGroups)
 			{
 				//1. Mesh
-				for (int i = 0; i < _editor._portrait._meshes.Count; i++)
+				int nMeshes = _editor._portrait._meshes != null ? _editor._portrait._meshes.Count : 0;
+				if(nMeshes > 0)
 				{
-					_meshes.Add(_editor._portrait._meshes[i]);
+					for (int i = 0; i < _editor._portrait._meshes.Count; i++)
+					{
+						_meshes.Add(_editor._portrait._meshes[i]);
+					}
 				}
+				
 			}
 
 			if (_requestTarget == REQUEST_TARGET.MeshAndMeshGroups)
 			{
 				//2. Mesh Group
-				for (int i = 0; i < _editor._portrait._meshGroups.Count; i++)
+				int nMeshGroups = _editor._portrait._meshGroups != null ? _editor._portrait._meshGroups.Count : 0;
+				if(nMeshGroups > 0)
 				{
-					apMeshGroup meshGroup = _editor._portrait._meshGroups[i];
-					if (meshGroup == srcMeshGroup || meshGroup._parentMeshGroup != null)//다른 ChildMeshGroup도 가져오지 못하게..
+					for (int i = 0; i < nMeshGroups; i++)
 					{
-						continue;
-					}
-					//재귀적으로 이미 포함된 MeshGroup인지 판단한다.
-					//추가 12.03 : 그 반대도 포함해야 한다.
-					apTransform_MeshGroup childMeshGroupTransform = srcMeshGroup.FindChildMeshGroupTransform(meshGroup);
-					apTransform_MeshGroup childMeshGroupTransform_Rev = meshGroup.FindChildMeshGroupTransform(srcMeshGroup);
-					if (childMeshGroupTransform == null && childMeshGroupTransform_Rev == null)
-					{
-						//child가 아닐때
-						_meshGroups.Add(meshGroup);
+						apMeshGroup meshGroup = _editor._portrait._meshGroups[i];
+						if (meshGroup == srcMeshGroup || meshGroup._parentMeshGroup != null)//다른 ChildMeshGroup도 가져오지 못하게..
+						{
+							continue;
+						}
+						//재귀적으로 이미 포함된 MeshGroup인지 판단한다.
+						//추가 12.03 : 그 반대도 포함해야 한다.
+						apTransform_MeshGroup childMeshGroupTransform = srcMeshGroup.FindChildMeshGroupTransform(meshGroup);
+						apTransform_MeshGroup childMeshGroupTransform_Rev = meshGroup.FindChildMeshGroupTransform(srcMeshGroup);
+						if (childMeshGroupTransform == null && childMeshGroupTransform_Rev == null)
+						{
+							//child가 아닐때
+							_meshGroups.Add(meshGroup);
+						}
 					}
 				}
+				
 			}
 
 			if(_requestTarget == REQUEST_TARGET.ChildMeshTransforms)
 			{
 				//3. Child Mesh Transform
-				for (int i = 0; i < _meshGroup._renderUnits_All.Count; i++)
+				int nRenderUnits = _meshGroup._renderUnits_All != null ? _meshGroup._renderUnits_All.Count : 0;
+				if(nRenderUnits > 0)
 				{
-					apRenderUnit renderUnit = _meshGroup._renderUnits_All[i];
-					if(renderUnit._meshTransform != null)
+					for (int i = 0; i < _meshGroup._renderUnits_All.Count; i++)
 					{
-						if(!_meshTransforms.Contains(renderUnit._meshTransform))
+						apRenderUnit renderUnit = _meshGroup._renderUnits_All[i];
+						if(renderUnit._meshTransform != null)
 						{
-							_meshTransforms.Add(renderUnit._meshTransform);
+							if(!_meshTransforms.Contains(renderUnit._meshTransform))
+							{
+								_meshTransforms.Add(renderUnit._meshTransform);
+							}
 						}
 					}
 				}
 
-				_meshTransforms.Reverse();
+				_meshTransforms.Reverse();//순서 반대
 				
 			}
 
@@ -272,9 +296,36 @@ namespace AnyPortrait
 						_meshTransforms.Remove(exceptMestTF);
 					}
 				}
-				
 			}
-			
+
+			//초기 선택하기
+			if(_initSelectedObject != null)
+			{
+				if(_initSelectedObject is apMesh)
+				{
+					apMesh initMesh = _initSelectedObject as apMesh;
+					if(_meshes.Contains(initMesh) && !_selectedObjects.Contains(initMesh))
+					{
+						_selectedObjects.Add(initMesh);
+					}
+				}
+				else if(_initSelectedObject is apMeshGroup)
+				{
+					apMeshGroup initMeshGroup = _initSelectedObject as apMeshGroup;
+					if(_meshGroups.Contains(initMeshGroup) && !_selectedObjects.Contains(initMeshGroup))
+					{
+						_selectedObjects.Add(initMeshGroup);
+					}
+				}
+				else if(_initSelectedObject is apTransform_Mesh)
+				{
+					apTransform_Mesh initMeshTF = _initSelectedObject as apTransform_Mesh;
+					if(_meshTransforms.Contains(initMeshTF) && !_selectedObjects.Contains(initMeshTF))
+					{
+						_selectedObjects.Add(initMeshTF);
+					}
+				}
+			}
 			
 		}
 		
@@ -410,6 +461,8 @@ namespace AnyPortrait
 				guiStyle_Selected.normal.textColor = Color.white;
 				guiStyle_None.normal.textColor = Color.black;
 			}
+			guiStyle_None.alignment = TextAnchor.MiddleLeft;
+			guiStyle_Selected.alignment = TextAnchor.MiddleLeft;
 
 			//Texture2D whildImg = apEditorUtil.WhiteTexture;
 

@@ -60,10 +60,11 @@ namespace AnyPortrait
 
 				int height = 110;
 				
-				//[v1.4.5] 맥에서는 세로가 너무 짧으면 안된다.
-#if UNITY_EDITOR_OSX
-				height += 30;
+				//[v1.6.0] 맥이나 2023.1 이상에서는 세로가 너무 짧으면 안된다.
+#if UNITY_EDITOR_OSX || UNITY_2023_1_OR_NEWER
+				height += 15;
 #endif
+
 				s_window = curTool;
 				s_window.position = new Rect((editor.position.xMin + editor.position.xMax) / 2 - (width / 2),
 												(editor.position.yMin + editor.position.yMax) / 2 - (height / 2),

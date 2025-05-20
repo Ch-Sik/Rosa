@@ -209,6 +209,38 @@ namespace AnyPortrait
 			}
 		}
 
+		/// <summary>
+		/// Link가 필요한지 체크한다.
+		/// </summary>
+		/// <returns></returns>
+		public bool IsNeedLink()
+		{
+			if(_gravityControlParamID >= 0)
+			{
+				if(_gravityControlParam == null)
+				{
+					return true;
+				}
+				if(_gravityControlParam._uniqueID != _gravityControlParamID)
+				{
+					return true;
+				}
+			}
+
+			if(_windControlParamID >= 0)
+			{
+				if(_windControlParam == null)
+				{
+					return true;
+				}
+				if(_windControlParam._uniqueID != _windControlParamID)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		// Get
 		//----------------------------------------
 		public Vector2 GetGravityAcc()

@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -228,6 +228,7 @@ namespace AnyPortrait
 		private Texture2D _img_Delimeter = null;
 		private Texture2D _img_LowCPU = null;
 		private Texture2D _img_MeshHidden = null;
+		private Texture2D _img_MeshMaskHidden = null;
 		private Texture2D _img_BoneHidden = null;
 		private Texture2D _img_BoneOutline = null;
 		private Texture2D _img_PhysicsDisabled = null;
@@ -247,7 +248,7 @@ namespace AnyPortrait
 		//조건값들 (각각 다르다)
 		//값들
 		private enum VALUE_VIEW_LOWCPU { None, LowCPU }
-		private enum VALUE_VIEW_MESH { Shown, Hidden }
+		private enum VALUE_VIEW_MESH { ShownAll, ShownWithoutMask, Hidden }
 		private enum VALUE_VIEW_BONE { Shown, Hidden, Outline }
 		private enum VALUE_VIEW_PHYSICS { Enabled, Disabled }
 		private enum VALUE_VIEW_ONION_SKIN { None, OnionSkin }
@@ -259,7 +260,7 @@ namespace AnyPortrait
 
 		//아이콘이 안보이도록 만드는 설정이 기본값
 		private VALUE_VIEW_LOWCPU _prevViewLowCpu = VALUE_VIEW_LOWCPU.None;
-		private VALUE_VIEW_MESH _prevViewMesh = VALUE_VIEW_MESH.Shown;
+		private VALUE_VIEW_MESH _prevViewMesh = VALUE_VIEW_MESH.ShownAll;
 		private VALUE_VIEW_BONE _prevViewBone = VALUE_VIEW_BONE.Shown;
 		private VALUE_VIEW_PHYSICS _prevViewPhysics = VALUE_VIEW_PHYSICS.Enabled;
 		private VALUE_VIEW_ONION_SKIN _prevViewOnionSkin = VALUE_VIEW_ONION_SKIN.None;
@@ -270,7 +271,7 @@ namespace AnyPortrait
 		private VALUE_EDIT_SELECTIONLOCK _prevEditSelectionLock = VALUE_EDIT_SELECTIONLOCK.NotEdit;
 
 		private VALUE_VIEW_LOWCPU _curViewLowCpu = VALUE_VIEW_LOWCPU.None;
-		private VALUE_VIEW_MESH _curViewMesh = VALUE_VIEW_MESH.Shown;
+		private VALUE_VIEW_MESH _curViewMesh = VALUE_VIEW_MESH.ShownAll;
 		private VALUE_VIEW_BONE _curViewBone = VALUE_VIEW_BONE.Shown;
 		private VALUE_VIEW_PHYSICS _curViewPhysics = VALUE_VIEW_PHYSICS.Enabled;
 		private VALUE_VIEW_ONION_SKIN _curViewOnionSkin = VALUE_VIEW_ONION_SKIN.None;
@@ -343,6 +344,7 @@ namespace AnyPortrait
 			_img_Delimeter =		_editor.ImageSet.Get(apImageSet.PRESET.GUI_ViewStat_BG);
 			_img_LowCPU =			_editor.ImageSet.Get(apImageSet.PRESET.LowCPU);
 			_img_MeshHidden =		_editor.ImageSet.Get(apImageSet.PRESET.GUI_ViewStat_MeshHidden);
+			_img_MeshMaskHidden =	_editor.ImageSet.Get(apImageSet.PRESET.GUI_ViewStat_MaskMeshHidden);
 			_img_BoneHidden =		_editor.ImageSet.Get(apImageSet.PRESET.GUI_ViewStat_BoneHidden);
 			_img_BoneOutline =		_editor.ImageSet.Get(apImageSet.PRESET.GUI_ViewStat_BoneOutline);
 			_img_PhysicsDisabled =	_editor.ImageSet.Get(apImageSet.PRESET.GUI_ViewStat_DisablePhysics);
@@ -361,7 +363,7 @@ namespace AnyPortrait
 
 			//조건값들 (각각 다르다)
 			_prevViewLowCpu = VALUE_VIEW_LOWCPU.None;
-			_prevViewMesh = VALUE_VIEW_MESH.Shown;
+			_prevViewMesh = VALUE_VIEW_MESH.ShownAll;
 			_prevViewBone = VALUE_VIEW_BONE.Shown;
 			_prevViewPhysics = VALUE_VIEW_PHYSICS.Enabled;
 			_prevViewOnionSkin = VALUE_VIEW_ONION_SKIN.None;
@@ -372,7 +374,7 @@ namespace AnyPortrait
 			_prevEditSelectionLock = VALUE_EDIT_SELECTIONLOCK.NotEdit;
 
 			_curViewLowCpu = VALUE_VIEW_LOWCPU.None;
-			_curViewMesh = VALUE_VIEW_MESH.Shown;
+			_curViewMesh = VALUE_VIEW_MESH.ShownAll;
 			_curViewBone = VALUE_VIEW_BONE.Shown;
 			_curViewPhysics = VALUE_VIEW_PHYSICS.Enabled;
 			_curViewOnionSkin = VALUE_VIEW_ONION_SKIN.None;
@@ -503,7 +505,7 @@ namespace AnyPortrait
 
 				//값을 초기화 (아이콘이 안보여질 값으로 지정한다.)
 				_prevViewLowCpu = VALUE_VIEW_LOWCPU.None;
-				_prevViewMesh = VALUE_VIEW_MESH.Shown;
+				_prevViewMesh = VALUE_VIEW_MESH.ShownAll;
 				_prevViewBone = VALUE_VIEW_BONE.Shown;
 				_prevViewPhysics = VALUE_VIEW_PHYSICS.Enabled;
 				_prevViewOnionSkin = VALUE_VIEW_ONION_SKIN.None;
@@ -645,7 +647,13 @@ namespace AnyPortrait
 
 			//View 설정 체크
 			_curViewLowCpu = _editor._isLowCPUOption ? VALUE_VIEW_LOWCPU.LowCPU : VALUE_VIEW_LOWCPU.None;
-			_curViewMesh = _editor._meshGUIRenderMode == apEditor.MESH_RENDER_MODE.Render ? VALUE_VIEW_MESH.Shown : VALUE_VIEW_MESH.Hidden;
+
+			switch (_editor._meshGUIRenderMode)
+			{
+				case apEditor.MESH_RENDER_MODE.None:				_curViewMesh = VALUE_VIEW_MESH.Hidden; break;
+				case apEditor.MESH_RENDER_MODE.RenderAll:			_curViewMesh = VALUE_VIEW_MESH.ShownAll; break;
+				case apEditor.MESH_RENDER_MODE.RenderWithOutMask:	_curViewMesh = VALUE_VIEW_MESH.ShownWithoutMask; break;
+			}
 			
 			switch (_editor._boneGUIRenderMode)
 			{
@@ -785,7 +793,7 @@ namespace AnyPortrait
 				&&
 				//View 중에 하나라도 아이콘이 나오는 조건
 				(_curViewLowCpu != VALUE_VIEW_LOWCPU.None
-				|| _curViewMesh != VALUE_VIEW_MESH.Shown
+				|| _curViewMesh != VALUE_VIEW_MESH.ShownAll
 				|| _curViewBone != VALUE_VIEW_BONE.Shown
 				|| _curViewPhysics != VALUE_VIEW_PHYSICS.Enabled
 				|| _curViewOnionSkin != VALUE_VIEW_ONION_SKIN.None
@@ -915,12 +923,17 @@ namespace AnyPortrait
 			{
 				switch (_curViewMesh)
 				{
-					case VALUE_VIEW_MESH.Shown:
+					case VALUE_VIEW_MESH.ShownAll:
 						_type2Icons[ICON_TYPE.View_MeshHidden].Hide();
 						break;
 
+					case VALUE_VIEW_MESH.ShownWithoutMask:
+						_type2Icons[ICON_TYPE.View_MeshHidden].Show(_img_MeshMaskHidden, curIconPos);//마스크만 안보인다.
+						curIconPos += posOffset;
+						break;
+
 					case VALUE_VIEW_MESH.Hidden:
-						_type2Icons[ICON_TYPE.View_MeshHidden].Show(_img_MeshHidden, curIconPos);
+						_type2Icons[ICON_TYPE.View_MeshHidden].Show(_img_MeshHidden, curIconPos);//모든 메시가 안보인다.
 						curIconPos += posOffset;
 						break;
 				}

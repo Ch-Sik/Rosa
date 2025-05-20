@@ -874,8 +874,6 @@ namespace AnyPortrait
 					//이제 다시 정렬을 해보자
 					//- 인덱스 스왑만 먼저 한다.
 					//- 버퍼 정렬을 하려면.. Array가 필요하당..
-
-
 					
 
 					//삭제 21.8.6 : Meta 데이터를 이용하면 optTransform을 이용하지 않아도 된다.

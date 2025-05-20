@@ -1161,12 +1161,14 @@ namespace AnyPortrait
 			//이전 : ID를 제외한 모든 데이터 초기화
 			//변경 v1.5.0 : 초기화가 필요한지 한번 검토한 후 필요하면 리셋
 			//유효성 테스트를 한다.
-			bool isValid = ValidateData(mesh);
-			if(isValid)
-			{
-				//이미 유효하다면 그냥 종료
-				return;
-			}
+			//bool isValid = ValidateData(mesh);
+			//if(isValid)
+			//{
+			//	//이미 유효하다면 그냥 종료
+			//	return;
+			//}
+
+			//삭제 v1.6.0 > 항상 리셋한다. Undo시 링크가 풀리는 문제가 있다.
 
 			//유효하지 않다.
 			int nVertIDs = _vertIDs != null ? _vertIDs.Count : 0;
@@ -1384,10 +1386,11 @@ namespace AnyPortrait
 			int nNeedTri = nVert - 2;
 
 
-			if (_hidddenEdges.Count == nNeedHiddenEdge && _tris.Count == nNeedTri)
-			{
-				return;
-			}
+			//if (_hidddenEdges.Count == nNeedHiddenEdge && _tris.Count == nNeedTri)
+			//{
+			//	Debug.Log("이미 완료된 상태입니다.");
+			//	return;
+			//}
 
 			_hidddenEdges.Clear();
 
@@ -1542,25 +1545,6 @@ namespace AnyPortrait
 						totalReversedAngles += reverseAngle;
 					}
 
-					//if(isDebug)
-					//{
-					//	Debug.LogWarning("둔각이 있는 폴리곤 발견");
-					//	for (int i = 0; i < sortedLinkedVerts.Count; i++)
-					//	{
-					//		curLVert = sortedLinkedVerts[i];
-					//		if(!curLVert._isIndent)
-					//		{
-					//			Debug.Log("[" + i + "] : " + curLVert._vert._pos + " / Angle : " + curLVert._angleToPrev + " ~ " + curLVert._angleToNext);
-					//		}
-					//		else
-					//		{
-					//			Debug.LogError("[" + i + " - 둔각] : " + curLVert._vert._pos + " / Angle : " + curLVert._angleToPrev + " ~ " + curLVert._angleToNext);
-					//		}
-							
-					//	}
-					//	Debug.Log("---");
-					//}
-
 					//만약 전체 Prev->Next 각도의 합이 Reverse보다 더 크다면, 순서가 반대가 되어야 한다.
 					if(totalNormalAngles > totalReversedAngles)
 					{
@@ -1579,26 +1563,8 @@ namespace AnyPortrait
 							{
 								isAnyIndent = true;
 							}
-
-							//if(!curLVert._isIndent)
-							//{
-							//	Debug.Log("[" + i + "] : " + curLVert._vert._pos + " / Angle : " + curLVert._angleToPrev + " ~ " + curLVert._angleToNext);
-							//}
-							//else
-							//{
-							//	Debug.LogError("[" + i + " - 둔각] : " + curLVert._vert._pos + " / Angle : " + curLVert._angleToPrev + " ~ " + curLVert._angleToNext);
-							//}
 						}
-						//Debug.Log("---");
 					}
-					//else
-					//{
-					//	if(isDebug)
-					//	{
-					//		Debug.Log("정방향 : 내부 각도 : " + totalNormalAngles + " / 외부 각도 : " + totalReversedAngles);
-					//	}
-						
-					//}
 
 					//연결 불가능한 리스트를 만들자
 					//단, 둔각이 하나라도 있는 경우에
@@ -1725,17 +1691,11 @@ namespace AnyPortrait
 					}
 				}
 
-
-
-
 				bool isAnyPreventedPair = preventableCondsByAngle != null && preventableCondsByAngle.Count > 0;
 				//if (isAnyPreventedPair)
 				//{
 				//	Debug.Log("금지된 조합이 있다. [" + (preventableCondsByAngle.Count / 2) + "]");
 				//}
-
-
-
 
 				//Debug.Log("히든 엣지 필요 개수 : " + nNeedHiddenEdge);
 				for (int iBaseVert = 0; iBaseVert < nVert; iBaseVert++)
@@ -1982,6 +1942,7 @@ namespace AnyPortrait
 
 		private void MakeTriangles()
 		{
+			
 			_tris.Clear();
 			List<apMeshEdge> allEdges = new List<apMeshEdge>();
 			for (int i = 0; i < _edges.Count; i++)

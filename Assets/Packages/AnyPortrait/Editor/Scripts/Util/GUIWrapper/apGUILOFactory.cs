@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -104,7 +104,7 @@ namespace AnyPortrait
 			GUILayoutOption[] prevLO = _LO_Width;
 			_LO_Width = new GUILayoutOption[nextSize + 1];
 
-			//이전 데이터 복사
+			//이전 데이터 복사			
 			for (int i = 0; i <= prevSize; i++)
 			{
 				_LO_Width[i] = prevLO[i];
@@ -180,6 +180,7 @@ namespace AnyPortrait
 		//-------------------------------------------
 		public static apGUILOFactory I {  get {  return s_instance; } }
 		public bool IsInitialize() {  return _isInitialized; }
+		public void Uninitialize() { _isInitialized = false; }
 
 		//GUILayotOption 가져오기
 		public GUILayoutOption Width(int width)

@@ -409,6 +409,7 @@ namespace AnyPortrait
 		//-------------------------------------------
 		public static apGUIStyleWrapper I { get { return s_instance; } }
 		public bool IsInitialized() { return _isInitialized; }
+		public void Uninitialize() { _isInitialized = false; }
 
 		//자주 사용하는 GUIStyle Get함수
 		public GUIStyle GetNone_Label_White2Cyan(bool isSelected)

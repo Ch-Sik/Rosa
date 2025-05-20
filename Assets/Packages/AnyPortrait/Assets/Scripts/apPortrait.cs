@@ -31,37 +31,41 @@ namespace AnyPortrait
 	/// </summary>
 	public class apPortrait : MonoBehaviour
 	{
-		// Members
-		//-----------------------------------------------------
-		//public int _testVar = 0;
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 멤버 변수들
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-		//텍스쳐 등록 정보
+		// 메인 객체들
+        //---------------------------------------
+	    // 텍스쳐
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public List<apTextureData> _textureData = new List<apTextureData>();
 
-		//메시 등록 정보
+		// 메시
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public List<apMesh> _meshes = new List<apMesh>();
 
-		//메시 그룹 등록 정보
+		// 메시 그룹
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public List<apMeshGroup> _meshGroups = new List<apMeshGroup>();
 
 
-		//컨트롤 파라미터 등록 정보 [이건 Editor / Opt Realtime에 모두 적용된다.]
+		// 컨트롤 파라미터 [이건 Editor / Opt Realtime에 모두 적용된다.]
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public apController _controller = new apController();
 
-		//애니메이션 등록 정보 [이건 Editor / Opt Runtime에 모두 적용된다]
+		// 애니메이션 [이건 Editor / Opt Runtime에 모두 적용된다]
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public List<apAnimClip> _animClips = new List<apAnimClip>();
 
 
+        // 애니메이션 플레이
+        //---------------------------------------
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public apAnimPlayManager _animPlayManager = new apAnimPlayManager();
@@ -77,6 +81,27 @@ namespace AnyPortrait
 		private apAnimPlayDeferredRequest _animPlayDeferredRequest = null;
 
 
+		//추가 v1.6.0 : 애니메이션 종료시 호출되는 액션들
+		public enum ANIM_ENDED_TYPE
+		{
+			/// <summary>
+			/// This occurs when the animation is stopped or deactivated due to a transition to another animation.
+			/// </summary>
+			Deactivated,
+			/// <summary>
+			/// When a non-looping animation reaches its last frame. (Depending on the playback direction, it could also be the first frame.)
+			/// </summary>
+			LastFrameReached
+		}
+		/// <summary>
+		/// When the animation ends, registered events are called.
+		/// </summary>
+		public event Action<apPortrait, apAnimPlayData, ANIM_ENDED_TYPE> OnAnimationEnded;
+		
+
+
+		// Root Unit을 결정하는 데이터
+		//---------------------------------------
 		//RootUnit으로 적용되는 MainMeshGroup을 여러개를 둔다.
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
@@ -86,8 +111,6 @@ namespace AnyPortrait
 		[NonSerialized]
 		public List<apMeshGroup> _mainMeshGroupList = new List<apMeshGroup>();
 
-
-
 		// 루트 유닛을 여러 개를 둔다 (루트 유닛은 애니메이션이 적용되는 MeshGroup이다)
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
@@ -95,27 +118,31 @@ namespace AnyPortrait
 
 
 
-
+        // ID 관리
+        //---------------------------------------
 		// 유니크 IDs
 		[NonBackupField]
 		private apIDManager _IDManager = new apIDManager();
 
 
-		//추가 21.1.22 : 편집용 VisibiliePreset을 여기에 추가한다.
+        // (에디터용) 편의용 보조 데이터
+        //---------------------------------------
+		// 추가 21.1.22
+        // 객체 보이기/숨기기 프리셋
 		[NonBackupField, SerializeField]
 		private apVisibilityPresets _visiblePreset = new apVisibilityPresets();
 
 		public apVisibilityPresets VisiblePreset { get { if (_visiblePreset == null) { _visiblePreset = new apVisibilityPresets(); } return _visiblePreset; } }
 
-
-
-		//추가 21.6.3 : 작업 편의를 위한 가이드라인들
+		// 추가 21.6.3
+        // 가이드라인
 		[NonBackupField, SerializeField, HideInInspector]
 		private apGuideLines _guideLines = new apGuideLines();
 		public apGuideLines GuideLines { get { if (_guideLines == null) { _guideLines = new apGuideLines(); } return _guideLines; } }
 
 
-		//추가 v1.5.0 : 컨트롤 파라미터 스냅샷
+		// 추가 v1.5.0
+        // 컨트롤 파라미터 스냅샷
 		[NonBackupField, SerializeField, HideInInspector]
 		private apControlParamValueSnapShot _controlParamSnapShot = null;
 		public apControlParamValueSnapShot ControlParamSnapShot
@@ -160,7 +187,6 @@ namespace AnyPortrait
 		private Dictionary<string, apOptTextureData> _mapping_OptTextureData = null;
 
 
-		//추가
 		// Material 중에서 Batch가 될만한 것들은 중앙에서 관리를 한다.
 		/// <summary>[Please do not use it] A List of Batched Materials executed at runtime</summary>
 		[SerializeField, NonBackupField]
@@ -168,6 +194,8 @@ namespace AnyPortrait
 
 
 
+        // 애니메이션 이벤트 수신
+        //---------------------------------------
 		/// <summary>
 		/// Listener to receive animation events.
 		/// Since it is called by "UnitySendMessage", its object must be a class inherited from "MonoBehaviour".
@@ -194,10 +222,8 @@ namespace AnyPortrait
 
 
 
-
-
-
-
+        // 초기화
+        //---------------------------------------
 		public enum INIT_STATUS
 		{
 			Ready,
@@ -217,6 +243,9 @@ namespace AnyPortrait
 		private OnAsyncLinkCompleted _funcAyncLinkCompleted = null;
 
 
+
+        // 데이터가 저장되는 숨겨진 GameObject (Undo 효율성)
+        //---------------------------------------
 		//기본 데이터가 저장될 하위 GameObject
 		/// <summary>[Please do not use it]</summary>
 		[NonBackupField]
@@ -241,21 +270,27 @@ namespace AnyPortrait
 		public GameObject _subObjectGroup_Modifier = null;
 
 
+        // 업데이트과 토큰
+        //---------------------------------------
+        /// <summary>
+		/// [Please do not use it]
+		/// Instead of setting this variable, use function "SetImportant(bool isImportant)" instead.
+		/// </summary>
+		[SerializeField]
+		public bool _isImportant = true;
+
+
 		/// <summary>[Please do not use it] Frame Per Seconds</summary>
 		[SerializeField]
 		public int _FPS = 30;
-
-		//이전 : Important가 아닐 때의 타이머 > UpdateToken 방식으로 변경
-		//[NonBackupField]
-		//private float _timePerFrame = 1.0f / 30.0f;
-
-		//[NonBackupField]
-		//private float _tDelta = 0.0f;
 
 		//추가 2.28 : Important가 아닌 업데이트를 위한 토큰
 		[NonSerialized, NonBackupField]
 		private apOptUpdateChecker.UpdateToken _updateToken = null;
 
+
+        // Bake 크기 옵션
+        //---------------------------------------
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField, HideInInspector]
 		public float _bakeScale = 0.01f;//Bake시 0.01을 곱한다.
@@ -265,7 +300,8 @@ namespace AnyPortrait
 		public float _bakeZSize = 1.0f;//<<현재 Depth에 따라 1 차이를 준다.
 
 
-
+        // 썸네일 저장 경로
+        //---------------------------------------
 		//이미지 저장 경로를 저장하자
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField, HideInInspector]
@@ -290,6 +326,8 @@ namespace AnyPortrait
 		}
 
 
+        // 물리 효과
+        //---------------------------------------
 		//물리 옵션 - Editor / Opt (기본값은 On)
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
@@ -312,9 +350,11 @@ namespace AnyPortrait
 		//Opt 포함
 		[NonSerialized, NonBackupField]
 		private System.Diagnostics.Stopwatch _physicsTimer = null;
+
 		[NonSerialized, NonBackupField]
 		private float _physicsDeltaTime = 0.0f;
 		public float PhysicsDeltaTime { get { return _physicsDeltaTime; } }
+
 		private const float PHYSICS_MAX_DELTA_TIME = 0.05f;//20FPS보다 낮은 FPS에서는 물리 시간이 고정이다.
 		private const float PHYSICS_SKIP_DELTA_TIME = 1.5f;//지나치게 FPS가 낮거나 앱이 중단되었다면 해당 프레임에서는 물리 시간을 0으로 만들어야 한다.
 
@@ -327,20 +367,17 @@ namespace AnyPortrait
 		/// <summary>Manager controlling physical effects</summary>
 		public apForceManager ForceManager { get { return _forceManager; } }
 
+
+        // Bake시 사용되지 않는 객체들의 임시 저장 장소
+        //---------------------------------------
 		/// <summary>[Please do not use it]</summary>
 		[HideInInspector, NonBackupField]
 		public GameObject _bakeUnlinkedGroup = null;
 
-		/// <summary>
-		/// [Please do not use it]
-		/// Instead of setting this variable, use function "SetImportant(bool isImportant)" instead.
-		/// </summary>
-		[SerializeField]
-		public bool _isImportant = true;
 
-
-		//자동 시작하는 AnimClipID
-		//-1이면 자동으로 시작되는 AnimClip은 없다.
+        // 애니메이션 자동 시작 옵션
+        //---------------------------------------
+		//자동 시작하는 AnimClipID. -1이면 자동으로 시작되는 AnimClip은 없다.
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField]
 		public int _autoPlayAnimClipID = -1;
@@ -351,6 +388,8 @@ namespace AnyPortrait
 		private bool _isAutoPlayCheckable = false;
 
 
+        // Optimized Bake 관련 변수
+        //---------------------------------------
 		//최적화된 Portrait
 		/// <summary>[Please do not use it]</summary>
 		[SerializeField, HideInInspector]
@@ -367,7 +406,9 @@ namespace AnyPortrait
 		public apPortrait _bakeSrcEditablePortrait = null;//Opt Target Bake시 (자신이 OptPortrait 일때) 그 소스가 되는 Portrait (타겟이 불확실할 경우 경고 메시지를 주기 위함)
 
 
-		//추가 3.22 : SortingLayer 관련
+        // Sorting 옵션
+        //---------------------------------------
+		//추가 3.22
 		//모든 Mesh는 동일한 Sorting Layer Name/Order를 가진다.
 		//Bake할 때 그 값이 같아야 한다.
 		[SerializeField]
@@ -393,6 +434,8 @@ namespace AnyPortrait
 
 
 
+        // Mecanim 옵션
+        //---------------------------------------
 		// 추가 4.26 : Mecanim 설정
 		[SerializeField]
 		public bool _isUsingMecanim = false;
@@ -410,16 +453,13 @@ namespace AnyPortrait
 		[SerializeField, NonBackupField]//백업은 안된다.
 		public Animator _animator = null;
 
-
-
-		//AnimClip 의 Asset과 연결 데이터
-		//[SerializeField, NonBackupField]
-		//public List<apAnimMecanimData_AssetPair> _animClipAssetPairs = new List<apAnimMecanimData_AssetPair>();
-
 		//메카님 레이어 정보 (Blend 포함)
 		[SerializeField, NonBackupField]
 		public List<apAnimMecanimData_Layer> _animatorLayerBakedData = new List<apAnimMecanimData_Layer>();
 
+
+        // PSD 임포트 기록
+        //---------------------------------------
 		[SerializeField, NonBackupField]
 		public List<apPSDSet> _bakedPsdSets = new List<apPSDSet>();
 
@@ -427,6 +467,9 @@ namespace AnyPortrait
 		[SerializeField, NonBackupField]
 		public List<apPSDSecondarySet> _bakedPsdSecondarySet = new List<apPSDSecondarySet>();
 
+
+        // 빌보드
+        //---------------------------------------
 		//추가 9.19
 		//빌보드 처리를 위한 카메라
 		public enum BILLBOARD_TYPE
@@ -452,22 +495,39 @@ namespace AnyPortrait
 		public BILLBOARD_PARENT_ROTATION _billboardParentRotation = BILLBOARD_PARENT_ROTATION.Ignore;
 
 
+        //추가 19.9.24 : 빌보드인 경우, 카메라의 SortMode를 강제로 Orthographic 고정할 것인지 여부 (기본값은 True)
+		[SerializeField]
+		public bool _isForceCamSortModeToOrthographic = true;
 
+
+
+		//추가 20.9.15 : 이전 프레임에서의 위치와 현재 프레임의 InvRotation Matrix를 계산하자.
+		//빌보드 처리를 위함
+		[NonSerialized]
+		private Vector3 _posW_Prev1F = Vector3.zero;
+
+		[NonSerialized]
+		private Matrix4x4 _rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+		[NonSerialized]
+		private Matrix4x4 _invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+
+        // 기본 컴포넌트
+        //---------------------------------------
 		[NonSerialized]
 		public Transform _transform = null;
 
-		#region [미사용 코드] 이전 코드 : 단일 카메라만 지원
-		//[NonSerialized]
-		//private Camera _curCamera = null;
-		//[NonSerialized]
-		//private Transform _curCameraTransform = null;
-		//[NonSerialized]
-		//private float _zDepthOnPerspectiveCam = 0.0f; 
-		#endregion
 
+        // 연결된 카메라 (마스크 렌더링 + 빌보드 연산용)
+        //---------------------------------------
+		// < 렌더링 카메라 >
 		//변경 : 1개 또는 다수의 카메라를 자동으로 탐색하여 처리
 		[NonSerialized]
 		private apOptMainCamera _mainCamera = null;
+
+		//추가 v1.6.0
+		[NonSerialized] private apOptMaskRenderCamera _maskRenderCamera = null;
 
 		//추가 19.9.24 : 멀티 카메라를 지원하기 위한 옵션 (VR인 경우에만 지원한다.)
 		public enum VR_SUPPORT_MODE
@@ -497,23 +557,24 @@ namespace AnyPortrait
 		/// </summary>
 		public enum CAMERA_CHECK_MODE : int
 		{
-			/// <summary>
-			/// Cameras are checked again only if the current camera becomes invalid. (default)
-			/// </summary>
+			/// <summary>Cameras are checked again only if the current camera becomes invalid. (default)</summary>
 			CurrentCameraMainly = 0,
-			/// <summary>
-			/// Always check all cameras in the scene.
-			/// </summary>
+			/// <summary>Always check all cameras in the scene.</summary>
 			AllSceneCameras = 1,
 		}
 		[SerializeField] public CAMERA_CHECK_MODE _cameraCheckMode = CAMERA_CHECK_MODE.CurrentCameraMainly;
 
+		//추가 v1.6.0 : 렌더링 옵션 일부를 apOptMesh > apPortrait로 옮긴다.
+		//다만, 이전 버전과 호환성을 위해서 Unknown을 둔다. (이건 임시로 판단)
+		public enum RENDER_PIPELINE_OPTION : int
+		{
+			Unknown = 0, BuiltIn = 1, SRP = 2,
+		}
+		[SerializeField] public RENDER_PIPELINE_OPTION _renderPipelineOption = RENDER_PIPELINE_OPTION.Unknown;
 
 
-		//추가 19.9.24 : 빌보드인 경우, 카메라의 SortMode를 강제로 Orthographic 고정할 것인지 여부 (기본값은 True)
-		[SerializeField]
-		public bool _isForceCamSortModeToOrthographic = true;
-
+        // 메시의 렌더링 옵션
+		//---------------------------------------
 		//추가 9.25 : 그림자 생성 모드 > 유니티 Enum( UnityEngine.Rendering.ShadowCastingMode과 동일하지만 일부러 따로 만듬
 		public enum SHADOW_CASTING_MODE
 		{
@@ -543,6 +604,8 @@ namespace AnyPortrait
 		[SerializeField] public REFLECTION_PROBE_USAGE _meshReflectionProbeUsage = REFLECTION_PROBE_USAGE.Off;
 
 
+        // Timeline 옵션
+        //---------------------------------------
 		//Unity 2017 이상 : Timeline 연동 : 별도의 함수 없이 바로 시작
 #if UNITY_2017_1_OR_NEWER
 		[Serializable]
@@ -565,20 +628,29 @@ namespace AnyPortrait
 #endif
 
 
+        // 에디터에서의 오브젝트의 출력 순서
+        //---------------------------------------
 		//추가 3.29 : 에디터의 Hierarchy에서 보여지는 순서에 대한 ID 리스트 클래스
 		[SerializeField, NonBackupField]
 		public apObjectOrders _objectOrders = new apObjectOrders();
 
-		//추가 19.5.26 : ModMeshSet을 사용한 "v1.1.7에 적용된용량 최적화 빌드가 되었는가"
+
+        // v1.1.7의 용량 최적화 빌드 여부
+        //---------------------------------------
+		//추가 19.5.26 : ModMeshSet을 사용한 "v1.1.7에 적용된 용량 최적화 빌드가 되었는가"
 		[SerializeField, NonBackupField]
 		public bool _isSizeOptimizedV117 = false;
 
 
+        // 재질 세트
+        //---------------------------------------
 		//추가 19.6.2 : MaterialSet를 저장하자. Bake시 이용함.
 		[SerializeField]
 		public List<apMaterialSet> _materialSets = new List<apMaterialSet>();
 
 
+        // 뒤집혀진(Flipped) 메시 처리 옵션
+        //---------------------------------------
 		//20.8.11 : 메시의 플립 체크시, "리깅 본을 검사"하는 항목을 추가할 수 있다.
 		//- 리깅 여부 관계없이 체크 (Check regardless of Rigging) : 대신 다소 느려질 수 있음
 		//- 리깅된 메시는 제외 (Excluding mesh with Rigging applied)
@@ -593,6 +665,9 @@ namespace AnyPortrait
 		[SerializeField]
 		public FLIPPED_MESH_CHECK _flippedMeshOption = FLIPPED_MESH_CHECK.TransformOnly;
 
+
+        // 스케일시 연산 방식
+        //---------------------------------------
 		//20.8.5 본과 자식 메시 그룹의 행렬 계산 모드를 결정할 수 있다.
 		public enum ROOT_BONE_SCALE_METHOD : int
 		{
@@ -604,6 +679,8 @@ namespace AnyPortrait
 		public ROOT_BONE_SCALE_METHOD _rootBoneScaleMethod = ROOT_BONE_SCALE_METHOD.Default;
 
 
+        // 애니메이션 전환시 미지정된 값에 대한 옵션
+        //---------------------------------------
 		//추가 22.5.15 : 애니메이션 전환시, 지정되지 않은 컨트롤 파라미터 애니메이션의 값을 "기본값"으로 할지 "마지막 값을 유지할지" 옵션
 		public enum UNSPECIFIED_ANIM_CONTROL_PARAM : int
 		{
@@ -614,33 +691,25 @@ namespace AnyPortrait
 		public UNSPECIFIED_ANIM_CONTROL_PARAM _unspecifiedAnimControlParamOption = UNSPECIFIED_ANIM_CONTROL_PARAM.RevertToDefaultValue;//기본값 : CP 기본값으로 복원
 
 
-
+		// 프리팹 옵션
+        //---------------------------------------
 		//추가 20.9.14 : 만약 작업 전에 프리팹으로서 생성된 객체였다면,
 		//Diconnect 하기 전에 "프리팹으로서의 Root Game Object"와 "프리팹 에셋"을 "복구용"으로 지정하자
 		//Optimized 객체도 별도로 프리팹이 될 수 있으므로, 따로 작업한다.
 		//이값은 에디터에서 처음 조회할 때 갱신한다.
 		//[Legacy] : Disconnect 하더라도 프리팹 정보가 남아있다. 복구시 이 변수들이 필요 없을 수 있다.
 		//[2018.3] : Disconnect 하면 프리팹 정보가 완전히 사라진다. 복구시 이 변수들이 꼭 필요하며, Inspector에서 이 정보도 날릴 수 있다.
-
 		[SerializeField, NonBackupField, HideInInspector]
 		public GameObject _rootGameObjectAsPrefabInstanceForRestore = null;
 
 		[SerializeField, NonBackupField, HideInInspector]
 		public UnityEngine.Object _srcPrefabAssetForRestore = null;
 
-		//추가 20.9.15 : 이전 프레임에서의 위치와 현재 프레임의 InvRotation Matrix를 계산하자.
-		//빌보드 처리를 위함
-		[NonSerialized]
-		private Vector3 _posW_Prev1F = Vector3.zero;
 
-		[NonSerialized]
-		private Matrix4x4 _rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+		
 
-		[NonSerialized]
-		private Matrix4x4 _invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-
-
-
+		// 동기화 (Synchronize)
+		//---------------------------------------
 		//추가 21.6.7 : 다른 Portrait에 연동해서 재생할 수 있다.
 		//애니메이션, 컨트롤 파라미터 따로 연동할 수 있다.
 		[NonSerialized]
@@ -652,20 +721,7 @@ namespace AnyPortrait
 		[NonSerialized]
 		private bool _isSyncChild = false;//다른 Portrait에 애니메이션이나 컨트롤 파라미터가 연동된다.
 
-		//이전
-		//private enum SYNC_METHOD
-		//{
-		//	None,
-		//	/// <summary>애니메이션만 동기화된다.</summary>
-		//	AnimationOnly,
-		//	/// <summary>컨트롤 파라미터만 동기화된다.</summary>
-		//	ControlParamOnly,
-		//	/// <summary>애니메이션과 컨트롤 파라미터가 동기화된다.</summary>
-		//	AnimationAndControlParam
-		//}
-		//[NonSerialized]
-		//private SYNC_METHOD _syncMethod = SYNC_METHOD.None;
-
+		
 		//변경 21.9.18 : 각각의 요청에 따른 동기화를 각각의 변수에 저장하자
 		[NonSerialized]
 		private bool _isSync_Animation = false;
@@ -685,6 +741,8 @@ namespace AnyPortrait
 		private apSyncPlay _syncPlay = null;
 
 
+		// 업데이트 배속
+		//---------------------------------------
 		//추가 21.10.7 : 시간 옵션
 		//스크립트를 이용해서 어느 시간을 사용할지 결정한다. (배속)
 		public enum DELTA_TIME_OPTION : int
@@ -708,18 +766,20 @@ namespace AnyPortrait
 
 
 
+		// 재질 병합
+		//---------------------------------------
 		//추가 21.12.22 : 재질 병합 기능을 사용하는가
 		//재질 병합은 "주도적으로 하는 Portrait"와 그것에 연결된 다른 Portrait들을 대상으로 한다.
 		//함수는 "주도적으로 하는 Portrait" 위주로 한다.
-		[NonSerialized]
-		private bool _isUseMergedMat = false;
-		[NonSerialized]
-		private apPortrait _mergeMatMainPortrait = null;
-		[NonSerialized]
-		private List<apPortrait> _mergedMatSubPortraits = null;
-		[NonSerialized]
-		public apOptMergedMaterial _optMergedMaterial = null;
+		[NonSerialized] private bool _isUseMergedMat = false;
+		[NonSerialized] private apPortrait _mergeMatMainPortrait = null;
+		[NonSerialized] private List<apPortrait> _mergedMatSubPortraits = null;
+		[NonSerialized] public apOptMergedMaterial _optMergedMaterial = null;
 
+
+
+		// 텔레포트 문제 해결 / 루트유닛 전환시 문제 해결
+		//---------------------------------------
 		//추가 22.7.7 : 불연속적인 이동(일명 텔레포트)을 하는 경우, 물리 효과 (지글본, 물리 재질)가 갑자기 튀는 경우가 있다.
 		//옵션에 따라서는 텔레포트시 해당 프레임에서는 물리 효과의 "이전 위치" 계산을 생략해야한다.
 		/// <summary>텔레포트 발생시 물리 처리 보정</summary>
@@ -747,12 +807,14 @@ namespace AnyPortrait
 
 		[NonSerialized] public bool _isPhysicsEnabledInPrevFrame = false;//이전 프레임에서 물리가 유효하게 동작했는가
 
-
+		
 		//추가 [v1.4.7]
 		//루트 유닛이 전환되는 경우 물리 효과가 튀면 안된다.
 		[NonSerialized] public bool _isCurrentRootUnitChanged = false;
 
 
+		// 낮은 빈도로 메시 갱신
+		//---------------------------------------
 		// 추가 v1.4.7
 		// 메시 갱신 빈도를 제어해서 낮은 프레임에서 동작하는 것처럼 보일 수 있다.
 		public enum MESH_UPDATE_FREQUENCY : int
@@ -792,7 +854,8 @@ namespace AnyPortrait
 		[NonSerialized] private float _tNotImportant_Elapsed = 0.0f;
 
 
-
+		// 업데이트 시점 옵션 (Update <-> LateUpdate)
+		//---------------------------------------
 		// 추가 v1.4.8 : 업데이트 시점
 		public enum PROCESS_EVENT_ON : int
 		{
@@ -801,6 +864,10 @@ namespace AnyPortrait
 		}
 		[SerializeField] public PROCESS_EVENT_ON _mainProcessEvent = PROCESS_EVENT_ON.LateUpdate;
 
+
+
+		// 루트 모션
+		//---------------------------------------
 		// 추가 v1.4.8 : 루트 모션
 		public enum ROOT_MOTION_MODE : int
 		{
@@ -843,9 +910,6 @@ namespace AnyPortrait
 		[SerializeField] public ROOT_MOTION_TARGET_TRANSFORM _rootMotionTargetTransformType = ROOT_MOTION_TARGET_TRANSFORM.Parent;
 		[SerializeField, NonBackupField] public Transform _rootMotionSpecifiedParentTransform = null;
 
-		
-		
-		
 
 		//조건을 체크하여 실제로 RootMotion이 어떻게 동작하는지의 모드 (유효성 검사 결과)
 		[NonSerialized] public ROOT_MOTION_MODE _rootMotionValidatedMode = ROOT_MOTION_MODE.None;
@@ -867,6 +931,10 @@ namespace AnyPortrait
 		[NonSerialized] private Vector3 _rootMotion_RequestedPos = Vector3.zero;
 
 
+
+
+		// IK 알고리즘 옵션
+		//---------------------------------------
 		//추가 [v1.5.0] IK 처리 알고리즘 - 에디터/런타임 별개 지정 가능
 		public enum IK_METHOD : int
 		{
@@ -877,6 +945,11 @@ namespace AnyPortrait
 		//v1.5.0 추가 : IK 처리 방식 (런타임)
 		[SerializeField] public IK_METHOD _IKMethod = IK_METHOD.CCD;//기본은 이전 버전에서 제작한 사람들을 위해서 기본값은 CCD 유지. 대신 새로 생성할땐 FABRIK을 지정한다.
 
+
+
+
+		// 보이지 않는 메시 업데이트 옵션
+		//---------------------------------------
 		//v1.5.0 추가 : 보이지 않는 메시를 업데이트하기 여부 (물리 움직임의 일관성을 위함)
 		public enum INVISIBLE_MESH_UPDATE : int
 		{
@@ -888,6 +961,9 @@ namespace AnyPortrait
 		[SerializeField] public INVISIBLE_MESH_UPDATE _invisibleMeshUpdate = INVISIBLE_MESH_UPDATE.NotUpdate;
 
 
+
+		// 클리핑 메시의 연산 타이밍 (Update / BeforeRendering)
+		//---------------------------------------
 		//v1.5.1 추가 : 클리핑 메시 업데이트 타이밍을 변경할 수 있다.
 		public enum CLIPPING_MESH_UPDATE : int
 		{
@@ -903,30 +979,37 @@ namespace AnyPortrait
 
 
 
+		//==========================================================================
+
+
+
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 주요 로직들 (MonoBehaviour - Init/Update)
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 		// Init
 		//-----------------------------------------------------
 		void Awake()
 		{
-
+#if UNITY_EDITOR
 			if (Application.isPlaying)
 			{
+#endif
 				if (_FPS < 10)
 				{
 					_FPS = 10;
 				}
-				//_isImportant = true;
-
-				//이전 > UpdateToken으로 변경
-				//_timePerFrame = 1.0f / (float)_FPS;
-				//_tDelta = _timePerFrame * UnityEngine.Random.Range(0.0f, 1.0f);
-
-
+				
 				if (_initStatus == INIT_STATUS.Ready)
 				{
 					//_initStatus = INIT_STATUS.Ready;
 					_funcAyncLinkCompleted = null;
 				}
+
+#if UNITY_EDITOR
 			}
+#endif
 		}
 
 
@@ -937,25 +1020,11 @@ namespace AnyPortrait
 			if (Application.isPlaying)
 			{
 #endif
-				if (_FPS < 10)
-				{
-					_FPS = 10;
-				}
-
-				//이전 > UpdateToken 방식으로 변경
-				//_timePerFrame = 1.0f / (float)_FPS;
-				//_tDelta = _timePerFrame * UnityEngine.Random.Range(0.0f, 1.0f);
-
-
 				if (_initStatus == INIT_STATUS.Ready)
 				{
 					Initialize();
 
-					//자동으로 시작을 해보자
-					//ShowRootUnit(); //<< Initialize에 이미 ShowRootUnit이 포함되어 있다.
-
 					_updateCount = 0;
-					//_updateKeyIndex = 0;
 				}
 
 				_controller.InitRequest();
@@ -972,7 +1041,6 @@ namespace AnyPortrait
 			if (Application.isPlaying)
 			{
 #endif
-
 				//추가 21.12.22 : 재질 병합시, 병합을 먼저 해제해야한다.
 				if (_isUseMergedMat)
 				{
@@ -983,6 +1051,13 @@ namespace AnyPortrait
 				//생성된 재질을 삭제하자.
 				apOptSharedMaterial.I.OnPortraitDestroyed(this);
 				_optBatchedMaterial.Clear(true);
+
+				//추가 v1.6.0
+				if(_maskRenderCamera != null)
+				{
+					//생성된 마스크 관련 데이터(RT, 커맨드 버퍼, 이벤트)를 삭제 및 해제
+					_maskRenderCamera.Clear();
+				}
 #if UNITY_EDITOR
 			}
 #endif
@@ -1035,7 +1110,6 @@ namespace AnyPortrait
 		//-----------------------------------------------------
 		void Update()
 		{
-
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 			{
@@ -1155,222 +1229,6 @@ namespace AnyPortrait
 				Debug.LogException(ex, this.gameObject);
 			}
 #endif
-
-			#region [미사용 코드]
-			////추가 21.4.3 : 출력할게 없다면 스크립트를 중단한다.
-			//if (_curPlayingOptRootUnit == null)
-			//{
-			//	_prevOptRootUnit = null;
-			//	return;
-			//}
-
-			////추가 21.6.8 : 동기화되어서 수동적으로 동작해야한다면 여기서 업데이트를 하지 않는다. (부모가 업데이트 함수를 호출해줘야 한다.)
-			//if (_isSyncChild)
-			//{
-			//	return;
-			//}
-
-
-			////추가 20.7.9 : 물리에서 공통적으로 사용할 DeltaTime을 계산한다.
-			//CalculatePhysicsTimer();
-
-
-			////추가 22.7.7 : 물리 텔레포트를 보정하기 위한 감지 함수를 호출한다.
-			//CheckTeleport();
-
-
-			//#region [핵심 코드 >>> Update에서 넘어온 코드]
-			////_tDelta += Time.deltaTime;//<<이전 방식 (Important가 아닌 경우)
-
-			//#region [사용 : 1프레임 지연 없이 사용하는 경우. 단, 외부 처리에 대해서는 Request 방식으로 처리해야한다.]
-
-			////추가 21.10.7 : 업데이트 시간 계산 옵션이 적용된다. 기존의 Time.deltaTime만 사용하지는 않는다.
-			//switch (_deltaTimeOption)
-			//{
-			//	case DELTA_TIME_OPTION.DeltaTime: _tCurUpdate = Time.deltaTime; break;
-			//	case DELTA_TIME_OPTION.UnscaledDeltaTime: _tCurUpdate = Time.unscaledDeltaTime; break;
-			//	case DELTA_TIME_OPTION.MultipliedDeltaTime: _tCurUpdate = Time.deltaTime * _deltaTimeMultiplier; break;
-			//	case DELTA_TIME_OPTION.MultipliedUnscaledDeltaTime: _tCurUpdate = Time.unscaledDeltaTime * _deltaTimeMultiplier; break;
-			//	case DELTA_TIME_OPTION.CustomFunction:
-			//		{
-			//			//추가 22.1.8: 콜백 함수 이용
-			//			if (_funcDeltaTimeRequested != null)
-			//			{
-			//				_tCurUpdate = _funcDeltaTimeRequested(_deltaTimeRequestSavedObject);
-			//			}
-			//			else
-			//			{
-			//				//함수가 없다면 옵션 변경
-			//				Debug.Log("AnyPortrait : The callback function to get the update time was null, so it's back to the default option.");
-			//				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
-			//				_tCurUpdate = Time.deltaTime;
-			//			}
-			//		}
-			//		break;
-			//}
-
-
-			////힘 관련 업데이트
-			//ForceManager.Update(_tCurUpdate);
-
-			////애니메이션 업데이트
-			//_animPlayManager.Update(_tCurUpdate);
-
-			////추가 20.11.23 : 애니메이션 정보가 모디파이어 처리에 반영되도록 매핑 클래스를 동작시킨다.
-			//_animPlayMapping.Update();
-
-
-			////추가 : 애니메이션 업데이트가 끝났다면 ->
-			////다른 스크립트에서 요청한 ControlParam 수정 정보를 반영한다.
-			//_controller.CompleteRequests();
-			//#endregion
-
-
-			////if (_tDelta > _timePerFrame)
-			////if(true)
-			//if (_curPlayingOptRootUnit != null)
-			//{
-			//	//추가 9.19 : Camera 체크
-			//	//if(_billboardType != BILLBOARD_TYPE.None)
-			//	//{
-			//	//	CheckAndRefreshCameras();
-			//	//} >> 이전 : 빌보드가 아닌 경우 생략
-
-			//	//변경 : 언제나
-			//	CheckAndRefreshCameras();
-
-
-			//	//전체 업데이트하는 코드
-			//	//일정 프레임마다 업데이트를 한다.
-			//	//#if UNITY_EDITOR
-			//	//					Profiler.BeginSample("Portrait - Update Transform");
-			//	//#endif
-			//	if (_isImportant)
-			//	{
-			//		//v1.4.7 : 매시 갱신 빈도 옵션을 적용한다.
-			//		_isMeshRefreshFrame = false;
-			//		switch (_meshRefreshRateOption)
-			//		{
-			//			case MESH_UPDATE_FREQUENCY.EveryFrames:
-			//				// [ 메시 갱신 빈도가 "매프레임 (기본값)"인 경우
-			//				_isMeshRefreshFrame = true;//항상 갱신
-			//				break;
-
-			//			case MESH_UPDATE_FREQUENCY.FixedFrames_NotSync:
-			//				{
-			//					// [ 메시 갱신 빈도가 "고정 프레임 + 동기화 안됨"인 경우
-			//					_tMeshRefreshTimer += Time.unscaledDeltaTime;
-			//					int refreshFPS = Mathf.Clamp(_meshRefreshRateFPS, MESH_REFRESH_FPS_MIN, MESH_REFRESH_FPS_MAX);
-			//					float secPerFrame = 1.0f / (float)refreshFPS;
-			//					if(_tMeshRefreshTimer > secPerFrame)
-			//					{
-			//						_tMeshRefreshTimer -= secPerFrame;
-			//						_isMeshRefreshFrame = true;
-			//					}
-			//				}
-			//				break;
-
-			//			case MESH_UPDATE_FREQUENCY.FixedFrames_Sync:
-			//				// [ 메시 갱신 빈도가 "고정 프레임 + 동기화됨"인 경우
-			//				//동기화된 타이머로부터 업데이트 여부를 받자
-			//				_isMeshRefreshFrame = apOptFixedFrameChecker.I.IsUpdatable(_meshRefreshRateFPS);
-
-			//				//Late Update에서 호출을 하자
-			//				apOptFixedFrameChecker.I.OnLateUpdate(_meshRefreshRateFPS);
-			//				break;
-			//		}
-
-			//		//v1.4.7
-			//		if(!_isMeshRefreshFrame)
-			//		{
-			//			//현재 프레임이 메시가 갱신되지 않는 (=건너뛰는) 프레임인데,
-			//			//다음의 경우엔 프레임 계산에 상관없이 무조건 메시를 갱신해야한다.
-			//			//- Root Unit이 변경된 경우 > 여기서 체크한다.
-			//			//- 상하좌우 플립이 된 경우 > UpdateTransforms의 내부의 CheckFlippedTransform() 구문에서 체크한다.
-
-			//			//Root Unit이 변경된 경우
-			//			if(_prevOptRootUnit != _curPlayingOptRootUnit)
-			//			{
-			//				_isMeshRefreshFrame = true;
-			//			}
-			//		}
-
-			//		//v1.4.7 변경 : UpdateTransform에 _isMeshRefreshFrame를 입력해서 메시 갱신 여부를 전달하자.
-			//		_curPlayingOptRootUnit.UpdateTransforms(_tCurUpdate, _isMeshRefreshFrame);
-
-			//	}
-			//	else
-			//	{	
-			//		//중앙에서 관리하는 토큰 업데이트
-
-			//		//이전
-			//		//if (apOptUpdateChecker.I.GetUpdatable(_updateToken))
-			//		//변경 v1.4.8 : Update에서 생성/갱신된 토큰의 값을 바로 사용한다.
-			//		bool isUpdatedFrame = _updateToken != null && _updateToken.IsUpdatable;
-
-			//		if (isUpdatedFrame)
-			//		{
-			//			_curPlayingOptRootUnit.UpdateTransforms(_updateToken.ResultElapsedTime, true);
-			//		}
-			//		else
-			//		{
-			//			_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
-			//		}
-
-			//		//메시 갱신 변수 자체는 매프레임 동작하게 만든다. (마스크등의 이슈로)
-			//		_isMeshRefreshFrame = true;
-
-
-			//		//추가 v1.4.8 : 업데이트 여부에 상관없이 토큰 후처리를 위해 호출한다.
-			//		apOptUpdateChecker.I.OnLateUpdate();
-			//	}
-
-			//}
-
-			//PostUpdate();//추가 20.9.15 : 현재 프레임의 위치등을 저장하자.
-
-			////추가 21.6.8 : 동기화된 객체라면, 자식 객체들의 업데이트를 대신 해주자
-			//if (_isSyncParent)
-			//{
-			//	int nChildPortrait = _syncChildPortraits.Count;
-			//	apPortrait childPortrait = null;
-			//	bool isAnyRemovedPortrait = false;
-			//	for (int i = 0; i < nChildPortrait; i++)
-			//	{
-			//		childPortrait = _syncChildPortraits[i];
-			//		if (childPortrait == null)
-			//		{
-			//			isAnyRemovedPortrait = true;
-			//			continue;
-			//		}
-
-			//		//업데이트를 대신 호출해준다.
-			//		childPortrait.UpdateAsSyncChild(_tCurUpdate, _isMeshRefreshFrame);
-			//	}
-			//	if (isAnyRemovedPortrait)
-			//	{
-			//		//알게모르게 삭제된게 있었다;
-			//		//리스트에서 제거해주자
-			//		_syncChildPortraits.RemoveAll(delegate (apPortrait a)
-			//		{
-			//			return a == null;
-			//		});
-
-			//		//만약 모두 삭제되었다.
-			//		if (_syncChildPortraits.Count == 0)
-			//		{
-			//			//동기화 해제
-			//			_isSyncParent = false;
-			//			_syncChildPortraits = null;
-			//		}
-			//	}
-			//}
-			//#endregion
-
-
-			////v1.4.7 : Cur > Prev로 OptRootUnit 저장
-			//_prevOptRootUnit = _curPlayingOptRootUnit; 
-			#endregion
 		}
 
 
@@ -1385,9 +1243,6 @@ namespace AnyPortrait
 				ProcessRootMotion_FixedUpdate();
 			}
 		}
-
-
-
 
 
 
@@ -1495,21 +1350,44 @@ namespace AnyPortrait
 						//현재 업데이트되는 프레임이다.
 						_curPlayingOptRootUnit.UpdateTransforms(_tNotImportant_Elapsed, true, _funcRootMotionEvent);
 					}
-					else
-					{
-						//업데이트되지 않는 프레임이다.
-#if UNITY_2017_1_OR_NEWER
-						//2017부터는 옵션에 따라 Mask Mesh 갱신 여부 설정 (렌더링 전에 시행할 수도 있다.)
-						if(_clippingMeshUpdate == CLIPPING_MESH_UPDATE.InUpdateRoutine)
-						{
-							_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
-						}
-#else
-						//2017 전에는 옵션 무관하게 여기서 바로 Mask Mesh 갱신
-						_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
-#endif				
-					}
+
+					// [v1.6.0] RootUnit의 UpdateTransformsOnlyMaskMesh 삭제.
+					// 마스크 처리는 MaskRenderCamera에서 일괄적으로 처리한다.
+// 					else
+// 					{
+// 						//업데이트되지 않는 프레임이다.
+// #if UNITY_2017_1_OR_NEWER
+// 						//2017부터는 옵션에 따라 Mask Mesh 갱신 여부 설정 (렌더링 전에 시행할 수도 있다.)
+// 						if(_clippingMeshUpdate == CLIPPING_MESH_UPDATE.InUpdateRoutine)
+// 						{
+// 							_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
+// 						}
+// #else
+// 						//2017 전에는 옵션 무관하게 여기서 바로 Mask Mesh 갱신
+// 						_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
+// #endif				
+// 					}
 				}
+
+
+				//추가 v1.6.0 : 마스크 연산을 여기서 일괄 처리 (옵션에 따라)
+				//Built-in + 단일 카메라에서의 마스크 업데이트는 Calculte 과정에서 한다.
+#if UNITY_2017_1_OR_NEWER
+				//2017부터는 옵션에 따라 Mask Mesh 갱신 여부 설정 (렌더링 전에 시행할 수도 있다.)
+				if(_clippingMeshUpdate == CLIPPING_MESH_UPDATE.InUpdateRoutine)
+				{
+					if(_maskRenderCamera != null)
+					{
+						_maskRenderCamera.RenderEvent_CalculateCall();
+					}
+				}				
+#else
+				//그 이전 버전의 Unity에서는 BeforeRendering이 없어서 옵션 적용 안됨
+				if(_maskRenderCamera != null)
+				{
+					_maskRenderCamera.RenderEvent_CalculateCall();
+				}
+#endif
 			}
 
 
@@ -1519,9 +1397,11 @@ namespace AnyPortrait
 				UpdateSyncedChildren();
 			}
 
-
 			//v1.4.7 : Cur > Prev로 OptRootUnit 저장
 			_prevOptRootUnit = _curPlayingOptRootUnit;
+
+			//v1.6.0 : 애니메이션의 종료 콜백을 여기서 일괄 호출한다.
+			_animPlayManager.InvokeEndPlayUnitEvents();
 		}
 
 
@@ -2277,20 +2157,41 @@ namespace AnyPortrait
 					{	
 						_curPlayingOptRootUnit.UpdateTransformsAsSyncChild(notImportantElapsedTime, _isSync_Bone, true, _funcRootMotionEvent);//동기화용
 					}
-					else
+
+					//[v1.6.0] RootUnit의 UpdateTransformsOnlyMaskMesh는 삭제되었다.
+					// 마스크 연산은 MaskRenderCamera에서 일괄적으로 수행된다.
+// 					else
+// 					{
+// #if UNITY_2017_1_OR_NEWER
+// 						//2017부터는 옵션에 따라 Mask Mesh 갱신 여부 설정 (렌더링 전에 시행할 수도 있다.)
+// 						if(_clippingMeshUpdate == CLIPPING_MESH_UPDATE.InUpdateRoutine)
+// 						{
+// 							_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
+// 						}
+// #else
+// 						//2017 전에는 옵션 무관하게 여기서 바로 Mask Mesh 갱신
+// 						_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
+// #endif
+// 					}
+				}
+
+				//v1.6.0 마스크 연산은 MaskRenderCamera에서 일괄적으로 처리한다.
+				//여기서는 Built-in+단일 카메라 연산을 수행한다.
+#if UNITY_2017_1_OR_NEWER				
+				if(_clippingMeshUpdate == CLIPPING_MESH_UPDATE.InUpdateRoutine)
+				{
+					//옵션에 의해서 마스크 연산 시점을 Update와 BeforeRendering 중에서 결정할 수 있다.
+					if(_maskRenderCamera != null)
 					{
-#if UNITY_2017_1_OR_NEWER
-						//2017부터는 옵션에 따라 Mask Mesh 갱신 여부 설정 (렌더링 전에 시행할 수도 있다.)
-						if(_clippingMeshUpdate == CLIPPING_MESH_UPDATE.InUpdateRoutine)
-						{
-							_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
-						}
-#else
-						//2017 전에는 옵션 무관하게 여기서 바로 Mask Mesh 갱신
-						_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
-#endif
+						_maskRenderCamera.RenderEvent_CalculateCall();
 					}
 				}
+#else
+				if(_maskRenderCamera != null)
+				{
+					_maskRenderCamera.RenderEvent_CalculateCall();
+				}
+#endif
 
 			}
 
@@ -2298,6 +2199,9 @@ namespace AnyPortrait
 
 			//v1.4.7
 			_prevOptRootUnit = _curPlayingOptRootUnit;
+
+			//v1.6.0 : 애니메이션의 종료 콜백을 여기서 일괄 호출한다.
+			_animPlayManager.InvokeEndPlayUnitEvents();
 		}
 
 
@@ -2475,46 +2379,9 @@ namespace AnyPortrait
 		}
 #endif
 
-		//변경 20.7.9 [EnterPlayMode 기능 관련 개선 코드]
-		//유니티 2019.3에서 EnterPlayMode에 들어갈 때 Domain Reload를 스킵할 수 있다.
-		//문제는, Link를 하기 위해서 _initStatus가 초기화 되어야 하는 apPortrait인데, 이게 Completed 상태로 그냥 남아버릴 수 있다.
-		//여러가지 처리가 있을 수 있지만, 그냥 Domain Reload가 스킵된 상태로 게임에 진입하면 모든 apPortrait를 찾아서
-		//강제 초기화 함수를 실행하도록 만들자.
-#if UNITY_2019_3_OR_NEWER && UNITY_EDITOR
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-		private static void InitForceWhenDomainReloadSkipped()
-		{
-			//Debug.LogWarning("InitForceWhenSkipDomainReload");
-			//존재하는 모든 apPortrait를 찾는다.
-			
-			//v1.4.8 : Unity 2023용 코드 분기
-#if UNITY_2023_1_OR_NEWER
-			apPortrait[] portraitsInScene = GameObject.FindObjectsByType<apPortrait>(FindObjectsSortMode.None);
-#else
-			apPortrait[] portraitsInScene = GameObject.FindObjectsOfType<apPortrait>();
-#endif
-
-			if(portraitsInScene != null && portraitsInScene.Length > 0)
-			{
-				for (int i = 0; i < portraitsInScene.Length; i++)
-				{
-					portraitsInScene[i].ResetInitStatusToReadyWhenDomainReloadSkipped();
-				}
-			}
-		}
-
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		private void ResetInitStatusToReadyWhenDomainReloadSkipped()
-		{
-			//Debug.LogError("Init Status [" + _initStatus + " > INIT_STATUS.Ready] (" + gameObject.name + ")");
-			_initStatus = INIT_STATUS.Ready;
-		}
-#endif
 
 
-
+		
 		//v1.5.1 : 클리핑 마스크 업데이트를 렌더링 직전에 수행하기
 		private void OnUpdateMaskMeshBeforeRendering()
 		{
@@ -2527,244 +2394,34 @@ namespace AnyPortrait
 				return;
 			}
 
-			_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
-		}
+			//이전
+			//_curPlayingOptRootUnit.UpdateTransformsOnlyMaskMesh();
 
-
-		// Event
-		//-----------------------------------------------------
-
-#if UNITY_EDITOR
-
-		//추가 12.13
-		//apOptMesh의 OnValidate에서 호출되는 함수.
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void OnMeshResetInEditor()
-		{
-
-
-			if (Application.isEditor && !Application.isPlaying)
+			//변경 v1.6.0 : MaskRenderCamera에서 일괄 수행
+			if(_maskRenderCamera != null)
 			{
-				//19.10.26 : 빌보드를 일단 끈다.
-				apPortrait.BILLBOARD_TYPE billboardType = _billboardType;
-
-				try
-				{
-					if (_optMeshes != null && _optMeshes.Count > 0)
-					{
-						//Debug.LogError("OnMeshResetInEditor : " + this.name);
-
-						for (int i = 0; i < _optMeshes.Count; i++)
-						{
-							_optMeshes[i].InitMesh(true);
-							_optMeshes[i].ResetMeshAndMaterialIfMissing();
-						}
-						UpdateForce();
-					}
-				}
-				catch (Exception ex)
-				{
-					Debug.LogError("AnyPortrait : Refresh Meshes Failed\n" + ex);
-				}
-
-				_billboardType = billboardType;//복구
-
-				//추가 22.1.9 : 첫번째 루트 유닛만 보여준다.
-				int nOptRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
-				if (nOptRootUnits > 0)
-				{
-					ShowRootUnitWhenBake(_optRootUnitList[0]);
-				}
+				_maskRenderCamera.RenderEvent_CalculateCall();
 			}
 		}
-#endif
+
+
+		//추가. 업데이트가 끝나면 이 함수를 호출하자.
+		private void PostUpdate()
+		{
+			//빌보드인 경우, 현재 프레임에서의 위치를 저장한다. (나중에 "이전 프레임의 위치"로서 가져올 수 있게)
+			_posW_Prev1F = _transform.position;
+
+
+			//추가 v1.4.7 : 루트 유닛 변경에 따른 물리 튐 현상 버그 변수 초기화
+			_isCurrentRootUnitChanged = false;
+		}
+
 
 
 		// Functions
 		//-----------------------------------------------------
 
-		/// <summary>
-		/// Show one of the Root Units. 
-		/// The Root Unit can have an animation clip that starts automatically, or it can be the first Root Unit.
-		/// </summary>
-		public void ShowRootUnit()
-		{
-			//RootUnit 플레이 조건
-			//1. 자동 시작 AnimClip이 있다면 그걸 가지고 있는 RootUnit을 시작한다.
-			//2. 없다면 0번 RootUnit을 재생
-
-			apOptRootUnit targetOptRootUnit = null;
-			apAnimClip firstPlayAnimClip = null;
-
-			if (_isAutoPlayCheckable && _autoPlayAnimClipID >= 0)
-			{
-				apAnimClip curAnimClip = null;
-				for (int i = 0; i < _animClips.Count; i++)
-				{
-					curAnimClip = _animClips[i];
-					if (curAnimClip._uniqueID == _autoPlayAnimClipID
-						&& curAnimClip._targetOptTranform != null)
-					{
-						if (curAnimClip._targetOptTranform._rootUnit != null)
-						{
-							//자동 재생할 Root Unit을 찾았다.
-							targetOptRootUnit = curAnimClip._targetOptTranform._rootUnit;
-							firstPlayAnimClip = curAnimClip;
-
-							break;
-						}
-					}
-				}
-			}
-
-			_isAutoPlayCheckable = false;
-
-			//없다면 0번 RootUnit 을 선택한다.
-			if (targetOptRootUnit == null)
-			{
-				if (_optRootUnitList.Count > 0)
-				{
-					targetOptRootUnit = _optRootUnitList[0];
-				}
-			}
-
-			
-			apOptRootUnit prevRootUnit = _curPlayingOptRootUnit;//v1.4.7 추가
-
-			_curPlayingOptRootUnit = null;
-			apOptRootUnit optRootUnit = null;
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				optRootUnit = _optRootUnitList[i];
-				if (optRootUnit == targetOptRootUnit)
-				{
-					//이건 Show를 하자
-					optRootUnit.Show();
-					_curPlayingOptRootUnit = targetOptRootUnit;
-				}
-				else
-				{
-					//이건 Hide
-					optRootUnit.Hide();
-				}
-			}
-
-			//v1.4.7 : 루트 유닛이 변경되는 것을 체크한다.
-			_isCurrentRootUnitChanged = prevRootUnit != _curPlayingOptRootUnit;
-
-			//자동 재생을 한다.
-			if (firstPlayAnimClip != null)
-			{
-				//이전
-				//PlayNoDebug(firstPlayAnimClip._name);
-
-				if (!_isUsingMecanim)
-				{
-					//변경
-					Play(firstPlayAnimClip._name);
-				}
-
-			}
-
-			//만약 숨어있다가 나타날때 위치가 바뀌어있었다면 워프 가능성이 있다.
-			//이 경우를 대비해서 물리 위치를 현재 위치로 갱신해두자
-			if (_transform != null)
-			{
-				_transform = transform;
-			}
-			_posW_Prev1F = _transform.position;
-
-
-			//v1.4.9 : 루트유닛이 바뀌면 한번이 아닌 3번의 프레임동안 물리가 비활성화된다.
-			//1번으로는 물리가 이상하게 작동하는 듯
-			if(_isCurrentRootUnitChanged)
-			{
-				_preventPhysicsCount = 3;
-			}
-		}
-
-		/// <summary>
-		/// Makes the input Root Unit visible. 
-		/// If it has an animation clip that plays automatically, this animation clip will play automatically.
-		/// </summary>
-		/// <param name="targetOptRootUnit">Root Unit to be visible</param>
-		public void ShowRootUnit(apOptRootUnit targetOptRootUnit)
-		{
-			apAnimClip firstPlayAnimClip = null;
-			if (_isAutoPlayCheckable && _autoPlayAnimClipID >= 0)
-			{
-				//자동 재생은 제한적으로 실행한다.
-				//targetOptRootUnit에 포함된 AnimClip만 실행된다.
-				apAnimClip curAnimClip = null;
-				for (int i = 0; i < _animClips.Count; i++)
-				{
-					curAnimClip = _animClips[i];
-					if (curAnimClip._uniqueID == _autoPlayAnimClipID
-						&& curAnimClip._targetOptTranform != null)
-					{
-						if (curAnimClip._targetOptTranform._rootUnit != null
-							&& curAnimClip._targetOptTranform._rootUnit == targetOptRootUnit)
-						{
-							//자동 재생할 AnimClip을 찾았다.
-							firstPlayAnimClip = curAnimClip;
-							break;
-						}
-					}
-				}
-			}
-
-			_isAutoPlayCheckable = false;
-
-
-			apOptRootUnit prevRootUnit = _curPlayingOptRootUnit;//v1.4.7 추가
-
-			_curPlayingOptRootUnit = null;
-			apOptRootUnit optRootUnit = null;
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				optRootUnit = _optRootUnitList[i];
-				if (optRootUnit == targetOptRootUnit)
-				{
-					//이건 Show를 하자
-					optRootUnit.Show();
-					_curPlayingOptRootUnit = targetOptRootUnit;
-				}
-				else
-				{
-					//이건 Hide
-					optRootUnit.Hide();
-				}
-			}
-
-
-			//v1.4.7 : 루트 유닛이 변경되는 것을 체크한다.
-			_isCurrentRootUnitChanged = prevRootUnit != _curPlayingOptRootUnit;
-
-
-			//자동 재생을 한다.
-			if (firstPlayAnimClip != null)
-			{
-				//Play(firstPlayAnimClip._name);
-
-				if (!_isUsingMecanim)
-				{
-					//변경
-					Play(firstPlayAnimClip._name);
-				}
-			}
-
-			//v1.4.9 : 루트유닛이 바뀌면 한번이 아닌 3번의 프레임동안 물리가 비활성화된다.
-			//1번으로는 물리가 이상하게 작동하는 듯
-			if(_isCurrentRootUnitChanged)
-			{
-				_preventPhysicsCount = 3;
-			}
-		}
-
-
-		//추가 21.9.21 : 애니메이션 재생 없이 루트 유닛을 전환하는 함수		
+		//추가 21.9.21 : 애니메이션 재생 없이 루트 유닛을 전환하는 함수 (SyncPlay에서 호출)
 		public void SwitchRootUnitWithoutPlayAnim(apOptRootUnit targetOptRootUnit)
 		{
 			_isAutoPlayCheckable = false;
@@ -2806,1074 +2463,16 @@ namespace AnyPortrait
 
 
 
-
-		/// <summary>
-		/// Hide all Root Units
-		/// </summary>
-		public void HideRootUnits()
-		{
-			StopAll();
-
-			//추가 21.4.3
-			//StopAll이 적용되려면 업데이트가 한번 되어야 한다.
-			//Hide되면 애니메이션이 업데이트되지 않으므로, 여기서 강제로 업데이트를 한번 더 하자
-			if (!_isUsingMecanim)
-			{
-				//_animPlayManager.Update(0.0f);
-				_animPlayManager.ReleaseAllPlayUnitAndQueues();
-			}
-
-			//모두 숨기기
-			_curPlayingOptRootUnit = null;
-
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				_optRootUnitList[i].Hide();
-			}
-
-			_isCurrentRootUnitChanged = false;
-		}
+		
 
 
 
-		//추가 21.3.14 : 실행중인 RootUnit을 리턴한다.
-		/// <summary>
-		/// Return the currently playing Root Unit.
-		/// </summary>
-		/// <returns>Root Unit currently playing. If not, return null</returns>
-		public apOptRootUnit GetCurrentRootUnit()
-		{
-			return _curPlayingOptRootUnit;
-		}
 
-		/// <summary>
-		/// Return the index of the currently playing Root Unit.
-		/// </summary>
-		/// <returns>Index of the currently playing Root Unit. If not, return -1</returns>
-		public int GetCurrentRootUnitIndex()
-		{
-			if (_curPlayingOptRootUnit == null)
-			{
-				return -1;
-			}
-			return _optRootUnitList.IndexOf(_curPlayingOptRootUnit);
-		}
-
-
-
-		/// <summary>
-		/// Initializes the command buffer for clipping mask processing.
-		/// </summary>
-		/// <param name="targetOptRootUnit">Target Root Unit</param>
-		/// <param name="isRegistToCamera">If True, re-register the command buffers to the camera after initialization.</param>
-		public void ResetMeshCommandBuffer(apOptRootUnit targetOptRootUnit, bool isRegistToCamera)
-		{
-			if (targetOptRootUnit == null)
-			{
-				return;
-			}
-			targetOptRootUnit.ResetCommandBuffer(isRegistToCamera);
-		}
-
-		/// <summary>
-		/// [Please do not use it]
-		/// Bake Function likes "ShowRootUnit" using Default Visible Value.
-		/// </summary>
-		/// <param name="targetOptRootUnit">Target Root Unit</param>
-		public void ShowRootUnitWhenBake(apOptRootUnit targetOptRootUnit)
-		{
-			_curPlayingOptRootUnit = null;
-			apOptRootUnit optRootUnit = null;
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				optRootUnit = _optRootUnitList[i];
-				if (optRootUnit == targetOptRootUnit)
-				{
-					//이건 Show를 하자
-					optRootUnit.ShowWhenBake();
-					_curPlayingOptRootUnit = targetOptRootUnit;
-				}
-				else
-				{
-					//이건 Hide
-					optRootUnit.Hide();
-				}
-			}
-
-			_isCurrentRootUnitChanged = false;
-		}
-
-
-
-		/// <summary>Turn physical effects on or off.</summary>
-		/// <param name="isPhysicEnabled"></param>
-		public void SetPhysicEnabled(bool isPhysicEnabled)
-		{
-			_isPhysicsPlay_Opt = isPhysicEnabled;
-		}
-
-
-		///// <summary>
-		///// [Do not use this function]
-		///// </summary>
-		//public void IgnoreAnimAutoPlayOption()
-		//{
-		//	_isAutoPlayCheckable = false;
-		//}
 
 		//--------------------------------------------------------------------------------------
 		// Runtime Optimized
 		//--------------------------------------------------------------------------------------
-		//첫 Bake 후 또는 시작후 로딩시 Modifier -> 해당 OptTransform을 연결한다.
-		/// <summary>
-		/// Initialize before updating. 
-		/// This is done automatically if you do not call the function directly. 
-		/// "AsyncInitialize()" is recommended when it takes a lot of execution time.
-		/// </summary>
-		public bool Initialize()
-		{
-			// < 단계 1 > : 기본 초기화 (비동기 함수에서는 비동기 전에 호출하는 구문)
-
-			//Debug.Log("LinkModifierAndMeshGroups_Opt");
-			if (_initStatus != INIT_STATUS.Ready)
-			{
-				//엥 비동기 로딩 중이거나 로딩이 끝났네염
-				//Debug.LogError(">>> 이미 로딩이 된 상태. 초기화 필요");
-				return false;
-			}
-
-			if (_transform == null)
-			{
-				_transform = transform;
-			}
-
-			//Transform 추가시 위치를 초기화하자 (20.9.15)
-			_posW_Prev1F = _transform.position;
-			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-
-
-
-			//HideRootUnits();//삭제 21.5.27
-
-			_funcAyncLinkCompleted = null;
-			_isAutoPlayCheckable = true;
-
-			_prevOptRootUnit = null;//추가 v1.4.7
-
-
-			// < 단계 2 > : Hide Root Unit 전의 초기화 | 비동기에서는 첫 Yield 이전의 실행될 코드
-
-			//추가 20.7.5 : 컨트롤 파라미터를 초기화 (이게 왜 없었지)
-			_controller.InitRuntime(this);
-
-
-			//추가 20.11.23 : 모디파이어 최적화를 위한 애니메이션 매핑 클래스
-			//생성과 동시에 링크가 된다.
-			if (_animPlayMapping == null)
-			{
-				_animPlayMapping = new apAnimPlayMapping(this);
-			}
-			else
-			{
-				//다시 링크를 하자
-				_animPlayMapping.Link(this);
-			}
-
-
-			//추가 12.7 : OptRootUnit도 Link를 해야한다.
-			for (int iOptRootUnit = 0; iOptRootUnit < _optRootUnitList.Count; iOptRootUnit++)
-			{
-				_optRootUnitList[iOptRootUnit].Link(this);
-			}
-
-			//MeshGroup -> OptTransform을 돌면서 처리
-			for (int iOptTransform = 0; iOptTransform < _optTransforms.Count; iOptTransform++)
-			{
-				_optTransforms[iOptTransform].ClearResultParams(false);
-			}
-
-			//HideRootUnits();//삭제 21.5.27 : 동기 초기화에서는 필요없다.
-
-
-
-			// < 단계 3 > : Batched Mat, OptTransform, 초기화
-
-			//추가 : BatchedMat도 연결
-			_optBatchedMaterial.Link(this);
-
-			for (int i = 0; i < _optMeshes.Count; i++)
-			{
-				_optMeshes[i].InitMesh(true);//<<이때 ShowHide도 결정된다.
-				_optMeshes[i].InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
-			}
-
-			apOptTransform curOptTransform = null;
-			List<apOptModifierUnitBase> curModifiers = null;
-			apOptModifierUnitBase curModifier = null;
-			List<apOptParamSetGroup> curParamSetGroups = null;
-			apOptParamSetGroup curParamSetGroup = null;
-			List<apOptParamSet> curParamSets = null;
-
-
-			for (int iOptTransform = 0; iOptTransform < _optTransforms.Count; iOptTransform++)
-			{
-				curOptTransform = _optTransforms[iOptTransform];
-
-				curModifiers = curOptTransform._modifierStack._modifiers;
-				for (int iMod = 0; iMod < curModifiers.Count; iMod++)
-				{
-					curModifier = curModifiers[iMod];
-
-					//Portrait를 연결해준다.
-					curModifier.Link(this, curOptTransform);
-
-					curParamSetGroups = curModifier._paramSetGroupList;
-					for (int iPSGroup = 0; iPSGroup < curParamSetGroups.Count; iPSGroup++)
-					{
-						curParamSetGroup = curParamSetGroups[iPSGroup];
-
-						//List<apModifierParamSet> paramSets = mod._paramSetList;
-						//1. Key를 세팅해주자
-						switch (curParamSetGroup._syncTarget)
-						{
-							case apModifierParamSetGroup.SYNC_TARGET.Static:
-								break;
-
-							case apModifierParamSetGroup.SYNC_TARGET.Controller:
-								curParamSetGroup._keyControlParam = GetControlParam(curParamSetGroup._keyControlParamID);
-								break;
-
-							case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
-								break;
-						}
-
-
-						curParamSets = curParamSetGroup._paramSetList;
-
-						for (int iParamSet = 0; iParamSet < curParamSets.Count; iParamSet++)
-						{
-							//Param Set Link
-							curParamSets[iParamSet].LinkParamSetGroup(curParamSetGroup, this);
-						}
-					}
-				}
-
-				//이전
-				//optTransform.RefreshModifierLink();//이 코드는 사용되지 않는다. Root OptTransform에서만 호출해야한다.
-			}
-
-
-			// < 단계 4 > : Root Unit, Anim Clip 초기화
-
-			apOptRootUnit curRootUnit = null;
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				curRootUnit = _optRootUnitList[i];
-
-				curRootUnit._rootOptTransform.ClearResultParams(true);
-				curRootUnit._rootOptTransform.RefreshModifierLink(true, true);
-
-				//추가 20.8.30
-				curRootUnit._rootOptTransform.Initialize(true, true, this);
-			}
-
-			for (int i = 0; i < _animClips.Count; i++)
-			{
-				_animClips[i].LinkOpt(this);
-			}
-
-			//AnimPlayer를 추가했다.
-			_animPlayManager.LinkPortrait(this);
-
-
-			// < 단계 5 > : 메타 데이터를 초기화
-
-			//추가 22.5.18 [v1.4.0] 지연된 애니메이션 실행 요청
-			if (_animPlayDeferredRequest == null)
-			{
-				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
-			}
-			_animPlayDeferredRequest.Ready();
-
-
-			//추가 21.9.24 : 유니티 이벤트를 사용하는 경우
-			if (_animEventCallMode == ANIM_EVENT_CALL_MODE.Callback)
-			{
-				if (_unityEventWrapper == null)
-				{
-					_unityEventWrapper = new apUnityEventWrapper();
-				}
-				_unityEventWrapper.Link(this);
-			}
-
-			//추가 22.6.8 : 애니메이션, 텍스쳐등을 빠르게 접근하기 위한 매핑 변수 생성
-			MakeFastReferMapping();
-
-
-
-
-			//여기로 옮기기
-			HideRootUnits();
-
-
-			//추가 21.10.7 : 배속 옵션 초기화 (함수 호출이 없었다면)
-			if (!_isDeltaTimeOptionChanged)
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
-				_deltaTimeMultiplier = 1.0f;
-				_funcDeltaTimeRequested = null;
-				_deltaTimeRequestSavedObject = null;
-			}
-
-			//추가 21.12.22 : 재질 병합 관련 변수 초기화
-			_isUseMergedMat = false;
-			_mergeMatMainPortrait = null;
-			_mergedMatSubPortraits = null;
-
-			//추가 22.7.7 : 텔레포트 관련 변수 초기화
-			_isTeleportChecked = false;//이전에 텔레포트가 체크되었는가.
-			_teleportCheck_PosPrev = Vector3.zero;//이전 프레임에서의 텔레포트
-			_teleportCheck_ScalePrev = Vector3.one;//[v1.5.0] 텔레포트의 스케일 체크
-			_teleportCheck_RotationPrev = Vector3.zero;//[v1.5.0] 텔레포트의 회전 체크
-
-			_isCurrentTeleporting = false;//현재 프레임에서 텔레포트가 발생했는가
-			_isPhysicsEnabledInPrevFrame = false;//이전에 물리 연산이 있었는가
-			_curPlayingOptRootUnit = null;
-
-			//추가 v1.4.7 : 루트유닛 변경에 따른 물리 튀는 문제 변수 초기화
-			_isCurrentRootUnitChanged = false;
-
-			//추가 v1.4.8 : 루트 모션 유효성 체크
-			ValidateRootMotion();
-
-
-
-			//로딩 끝
-			_initStatus = INIT_STATUS.Completed;
-
-			CleanUpMeshesCommandBuffers();
-
-			//추가 : 초기화시 카메라 갱신 로직 필요
-			CheckAndRefreshCameras(false);//false : 여기서는 카메라 변경(초기화>발견)시에도 커맨드 버퍼를 갱신하지 않는다. ShowRootUnit에서 버퍼가 생성될 것임
-
-			ShowRootUnit();
-
-			return true;
-		}
-
-
-
-		//-------------------------------------------
-		// 비동기 방식의 로딩
-		//-------------------------------------------
-		/// <summary>
-		/// Initialize asynchronously using coroutine. It does the same thing as the "Initialize ()" function.
-		/// </summary>
-		/// <returns>It returns False if it is already initialized or in progress. If it is true, it means that the initialization starts normally.</returns>
-		public bool AsyncInitialize()
-		{
-			if (_initStatus != INIT_STATUS.Ready)
-			{
-				//오잉 비동기 로딩중이거나 로딩이 끝났네염
-				return false;
-			}
-
-			//비동기 로딩 시작
-			_initStatus = INIT_STATUS.AsyncLoading;
-
-			if (_transform == null)
-			{
-				_transform = transform;
-			}
-
-			//Transform 추가시 위치를 초기화하자 (20.9.15)
-			_posW_Prev1F = _transform.position;
-			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-
-			_prevOptRootUnit = null;//추가 v1.4.7
-
-			//지연된 플레이 요청 초기화 (여기선 HideRootUnits보단 미리 호출되어야 한다.)
-			if (_animPlayDeferredRequest == null)
-			{
-				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
-			}
-			_animPlayDeferredRequest.Ready();
-
-
-
-			HideRootUnits();
-
-
-
-			StartCoroutine(LinkOptCoroutine());
-
-			return true;
-		}
-
-
-		/// <summary>
-		/// Initialize asynchronously using coroutine. It does the same thing as the "Initialize ()" function.
-		/// </summary>
-		/// <param name="onAsyncLinkCompleted">Functions to receive callbacks when initialization is complete.</param>
-		/// <returns>It returns False if it is already initialized or in progress. If it is true, it means that the initialization starts normally.></returns>
-		public bool AsyncInitialize(OnAsyncLinkCompleted onAsyncLinkCompleted)
-		{
-			if (_initStatus != INIT_STATUS.Ready)
-			{
-				//오잉 비동기 로딩중이거나 로딩이 끝났네염
-				return false;
-			}
-
-			//비동기 로딩 시작
-			_initStatus = INIT_STATUS.AsyncLoading;
-
-			_funcAyncLinkCompleted = onAsyncLinkCompleted;
-
-			//for (int i = 0; i < _optMeshes.Count; i++)
-			//{
-			//	_optMeshes[i].InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
-			//	_optMeshes[i].Hide();
-			//}
-
-			if (_transform == null)
-			{
-				_transform = transform;
-			}
-
-			//Transform 추가시 위치를 초기화하자 (20.9.15)
-			_posW_Prev1F = _transform.position;
-			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-
-			_prevOptRootUnit = null;//추가 v1.4.7
-
-
-			//지연된 플레이 요청 초기화 (여기선 HideRootUnits보단 미리 호출되어야 한다.)
-			if (_animPlayDeferredRequest == null)
-			{
-				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
-			}
-			_animPlayDeferredRequest.Ready();
-
-
-
-			HideRootUnits();
-
-			StartCoroutine(LinkOptCoroutine());
-
-			return true;
-
-		}
-
-		/// <summary>
-		/// Initialize using coroutine. 
-		/// This function runs at low CPU usage by setting the "time interval at which Yield is called" by the user. 
-		/// However, the processing time may be very long.
-		/// </summary>
-		/// <param name="timePerYield">Time value for whether Yield is called every few milliseconds during initialization.(10ms ~ 1000ms)</param>
-		/// <param name="onAsyncLinkCompleted">Functions to receive callbacks when initialization is complete.</param>
-		/// <returns>It returns False if it is already initialized or in progress. If it is true, it means that the initialization starts normally.></returns>
-		public bool AsyncInitialize(int timePerYield, OnAsyncLinkCompleted onAsyncLinkCompleted = null)
-		{
-			if (_initStatus != INIT_STATUS.Ready)
-			{
-				//오잉 비동기 로딩중이거나 로딩이 끝났네염
-				return false;
-			}
-
-			//비동기 로딩 시작
-			_initStatus = INIT_STATUS.AsyncLoading;
-
-			apAsyncTimer asyncTimer = new apAsyncTimer(timePerYield);
-
-			_funcAyncLinkCompleted = onAsyncLinkCompleted;
-
-			if (_transform == null)
-			{
-				_transform = transform;
-			}
-
-			//Transform 추가시 위치를 초기화하자 (20.9.15)
-			_posW_Prev1F = _transform.position;
-			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-
-			_prevOptRootUnit = null;//추가 v1.4.7
-
-			//지연된 플레이 요청 초기화 (여기선 HideRootUnits보단 미리 호출되어야 한다.)
-			if (_animPlayDeferredRequest == null)
-			{
-				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
-			}
-			_animPlayDeferredRequest.Ready();
-
-
-			HideRootUnits();
-
-
-			StartCoroutine(LinkOptCoroutineWithAsyncTimer(asyncTimer));
-
-			return true;
-
-		}
-
-
-		private IEnumerator LinkOptCoroutine()
-		{
-			// < 단계 2 > : Hide Root Unit 전의 초기화 | 비동기에서는 첫 Yield 이전의 실행될 코드
-
-			//추가 20.7.5 : 컨트롤 파라미터를 초기화 (이게 왜 없었지)
-			_controller.InitRuntime(this);
-
-			//추가 20.11.23 : 모디파이어 최적화를 위한 애니메이션 매핑 클래스
-			//생성과 동시에 링크가 된다.
-			if (_animPlayMapping == null)
-			{
-				_animPlayMapping = new apAnimPlayMapping(this);
-			}
-			else
-			{
-				//다시 링크를 하자
-				_animPlayMapping.Link(this);
-			}
-
-
-			//추가 12.7 : OptRootUnit도 Link를 해야한다.
-			for (int iOptRootUnit = 0; iOptRootUnit < _optRootUnitList.Count; iOptRootUnit++)
-			{
-				_optRootUnitList[iOptRootUnit].Link(this);
-			}
-
-
-			//MeshGroup -> OptTransform을 돌면서 처리
-			for (int iOptTransform = 0; iOptTransform < _optTransforms.Count; iOptTransform++)
-			{
-				_optTransforms[iOptTransform].ClearResultParams(false);
-			}
-
-			HideRootUnits();
-
-
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-			// < 단계 3 > : Batched Mat, OptTransform, 초기화
-
-			//추가 : BatchedMat도 연결
-			_optBatchedMaterial.Link(this);
-
-			for (int i = 0; i < _optMeshes.Count; i++)
-			{
-				_optMeshes[i].InitMesh(true);
-				_optMeshes[i].InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
-				_optMeshes[i].Hide();//<<비동기에서는 바로 Hide
-			}
-
-			int nLoad = 0;
-
-			apOptTransform curOptTransform = null;
-			List<apOptModifierUnitBase> curModifiers = null;
-			apOptModifierUnitBase curModifier = null;
-			List<apOptParamSetGroup> curParamSetGroups = null;
-			apOptParamSetGroup curParamSetGroup = null;
-			List<apOptParamSet> curParamSets = null;
-
-			for (int iOptTransform = 0; iOptTransform < _optTransforms.Count; iOptTransform++)
-			{
-				curOptTransform = _optTransforms[iOptTransform];
-
-				curModifiers = curOptTransform._modifierStack._modifiers;
-
-				for (int iMod = 0; iMod < curModifiers.Count; iMod++)
-				{
-					curModifier = curModifiers[iMod];
-
-					//Portrait를 연결해준다.
-					curModifier.Link(this, curOptTransform);
-
-					//Wait
-					nLoad++;
-					if (nLoad > 5)
-					{
-						nLoad = 0;
-						yield return new WaitForEndOfFrame();
-					}
-
-
-					curParamSetGroups = curModifier._paramSetGroupList;
-					for (int iPSGroup = 0; iPSGroup < curParamSetGroups.Count; iPSGroup++)
-					{
-						curParamSetGroup = curParamSetGroups[iPSGroup];
-
-						//List<apModifierParamSet> paramSets = mod._paramSetList;
-						//1. Key를 세팅해주자
-						switch (curParamSetGroup._syncTarget)
-						{
-							case apModifierParamSetGroup.SYNC_TARGET.Static:
-								break;
-
-							case apModifierParamSetGroup.SYNC_TARGET.Controller:
-								curParamSetGroup._keyControlParam = GetControlParam(curParamSetGroup._keyControlParamID);
-								break;
-
-							case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
-								break;
-						}
-
-
-						curParamSets = curParamSetGroup._paramSetList;
-
-						for (int iParamSet = 0; iParamSet < curParamSets.Count; iParamSet++)
-						{
-							//Param Set Link
-							curParamSets[iParamSet].LinkParamSetGroup(curParamSetGroup, this);
-						}
-					}
-
-					//Wait
-					nLoad++;
-					if (nLoad > 5)
-					{
-						nLoad = 0;
-						yield return new WaitForEndOfFrame();
-					}
-				}
-
-				//이전
-				//optTransform.RefreshModifierLink();
-
-			}
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-
-
-			// < 단계 4 > : Root Unit, Anim Clip 초기화
-
-			apOptRootUnit curRootUnit = null;
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				curRootUnit = _optRootUnitList[i];
-
-				curRootUnit._rootOptTransform.ClearResultParams(true);
-				curRootUnit._rootOptTransform.RefreshModifierLink(true, true);
-
-				//추가 20.8.30
-				curRootUnit._rootOptTransform.Initialize(true, true, this);
-			}
-
-			for (int i = 0; i < _animClips.Count; i++)
-			{
-				_animClips[i].LinkOpt(this);
-			}
-
-
-			//추가) AnimPlayer를 추가했다.
-			_animPlayManager.LinkPortrait(this);
-			_isAutoPlayCheckable = true;
-
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-
-
-			// < 단계 5 > : 메타 데이터를 초기화
-
-
-			//추가 22.5.18 [v1.4.0] 지연된 애니메이션 실행 요청
-			if (_animPlayDeferredRequest == null)
-			{
-				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
-			}
-			_animPlayDeferredRequest.Ready();
-
-
-			//추가 21.9.24 : 유니티 이벤트를 사용하는 경우
-			if (_animEventCallMode == ANIM_EVENT_CALL_MODE.Callback)
-			{
-				if (_unityEventWrapper == null)
-				{
-					_unityEventWrapper = new apUnityEventWrapper();
-				}
-				_unityEventWrapper.Link(this);
-			}
-
-			//추가 22.6.8 : 애니메이션, 텍스쳐등을 빠르게 접근하기 위한 매핑 변수 생성
-			MakeFastReferMapping();
-
-
-			//추가 21.10.7 : 배속 옵션 초기화 (함수 호출이 없었다면)
-			if (!_isDeltaTimeOptionChanged)
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
-				_deltaTimeMultiplier = 1.0f;
-				_funcDeltaTimeRequested = null;
-				_deltaTimeRequestSavedObject = null;
-			}
-
-			//추가 21.12.22 : 재질 병합 관련 변수 초기화
-			_isUseMergedMat = false;
-			_mergeMatMainPortrait = null;
-			_mergedMatSubPortraits = null;
-
-
-			//추가 22.7.7 : 텔레포트 관련 변수 초기화
-			_isTeleportChecked = false;//이전에 텔레포트가 체크되었는가.
-			_teleportCheck_PosPrev = Vector3.zero;//이전 프레임에서의 텔레포트
-			_teleportCheck_ScalePrev = Vector3.one;//[v1.5.0] 텔레포트의 스케일 체크
-			_teleportCheck_RotationPrev = Vector3.zero;//[v1.5.0] 텔레포트의 회전 체크
-
-			_isCurrentTeleporting = false;//현재 프레임에서 텔레포트가 발생했는가
-			_isPhysicsEnabledInPrevFrame = false;//이전에 물리 연산이 있었는가
-			_curPlayingOptRootUnit = null;
-
-			//추가 v1.4.7 : 루트유닛 변경에 따른 물리 튀는 문제 변수 초기화
-			_isCurrentRootUnitChanged = false;
-
-
-			//추가 v1.4.8 : 루트 모션 유효성 체크
-			ValidateRootMotion();
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-
-			//끝!
-			_initStatus = INIT_STATUS.Completed;
-
-			CleanUpMeshesCommandBuffers();
-
-			//if(_optRootUnitList.Count > 0)
-			//{
-			//	ShowRootUnit(_optRootUnitList[0]);//일단 첫번째 RootUnit이 나온다.
-			//}
-
-			//추가 : 초기화시 카메라 갱신 로직 필요
-			CheckAndRefreshCameras(false);//false : 초기화시엔 카메라 변경(초기화>발견)시에도 커맨드 버퍼를 리셋하지 않는다.
-
-			ShowRootUnit();
-
-
-
-			if (_funcAyncLinkCompleted != null)
-			{
-				//콜백 이벤트 호출
-				_funcAyncLinkCompleted(this);
-				_funcAyncLinkCompleted = null;
-			}
-
-
-		}
-
-
-		//추가 19.5.28 : AsyncTimer를 이용하여 LinkOpCoroutine를 개선한 버전.
-		//실제로 실행 시간 타이머가 동작한다.
-		private IEnumerator LinkOptCoroutineWithAsyncTimer(apAsyncTimer asyncTimer)
-		{
-			// < 단계 2 > : Hide Root Unit 전의 초기화 | 비동기에서는 첫 Yield 이전의 실행될 코드
-
-			//추가 20.7.5 : 컨트롤 파라미터를 초기화 (이게 왜 없었지)
-			_controller.InitRuntime(this);
-
-
-			//랜덤하게 프레임을 쉬어주자
-			int nWaitRandom = UnityEngine.Random.Range(0, 5);
-			for (int i = 0; i < nWaitRandom; i++)
-			{
-				yield return new WaitForEndOfFrame();
-			}
-
-
-			//추가 20.11.23 : 모디파이어 최적화를 위한 애니메이션 매핑 클래스
-			//생성과 동시에 링크가 된다.
-			if (_animPlayMapping == null)
-			{
-				_animPlayMapping = new apAnimPlayMapping(this);
-			}
-			else
-			{
-				//다시 링크를 하자
-				_animPlayMapping.Link(this);
-			}
-
-
-
-			//추가 12.7 : OptRootUnit도 Link를 해야한다.
-			for (int iOptRootUnit = 0; iOptRootUnit < _optRootUnitList.Count; iOptRootUnit++)
-			{
-				yield return _optRootUnitList[iOptRootUnit].LinkAsync(this, asyncTimer);
-			}
-
-
-			//MeshGroup -> OptTransform을 돌면서 처리
-			for (int iOptTransform = 0; iOptTransform < _optTransforms.Count; iOptTransform++)
-			{
-				_optTransforms[iOptTransform].ClearResultParams(false);
-			}
-
-			HideRootUnits();
-
-
-
-
-			//타이머에 의해서 Wait
-			if (asyncTimer.IsYield())
-			{
-				yield return asyncTimer.WaitAndRestart();
-			}
-
-
-			// < 단계 3 > : Batched Mat, OptTransform, 초기화
-
-			//BatchedMat도 연결
-			_optBatchedMaterial.Link(this);
-
-
-			for (int i = 0; i < _optMeshes.Count; i++)
-			{
-				_optMeshes[i].InitMesh(true);
-				_optMeshes[i].InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
-				_optMeshes[i].Hide();//<<비동기에서는 바로 Hide
-
-				//타이머에 의해서 Wait
-				if (asyncTimer.IsYield())
-				{
-					yield return asyncTimer.WaitAndRestart();
-				}
-			}
-
-			apOptTransform curOptTransform = null;
-			List<apOptModifierUnitBase> curModifiers = null;
-			apOptModifierUnitBase curModifier = null;
-			List<apOptParamSetGroup> curParamSetGroups = null;
-			apOptParamSetGroup curParamSetGroup = null;
-			List<apOptParamSet> curParamSets = null;
-
-
-			for (int iOptTransform = 0; iOptTransform < _optTransforms.Count; iOptTransform++)
-			{
-				curOptTransform = _optTransforms[iOptTransform];
-
-				curModifiers = curOptTransform._modifierStack._modifiers;
-				for (int iMod = 0; iMod < curModifiers.Count; iMod++)
-				{
-					curModifier = curModifiers[iMod];
-
-					//추가 : Portrait를 연결해준다.
-					curModifier.Link(this, curOptTransform);
-
-					//타이머에 의해서 Wait
-					if (asyncTimer.IsYield())
-					{
-						yield return asyncTimer.WaitAndRestart();
-					}
-
-
-					curParamSetGroups = curModifier._paramSetGroupList;
-					for (int iPSGroup = 0; iPSGroup < curParamSetGroups.Count; iPSGroup++)
-					{
-						curParamSetGroup = curParamSetGroups[iPSGroup];
-
-						//List<apModifierParamSet> paramSets = mod._paramSetList;
-						//1. Key를 세팅해주자
-						switch (curParamSetGroup._syncTarget)
-						{
-							case apModifierParamSetGroup.SYNC_TARGET.Static:
-								break;
-
-							case apModifierParamSetGroup.SYNC_TARGET.Controller:
-								curParamSetGroup._keyControlParam = GetControlParam(curParamSetGroup._keyControlParamID);
-								break;
-
-							case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
-								break;
-						}
-
-
-						curParamSets = curParamSetGroup._paramSetList;
-
-						for (int iParamSet = 0; iParamSet < curParamSets.Count; iParamSet++)
-						{
-							apOptParamSet paramSet = curParamSets[iParamSet];
-
-							//Link를 해주자
-							paramSet.LinkParamSetGroup(curParamSetGroup, this);
-						}
-
-						//타이머에 의해서 Wait
-						if (asyncTimer.IsYield())
-						{
-							yield return asyncTimer.WaitAndRestart();
-						}
-					}
-				}
-			}
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-
-			// < 단계 4 > : Root Unit, Anim Clip 초기화
-			apOptRootUnit curRootUnit = null;
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				curRootUnit = _optRootUnitList[i];
-
-				curRootUnit._rootOptTransform.ClearResultParams(true);
-				yield return curRootUnit._rootOptTransform.RefreshModifierLinkAsync(true, true, asyncTimer);
-
-				//추가 20.8.30
-				yield return curRootUnit._rootOptTransform.InitializeAsync(true, true, asyncTimer, this);
-			}
-
-			//타이머에 의해서 Wait
-			if (asyncTimer.IsYield())
-			{
-				yield return asyncTimer.WaitAndRestart();
-			}
-
-
-
-			for (int i = 0; i < _animClips.Count; i++)
-			{
-				yield return _animClips[i].LinkOptAsync(this, asyncTimer);
-			}
-
-
-
-			//타이머에 의해서 Wait
-			if (asyncTimer.IsYield())
-			{
-				yield return asyncTimer.WaitAndRestart();
-			}
-
-
-			//추가) AnimPlayer를 추가했다.
-			yield return _animPlayManager.LinkPortraitAsync(this, asyncTimer);
-			_isAutoPlayCheckable = true;
-
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-
-			// < 단계 5 > : 메타 데이터를 초기화
-			//추가 22.5.18 [v1.4.0] 지연된 애니메이션 실행 요청
-			if (_animPlayDeferredRequest == null)
-			{
-				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
-			}
-			_animPlayDeferredRequest.Ready();
-
-
-			//추가 21.9.24 : 유니티 이벤트를 사용하는 경우
-			if (_animEventCallMode == ANIM_EVENT_CALL_MODE.Callback)
-			{
-				if (_unityEventWrapper == null)
-				{
-					_unityEventWrapper = new apUnityEventWrapper();
-				}
-				_unityEventWrapper.Link(this);
-			}
-
-			//추가 22.6.8 : 애니메이션, 텍스쳐등을 빠르게 접근하기 위한 매핑 변수 생성
-			MakeFastReferMapping();
-
-
-
-			//추가 21.10.7 : 배속 옵션 초기화 (함수 호출이 없었다면)
-			if (!_isDeltaTimeOptionChanged)
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
-				_deltaTimeMultiplier = 1.0f;
-				_funcDeltaTimeRequested = null;
-				_deltaTimeRequestSavedObject = null;
-			}
-
-			//추가 21.12.22 : 재질 병합 관련 변수 초기화
-			_isUseMergedMat = false;
-			_mergeMatMainPortrait = null;
-			_mergedMatSubPortraits = null;
-
-
-			//추가 22.7.7 : 텔레포트 관련 변수 초기화
-			_isTeleportChecked = false;//이전에 텔레포트가 체크되었는가.
-			_teleportCheck_PosPrev = Vector3.zero;//이전 프레임에서의 텔레포트
-			_teleportCheck_ScalePrev = Vector3.one;//[v1.5.0] 텔레포트의 스케일 체크
-			_teleportCheck_RotationPrev = Vector3.zero;//[v1.5.0] 텔레포트의 회전 체크
-
-			_isCurrentTeleporting = false;//현재 프레임에서 텔레포트가 발생했는가
-			_isPhysicsEnabledInPrevFrame = false;//이전에 물리 연산이 있었는가.
-			_curPlayingOptRootUnit = null;
-
-			//추가 v1.4.7 : 루트유닛 변경에 따른 물리 튀는 문제 변수 초기화
-			_isCurrentRootUnitChanged = false;
-
-			//추가 v1.4.8 : 루트 모션 유효성 체크
-			ValidateRootMotion();
-
-			//Wait
-			yield return new WaitForEndOfFrame();
-
-
-
-			//끝!
-			_initStatus = INIT_STATUS.Completed;
-
-			CleanUpMeshesCommandBuffers();
-
-			//if(_optRootUnitList.Count > 0)
-			//{
-			//	ShowRootUnit(_optRootUnitList[0]);//일단 첫번째 RootUnit이 나온다.
-			//}
-
-			//추가 : 초기화시 카메라 갱신 로직 필요
-			CheckAndRefreshCameras(false);//false : 초기화시엔 카메라 변경(초기화 > 발견)시에도 커맨드 버퍼를 초기화하지 않는다.
-
-			ShowRootUnit();
-
-
-
-			//AsyncTimer 끝
-			asyncTimer.OnCompleted();
-			asyncTimer = null;
-
-			if (_funcAyncLinkCompleted != null)
-			{
-				//콜백 이벤트 호출
-				_funcAyncLinkCompleted(this);
-				_funcAyncLinkCompleted = null;
-			}
-
-
-		}
-
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void SetFirstInitializeAfterBake()
-		{
-			_initStatus = INIT_STATUS.Ready;
-
-			if (_transform == null)
-			{
-				_transform = transform;
-			}
-
-			//Transform 추가시 위치를 초기화하자 (20.9.15)
-			_posW_Prev1F = _transform.position;
-			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
-
-			_prevOptRootUnit = null;//추가 v1.4.7
-		}
-
-
+		
 		/// <summary>
 		/// 추가 22.6.8 : string으로 인게임 중에 텍스쳐나 애니메이션을 참조할 때, 참조 속도를 높이기 위핸 매핑 변수 초기화
 		/// </summary>
@@ -4060,22 +2659,5414 @@ namespace AnyPortrait
 		}
 
 
-		//--------------------------------------------------------------------------------------
-		// Editor
-		//--------------------------------------------------------------------------------------
+
+
+		// 물리 타이머
+		//------------------------------------------------
+		// 추가 20.7.9 : 물리 타이머 갱신 (런타임/에디터 갱신시 호출할 것)
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void CalculatePhysicsTimer()
+		{
+			if(_physicsTimer == null)
+			{
+				_physicsTimer = new System.Diagnostics.Stopwatch();
+				_physicsTimer.Start();
+			}
+			float nextDeltaTime = (float)(_physicsTimer.ElapsedMilliseconds / 1000.0f);
+			if(nextDeltaTime > 0.0f)
+			{
+				_physicsDeltaTime = nextDeltaTime;
+
+				//변경
+				//v1.4.2 : 경과 시간이 지나치게 크다면 앱이 중단되었거나 FPS가 떨어졌던 것이다.
+				//이 경우엔 아예 Delta Time을 0으로 만들어서 현재 프레임을 무효로 만들어야 한다.
+				if (_physicsDeltaTime > PHYSICS_SKIP_DELTA_TIME)
+				{
+					//지나치게 긴 물리 시간 > 0초로 만든다.
+					_physicsDeltaTime = 0.0f;
+				}
+				else if (_physicsDeltaTime > PHYSICS_MAX_DELTA_TIME)
+				{
+					//적당히 시간이 조금 오버했다. Max로 한정하자
+					_physicsDeltaTime = PHYSICS_MAX_DELTA_TIME;
+				}
+
+
+				_physicsTimer.Stop();
+				_physicsTimer.Reset();
+				_physicsTimer.Start();
+			}
+
+			//_physicsDeltaTime = Time.unscaledDeltaTime;
+		}
+
+		//화면 캡쳐시에는 물리 시간이 강제된다.
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void SetPhysicsTimerWhenCapture(float tDelta)
+		{
+			if(_physicsTimer == null)
+			{
+				_physicsTimer = new System.Diagnostics.Stopwatch();
+				_physicsTimer.Start();
+			}
+
+			_physicsDeltaTime = tDelta;
+			_physicsTimer.Stop();
+			_physicsTimer.Reset();
+			_physicsTimer.Start();
+		}
+
+
+		/// <summary>
+		/// 추가 22.6.11 : 물리 타이머의 시간을 리셋한다.
+		/// </summary>
+		public void ResetPhysicsTimer()
+		{
+			if(_physicsTimer == null)
+			{
+				_physicsTimer = new System.Diagnostics.Stopwatch();
+				_physicsTimer.Start();
+			}
+			_physicsDeltaTime = 0;
+			_physicsTimer.Stop();
+			_physicsTimer.Reset();
+			_physicsTimer.Start();
+		}
 
 
 
-		// Get / Set
-		//-----------------------------------------------------
+
+		//카메라 관련
+		//-------------------------------------------------------------------------------------------------------
+		private void CheckAndRefreshCameras(bool isResetCommandBufferWhenCameraChanged = true)
+		{
+			if(_mainCamera == null)
+			{
+				_mainCamera = new apOptMainCamera(this);
+			}
+
+			//[v1.6.0] 추가 마스크 생성 카메라 로직이 Mesh 단위에서 Portrait 단위로 변경
+			if(_maskRenderCamera == null)
+			{
+				_maskRenderCamera = new apOptMaskRenderCamera(this);
+			}
+
+			if(_transform == null)
+			{
+				_transform = transform;
+			}
+
+			//변경 v1.5.0
+			//Refresh의 단계를 세분화
+			//1. 빌보드 여부
+			//- 빌보드가 아닌 경우 : 카메라 갱신만 한다.
+			//- 빌보드인 경우 : 카메라의 Matrix 비교 및 재연산도 한다.
+
+			//2. 멀티 카메라 여부
+			//- 멀티 카메라가 아닌 경우 : "지금 카메라가 유효하지 않은 경우"만 갱신을 한다.
+			//- 멀티 카메라인 경우 : 항상 씬의 모든 카메라와 비교를 한다. < 이거 옵션으로 설정 가능 (기본 비활성)
+			//>> 이걸 멀티 카메라 여부 대신 옵션을 별도로 둔다.
+
+			bool isCameraChanged = false;
+
+			//변경 2019.9.24 : 멀티 카메라도 지원하도록 래핑
+			if(_billboardType == BILLBOARD_TYPE.None)
+			{
+				//빌보드가 아니라면 단순 카메라 리스트 검사(false, false)
+				isCameraChanged = _mainCamera.Refresh(false, false, _cameraCheckMode);
+				if(isCameraChanged && isResetCommandBufferWhenCameraChanged)
+				{
+					//카메라가 변경되었다면 > 커맨드 버퍼를 갱신한다.
+					//ResetMeshesCommandBuffers(false); // 이전
+					ResetMeshesCommandBuffers(); // 변경 v1.6.0
+				}
+				return;
+			}
+			
+			//빌보드라면 카메라의 매트릭스까지 계산(false, true)
+			isCameraChanged = _mainCamera.Refresh(false, true, _cameraCheckMode);
+			if(isCameraChanged && isResetCommandBufferWhenCameraChanged)
+			{
+				//카메라가 변경되었다면 > 커맨드 버퍼를 갱신한다.
+				//ResetMeshesCommandBuffers(false); // 이전
+				ResetMeshesCommandBuffers(); // 변경 v1.6.0
+			}
+
+			//조건문 추가 v1.5.0 : 바라보는 카메라가 없는 경우에 갱신하면 안된다.
+			if(_mainCamera.GetNumberOfCamera() != apOptMainCamera.NumberOfCamera.None)
+			{
+				if(_billboardType == BILLBOARD_TYPE.Billboard)
+				{
+					//전체 빌보드
+					_transform.rotation = _mainCamera.Rotation;
+				}
+				else
+				{
+					//Up 고정 빌보드
+					_transform.rotation = Quaternion.LookRotation(_mainCamera.Forward, Vector3.up);//변경
+				}
+
+				//추가 v1.5.0
+				//옵션에 따라선, 부모 Transform의 Rotation을 더하거나 Up Vector를 맞춘다.
+				if(_billboardParentRotation != BILLBOARD_PARENT_ROTATION.Ignore)
+				{
+					//Ignore 외의 값을 갖는 경우
+					Transform parentTF = _transform.parent;
+					if(parentTF != null)
+					{
+						if(_billboardParentRotation == BILLBOARD_PARENT_ROTATION.PitchYawRoll)
+						{
+							//일반 더하기 연산 (Local) - Yaw-Pitch-Roll로 동작
+							//_transform.rotation *= parentTF.rotation;
+							_transform.rotation *= parentTF.localRotation;
+						}
+						else
+						{
+							//Up Vector 동기화
+							_transform.rotation = Quaternion.LookRotation(_mainCamera.Forward, parentTF.up);
+						}
+						
+					}
+				}
+				
+				
+				//카메라 좌표계에서의 Z값 (ZDepth)
+				//_zDepthOnPerspectiveCam = _curCamera.worldToCameraMatrix.MultiplyPoint3x4(_transform.position).z;//미사용 코드
+
+				//여기선 Orthographic SortMode로 해야한다.
+				//_curCamera.transparencySortMode = TransparencySortMode.Orthographic;
+
+				//추가 20.9.15
+				//Rotation 전용의 행렬/역행렬을 준비한다.
+				_rotationOnlyMatrixIfBillboard = Matrix4x4.TRS(Vector3.zero, _transform.rotation, Vector3.one);
+				_invRotationOnlyMatrixIfBillboard = _rotationOnlyMatrixIfBillboard.inverse;
+			}
+			
+		}
+
+		
+
+
+		/// <summary>
+		/// [Please do not use it] 
+		/// </summary>
+		/// <returns></returns>
+		public apOptMainCamera GetMainCamera()
+		{
+			return _mainCamera;
+		}
+
+		public apOptMaskRenderCamera GetMaskRenderCamera()
+		{
+			return _maskRenderCamera;
+		}
 
 
 
-		//--------------------------------------------------------------------------------------
-		// API
-		//--------------------------------------------------------------------------------------
-		// Play
-		//--------------------------------------------------------------------------------------
+		//추가 20.9.15 : 지글본의 좌표계 변환 처리를 위한 특별 함수
+		//이 함수의 내용은 지글본 코드(apOptBone)를 확인하자
+		/// <summary>
+		/// [Please do not use it] 
+		/// </summary>
+		public Vector3 OffsetPos2World_Prev(Vector3 posOffset)
+		{
+			//Debug.Log("Offset Pos Check : Cur : " + _transform.position.x + " / Prev : " + _posW_Prev1F.x);
+			return _rotationOnlyMatrixIfBillboard.MultiplyPoint3x4(posOffset) + _posW_Prev1F;
+		}
+
+		/// <summary>
+		/// [Please do not use it] 
+		/// </summary>
+		public Vector3 WorldPos2OffsetPos(Vector3 worldPos)
+		{
+			return _invRotationOnlyMatrixIfBillboard.MultiplyPoint3x4(worldPos - _transform.position);
+		}
+
+
+
+		// 애니메이션 콜백 이벤트 함수 (외부와 연결)
+		//-------------------------------------------------------------------------------------------------------
+		/// <summary>
+		/// [Please do not use it] Whether any animation end events are subscribed to
+		/// </summary>
+		public bool IsAnyAnimationEndedEventRegistered { get { return OnAnimationEnded != null; } }
+
+		/// <summary>
+		/// [Please do not use it] Animation End Event Callback
+		/// </summary>
+		public void InvokeAnimEndEvent(apAnimPlayData playData, ANIM_ENDED_TYPE animEndType)
+		{
+			if(OnAnimationEnded != null && playData != null)
+			{
+				OnAnimationEnded.Invoke(this, playData, animEndType);
+			}
+		}
+
+
+
+		// ID로 오브젝트 참조 - Run Time
+		//-------------------------------------------------------------------------------------------------------
+		/// <summary>
+		/// [Please do not use it] (For Editor, not Runtime)
+		/// </summary>
+		/// <param name="transformID"></param>
+		/// <returns></returns>
+		public apOptTransform GetOptTransform(int transformID)
+		{
+			if (transformID < -1)
+			{
+				return null;
+			}
+
+			if (_optTransforms == null)
+			{
+				return null;
+			}
+			//이전 (GC 발생)
+			//return _optTransforms.Find(delegate (apOptTransform a)
+			//{
+			//	return a._transformID == transformID;
+			//});
+
+			//변경 v1.5.0
+			s_GetOptTransform_ID = transformID;
+			return _optTransforms.Find(s_GetOptTransformByID_Func);
+		}
+
+		private static int s_GetOptTransform_ID = -1;
+		private static Predicate<apOptTransform> s_GetOptTransformByID_Func = FUNC_GetOptTransformByID;
+		private static bool FUNC_GetOptTransformByID(apOptTransform a)
+		{
+			return a._transformID == s_GetOptTransform_ID;
+		}
+
+
+
+		/// <summary>
+		/// [Please do not use it] (For Editor, not Runtime)
+		/// </summary>
+		/// <param name="meshGroupUniqueID"></param>
+		/// <returns></returns>
+		public apOptTransform GetOptTransformAsMeshGroup(int meshGroupUniqueID)
+		{
+			//Debug.Log("GetOptTransformAsMeshGroup [" + meshGroupUniqueID + "]");
+			if (meshGroupUniqueID < 0)
+			{
+				//Debug.LogError("ID < 0");
+				return null;
+			}
+			if (_optTransforms == null)
+			{
+				//Debug.LogError("OptTranforms is Null");
+				return null;
+			}
+
+			//이전 (GC 발생)
+			//return _optTransforms.Find(delegate (apOptTransform a)
+			//{
+			//	return a._meshGroupUniqueID == meshGroupUniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetOptTransformAsMeshGroup_ID = meshGroupUniqueID;
+			return _optTransforms.Find(s_GetOptTransformAsMeshGroup_Func);
+		}
+
+		private static int s_GetOptTransformAsMeshGroup_ID = -1;
+		private static Predicate<apOptTransform> s_GetOptTransformAsMeshGroup_Func = FUNC_GetOptTransformAsMeshGroup;
+		private static bool FUNC_GetOptTransformAsMeshGroup(apOptTransform a)
+		{
+			return a._meshGroupUniqueID == s_GetOptTransformAsMeshGroup_ID;
+		}
+
+		/// <summary>
+		/// Get Root Unit with Index
+		/// </summary>
+		/// <param name="rootUnitIndex"></param>
+		/// <returns></returns>
+		public apOptRootUnit GetOptRootUnit(int rootUnitIndex)
+		{
+			if(_optRootUnitList.Count == 0)
+			{
+				return null;
+			}
+			if(rootUnitIndex < 0 || rootUnitIndex >= _optRootUnitList.Count)
+			{
+				return null;
+			}
+			return _optRootUnitList[rootUnitIndex];
+		}
+
+		
+
+
+		//추가 19.6.3 : MaterialSet에 관련
+		public apMaterialSet GetMaterialSet(int uniqueID)
+		{
+			//이전 (GC 발생)
+			//return _materialSets.Find(delegate(apMaterialSet a)
+			//{
+			//	return a._uniqueID == uniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetMaterialSet_ID = uniqueID;
+			return _materialSets.Find(s_GetMaterialSetByID_Func);
+		}
+
+
+		private static int s_GetMaterialSet_ID = -1;
+		private static Predicate<apMaterialSet> s_GetMaterialSetByID_Func = FUNC_GetMaterialSetByID;
+		private static bool FUNC_GetMaterialSetByID(apMaterialSet a)
+		{
+			return a._uniqueID == s_GetMaterialSet_ID;
+		}
+
+
+		public apMaterialSet GetDefaultMaterialSet()
+		{
+			//이전 (GC 발생)
+			//return _materialSets.Find(delegate (apMaterialSet a)
+			//{
+			//	return a._isDefault;
+			//});
+
+			//변경 v1.5.0
+			return _materialSets.Find(s_GetDefaultMaterialSet);
+		}
+
+		private static Predicate<apMaterialSet> s_GetDefaultMaterialSet = FUNC_GetDefaultMaterialSet;
+		private static bool FUNC_GetDefaultMaterialSet(apMaterialSet a)
+		{
+			return a._isDefault;
+		}
+
+
+		//==========================================================================
+
+		
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 에디터 변수들
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		//----------------------------------------------------------
+		// EnterPlayMode 기능 관련 개선 코드
+		//----------------------------------------------------------
+
+		//변경 20.7.9 
+		//유니티 2019.3에서 EnterPlayMode에 들어갈 때 Domain Reload를 스킵할 수 있다.
+		//문제는, Link를 하기 위해서 _initStatus가 초기화 되어야 하는 apPortrait인데, 이게 Completed 상태로 그냥 남아버릴 수 있다.
+		//여러가지 처리가 있을 수 있지만, 그냥 Domain Reload가 스킵된 상태로 게임에 진입하면 모든 apPortrait를 찾아서
+		//강제 초기화 함수를 실행하도록 만들자.
+#if UNITY_2019_3_OR_NEWER && UNITY_EDITOR
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+		private static void InitForceWhenDomainReloadSkipped()
+		{
+			//Debug.LogWarning("InitForceWhenSkipDomainReload");
+			//존재하는 모든 apPortrait를 찾는다.
+			
+			//v1.4.8 : Unity 2023용 코드 분기
+#if UNITY_2023_1_OR_NEWER
+			apPortrait[] portraitsInScene = GameObject.FindObjectsByType<apPortrait>(FindObjectsSortMode.None);
+#else
+			apPortrait[] portraitsInScene = GameObject.FindObjectsOfType<apPortrait>();
+#endif
+
+			if(portraitsInScene != null && portraitsInScene.Length > 0)
+			{
+				for (int i = 0; i < portraitsInScene.Length; i++)
+				{
+					portraitsInScene[i].ResetInitStatusToReadyWhenDomainReloadSkipped();
+				}
+			}
+		}
+
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		private void ResetInitStatusToReadyWhenDomainReloadSkipped()
+		{
+			//Debug.LogError("Init Status [" + _initStatus + " > INIT_STATUS.Ready] (" + gameObject.name + ")");
+			_initStatus = INIT_STATUS.Ready;
+		}
+#endif
+
+
+
+		//---------------------------------------------------
+		// Reset Meshes
+		//---------------------------------------------------
+
+#if UNITY_EDITOR
+
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void OnMeshResetInEditor()
+		{
+			if (Application.isEditor && !Application.isPlaying)
+			{
+				//19.10.26 : 빌보드를 일단 끈다.
+				apPortrait.BILLBOARD_TYPE billboardType = _billboardType;
+
+				try
+				{
+					if (_optMeshes != null && _optMeshes.Count > 0)
+					{
+						//Debug.LogError("OnMeshResetInEditor : " + this.name);
+
+						for (int i = 0; i < _optMeshes.Count; i++)
+						{
+							_optMeshes[i].InitMesh(true);
+							_optMeshes[i].ResetMeshAndMaterialIfMissing();
+						}
+						UpdateForce();
+					}
+				}
+				catch (Exception ex)
+				{
+					Debug.LogError("AnyPortrait : Refresh Meshes Failed\n" + ex);
+				}
+
+				_billboardType = billboardType;//복구
+
+				//추가 22.1.9 : 첫번째 루트 유닛만 보여준다.
+				int nOptRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+				if (nOptRootUnits > 0)
+				{
+					ShowRootUnitWhenBake(_optRootUnitList[0]);
+				}
+			}
+		}
+
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void RefreshSortingOrderByDepth()
+		{
+			if (_optRootUnitList == null)
+			{
+				return;
+			}
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				_optRootUnitList[i].RefreshSortingOrderByDepth();
+			}
+		}
+
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void ApplySortingOptionToOptRootUnits()
+		{
+			if (_optRootUnitList == null)
+			{
+				return;
+			}
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				_optRootUnitList[i].SetSortingOrderOption(_sortingOrderOption, _sortingOrderPerDepth);
+			}
+		}
+#endif
+
+
+		//--------------------------------------------------------------
+		// Bake시 및 그에 준하는 경우에 호출되는 함수들
+		//--------------------------------------------------------------		
+		/// <summary>
+		/// [Please do not use it]
+		/// Bake Function likes "ShowRootUnit" using Default Visible Value.
+		/// </summary>
+		/// <param name="targetOptRootUnit">Target Root Unit</param>
+		public void ShowRootUnitWhenBake(apOptRootUnit targetOptRootUnit)
+		{
+			_curPlayingOptRootUnit = null;
+			apOptRootUnit optRootUnit = null;
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				optRootUnit = _optRootUnitList[i];
+				if (optRootUnit == targetOptRootUnit)
+				{
+					//이건 Show를 하자
+					optRootUnit.ShowWhenBake();
+					_curPlayingOptRootUnit = targetOptRootUnit;
+				}
+				else
+				{
+					//이건 Hide
+					optRootUnit.Hide();
+				}
+			}
+
+			_isCurrentRootUnitChanged = false;
+		}
+
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void SetFirstInitializeAfterBake()
+		{
+			_initStatus = INIT_STATUS.Ready;
+
+			if (_transform == null)
+			{
+				_transform = transform;
+			}
+
+			//Transform 추가시 위치를 초기화하자 (20.9.15)
+			_posW_Prev1F = _transform.position;
+			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+			_prevOptRootUnit = null;//추가 v1.4.7
+		}
+
+
+
+		//초기화와 관련된 상세 로그
+
+		#if UNITY_EDITOR
+		//v1.4.7 : 초기화 전에 실행했다면 에러 원인에 대한 로그를 보여주자
+		private void ShowErrorMsgIfNotInitialized_Editor(Exception ex)
+		{	
+			if(InitializationStatus != INIT_STATUS.Completed)
+			{
+				Debug.LogWarning("AnyPortrait : An error occurred because the function was called before [Initialization].\n"
+								+ "Please call the Initialize() function directly or try again after initialization (approx. 1 frame).\n"
+								+ "Please check the manual for more details.\n"
+								+ "( https://rainyrizzle.github.io/en/AdvancedManual/AD_InitializeScript.html )", this.gameObject);
+			}
+			Debug.LogException(ex, this.gameObject);
+		}
+#endif
+
+
+		//---------------------------------------------------------------
+		// 에디터 내에서의 단계별 초기화
+		//---------------------------------------------------------------
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void ReadyToEdit()
+		{
+			//ID리셋 / 텍스쳐 준비 / Null 메시 삭제
+			ReadyToEdit_Step1();
+
+			//메시 준비
+			ReadyToEdit_Step2();
+
+			//메시 그룹 기본 연결
+			ReadyToEdit_Step3();
+
+			//클리핑 레이어 연결
+			ReadyToEdit_Step4();
+
+			//부모-자식 메시 그룹 연결 / Bone 준비
+			ReadyToEdit_Step5();
+
+			//Render Unit 연결
+			ReadyToEdit_Step6();
+
+			//Anim Clip 준비
+			ReadyToEdit_Step7();
+
+			//모디파이어 준비 (LinkAndRefreshInEditor)
+			ReadyToEdit_Step8();
+
+			//Root Unit 연결
+			ReadyToEdit_Step9();
+		}
+
+
+		// ReadyToStep의 내용들을 각각의 서브 함수들로 분리한다.
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step1()
+		{
+			//ID 리스트 일단 리셋
+			ClearRegisteredUniqueIDs();
+
+			//컨트롤 / 컨트롤 파라미터 리셋
+			_controller.Ready(this);
+			_controller.SetDefaultAll();
+
+
+			for (int iTexture = 0; iTexture < _textureData.Count; iTexture++)
+			{
+				_textureData[iTexture].ReadyToEdit(this);
+			}
+
+			_meshes.RemoveAll(delegate (apMesh a)
+			{
+				return a == null;
+			});
+		}
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step2()
+		{
+			for (int iMeshes = 0; iMeshes < _meshes.Count; iMeshes++)
+			{
+				//내부 MeshComponent들의 레퍼런스를 연결하자
+				_meshes[iMeshes].ReadyToEdit(this);
+
+				//텍스쳐를 연결하자
+				int textureID = -1;
+
+				if (!_meshes[iMeshes].IsTextureDataLinked)//연결이 안된 경우
+				{
+					textureID = _meshes[iMeshes].LinkedTextureDataID;
+					_meshes[iMeshes].SetTextureData(GetTexture(textureID));
+				}
+
+				_meshes[iMeshes].LinkEdgeAndVertex();
+			}
+		}
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step3()
+		{
+			_meshGroups.RemoveAll(delegate (apMeshGroup a)
+			{
+				return a == null;
+			});
+
+
+			//메시 그룹도 비슷하게 해주자
+			//1. 메시/메시 그룹을 먼저 연결
+			//2. Parent-Child는 그 다음에 연결 (Child 먼저 / Parent는 나중에)
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+
+				meshGroup.Init(this);
+
+				//1. Mesh 연결
+				for (int iChild = 0; iChild < meshGroup._childMeshTransforms.Count; iChild++)
+				{
+					meshGroup._childMeshTransforms[iChild].RegistIDToPortrait(this);//추가 : ID를 알려주자
+
+					int childIndex = meshGroup._childMeshTransforms[iChild]._meshUniqueID;
+					if (childIndex >= 0)
+					{
+						apMesh existMesh = GetMesh(childIndex);
+						if (existMesh != null)
+						{
+							meshGroup._childMeshTransforms[iChild]._mesh = existMesh;
+						}
+						else
+						{
+							meshGroup._childMeshTransforms[iChild]._mesh = null;
+						}
+					}
+					else
+					{
+						meshGroup._childMeshTransforms[iChild]._mesh = null;
+					}
+				}
+
+				//1-2. MeshGroup 연결
+				for (int iChild = 0; iChild < meshGroup._childMeshGroupTransforms.Count; iChild++)
+				{
+					meshGroup._childMeshGroupTransforms[iChild].RegistIDToPortrait(this);//추가 : ID를 알려주자
+
+					int childIndex = meshGroup._childMeshGroupTransforms[iChild]._meshGroupUniqueID;
+					if (childIndex >= 0)
+					{
+						apMeshGroup existMeshGroup = GetMeshGroup(childIndex);
+						if (existMeshGroup != null)
+						{
+							meshGroup._childMeshGroupTransforms[iChild]._meshGroup = existMeshGroup;
+						}
+						else
+						{
+							meshGroup._childMeshGroupTransforms[iChild]._meshGroup = null;
+						}
+					}
+					else
+					{
+						meshGroup._childMeshGroupTransforms[iChild]._meshGroup = null;
+					}
+				}
+			}
+
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+
+				//2. 하위 MeshGroup 연결
+				for (int iChild = 0; iChild < meshGroup._childMeshGroupTransforms.Count; iChild++)
+				{
+					apTransform_MeshGroup childMeshGroupTransform = meshGroup._childMeshGroupTransforms[iChild];
+
+					if (childMeshGroupTransform._meshGroupUniqueID >= 0)
+					{
+						apMeshGroup existMeshGroup = GetMeshGroup(childMeshGroupTransform._meshGroupUniqueID);
+						if (existMeshGroup != null)
+						{
+							childMeshGroupTransform._meshGroup = existMeshGroup;
+
+							childMeshGroupTransform._meshGroup._parentMeshGroupID = meshGroup._uniqueID;
+							childMeshGroupTransform._meshGroup._parentMeshGroup = meshGroup;
+
+
+						}
+						else
+						{
+							childMeshGroupTransform._meshGroup = null;
+						}
+					}
+					else
+					{
+						childMeshGroupTransform._meshGroup = null;
+					}
+				}
+
+				//다만, 없어진 Mesh Group은 정리해주자
+				meshGroup._childMeshTransforms.RemoveAll(delegate (apTransform_Mesh a)
+				{
+					return a._mesh == null;
+				});
+				meshGroup._childMeshGroupTransforms.RemoveAll(delegate (apTransform_MeshGroup a)
+				{
+					return a._meshGroup == null;
+				});
+			}
+		}
+
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step4()
+		{
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+
+				//추가) Clipping Layer를 위해서 Mesh Transform끼리 연결을 해준다.
+				for (int iChild = 0; iChild < meshGroup._childMeshTransforms.Count; iChild++)
+				{
+					//연결하기 전에
+					//Child는 초기화해준다.
+					apTransform_Mesh meshTransform = meshGroup._childMeshTransforms[iChild];
+					meshTransform._isClipping_Child = false;
+					meshTransform._clipIndexFromParent = -1;
+					meshTransform._clipParentMeshTransform = null;
+
+					if (meshTransform._clipChildMeshes == null)
+					{
+						meshTransform._clipChildMeshes = new List<apTransform_Mesh.ClipMeshSet>();
+					}
+
+					meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
+					{
+						//조건에 맞지 않는 Clipping Child를 삭제한다.
+						//1. ID가 맞지 않다.
+						//2. MeshGroup에 존재하지 않다.
+						return a._transformID < 0 || (meshGroup.GetMeshTransform(a._transformID) == null);
+					});
+
+
+					//추가 19.6.9 : Material Set 연결
+					if (meshTransform._isUseDefaultMaterialSet)
+					{
+						//Default MatSet을 사용하는 경우
+						meshTransform._linkedMaterialSet = GetDefaultMaterialSet();
+						if (meshTransform._linkedMaterialSet != null)
+						{
+							meshTransform._materialSetID = meshTransform._linkedMaterialSet._uniqueID;
+						}
+					}
+					else
+					{
+						//별도의 MatSet을 설정한 경우
+						if (meshTransform._materialSetID >= 0)
+						{
+							meshTransform._linkedMaterialSet = GetMaterialSet(meshTransform._materialSetID);
+							if (meshTransform._linkedMaterialSet == null)
+							{
+								//존재하지 않는 Material Set
+								meshTransform._materialSetID = -1;
+								//Debug.LogError("Material Set 잘못 연결 후 초기화");
+							}
+						}
+						else
+						{
+							meshTransform._linkedMaterialSet = null;
+						}
+
+						//만약 연결이 안된다면 > Default를 찾아서 무조건 연결한다.
+						if (meshTransform._linkedMaterialSet == null)
+						{
+							meshTransform._linkedMaterialSet = GetDefaultMaterialSet();
+							if (meshTransform._linkedMaterialSet != null)
+							{
+								meshTransform._materialSetID = meshTransform._linkedMaterialSet._uniqueID;
+							}
+						}
+					}
+				}
+
+				for (int iChild = 0; iChild < meshGroup._childMeshTransforms.Count; iChild++)
+				{
+					apTransform_Mesh meshTransform = meshGroup._childMeshTransforms[iChild];
+					if (meshTransform._isClipping_Parent)
+					{
+						//최대 3개의 하위 Mesh를 검색해서 연결한다.
+						//찾은 이후엔 Sort를 해준다.
+
+						for (int iClip = 0; iClip < meshTransform._clipChildMeshes.Count; iClip++)
+						{
+							apTransform_Mesh.ClipMeshSet clipSet = meshTransform._clipChildMeshes[iClip];
+							int childMeshID = clipSet._transformID;
+							apTransform_Mesh childMeshTF = meshGroup.GetMeshTransform(childMeshID);
+							if (childMeshTF != null)
+							{
+								clipSet._meshTransform = childMeshTF;
+								//clipSet._renderUnit = meshGroup.GetRenderUnit(childMeshTF);//삭제 v1.5.0
+							}
+							else
+							{
+								clipSet._meshTransform = null;
+								clipSet._transformID = -1;
+								//clipSet._renderUnit = null;//삭제 v1.5.0
+							}
+						}
+
+						meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
+						{
+							return a._transformID < 0;
+						});
+
+
+					}
+					else
+					{
+						meshTransform._clipChildMeshes.Clear();
+
+
+					}
+
+					meshTransform.SortClipMeshTransforms();
+				}
+
+			}
+		}
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step5()
+		{
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+
+				//2. 상위 MeshGroup 연결
+				int parentUniqueID = meshGroup._parentMeshGroupID;
+				if (parentUniqueID >= 0)
+				{
+					meshGroup._parentMeshGroup = GetMeshGroup(parentUniqueID);
+					if (meshGroup._parentMeshGroup == null)
+					{
+						meshGroup._parentMeshGroupID = -1;
+					}
+				}
+				else
+				{
+					meshGroup._parentMeshGroup = null;
+				}
+			}
+
+			//Bone 연결 
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+
+				//Root 리스트는 일단 날리고 BoneAll 리스트를 돌면서 필요한걸 넣어주자
+				//이후엔 Root -> Child 방식으로 순회
+				meshGroup._boneList_Root.Clear();
+				if (meshGroup._boneList_All != null)
+				{
+					for (int iBone = 0; iBone < meshGroup._boneList_All.Count; iBone++)
+					{
+						apBone bone = meshGroup._boneList_All[iBone];
+
+						//먼저 ID를 ID Manager에 등록한다.
+						RegistUniqueID(apIDManager.TARGET.Bone, bone._uniqueID);
+
+						apBone parentBone = null;
+						if (bone._parentBoneID >= 0)
+						{
+							parentBone = meshGroup.GetBone(bone._parentBoneID);
+						}
+
+						bone.Link(meshGroup, parentBone, this);
+
+						if (parentBone == null)
+						{
+							//Parent가 없다면 Root 본이다.
+							meshGroup._boneList_Root.Add(bone);
+						}
+					}
+
+					//추가 5.9 : Bone의 Check Validation 함수를 호출해야 한다.
+					for (int iBone = 0; iBone < meshGroup._boneList_All.Count; iBone++)
+					{
+						meshGroup._boneList_All[iBone].CheckIKControllerValidation();
+					}
+				}
+
+
+				int curBoneIndex = 0;
+				for (int iRoot = 0; iRoot < meshGroup._boneList_Root.Count; iRoot++)
+				{
+					apBone rootBone = meshGroup._boneList_Root[iRoot];
+					//TODO : MeshGroup이 Transform으로 있는 경우에 Transform Matrix를 넣어줘야한다.
+					rootBone.LinkRecursive(0);
+					curBoneIndex = rootBone.SetBoneIndex(curBoneIndex) + 1;
+				}
+			}
+
+			////본 계층 / IK Chain도 다시 점검
+			//for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			//{
+			//	apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+
+			//}
+		}
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step6()
+		{
+			//Render Unit도 체크해주자
+			//아무 순서대로 하지 말고, Root이 MeshGroup을 찾아서 재귀적으로 한 뒤, 처리되지 못한 MeshGroup을 체크해야한다.
+			//Step5에서 MeshGroup간의 Parent-Child 연결이 완료되었으니 가능하다.
+			List<apMeshGroup> processedMeshGroups = new List<apMeshGroup>();
+
+			//이전
+			//for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			//{
+			//	apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+			//	//meshGroup.SetAllRenderUnitForceUpdate();
+			//	meshGroup.RefreshForce();
+			//	meshGroup.SortRenderUnits(true);
+			//	meshGroup.SortBoneListByLevelAndDepth();
+			//}
+
+			//변경 v1.4.2 : 루트 메시 그룹을 중심으로 재귀적으로 호출하자 (Sort RenderUnit 특성상)
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+				if(meshGroup._parentMeshGroup == null)
+				{
+					//루트 메시 그룹에 대해서만 재귀 함수 호출
+					ReadyToEdit_RefrestMeshGroupRecursive(meshGroup, meshGroup, processedMeshGroups);
+				}
+			}
+
+			//다시 돌면서, 처리되지 않은 나머지 메시 그룹을 찾아서 처리하자
+			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+				if(processedMeshGroups.Contains(meshGroup))
+				{
+					//이미 처리가 되었다.
+					continue;
+				}
+
+				//누락된 메시 그룹에 대해서도 호출
+				ReadyToEdit_RefrestMeshGroupRecursive(meshGroup, meshGroup._parentMeshGroup != null ? meshGroup._parentMeshGroup : meshGroup, processedMeshGroups);
+			}
+		}
+
+		//추가 v1.4.2 : 초기화시 메시 그룹의 Refresh/SortRenderUnit을 호출할 때, 그냥하는게 아니라 재귀적으로 하도록
+		private void ReadyToEdit_RefrestMeshGroupRecursive(apMeshGroup curMeshGroup, apMeshGroup rootMeshGroup, List<apMeshGroup> processedList)
+		{
+			if (curMeshGroup == null)
+			{
+				return;
+			}
+
+			curMeshGroup.SetDirtyToReset();//추가 1.4.2 : 초기화시 Reset 플래그를 올리자
+			curMeshGroup.RefreshForce();
+			if(curMeshGroup._parentMeshGroup == null || curMeshGroup == rootMeshGroup)
+			{
+				//이게 루트 메시 그룹이라면
+				//Sort 후 TF에 Depth Assign까지 수행한다.
+				curMeshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.AssignDepth);
+			}
+			else
+			{
+				//이게 루트 메시 그룹이 아니라면, 위에서 이미 Depth Assign이 되었으므로 정렬만 한다.
+				curMeshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.OnlySort);
+			}
+			curMeshGroup.SortBoneListByLevelAndDepth();
+
+			//결과 리스트에 추가
+			processedList.Add(curMeshGroup);
+
+			//자식 메시 그룹이 있다면 (이건 Step3에서 연결이 된다)
+			int nChildMeshGroups = curMeshGroup._childMeshGroupTransforms != null ? curMeshGroup._childMeshGroupTransforms.Count : 0;
+			if(nChildMeshGroups == 0)
+			{
+				return;
+			}
+
+			apTransform_MeshGroup childMeshGroupTF = null;
+			for (int i = 0; i < nChildMeshGroups; i++)
+			{
+				childMeshGroupTF = curMeshGroup._childMeshGroupTransforms[i];
+				if(childMeshGroupTF == null)
+				{
+					continue;
+				}
+				if(childMeshGroupTF._meshGroup == null
+					|| childMeshGroupTF._meshGroup == curMeshGroup
+					|| childMeshGroupTF._meshGroup == rootMeshGroup)
+				{
+					continue;
+				}
+
+				ReadyToEdit_RefrestMeshGroupRecursive(childMeshGroupTF._meshGroup, rootMeshGroup, processedList);
+
+			}
+		}
+
+
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step7()
+		{
+			//Anim Clip 준비도 하자
+			_animClips.RemoveAll(delegate(apAnimClip a)
+			{
+				return 
+				a == null || //Null이거나
+				(a._targetMeshGroupID >= 0 && GetMeshGroup(a._targetMeshGroupID) == null);//TargetMeshGroup ID는 있는데, MeshGroup은 존재하지 않는 경우
+			});
+
+			for (int i = 0; i < _animClips.Count; i++)
+			{
+				_animClips[i].LinkEditor(this);
+				_animClips[i].RemoveUnlinkedTimeline();
+			}
+		}
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step8()
+		{
+			//5. Modifier 세팅
+			LinkAndRefreshInEditor(true, apUtil.LinkRefresh.Set_AllObjects(null));
+
+			
+		}
+
+
+		/// <summary>[Please do not use it]</summary>
+		public void ReadyToEdit_Step9()
+		{
+			// Main MeshGroup 연결
+			// 수정) "다중" MainMeshGroup으로 변경
+
+			if (_mainMeshGroupList == null)		{ _mainMeshGroupList = new List<apMeshGroup>(); }
+			else								{ _mainMeshGroupList.Clear(); }
+
+			if (_mainMeshGroupIDList == null)
+			{
+				_mainMeshGroupIDList = new List<int>();
+			}
+
+
+			for (int iMGID = 0; iMGID < _mainMeshGroupIDList.Count; iMGID++)
+			{
+				int mainMeshGroupID = _mainMeshGroupIDList[iMGID];
+				bool isValidMeshGroupID = false;
+
+				if (mainMeshGroupID >= 0)
+				{
+					apMeshGroup mainMeshGroup = GetMeshGroup(mainMeshGroupID);
+					if (mainMeshGroup != null)
+					{
+						if (!_mainMeshGroupList.Contains(mainMeshGroup))
+						{
+							_mainMeshGroupList.Add(mainMeshGroup);
+							isValidMeshGroupID = true;
+						}
+					}
+				}
+				if (!isValidMeshGroupID)
+				{
+					_mainMeshGroupIDList[iMGID] = -1;//<<이건 삭제하자
+				}
+			}
+
+			//일단 유효하지 못한 ID는 삭제하자
+			_mainMeshGroupIDList.RemoveAll(delegate (int a)
+			{
+				return a < 0;
+			});
+
+			_rootUnits.Clear();
+
+			for (int iMainMesh = 0; iMainMesh < _mainMeshGroupList.Count; iMainMesh++)
+			{
+				apMeshGroup meshGroup = _mainMeshGroupList[iMainMesh];
+
+				apRootUnit newRootUnit = new apRootUnit();
+
+				newRootUnit.SetPortrait(this);
+				newRootUnit.SetMeshGroup(meshGroup);
+
+				_rootUnits.Add(newRootUnit);
+			}
+		}
+
+
+		//---------------------------------------------------------------
+		// 에디터 내에서의 Link
+		//---------------------------------------------------------------
+		//Editor 상태에서
+		//MeshGroup을 참조하는 객체들 간의 레퍼런스를 연결하고 갱신한다.
+		//Editor 실행시와 객체 추가/삭제시 호출해주자
+		//최적화 코드 추가 20.4.3
+		//- 1. 모든 항목을 링크할 지, 특정 애니메이션만 링크를 다시 할지 결정한다. (애니메이션 편집 정보는 해당 메시 그룹 외에는 다른 영향이 없으므로)
+		//- 2. Async 처리도 가능하도록 개선.
+		/// <summary>[Please do not use it]</summary>
+		/// <param name="curSelectedMeshGroup">현재 선택된 메시 그룹. RenderUnit과 Mod 정보를 한번 더 갱신한다. (이것 외의 링크를 제한하는 역할은 없음)</param>
+		/// <param name="targetAnimClip">현재 편집중인 AnimClip. 이게 null이면 전체 갱신. 대상이 있다면 불필요한 링크 작업은 생략된다.(isResetLink가 false인 경우에 한해서)</param>
+		public void LinkAndRefreshInEditor(bool isResetLink,
+											apUtil.LinkRefreshRequest linkRefreshRequest
+											//apMeshGroup editorSelectedMeshGroup
+											//, apAnimClip targetAnimClip
+											)
+		{
+			//4.1 리셋이 필요한지 검사한다.
+			//겸사겸사 불필요한 데이터도 삭제한다.
+
+			//노트 v1.5.0 : 이 대리자 코드는 GC를 발생시키지 않는다.
+			int nTextureRemoved = _textureData.RemoveAll(delegate(apTextureData a)
+			{
+				return a == null;
+			});
+			int nMeshRemoved = _meshes.RemoveAll(delegate(apMesh a)
+			{
+				return a == null;
+			});
+			int nMeshGroupRemoved = _meshGroups.RemoveAll(delegate(apMeshGroup a)
+			{
+				return a == null;
+			});
+			int nAnimClipRemoved = _animClips.RemoveAll(delegate(apAnimClip a)
+			{
+				return a == null;
+			});
+
+			
+			//단순히 MeshGroup을 루틴을 돌아서 처리하면, Root Mesh Group보다 Child Mesh Group이 나중에 처리되서,
+			//Root Mesh Group의 Link가 다 끊기게 된다.
+			//따라서 Child 부터 처리를 해야한다.
+			//<REV_MG>
+			List<apMeshGroup> revMeshGroups = GetReverseMeshGroupList(_meshGroups);
+			int nRevMeshGroups = revMeshGroups != null ? revMeshGroups.Count : 0;
+
+			int nModRemoved = 0;
+
+			//<REV_MG>
+			apMeshGroup curMeshGroup = null;
+			for (int i = 0; i < nRevMeshGroups; i++)
+			{
+				curMeshGroup = revMeshGroups[i];
+
+				//유효하지 않은 모디파이어들을 여기서 삭제한다.
+				//int curNumModRemoved = curMeshGroup._modifierStack.RemoveInvalidModifiers();
+				if(curMeshGroup._modifierStack._modifiers != null)
+				{
+					int curNumModRemoved = curMeshGroup._modifierStack._modifiers.RemoveAll(delegate(apModifierBase a)
+					{
+						return a == null;
+					});
+
+					nModRemoved += (curNumModRemoved > 0) ? curNumModRemoved : 0;
+				}
+			}
+
+			if(!isResetLink)
+			{
+				if(nTextureRemoved > 0 ||
+					nMeshRemoved > 0 ||
+					nMeshGroupRemoved > 0 ||
+					nAnimClipRemoved > 0 ||
+					nModRemoved > 0)
+				{
+					isResetLink = true;
+				}
+			}
+			
+
+			//4.1 추가
+			// 만약 isResetLink= true라면
+			// ReadyToEdit와 같이 전체 링크를 다시 하자
+			if (isResetLink)
+			{
+				//변경. 이 코드를 isResetLink 안으로 이동시킴 (20.4.3)
+				//--------------------------------------
+				_controller.Ready(this);
+
+				int nMeshes = _meshes != null ? _meshes.Count : 0;
+				if(nMeshes > 0)
+				{
+					for (int iMesh = 0; iMesh < nMeshes; iMesh++)
+					{
+						_meshes[iMesh].LinkEdgeAndVertex();
+					}
+				}
+
+				//--------------------------------------
+				//텍스쳐도 리셋
+				int nTextureData = _textureData != null ? _textureData.Count : 0;
+				if(nTextureData > 0)
+				{
+					for (int iTexture = 0; iTexture < nTextureData; iTexture++)
+					{
+						_textureData[iTexture].ReadyToEdit(this);
+					}
+				}
+
+				nMeshes = _meshes != null ? _meshes.Count : 0;
+				if(nMeshes > 0)
+				{
+					apMesh mesh = null;
+					for (int iMeshes = 0; iMeshes < nMeshes; iMeshes++)
+					{
+						//내부 MeshComponent들의 레퍼런스를 연결하자
+						mesh = _meshes[iMeshes];
+						
+						mesh.ReadyToEdit(this);
+
+						//텍스쳐를 연결하자
+						int textureID = mesh.LinkedTextureDataID;
+						mesh.SetTextureData(GetTexture(textureID));
+
+						mesh.LinkEdgeAndVertex();
+					}
+				}
+				
+
+				//1. 메시/메시 그룹을 먼저 연결
+				//2. Parent-Child는 그 다음에 연결 (Child 먼저 / Parent는 나중에)
+				//<REV_MG>
+				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
+				{
+					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
+
+					meshGroup.Init(this);
+
+					int nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
+					if(nChildMeshTFs > 0)
+					{
+						meshGroup._childMeshTransforms.RemoveAll(delegate(apTransform_Mesh a)
+						{
+							return a == null;
+						});
+
+						//개수 변경
+						nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
+
+						//1. Mesh 연결 + Clipping 연결
+						apTransform_Mesh meshTransform = null;
+						for (int iChild = 0; iChild < nChildMeshTFs; iChild++)
+						{
+							meshTransform = meshGroup._childMeshTransforms[iChild];
+							meshTransform.RegistIDToPortrait(this);//추가 : ID를 알려주자
+
+							int meshID = meshTransform._meshUniqueID;
+							if (meshID >= 0)
+							{
+								if (meshTransform._mesh == null)
+								{
+									//Mesh가 연결 안된 경우
+									apMesh existMesh = GetMesh(meshID);
+									if (existMesh != null)
+									{
+										meshTransform._mesh = existMesh;
+									}
+									else
+									{
+										meshTransform._mesh = null;
+									}
+								}
+
+								//--------------
+								//추가) Clipping Layer를 위해서 Mesh Transform끼리 연결을 해준다.
+								if (meshTransform._clipChildMeshes == null)
+								{
+									meshTransform._clipChildMeshes = new List<apTransform_Mesh.ClipMeshSet>();
+								}
+
+								meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
+								{
+									//조건에 맞지 않는 Clipping Child를 삭제한다.
+									//1. ID가 맞지 않다.
+									//2. MeshGroup에 존재하지 않다.
+									return a._transformID < 0 || (meshGroup.GetMeshTransform(a._transformID) == null);
+								});
+								
+								//-------------
+							}
+							else
+							{
+								//Mesh ID가 유효하지 않은 MeshTransform
+								meshTransform._mesh = null;
+							}
+
+							//추가 19.6.9 : Material Set 연결
+							if (meshTransform._isUseDefaultMaterialSet)
+							{
+								//기본값의 MatSet을 사용하자.
+								meshTransform._linkedMaterialSet = GetDefaultMaterialSet();
+								if(meshTransform._linkedMaterialSet != null)
+								{
+									//ID도 바꿔주자.
+									meshTransform._materialSetID = meshTransform._linkedMaterialSet._uniqueID;
+								}
+							}
+							else
+							{
+								if (meshTransform._materialSetID >= 0)
+								{
+									meshTransform._linkedMaterialSet = GetMaterialSet(meshTransform._materialSetID);
+									if (meshTransform._linkedMaterialSet == null)
+									{
+										//존재하지 않는 Material Set
+										meshTransform._materialSetID = -1;
+									}
+								}
+								else
+								{
+									meshTransform._linkedMaterialSet = null;
+								}
+							}
+						}
+					}
+
+					//1-2. MeshGroup 연결
+					int nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;
+					if(nChildMeshGroupTFs > 0)
+					{
+						meshGroup._childMeshGroupTransforms.RemoveAll(delegate(apTransform_MeshGroup a)
+						{
+							return a == null;
+						});
+
+						nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;
+
+						apTransform_MeshGroup meshGroupTF = null;
+
+						for (int iChild = 0; iChild < nChildMeshGroupTFs; iChild++)
+						{
+							meshGroupTF = meshGroup._childMeshGroupTransforms[iChild];
+							meshGroupTF.RegistIDToPortrait(this);//추가 : ID를 알려주자
+
+							int meshGroupID = meshGroupTF._meshGroupUniqueID;
+							if (meshGroupID >= 0)
+							{	
+								if (meshGroupTF._meshGroup == null)
+								{
+									//MeshGroup이 연결이 안된 경우
+									apMeshGroup existMeshGroup = GetMeshGroup(meshGroupID);
+									if (existMeshGroup != null)
+									{
+										meshGroupTF._meshGroup = existMeshGroup;
+									}
+									else
+									{
+										meshGroupTF._meshGroup = null;
+										//Debug.LogError("MeshGroup이 없는 MeshGroupTransform 발견 : " + meshGroup._childMeshGroupTransforms[iChild]._nickName);
+									}
+								}
+							}
+							else
+							{
+								//MeshGroup ID가 유효하지 않은 MeshGroupTransform 발견
+								meshGroupTF._meshGroup = null;
+							}
+						}						
+					}
+				}
+
+				//<REV_MG>
+				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
+				{
+					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
+
+					//2. 하위 MeshGroup 연결
+					int nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;
+					if(nChildMeshGroupTFs > 0)
+					{
+						for (int iChild = 0; iChild < nChildMeshGroupTFs; iChild++)
+						{
+							apTransform_MeshGroup childMeshGroupTransform = meshGroup._childMeshGroupTransforms[iChild];
+
+							if (childMeshGroupTransform._meshGroupUniqueID >= 0)
+							{
+								apMeshGroup existMeshGroup = GetMeshGroup(childMeshGroupTransform._meshGroupUniqueID);
+								if (existMeshGroup != null)
+								{
+									childMeshGroupTransform._meshGroup = existMeshGroup;
+
+									childMeshGroupTransform._meshGroup._parentMeshGroupID = meshGroup._uniqueID;
+									childMeshGroupTransform._meshGroup._parentMeshGroup = meshGroup;
+								}
+								else
+								{
+									childMeshGroupTransform._meshGroup = null;
+								}
+							}
+							else
+							{
+								childMeshGroupTransform._meshGroup = null;
+							}
+						}
+					}
+					
+
+					//다만, 없어진 Mesh Group은 정리해주자
+					int nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
+					if(nChildMeshTFs > 0)
+					{
+						meshGroup._childMeshTransforms.RemoveAll(delegate (apTransform_Mesh a)
+						{
+							return a._mesh == null;
+						});
+					}
+
+					nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;					
+					if(nChildMeshGroupTFs > 0)
+					{
+						meshGroup._childMeshGroupTransforms.RemoveAll(delegate (apTransform_MeshGroup a)
+						{
+							return a._meshGroup == null;
+						});
+					}
+				}
+
+
+				//Link에서 SortRenderUnit 변경사항 (v1.4.2)
+				//이전 : SortRenderUnit을 호출하여 RenderUnit / TF의 Depth를 갱신한 후 Clipping, RenderUnit 리셋과 같은 후속 처리를 한다.
+				// >> 렌더유닛이 완성되지 않았거나 서브 메시 그룹이 먼저 호출되는 경우 Depth가 잘못 적용되는 문제가 발생한다.
+
+				//변경
+				//- 순서를 변경하여 RenderUnit을 먼저 체크 및 생성한다.
+				//- Sort는 값 할당 없이 먼저 수행한다.
+				//- Link 이후, Root Mesh Group에 한해서 Depth 할당을 다시 한다.
+
+				//참고 REV_MG는 Child > Root 순서로 호출되는 리스트다.
+				//<REV_MG>
+				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
+				{
+					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
+
+					//기존 렌더유닛 검토 및 다시 생성) (위치 변경 v1.4.2)
+					meshGroup.ResetRenderUnitsWithoutRefreshEditor();
+
+					//단순 정렬
+					meshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.OnlySort);
+
+
+					//추가 : Clipping 후속 처리를 한다.
+					apTransform_Mesh meshTransform = null;
+					int nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
+					if(nChildMeshTFs > 0)
+					{
+						for (int iChild = 0; iChild < nChildMeshTFs; iChild++)
+						{
+							meshTransform = meshGroup._childMeshTransforms[iChild];
+
+							if (meshTransform._isClipping_Parent)
+							{
+								//Clipped Mesh를 검색해서 연결한다.
+								//찾은 이후엔 Sort를 해준다.
+								int nClipMeshes = meshTransform._clipChildMeshes != null ? meshTransform._clipChildMeshes.Count : 0;
+								if(nClipMeshes > 0)
+								{
+									for (int iClip = 0; iClip < nClipMeshes; iClip++)
+									{
+										apTransform_Mesh.ClipMeshSet clipSet = meshTransform._clipChildMeshes[iClip];
+										int childMeshID = clipSet._transformID;
+										apTransform_Mesh childMeshTF = meshGroup.GetMeshTransform(childMeshID);
+										if (childMeshTF != null)
+										{
+											clipSet._meshTransform = childMeshTF;
+											//clipSet._renderUnit = meshGroup.GetRenderUnit(childMeshTF);//삭제 v1.5.0
+										}
+										else
+										{
+											clipSet._meshTransform = null;
+											clipSet._transformID = -1;
+											//clipSet._renderUnit = null;//삭제 v1.5.0
+										}
+									}
+
+									meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
+									{
+										return a._transformID < 0;
+									});
+								}
+							}
+							else
+							{
+								if(meshTransform._clipChildMeshes == null)
+								{
+									meshTransform._clipChildMeshes = new List<apTransform_Mesh.ClipMeshSet>();
+								}
+								meshTransform._clipChildMeshes.Clear();//<<이건 일단 초기화 하지말자
+							}
+
+							meshTransform.SortClipMeshTransforms();
+						}
+					}
+					
+
+
+					//이전 >> 위치가 변경되었다 [v1.4.2]
+					////여기서 RenderUnit을 모두 리셋한다. (기존 렌더유닛 검토 및 다시 생성)
+					//meshGroup.ResetRenderUnitsWithoutRefreshEditor();
+
+					//클리핑 메시 연결을 자동으로 갱신한다.
+					meshGroup.RefreshAutoClipping();
+
+					//[v1.6.0] 마스크 데이터의 연결을 갱신한다.
+					if(meshGroup._parentMeshGroup == null)
+					{
+						//Root Mesh Group인 경우에만 마스크 Link를 한다. 재귀적이므로
+						meshGroup.LinkSendMaskData();
+					}
+					
+
+
+					if (meshGroup._rootRenderUnit != null)
+					{
+						meshGroup._rootRenderUnit.ReadyToUpdate();
+					}
+				}
+
+				//추가 [v1.4.2] Root Mesh Group에 대해 Depth를 갱신하는 Sorting을 여기서 하자
+				//Root Mesh Group만 체크하므로 [REV_MG]를 따르지 않는다.
+				int nMeshGroups = _meshGroups != null ? _meshGroups.Count : 0;
+				if(nMeshGroups > 0)
+				{
+					for (int iMeshGroup = 0; iMeshGroup < nMeshGroups; iMeshGroup++)
+					{
+						apMeshGroup meshGroup = _meshGroups[iMeshGroup];
+						if(meshGroup._parentMeshGroup == null && meshGroup._parentMeshGroupID < 0)
+						{
+							//Root MeshGroup인 경우
+							//Sort 후 Depth 할당까지 하자
+							meshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.AssignDepth);
+						}
+					}
+				}
+				
+
+				//3. MeshGroup -> Modifier를 돌면서 삭제된 meshTransform / meshGroupTransform / Bone을 잡고 있는 경우 삭제한다.
+				//<REV_MG>
+				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
+				{
+					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
+
+					int nModifiers = meshGroup._modifierStack._modifiers != null ? meshGroup._modifierStack._modifiers.Count : 0;
+					if(nModifiers == 0)
+					{
+						continue;
+					}
+					
+					meshGroup._modifierStack._modifiers.RemoveAll(delegate(apModifierBase a)
+					{
+						return a == null;
+					});
+
+					//모디파이어 개수 다시 계산
+					nModifiers = meshGroup._modifierStack._modifiers != null ? meshGroup._modifierStack._modifiers.Count : 0;
+
+					for (int iMod = 0; iMod < nModifiers; iMod++)
+					{
+						apModifierBase modifier = meshGroup._modifierStack._modifiers[iMod];
+						if(modifier == null)
+						{
+							continue;
+						}
+
+						//여기서 Modifier Link를 다시 해야한다.
+						
+						//apMeshGroup meshGroupOfTransform = null;
+						apMeshGroup meshGroupOfBone = null;
+
+						int nPSGs = modifier._paramSetGroup_controller != null ? modifier._paramSetGroup_controller.Count : 0;
+
+						if(nPSGs == 0)
+						{
+							continue;
+						}
+
+						for (int iPSG = 0; iPSG < nPSGs; iPSG++)
+						{
+							apModifierParamSetGroup modPSG = modifier._paramSetGroup_controller[iPSG];
+
+							switch (modPSG._syncTarget)
+							{
+								case apModifierParamSetGroup.SYNC_TARGET.Bones:
+								case apModifierParamSetGroup.SYNC_TARGET.ControllerWithoutKey:
+									//안쓰는 값
+									break;
+								case apModifierParamSetGroup.SYNC_TARGET.Controller:
+									//Controller 체크해볼 필요 있다.
+									modPSG._keyControlParam = _controller.FindParam(modPSG._keyControlParamID);
+									
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
+									modPSG._keyAnimClip = GetAnimClip(modPSG._keyAnimClipID);
+									modPSG._keyAnimTimeline = null;
+									modPSG._keyAnimTimelineLayer = null;
+									if(modPSG._keyAnimClip != null)
+									{
+										modPSG._keyAnimTimeline = modPSG._keyAnimClip.GetTimeline(modPSG._keyAnimTimelineID);
+										if(modPSG._keyAnimTimeline != null)
+										{
+											modPSG._keyAnimTimelineLayer = modPSG._keyAnimTimeline.GetTimelineLayer(modPSG._keyAnimTimelineLayerID);
+										}
+									}
+									
+									break;
+							}
+
+							int nParamSets = modPSG._paramSetList != null ? modPSG._paramSetList.Count : 0;
+							if(nParamSets == 0)
+							{
+								continue;
+							}
+
+							for (int iPS = 0; iPS < nParamSets; iPS++)
+							{
+								apModifierParamSet modPS = modPSG._paramSetList[iPS];
+
+								if (modPS._meshData != null)
+								{
+									//하위의 MeshGroup Transform이 삭제될 수 있도록
+									//적절하지 않은 MeshData를 삭제하자
+									//int nRemoved = modPS._meshData.RemoveAll(delegate (apModifiedMesh a)
+									modPS._meshData.RemoveAll(delegate (apModifiedMesh a)
+									{
+										if (meshGroup != null)
+										{
+											if (a._isMeshTransform)
+											{
+												//MeshTransform이 유효한지 찾자
+												a._transform_Mesh = meshGroup.GetMeshTransformRecursive(a._transformUniqueID);
+												if (a._transform_Mesh == null || a._transform_Mesh._mesh == null)
+												{
+													//Mesh Transform이 없다. 삭제
+													return true;
+												}
+											}
+											else
+											{
+												//MeshGroupTransform이 유효한지 찾자
+												a._transform_MeshGroup = meshGroup.GetMeshGroupTransformRecursive(a._transformUniqueID);
+												if (a._transform_MeshGroup == null || a._transform_MeshGroup._meshGroup == null)
+												{
+													//MeshGroup Transform이 없다. 삭제
+													return true;
+												}
+											}
+										}
+
+										return false;
+									});
+								}
+
+								//적절하지 않은 Bone Data를 삭제하자
+								if (modPS._boneData != null)
+								{
+									modPS._boneData.RemoveAll(delegate (apModifiedBone a)
+									{
+										meshGroupOfBone = GetMeshGroup(a._meshGropuUniqueID_Bone);
+
+										if(meshGroupOfBone != null)
+										{
+											a._bone = meshGroupOfBone.GetBone(a._boneID);
+											if(a._bone == null)
+											{
+												//Bone이 없다. 삭제
+												//Debug.LogError("ModBone - Bone : 삭제됨");
+												return true;
+											}
+										}
+
+										return false;
+									});
+								}
+							}
+						}
+					}
+				}
+				
+				//Root Unit도 갱신하자
+				if (_mainMeshGroupList == null)		{ _mainMeshGroupList = new List<apMeshGroup>(); }
+				else								{ _mainMeshGroupList.Clear(); }
+
+				if (_mainMeshGroupIDList == null) { _mainMeshGroupIDList = new List<int>(); }
+
+				for (int iMGID = 0; iMGID < _mainMeshGroupIDList.Count; iMGID++)
+				{
+					int mainMeshGroupID = _mainMeshGroupIDList[iMGID];
+					bool isValidMeshGroupID = false;
+
+					if (mainMeshGroupID >= 0)
+					{
+						apMeshGroup mainMeshGroup = GetMeshGroup(mainMeshGroupID);
+						if (mainMeshGroup != null)
+						{
+							if (!_mainMeshGroupList.Contains(mainMeshGroup))
+							{
+								_mainMeshGroupList.Add(mainMeshGroup);
+								isValidMeshGroupID = true;
+							}
+						}
+					}
+					if (!isValidMeshGroupID)
+					{
+						_mainMeshGroupIDList[iMGID] = -1;//<<이건 삭제하자
+					}
+				}
+
+				//일단 유효하지 못한 ID는 삭제하자
+				_mainMeshGroupIDList.RemoveAll(delegate (int a)
+				{
+					return a < 0;
+				});
+
+				//기존의 RootUnit중 삭제할 것 먼저 빼자
+				if (_rootUnits == null)
+				{
+					_rootUnits = new List<apRootUnit>();
+				}
+				_rootUnits.RemoveAll(delegate (apRootUnit a)
+				{
+					//유효한 MeshGroup을 가지지 않는 경우
+					return a._childMeshGroup == null
+							|| !_meshGroups.Contains(a._childMeshGroup)
+							|| !_mainMeshGroupList.Contains(a._childMeshGroup);
+				});
+				
+
+
+				//재활용을 위해서 리스트를 새로 만들자
+				List<apRootUnit> prevRootUnits = new List<apRootUnit>();
+				for (int iRootUnit = 0; iRootUnit < _rootUnits.Count; iRootUnit++)
+				{
+					prevRootUnits.Add(_rootUnits[iRootUnit]);
+				}
+
+				//리스트 클리어
+				_rootUnits.Clear();
+				for (int iMainMesh = 0; iMainMesh < _mainMeshGroupList.Count; iMainMesh++)
+				{
+					apMeshGroup meshGroup = _mainMeshGroupList[iMainMesh];
+					
+					//재활용 가능한지 확인하자
+					//이전 (GC 발생)
+					//apRootUnit existRootUnit = prevRootUnits.Find(delegate(apRootUnit a)
+					//{
+					//	return a._childMeshGroup == meshGroup;
+					//});
+
+					//변경 v1.5.0
+					s_LinkRefresh_RootUnitMeshGroup = meshGroup;
+					apRootUnit existRootUnit = prevRootUnits.Find(s_LinkRefresh_FindRootUnitByMeshGroup_Func);
+
+
+					if (existRootUnit != null)
+					{
+						//있다. 리스트에 넣자
+						existRootUnit.SetPortrait(this);
+						_rootUnits.Add(existRootUnit);
+					}
+					else
+					{
+						//없다. 새로 추가
+						apRootUnit newRootUnit = new apRootUnit();
+
+						newRootUnit.SetPortrait(this);
+						newRootUnit.SetMeshGroup(meshGroup);
+
+						_rootUnits.Add(newRootUnit);
+					}
+				}
+
+				//애니메이션도 연결을 복구하자
+				int nAnimClips = _animClips != null ? _animClips.Count : 0;
+				if(nAnimClips > 0)
+				{
+					for (int iAnimClip = 0; iAnimClip < nAnimClips; iAnimClip++)
+					{
+						apAnimClip animClip = _animClips[iAnimClip];
+						bool isNeedToLink = false;
+						if(animClip._targetMeshGroup == null)
+						{
+							//MeshGroup이 없다.
+							isNeedToLink = true;
+						}
+						else if(animClip._targetMeshGroup != null)
+						{
+							if(animClip._targetMeshGroup._uniqueID != animClip._targetMeshGroupID)
+							{
+								//MeshGroup ID가 다르다.
+								isNeedToLink = true;
+							}
+							else if(_meshGroups != null && !_meshGroups.Contains(animClip._targetMeshGroup))
+							{
+								//연결된 MeshGroup이 유효하지 않은 상태다.
+								isNeedToLink = true;
+							}
+						}
+
+						if(isNeedToLink)
+						{
+							animClip._targetMeshGroup = GetMeshGroup(animClip._targetMeshGroupID);
+						}
+					}
+				}
+
+
+
+			}
+			//------------[ isResetLink 끝 ] -------------------
+			
+			//모든 모디파이어가 아닌 특정 AnimClip에 대한 모디파이어를 제외할 것인가.
+			bool isLinkAllMeshGroups = false;
+			bool isSkipAllAnimModifier = false;//모든 Anim 모디파이어 스킵
+			bool isSkipUnselectedAnimPSGs = false;//선택되지 않은 Anim 모디파이어의 PSG 스킵
+			apAnimClip selectedAnimClip = null;
+
+			bool isNeedToRefreshOtherMeshGroups = false;
+			apMeshGroup curSelectedMeshGroup = null;
+
+			//메시 그룹 링크 다시 확인하는 코드
+			//최적화 20.4.3 : 이 코드들이 에디터를 무겁게 한다.
+			//만약 특정 메시 그룹을 선택했거나, 특정 AnimClip을 선택했다면, 그 외의 메시 그룹을 갱신하지 말자.
+			//revMeshGroups에서 대상이 되는 메시 그룹의 부모/자식들은 제외한다.
+			if(linkRefreshRequest != null)
+			{
+				if(linkRefreshRequest.Request_MeshGroup == apUtil.LR_REQUEST__MESHGROUP.SelectedMeshGroup && linkRefreshRequest.MeshGroup != null)
+				{
+					//대상이 되는 메시 그룹과 관련된 모든 메시 그룹을 찾자.
+					List<apMeshGroup> targetMeshGroups = new List<apMeshGroup>();
+
+					if(linkRefreshRequest.MeshGroup != null)
+					{
+						FindAllParentAndChildrenMeshGroups(linkRefreshRequest.MeshGroup, targetMeshGroups);
+					}
+
+					revMeshGroups = targetMeshGroups;//일부 메시 그룹만 선택을 한다.
+					nRevMeshGroups = revMeshGroups != null ? revMeshGroups.Count : 0;//개수도 다시 계산
+				}
+
+				//모든 객체를 대상으로 Link를 한다.
+				isLinkAllMeshGroups = linkRefreshRequest.Request_MeshGroup == apUtil.LR_REQUEST__MESHGROUP.AllMeshGroups;
+
+				//모든 Anim 모디파이어를 생략한다. (그 외의 모디파이어는 생략하지 않음)
+				isSkipAllAnimModifier = linkRefreshRequest.Request_Modifier == apUtil.LR_REQUEST__MODIFIER.AllModifiers_ExceptAnimMods;
+
+				//특정 AnimClip에 대한 PSG를 제외한 나머지를 생략한다. (Anim 모디파이어 중에서)
+				isSkipUnselectedAnimPSGs = linkRefreshRequest.Request_PSG == apUtil.LR_REQUEST__PSG.SelectedAnimClipPSG_IfAnimModifier;
+				selectedAnimClip = linkRefreshRequest.AnimClip;
+
+				isNeedToRefreshOtherMeshGroups = (revMeshGroups.Count > 1);
+				curSelectedMeshGroup = linkRefreshRequest.MeshGroup;
+			}
+			else
+			{
+				isLinkAllMeshGroups = true;//Request가 없다면 모든 객체를 대상으로 Link 수행
+			}
+
+
+			//v1.6.0 변경 전략
+			//이 타이밍에 삭제후 Undo를 한다면, ID는 유효하지만 링크가 되지 않은 상태의 데이터들이 있다.
+			//이때 링크 멤버의 null 여부로 유효성을 판단하면 링크가 해제되어 데이터가 날라가는 버그가 발생한다.
+			//이 아래의 코드부터는 ID를 먼저 확인하여 다시 링크하는 코드가 추가되어야 한다.
+
+			//<REV_MG>
+			for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
+			{
+				apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
+
+				//첫 Link시, 잘못된 데이터가 있으면 삭제를 한다.
+				
+				meshGroup._modifierStack.RefreshAndSort(	apModifierStack.REFRESH_OPTION_ACTIVE.Keep,
+															apModifierStack.REFRESH_OPTION_REMOVE.RemoveNullModifiers);//변경 22.12.13
+
+				
+				//Bone 연결 
+				//Root 리스트는 일단 날리고 BoneAll 리스트를 돌면서 필요한걸 넣어주자
+				//이후엔 Root -> Child 방식으로 순회
+				if(meshGroup._boneList_Root == null)
+				{
+					meshGroup._boneList_Root = new List<apBone>();
+				}
+				meshGroup._boneList_Root.Clear();
+
+				int nBoneListAll = meshGroup._boneList_All != null ? meshGroup._boneList_All.Count : 0;
+				if(nBoneListAll > 0)
+				{
+					apBone bone = null;
+					for (int iBone = 0; iBone < nBoneListAll; iBone++)
+					{
+						bone = meshGroup._boneList_All[iBone];
+						if (bone._childBones == null)
+						{
+							bone._childBones = new List<apBone>();
+						}
+						bone._childBones.Clear();
+					}
+
+					for (int iBone = 0; iBone < nBoneListAll; iBone++)
+					{
+						bone = meshGroup._boneList_All[iBone];
+
+						apBone parentBone = null;
+						if (bone._parentBoneID >= 0)
+						{
+							parentBone = meshGroup.GetBone(bone._parentBoneID);
+						}
+
+						bone.Link(meshGroup, parentBone, this);
+
+						if (parentBone == null)
+						{
+							//Parent가 없다면 Root 본이다.
+							meshGroup._boneList_Root.Add(bone);
+						}
+					}
+
+					//추가 5.9 : Bone의 Check Validation 함수를 호출해야 한다.
+					for (int iBone = 0; iBone < nBoneListAll; iBone++)
+					{
+						meshGroup._boneList_All[iBone].CheckIKControllerValidation();
+					}
+				}
+
+
+				int curBoneIndex = 0;
+				int nRootBoneList = meshGroup._boneList_Root != null ? meshGroup._boneList_Root.Count : 0;
+				if(nRootBoneList > 0)
+				{
+					for (int iRoot = 0; iRoot < nRootBoneList; iRoot++)
+					{
+						apBone rootBone = meshGroup._boneList_Root[iRoot];
+						
+						//TODO : MeshGroup이 Transform으로 있는 경우에 Transform Matrix를 넣어줘야한다.
+						rootBone.LinkRecursive(0);
+						curBoneIndex = rootBone.SetBoneIndex(curBoneIndex) + 1;
+					}
+				}
+				
+
+				List<apModifierBase> modifiers = meshGroup._modifierStack._modifiers;
+				int nModifiers = modifiers != null ? modifiers.Count : 0;
+				if (nModifiers > 0)
+				{
+					for (int iMod = 0; iMod < nModifiers; iMod++)
+					{
+						apModifierBase mod = modifiers[iMod];
+
+						//추가 : Portrait를 연결해준다.
+						mod.LinkPortrait(this);
+
+						//ID > MeshGroup 연결
+						if(mod._meshGroup == null && mod._meshGroupUniqueID >= 0)
+						{
+							mod._meshGroup = GetMeshGroup(mod._meshGroupUniqueID);
+						}
+
+						//삭제 조건1 - MeshGroup이 없다
+						if (mod._meshGroup == null)
+						{
+							continue;
+						}
+
+						//>> 최적화 20.4.3
+						if (isSkipAllAnimModifier && mod.IsAnimated)
+						{
+							//요청에 따라 Anim 모디파이어는 생략하자
+							continue;
+						}
+
+						List<apModifierParamSetGroup> paramSetGroups = mod._paramSetGroup_controller;
+						int nPSGs = paramSetGroups != null ? paramSetGroups.Count : 0;
+						if (nPSGs > 0)
+						{
+							for (int iPSGroup = 0; iPSGroup < nPSGs; iPSGroup++)
+							{
+								apModifierParamSetGroup paramSetGroup = paramSetGroups[iPSGroup];
+
+								//버그
+								//삭제 후 Undo시 paramSetGroup._keyAnimClip가 null이 된다.
+								//그래서 옵션에 관계없이 애니메이션만 일단 링크를 미리 검사하자
+								if(mod.IsAnimated)
+								{
+									//v1.6.0 : 버그 수정. Undo후에 이게 null될 수 있다.
+									//근데 아래서 링크를 체크하는데 여기서 조건을 체크하니 제대로 안돌아갈 수 밖에
+									if(paramSetGroup._keyAnimClip == null
+									|| (paramSetGroup._keyAnimClip != null && paramSetGroup._keyAnimClip._uniqueID != paramSetGroup._keyAnimClipID))
+									{
+										paramSetGroup._keyAnimClip = GetAnimClip(paramSetGroup._keyAnimClipID);
+										//Debug.LogWarning("연결이 해제되었던 Anim Clip 발견 > 다시 연결 [" + (paramSetGroup._keyAnimClip != null ? paramSetGroup._keyAnimClip._name : "없음") + "]");
+									}
+								}
+								
+
+								//>> 최적화 20.4.3 : 만약 애니메이션 설정시, 해당 애니메이션에 관련된 것들만 갱신한다.
+								if (isSkipUnselectedAnimPSGs && mod.IsAnimated)
+								{
+									// Debug.Log("애니메이션 모디파이어의 일부 PSG는 생략될 수 있음 - 이 PSG의 애니메이션 [" 
+									// 	+ (paramSetGroup._keyAnimClip != null ? paramSetGroup._keyAnimClip._name : "(없음)]"));
+
+									if (paramSetGroup._keyAnimClip != selectedAnimClip)
+									{
+										//특정 AnimClip을 제외한 다른 AnimClip에 대한 ParamSetGroup은 Link를 생략한다.
+										//Debug.LogError(">> Skip : 이 PSG는 대상 애니메이션이 아님");
+										continue;
+									}
+								}
+
+								int nParamSets = paramSetGroup._paramSetList != null ? paramSetGroup._paramSetList.Count : 0;
+
+								//List<apModifierParamSet> paramSets = mod._paramSetList;
+								//1. Key를 세팅해주자
+								switch (paramSetGroup._syncTarget)
+								{
+									case apModifierParamSetGroup.SYNC_TARGET.Static:
+										break;
+
+									case apModifierParamSetGroup.SYNC_TARGET.Controller:
+										{
+											if(paramSetGroup._keyControlParam == null
+												|| (paramSetGroup._keyControlParam != null && paramSetGroup._keyControlParam._uniqueID != paramSetGroup._keyControlParamID)
+												)
+											{
+												paramSetGroup._keyControlParam = GetControlParam(paramSetGroup._keyControlParamID);
+											}	
+										}
+										
+										break;
+
+									case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
+										{
+											//AnimClip과 연동을 먼저 한다.
+
+											// ParamSetGroup -> AnimClip과 연동
+											paramSetGroup._keyAnimClip = GetAnimClip(paramSetGroup._keyAnimClipID);
+
+											if (paramSetGroup._keyAnimClip == null)
+											{
+												//Debug.LogError(">> PSG Key AnimClip 삭제 : " + paramSetGroup._keyAnimClipID);
+												paramSetGroup._keyAnimClipID = -1;//<<삭제 하자
+												break;
+											}
+
+											// ParamSetGroup -> Anim Timeline과 연동
+											paramSetGroup._keyAnimTimeline = paramSetGroup._keyAnimClip.GetTimeline(paramSetGroup._keyAnimTimelineID);
+
+											if (paramSetGroup._keyAnimTimeline == null)
+											{
+												paramSetGroup._keyAnimTimelineID = -1;
+												break;
+											}
+
+											// ParamSetGroup -> Anim Timeline Layer와 연동
+											paramSetGroup._keyAnimTimelineLayer = paramSetGroup._keyAnimTimeline.GetTimelineLayer(paramSetGroup._keyAnimTimelineLayerID);
+											
+
+											if (paramSetGroup._keyAnimTimelineLayer == null)
+											{
+												paramSetGroup._keyAnimTimelineLayerID = -1;
+												break;
+											}
+
+											//추가) 상호 연동을 해주자
+											paramSetGroup._keyAnimTimelineLayer.LinkParamSetGroup(paramSetGroup);
+
+											//키프레임이면 여기서 한번더 링크를 해주자
+											
+											if (nParamSets > 0)
+											{
+												//[v1.5.0]
+												//버그로 인하여 "동일한 키프레임"을 가리키는 ParamSet이 생성되기도 한다.
+												//리스트를 만들어서 이미 동일한 키프레임의 경우 무효로 만들자
+												List<apAnimKeyframe> checkedKeyframes = new List<apAnimKeyframe>();
+
+												apModifierParamSet paramSet = null;
+												for (int iPS = 0; iPS < nParamSets; iPS++)
+												{
+													paramSet = paramSetGroup._paramSetList[iPS];
+													int keyframeID = paramSet._keyframeUniqueID;
+
+													apAnimKeyframe targetKeyframe = paramSetGroup._keyAnimTimelineLayer.GetKeyframeByID(keyframeID);
+													if (targetKeyframe != null)
+													{
+														if(!checkedKeyframes.Contains(targetKeyframe))
+														{
+															//연결되지 않은 키프레임이다.
+															paramSet.LinkSyncKeyframe(targetKeyframe);
+															checkedKeyframes.Add(targetKeyframe);
+
+															//Debug.Log(">> Mod-ParamSet과 Keyframe 연결함 [" + keyframeID + "]");
+														}
+														else
+														{
+															//Debug.LogError("에러 : 이미 연결이 완료된 키프레임에 다른 ModParamSet이 연결을 시도했다.");
+															//Debug.LogError(">> Mod-ParamSet과 Keyframe 연결 실패 : 이미 다른 키프레임과 연결됨 [" + keyframeID + "]");
+															paramSet._keyframeUniqueID = -1;//삭제 처리
+														}
+														
+													}
+													else
+													{
+														//못찾았다. > Keyframe 연동 에러
+														paramSet._keyframeUniqueID = -1;
+
+														//Debug.LogError(">> Mod-ParamSet과 Keyframe 연결 실패 [" + keyframeID + "]");
+													}
+
+												}
+
+												//"키프레임 연동" 방식에서 비어있는 키프레임이라면?
+												paramSetGroup._paramSetList.RemoveAll(delegate (apModifierParamSet a)
+												{
+													return a._keyframeUniqueID < 0;
+												});
+											}
+										}
+										break;
+								}
+
+								//Debug.Log("> 모디파이어의 ModMesh/ModBone 링크 시도");
+								List<apModifierParamSet> paramSets = paramSetGroup._paramSetList;
+								nParamSets = paramSetGroup._paramSetList != null ? paramSetGroup._paramSetList.Count : 0;
+								if (nParamSets > 0)
+								{
+									apModifierParamSet paramSet = null;
+									for (int iParamSet = 0; iParamSet < nParamSets; iParamSet++)
+									{
+										paramSet = paramSets[iParamSet];
+
+										//Link를 해주자
+										paramSet.LinkParamSetGroup(paramSetGroup);
+
+										List<apModifiedMesh> meshData = paramSet._meshData;
+										apTransform_Mesh meshTransform = null;
+										apTransform_MeshGroup meshGroupTransform = null;
+										apRenderUnit renderUnit = null;
+
+
+										//1. ModMesh
+										int nMeshData = meshData != null ? meshData.Count : 0;
+										if (nMeshData > 0)
+										{
+											for (int iMesh = 0; iMesh < nMeshData; iMesh++)
+											{
+												apModifiedMesh modMesh = meshData[iMesh];
+
+												//추가 : Modifier의 meshGroup과 Transform의 MeshGroup을 분리한다.
+												apMeshGroup meshGroupOfTransform = null;
+
+												if (modMesh._isRecursiveChildTransform)
+												{
+													//Mesh Group 다시 링크 (다르다)
+													meshGroupOfTransform = GetMeshGroup(modMesh._meshGroupUniqueID_Transform);
+												}
+												else
+												{
+													//동일한 MeshGroup이다.
+													meshGroupOfTransform = meshGroup;
+												}
+
+												modMesh._meshGroupUniqueID_Modifier = meshGroup._uniqueID;
+
+												//변경 : 타입 대신 값을 보고 판단한다.
+												if (modMesh._transformUniqueID >= 0 && meshGroupOfTransform != null)
+												{
+													if (modMesh._isMeshTransform)
+													{
+														//다시 링크해야할지 여부를 판단한다.
+														meshTransform = meshGroupOfTransform.GetMeshTransform(modMesh._transformUniqueID);
+
+														if (meshTransform != null)
+														{
+															renderUnit = meshGroup.GetRenderUnit(meshTransform);
+															modMesh.Link_MeshTransform(meshGroup, meshGroupOfTransform, meshTransform, renderUnit, this);
+														}
+													}
+													else
+													{
+														meshGroupTransform = meshGroupOfTransform.GetMeshGroupTransform(modMesh._transformUniqueID);
+
+														if (meshGroupTransform != null)
+														{
+															renderUnit = meshGroup.GetRenderUnit(meshGroupTransform);
+															modMesh.Link_MeshGroupTransform(meshGroup, meshGroupOfTransform, meshGroupTransform, renderUnit);
+														}
+													}
+												}
+											}
+
+											//int nRemove = paramSet._meshData.RemoveAll(delegate (apModifiedMesh a)
+											paramSet._meshData.RemoveAll(delegate (apModifiedMesh a)
+											{
+												return a._meshGroupOfModifier == null || a._meshGroupOfTransform == null;
+											});
+										}
+
+										//---------------------------------------------------------------------------------
+										//2. Bone 연동을 하자
+
+										List<apModifiedBone> boneData = paramSet._boneData;
+										apModifiedBone modBone = null;
+
+										int nBoneData = boneData != null ? boneData.Count : 0;
+										if (nBoneData > 0)
+										{
+											for (int iModBone = 0; iModBone < nBoneData; iModBone++)
+											{
+												modBone = boneData[iModBone];
+												apMeshGroup meshGroupOfBone = GetMeshGroup(modBone._meshGropuUniqueID_Bone);
+												apMeshGroup meshGroupOfModifier = GetMeshGroup(modBone._meshGroupUniqueID_Modifier);
+												if (meshGroupOfBone == null || meshGroupOfModifier == null)
+												{
+													//Link Error : Mod Bone 링크 실패 [MeshGroup]
+													//Debug.LogError("Link Error : Mod Bone 링크 실패 [MeshGroup]");
+													continue;
+												}
+
+												apBone bone = meshGroupOfBone.GetBone(modBone._boneID);
+												if (bone == null)
+												{
+													//Link Error : Mod Bone 링크 실패
+													//Debug.LogError("Link Error : Mod Bone 링크 실패 [Bone]");
+													continue;
+												}
+
+												meshGroupTransform = meshGroupOfModifier.GetMeshGroupTransformRecursive(modBone._transformUniqueID);
+												if (meshGroupTransform == null)
+												{
+													//Link Error : Mod Bone 링크 실패 [MeshGroup Transform]
+													//Debug.LogError("Link Error : Mod Bone 링크 실패 [MeshGroup Transform]");
+													continue;
+												}
+
+												renderUnit = meshGroupOfModifier.GetRenderUnit(meshGroupTransform._transformUniqueID, false);
+												if (renderUnit == null)
+												{
+													//Debug.LogError("Link Error : Mod Bone 링크 실패 [Render Unit]");
+													//Debug.LogError("Link Error : Mod Bone 링크 실패 [Render Unit]");
+													//continue;
+													//다시 체크 및 보정
+													if (meshGroupOfBone == meshGroupOfModifier)
+													{
+														meshGroupTransform = meshGroupOfModifier._rootMeshGroupTransform;
+													}
+													else
+													{
+														meshGroupTransform = meshGroupOfModifier.FindChildMeshGroupTransform(meshGroupOfBone);
+													}
+
+													if (meshGroupTransform != null)
+													{
+														renderUnit = meshGroupOfModifier.GetRenderUnit(meshGroupTransform._transformUniqueID, false);
+														//Debug.LogError("잘못된 ModBone 연결이 보정되었다.");
+														modBone.Init(meshGroupOfModifier._uniqueID, meshGroupOfBone._uniqueID, meshGroupTransform._transformUniqueID, bone);
+													}
+												}
+
+												modBone.Link(meshGroupOfModifier, meshGroupOfBone, bone, renderUnit, meshGroupTransform);
+											}
+
+											//연동 안된 ModBone은 삭제하자
+											//---------------------------------------------------------------------------------
+											boneData.RemoveAll(delegate (apModifiedBone a)
+											{
+												return a._bone == null || a._meshGroup_Bone == null || a._meshGroup_Modifier == null;
+											});
+										}
+										
+
+									}
+								}
+							}
+						}
+						
+
+
+						//mod.RefreshParamSet();
+						if (mod.IsAnimated)
+						{
+							//애니메이션 타입이라면 > 일부 AnimClip에 대한 처리하자.
+							mod.RefreshParamSet(linkRefreshRequest);//<<단순 변경시 linkRefreshRequest로 입력 되어야 한다.
+																	//mod.RefreshParamSet(null);//<<삭제시 이게 null로 입력되어야 한다.
+						}
+						else
+						{
+							mod.RefreshParamSet(null);
+						}
+					}
+
+					meshGroup._modifierStack._modifiers.RemoveAll(delegate (apModifierBase a)
+					{
+						return a._meshGroup == null;
+					});
+				}
+				
+				//UnityEngine.Profiling.Profiler.EndSample();
+				//ModStack의 CalculateParam을 모두 지우고 다시 만들자
+				
+				//이 조건문 추가 20.4.3 : 모든 메시 그룹에 대해서 Refresh를 할 경우에만
+				//단, 여러개의 메시그룹을 대상으로 하는 경우에는 타겟을 제외한 나머지 객체는 Refresh를 해야한다.
+				//UnityEngine.Profiling.Profiler.BeginSample("Link 5-4 - Refresh Link");
+
+				if(isLinkAllMeshGroups)
+				{
+					//Debug.Log(">>>> All MeshGroups (Other)");
+					meshGroup.RefreshModifierLink(null);
+				}
+				else if(curSelectedMeshGroup != null 
+					&& isNeedToRefreshOtherMeshGroups
+					&& curSelectedMeshGroup != meshGroup)
+				{
+					//Debug.Log(">>>> 타겟이 아닌 다른 메시 그룹의 모디파이어를 Refresh [" + meshGroup._name + "]");
+					meshGroup.RefreshModifierLink(linkRefreshRequest);
+				}
+
+				//UnityEngine.Profiling.Profiler.EndSample();
+			}
+
+
+			//UnityEngine.Profiling.Profiler.EndSample();
+			//UnityEngine.Profiling.Profiler.BeginSample("Link 6");
+
+			if(curSelectedMeshGroup != null && !isLinkAllMeshGroups)
+			{
+				//모든 메시 그룹을 대상으로 한게 아닌데 대상 메시 그룹이 있다면
+				curSelectedMeshGroup.RefreshModifierLink(linkRefreshRequest);
+			}
+
+			//UnityEngine.Profiling.Profiler.EndSample();
+			//UnityEngine.Profiling.Profiler.BeginSample("Link 7");
+
+			if (isSkipUnselectedAnimPSGs && linkRefreshRequest.AnimClip != null)
+			{
+				//특정 AnimClip만 검사
+				linkRefreshRequest.AnimClip.LinkEditor(this);
+				linkRefreshRequest.AnimClip.RemoveUnlinkedTimeline();
+			}
+			else
+			{
+				//전체 검사
+				int nAnimClips = _animClips != null ? _animClips.Count : 0;
+				if (nAnimClips > 0)
+				{
+					apAnimClip animClip = null;
+					for (int i = 0; i < _animClips.Count; i++)
+					{
+						animClip = _animClips[i];
+						animClip.LinkEditor(this);
+						animClip.RemoveUnlinkedTimeline();
+					}
+				}
+				
+			}
+			
+
+			//UnityEngine.Profiling.Profiler.EndSample();
+			//UnityEngine.Profiling.Profiler.BeginSample("Link 8");
+			
+			//추가 9.30 : 만약, 선택한 MeshGroup에 하위 MeshGroup이 있다면,
+			//전체적으로 하위 MeshGroup으로의 연결을 다시 해야한다.
+			//위에서 연결이 흐트러졌기 때문
+			
+			if(linkRefreshRequest != null && curSelectedMeshGroup != null)
+			{
+				//하위에 메시 그룹이 있거나, 모든 메시 그룹을 대상으로 하지 않았을 경우
+				if((curSelectedMeshGroup._childMeshGroupTransforms != null && curSelectedMeshGroup._childMeshGroupTransforms.Count > 0)
+					|| !isLinkAllMeshGroups)
+				{
+					//UnityEngine.Profiling.Profiler.BeginSample("Link 8-1");
+					curSelectedMeshGroup.LinkModMeshRenderUnits(linkRefreshRequest);
+					//UnityEngine.Profiling.Profiler.EndSample();
+
+					//UnityEngine.Profiling.Profiler.BeginSample("Link 8-2");
+					curSelectedMeshGroup.RefreshModifierLink(linkRefreshRequest);
+					//UnityEngine.Profiling.Profiler.EndSample();
+				}
+			}
+
+
+			//UnityEngine.Profiling.Profiler.EndSample();
+
+			//삭제 v1.5.0 : GC.Collect는 너무 많은 성능 스파이크를 일으킨다.
+			//Debug.LogError("TODO : GC가 너무 커서 여기서 성능이 크게 떨어진다.");
+			//Debug.LogError("일반적인 작업에서는 GC를 호출하지 않고, 메뉴 전환시에 GC를 호출하자");
+			//System.GC.Collect();
+
+			//UnityEngine.Profiling.Profiler.EndSample();
+			
+		}
+
+		
+		private static apMeshGroup s_LinkRefresh_RootUnitMeshGroup = null;
+		private static Predicate<apRootUnit> s_LinkRefresh_FindRootUnitByMeshGroup_Func = FUNC_LinkRefresh_FindRootUnitByMeshGroup;
+		private static bool FUNC_LinkRefresh_FindRootUnitByMeshGroup(apRootUnit a)
+		{
+			return a._childMeshGroup == s_LinkRefresh_RootUnitMeshGroup;
+		}
+
+
+
+		//--------------------------------------------------------------------
+		// ID 관리
+		//--------------------------------------------------------------------
+		//유니크 아이디는 몇가지 타입에 맞게 통합해서 관리한다.
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void ClearRegisteredUniqueIDs()
+		{
+			_IDManager.Clear();
+		}
+
+		// 발급된 ID는 관리를 위해 회수한다.
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="ID"></param>
+		public void RegistUniqueID(apIDManager.TARGET target, int ID)
+		{
+			_IDManager.RegistID(target, ID);
+		}
+
+
+		// 새로운 ID를 발급한다.
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		/// <param name="targetType"></param>
+		/// <returns></returns>
+		public int MakeUniqueID(apIDManager.TARGET targetType)
+		{
+			int resultID = _IDManager.MakeUniqueID(targetType);
+			//수정 20.1.16 : 발급 즉시 등록하자 (중복 막기 위함)
+			//if(resultID >= 0)
+			//{
+			//	RegistUniqueID(taTyperget, resultID);
+			//}
+
+			//MakeUniqueID에서 이미 등록이 되었다. (22.7.12)
+
+			return resultID;
+		}
+
+
+
+		// 객체 삭제시 ID 회수
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="unusedID"></param>
+		public void PushUnusedID(apIDManager.TARGET target, int unusedID)
+		{
+			_IDManager.PushUnusedID(target, unusedID);
+		}
+
+
+		//모든 ID를 리셋하고 다시 등록한다.
+		//Undo용
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void RefreshAllUniqueIDs()
+		{
+			_IDManager.Clear();
+			
+			
+			//1. Texture
+			apTextureData curTextureData = null;
+			for (int i = 0; i < _textureData.Count; i++)
+			{
+				curTextureData = _textureData[i];
+				if(curTextureData == null) { continue; }
+
+				_IDManager.RegistID(apIDManager.TARGET.Texture, curTextureData._uniqueID);
+			}
+
+			//2. Mesh + Vertex + Pin
+			apMesh curMesh = null;
+			for (int i = 0; i < _meshes.Count; i++)
+			{
+				curMesh = _meshes[i];
+				if(curMesh == null) { continue; }
+
+				_IDManager.RegistID(apIDManager.TARGET.Mesh, curMesh._uniqueID);
+				curMesh.RefreshVertexAndPinIDs();//<<Vertex ID를 등록한다.
+			}
+
+			//3. MeshGroup + Transform + Modifier + Bone
+			apMeshGroup curMeshGroup = null;
+			for (int i = 0; i < _meshGroups.Count; i++)
+			{
+				curMeshGroup = _meshGroups[i];
+				if(curMeshGroup == null) { continue; }
+				
+				_IDManager.RegistID(apIDManager.TARGET.MeshGroup, curMeshGroup._uniqueID);
+
+
+				//MeshGroup -> Transform
+				apTransform_Mesh meshTF = null;
+				for (int iMeshTF = 0; iMeshTF < curMeshGroup._childMeshTransforms.Count; iMeshTF++)
+				{
+					meshTF = curMeshGroup._childMeshTransforms[iMeshTF];
+					if(meshTF == null) { continue; }
+
+					_IDManager.RegistID(apIDManager.TARGET.Transform, meshTF._transformUniqueID);
+				}
+
+				apTransform_MeshGroup mgTF = null;
+				for (int iMGTF = 0; iMGTF < curMeshGroup._childMeshGroupTransforms.Count; iMGTF++)
+				{
+					mgTF = curMeshGroup._childMeshGroupTransforms[iMGTF];
+					if(mgTF == null) { continue; }
+
+					_IDManager.RegistID(apIDManager.TARGET.Transform, mgTF._transformUniqueID);
+				}
+
+				if(curMeshGroup._rootMeshGroupTransform != null)
+				{
+					_IDManager.RegistID(	apIDManager.TARGET.Transform, 
+											curMeshGroup._rootMeshGroupTransform._transformUniqueID);
+				}
+
+				//MeshGroup -> Modifier
+				apModifierBase modifier = null;
+				for (int iMod = 0; iMod < curMeshGroup._modifierStack._modifiers.Count; iMod++)
+				{
+					modifier = curMeshGroup._modifierStack._modifiers[iMod];
+					if(modifier == null) { continue; }
+
+					_IDManager.RegistID(	apIDManager.TARGET.Modifier,
+											modifier._uniqueID);
+				}
+
+				apBone bone = null;
+				for (int iBone = 0; iBone < curMeshGroup._boneList_All.Count; iBone++)
+				{
+					bone = curMeshGroup._boneList_All[iBone];
+					if(bone == null) { continue; }
+
+					_IDManager.RegistID(	apIDManager.TARGET.Bone,
+											bone._uniqueID);
+
+				}
+			}
+
+			//4. Control Param
+			apControlParam controlParam = null;
+			for (int i = 0; i < _controller._controlParams.Count; i++)
+			{
+				controlParam = _controller._controlParams[i];
+				if(controlParam == null) { continue; }
+
+				_IDManager.RegistID(	apIDManager.TARGET.ControlParam,
+										controlParam._uniqueID);
+			}
+
+			//5. AnimClip + AnimTimeline + AnimTimeline Layer + AnimKeyframe
+			apAnimClip animClip = null;
+			apAnimTimeline timeline = null;
+			apAnimTimelineLayer timelineLayer = null;
+			apAnimKeyframe keyframe = null;
+			for (int iAnimClip = 0; iAnimClip < _animClips.Count; iAnimClip++)
+			{
+				animClip = _animClips[iAnimClip];
+				if(animClip == null) { continue; }
+
+				_IDManager.RegistID(	apIDManager.TARGET.AnimClip,
+										animClip._uniqueID);
+
+				//Timeline
+				for (int iTimeline = 0; iTimeline < animClip._timelines.Count; iTimeline++)
+				{
+					timeline = animClip._timelines[iTimeline];
+					if(timeline == null) { continue; }
+
+					_IDManager.RegistID(	apIDManager.TARGET.AnimTimeline,
+											timeline._uniqueID);
+
+					//Timeline Layer
+					for (int iTimelineLayer = 0; iTimelineLayer < timeline._layers.Count; iTimelineLayer++)
+					{
+						timelineLayer = timeline._layers[iTimelineLayer];
+						if(timelineLayer == null) { continue; }
+
+						_IDManager.RegistID(	apIDManager.TARGET.AnimTimelineLayer,
+												timelineLayer._uniqueID);
+
+						//Keyframe
+						for (int iKeyframe = 0; iKeyframe < timelineLayer._keyframes.Count; iKeyframe++)
+						{
+							keyframe = timelineLayer._keyframes[iKeyframe];
+							if(keyframe == null)
+							{
+								continue;
+							}
+
+							_IDManager.RegistID(	apIDManager.TARGET.AnimKeyFrame,
+													keyframe._uniqueID);
+
+						}
+					}
+				}
+			}
+
+
+		}
+
+
+
+		//--------------------------------------------------------------------
+		// 에디터용 객체 참조/제어 관련 함수들
+		//--------------------------------------------------------------------
+		/// <summary>
+		/// [Please do not use it] (For Editor, not Runtime)
+		/// </summary>
+		/// <param name="uniqueID"></param>
+		/// <returns></returns>
+		public apTextureData GetTexture(int uniqueID)
+		{
+			//이전 (GC 발생)
+			//return _textureData.Find(delegate (apTextureData a)
+			//{
+			//	return a._uniqueID == uniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetTexture_ID = uniqueID;
+			return _textureData.Find(s_GetTextureByID_Func);
+		}
+
+		private static int s_GetTexture_ID = -1;
+		private static Predicate<apTextureData> s_GetTextureByID_Func = FUNC_GetTextureByID;
+		private static bool FUNC_GetTextureByID(apTextureData a)
+		{
+			return a._uniqueID == s_GetTexture_ID;
+		}
+
+		/// <summary>
+		/// [Please do not use it] (For Editor, not Runtime)
+		/// </summary>
+		/// <param name="uniqueID"></param>
+		/// <returns></returns>
+		public apMesh GetMesh(int uniqueID)
+		{
+			//이전 (GC 발생)
+			//return _meshes.Find(delegate (apMesh a)
+			//{
+			//	return a._uniqueID == uniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetMesh_ID = uniqueID;
+			return _meshes.Find(s_GetMeshByID_Func);
+		}
+
+		private static int s_GetMesh_ID = -1;
+		private static Predicate<apMesh> s_GetMeshByID_Func = FUNC_GetMeshByID;
+		private static bool FUNC_GetMeshByID(apMesh a)
+		{
+			return a._uniqueID == s_GetMesh_ID;
+		}
+
+
+		/// <summary>
+		/// [Please do not use it] (For Editor, not Runtime)
+		/// </summary>
+		/// <param name="uniqueID"></param>
+		/// <returns></returns>
+		public apMeshGroup GetMeshGroup(int uniqueID)
+		{
+			//이전 (GC 발생)
+			//return _meshGroups.Find(delegate (apMeshGroup a)
+			//{
+			//	return a._uniqueID == uniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetMeshGroup_ID = uniqueID;
+			return _meshGroups.Find(s_GetMeshGroupByID_Func);
+		}
+
+		private static int s_GetMeshGroup_ID = -1;
+		private static Predicate<apMeshGroup> s_GetMeshGroupByID_Func = FUNC_GetMeshGroupByID;
+		private static bool FUNC_GetMeshGroupByID(apMeshGroup a)
+		{
+			return a._uniqueID == s_GetMeshGroup_ID;
+		}
+
+		/// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		/// <param name="uniqueID"></param>
+		/// <returns></returns>
+		public apControlParam GetControlParam(int uniqueID)
+		{
+			//이전 (GC 발생)
+			//return _controller._controlParams.Find(delegate (apControlParam a)
+			//{
+			//	return a._uniqueID == uniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetControlParam_ID = uniqueID;
+			return _controller._controlParams.Find(s_GetControlParamByID_Func);
+		}
+
+		private static int s_GetControlParam_ID = -1;
+		private static Predicate<apControlParam> s_GetControlParamByID_Func = FUNC_GetControlParamByID;
+		private static bool FUNC_GetControlParamByID(apControlParam a)
+		{
+			return a._uniqueID == s_GetControlParam_ID;
+		}
+
+		/// <summary>
+		/// Get Control Parameter
+		/// </summary>
+		/// <param name="controlParamName">Control Parameter Name</param>
+		/// <returns></returns>
+		public apControlParam GetControlParam(string controlParamName)
+		{
+			//이전 (GC 발생)
+			//return _controller._controlParams.Find(delegate (apControlParam a)
+			//{
+			//	return string.Equals(a._keyName, controlParamName);
+			//});
+
+			//변경 v1.5.0
+			s_GetControlParam_Name = controlParamName;
+			return _controller._controlParams.Find(s_GetControlParamByName_Func);
+		}
+
+		private static string s_GetControlParam_Name = null;
+		private static Predicate<apControlParam> s_GetControlParamByName_Func = FUNC_GetControlParamByName;
+		private static bool FUNC_GetControlParamByName(apControlParam a)
+		{
+			return string.Equals(a._keyName, s_GetControlParam_Name);
+		}
+
+
+
+
+		/// <summary>
+		/// [Please do not use it] (For Editor, not Runtime)
+		/// </summary>
+		/// <param name="uniqueID"></param>
+		/// <returns></returns>
+		public apAnimClip GetAnimClip(int uniqueID)
+		{
+			//이전 (GC 발생)
+			//return _animClips.Find(delegate (apAnimClip a)
+			//{
+			//	return a._uniqueID == uniqueID;
+			//});
+
+			//변경 v1.5.0
+			s_GetAnimClip_ID = uniqueID;
+			return _animClips.Find(s_GetAnimClipByID);
+		}
+
+		private static int s_GetAnimClip_ID = -1;
+		private static Predicate<apAnimClip> s_GetAnimClipByID = FUNC_GetAnimClipByID;
+		private static bool FUNC_GetAnimClipByID(apAnimClip a)
+		{
+			return a._uniqueID == s_GetAnimClip_ID;
+		}
+
+
+
+
+
+		//메모리 할당을 방지하는 변수
+		private List<apMeshGroup> _tmpReverseMeshGroups = null;
+
+		/// <summary>
+		/// 계층적으로 설계된 MeshGroup에 맞게 리스트를 다시 정리하여 리턴한다.
+		/// 인덱스 앞쪽에는 Child가 위치하고, 뒤로 갈 수록 Parent/Root가 나타난다.
+		/// </summary>
+		/// <param name="srcMeshGroup"></param>
+		/// <returns></returns>
+		private List<apMeshGroup> GetReverseMeshGroupList(List<apMeshGroup> srcMeshGroups)
+		{
+			if(_tmpReverseMeshGroups == null)
+			{
+				_tmpReverseMeshGroups = new List<apMeshGroup>();
+			}
+			_tmpReverseMeshGroups.Clear();
+
+			int nSrcMeshGroups = srcMeshGroups != null ? srcMeshGroups.Count : 0;
+			if (nSrcMeshGroups > 0)
+			{
+				apMeshGroup curMeshGroup = null;
+				for (int i = 0; i < nSrcMeshGroups; i++)
+				{
+					curMeshGroup = srcMeshGroups[i];
+					if (!_tmpReverseMeshGroups.Contains(curMeshGroup))
+					{
+						FindReverseMeshGroupListRecursive(curMeshGroup, _tmpReverseMeshGroups);
+					}
+				}
+			}
+			
+			return _tmpReverseMeshGroups;
+		}
+
+
+		private void FindReverseMeshGroupListRecursive(apMeshGroup curMeshGroup, List<apMeshGroup> resultList)
+		{
+			int nChildTFs = curMeshGroup._childMeshGroupTransforms != null ? curMeshGroup._childMeshGroupTransforms.Count : 0;
+			if(nChildTFs > 0)
+			{
+				apTransform_MeshGroup childMeshGroupTransform = null;
+				apMeshGroup childMeshGroup = null;
+				for (int iChild = 0; iChild < nChildTFs; iChild++)
+				{
+					childMeshGroupTransform = curMeshGroup._childMeshGroupTransforms[iChild];
+					childMeshGroup = childMeshGroupTransform._meshGroup;
+					if (childMeshGroup != null && childMeshGroup != curMeshGroup)
+					{
+						FindReverseMeshGroupListRecursive(childMeshGroup, resultList);
+					}
+				}
+			}
+			if (!resultList.Contains(curMeshGroup))
+			{
+				resultList.Add(curMeshGroup);
+			}
+		}
+
+
+		/// <summary>
+		/// 추가 20.4.3 : 입력된 메시 그룹을 포함하여 관련된 모든 메시 그룹을 찾는다. (부모/자식 모두)
+		/// </summary>
+		/// <param name="targetMeshGroup"></param>
+		/// <param name="resultList"></param>
+		private void FindAllParentAndChildrenMeshGroups(apMeshGroup targetMeshGroup, List<apMeshGroup> resultList)
+		{
+			//먼저 최상위 부모를 찾자
+			apMeshGroup rootParentMG = targetMeshGroup;
+			if (rootParentMG._parentMeshGroup != null)
+			{
+				while (true)
+				{
+					if(rootParentMG._parentMeshGroup == null)
+					{
+						break;
+					}
+					rootParentMG = rootParentMG._parentMeshGroup;
+				}
+			}
+			
+			//Recursive 방식ㅇ로 Root MG
+			FindReverseMeshGroupListRecursive(rootParentMG, resultList);
+		}
+
+
+
+		//==========================================================================
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 외부 사용 함수들
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		//------------------------------------------------
+		// Initialize
+		//------------------------------------------------
+		//첫 Bake 후 또는 시작후 로딩시 Modifier -> 해당 OptTransform을 연결한다.
+		/// <summary>
+		/// Initialize before updating. 
+		/// This is done automatically if you do not call the function directly. 
+		/// "AsyncInitialize()" is recommended when it takes a lot of execution time.
+		/// </summary>
+		public bool Initialize()
+		{
+			// < 단계 1 > : 기본 초기화 (비동기 함수에서는 비동기 전에 호출하는 구문)
+
+			//Debug.Log("LinkModifierAndMeshGroups_Opt");
+			if (_initStatus != INIT_STATUS.Ready)
+			{
+				//엥 비동기 로딩 중이거나 로딩이 끝났네염
+				//Debug.LogError(">>> 이미 로딩이 된 상태. 초기화 필요");
+				return false;
+			}
+
+			if (_transform == null)
+			{
+				_transform = transform;
+			}
+
+			//Transform 추가시 위치를 초기화하자 (20.9.15)
+			_posW_Prev1F = _transform.position;
+			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+			if (_FPS < 10) { _FPS = 10; }
+
+			//[v1.6.0] 마스크 렌더링 카메라는 초기화 초반에 생성해둬야 한다.
+			//메시 초기화시 참조되기 때문
+			if(_maskRenderCamera == null)
+			{
+				_maskRenderCamera = new apOptMaskRenderCamera(this);
+			}
+
+			//HideRootUnits();//삭제 21.5.27
+
+			_funcAyncLinkCompleted = null;
+			_isAutoPlayCheckable = true;
+
+			_prevOptRootUnit = null;//추가 v1.4.7
+
+
+			// < 단계 2 > : Hide Root Unit 전의 초기화 | 비동기에서는 첫 Yield 이전의 실행될 코드
+
+			//추가 20.7.5 : 컨트롤 파라미터를 초기화 (이게 왜 없었지)
+			_controller.InitRuntime(this);
+
+
+			//추가 20.11.23 : 모디파이어 최적화를 위한 애니메이션 매핑 클래스
+			//생성과 동시에 링크가 된다.
+			if (_animPlayMapping == null)
+			{
+				_animPlayMapping = new apAnimPlayMapping(this);
+			}
+			else
+			{
+				//다시 링크를 하자
+				_animPlayMapping.Link(this);
+			}
+
+
+			//추가 12.7 : OptRootUnit도 Link를 해야한다.
+			int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+			if (nRootUnits > 0)
+			{
+				for (int iOptRootUnit = 0; iOptRootUnit < nRootUnits; iOptRootUnit++)
+				{
+					_optRootUnitList[iOptRootUnit].Link(this);
+				}
+			}
+			
+
+			//MeshGroup -> OptTransform을 돌면서 처리
+			int nTransforms = _optTransforms != null ? _optTransforms.Count : 0;
+			if(nTransforms > 0)
+			{
+				for (int iOptTransform = 0; iOptTransform < nTransforms; iOptTransform++)
+				{
+					_optTransforms[iOptTransform].ClearResultParams(false);
+				}
+			}
+			
+			//HideRootUnits();//삭제 21.5.27 : 동기 초기화에서는 필요없다. (비동기에서는 필요함)
+
+			// < 단계 3 > : Batched Mat, OptTransform, 초기화
+
+			//추가 : BatchedMat도 연결
+			_optBatchedMaterial.Link(this);
+
+			//apOptMesh curMesh = null;
+			int nMeshes = _optMeshes != null ? _optMeshes.Count : 0;
+			if(nMeshes > 0)
+			{
+				//다음의 순서에 따라 초기화가 되어야 한다.
+				//상호 초기화가 있어서 순서가 잘못되면 제대로 로딩되지 않는다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].InitMesh(true);//<<이때 ShowHide도 결정된다.
+				}
+
+				//Mask 관련 초기화 및 링크를 한다.
+				//연결 - Parent 등록 - Child 등록 순서대로 해야한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					//마스크 정보 연결
+					_optMeshes[i].LinkMaskInfo();
+				}
+
+				//마스크 연결이 끝난 다음에 재질을 초기화한다. (Received 정보에 따라 재질 초기값이 바뀐다)
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
+				}
+
+				//연결 정보를 바탕으로 Render Camera에 연결을 한다.
+				// Mask Parent 먼저 호출한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].LinkSendMaskToRenderCamera(_maskRenderCamera);
+				}
+
+				// Mask Child를 호출한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].LinkReceiveMaskInfoToRenderCamera(_maskRenderCamera);
+				}
+			}
+
+			//Mesh 초기화 후엔 마스크 렌더러의 실행 순서를 정렬한다.
+			_maskRenderCamera.SortRenderers();
+			
+
+			apOptTransform curOptTransform = null;
+			List<apOptModifierUnitBase> curModifiers = null;			
+			apOptModifierUnitBase curModifier = null;			
+			List<apOptParamSetGroup> curParamSetGroups = null;
+			apOptParamSetGroup curParamSetGroup = null;
+			List<apOptParamSet> curParamSets = null;
+
+			if(nTransforms > 0)
+			{
+				for (int iOptTransform = 0; iOptTransform < nTransforms; iOptTransform++)
+				{
+					curOptTransform = _optTransforms[iOptTransform];
+
+					curModifiers = curOptTransform._modifierStack._modifiers;
+
+					int nModifiers = curModifiers != null ? curModifiers.Count : 0;
+					if(nModifiers == 0)
+					{
+						continue;
+					}
+
+					for (int iMod = 0; iMod < nModifiers; iMod++)
+					{
+						curModifier = curModifiers[iMod];
+
+						//Portrait를 연결해준다.
+						curModifier.Link(this, curOptTransform);
+
+						curParamSetGroups = curModifier._paramSetGroupList;
+
+						int nPSGs = curParamSetGroups != null ? curParamSetGroups.Count : 0;
+
+						if(nPSGs == 0)
+						{
+							continue;
+						}
+
+						for (int iPSGroup = 0; iPSGroup < nPSGs; iPSGroup++)
+						{
+							curParamSetGroup = curParamSetGroups[iPSGroup];
+
+							//List<apModifierParamSet> paramSets = mod._paramSetList;
+							//1. Key를 세팅해주자
+							switch (curParamSetGroup._syncTarget)
+							{
+								case apModifierParamSetGroup.SYNC_TARGET.Static:
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.Controller:
+									curParamSetGroup._keyControlParam = GetControlParam(curParamSetGroup._keyControlParamID);
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
+									break;
+							}
+
+
+							curParamSets = curParamSetGroup._paramSetList;
+
+							int nPSs = curParamSets != null ? curParamSets.Count : 0;
+							if(nPSs == 0)
+							{
+								continue;
+							}
+
+							for (int iParamSet = 0; iParamSet < nPSs; iParamSet++)
+							{
+								//Param Set Link
+								curParamSets[iParamSet].LinkParamSetGroup(curParamSetGroup, this);
+							}
+						}
+					}
+				}
+			}
+			
+
+
+			// < 단계 4 > : Root Unit, Anim Clip 초기화
+
+			apOptRootUnit curRootUnit = null;
+			if(nRootUnits > 0)
+			{
+				for (int i = 0; i < nRootUnits; i++)
+				{
+					curRootUnit = _optRootUnitList[i];
+
+					curRootUnit._rootOptTransform.ClearResultParams(true);
+					curRootUnit._rootOptTransform.RefreshModifierLink(true, true);
+
+					//추가 20.8.30
+					curRootUnit._rootOptTransform.Initialize(true, true, this);
+				}
+			}
+			
+			int nAnims = _animClips != null ? _animClips.Count : 0;
+			if (nAnims > 0)
+			{
+				for (int i = 0; i < nAnims; i++)
+				{
+					_animClips[i].LinkOpt(this);
+				}
+			}
+			
+
+			//AnimPlayer를 추가했다.
+			_animPlayManager.LinkPortrait(this);
+
+
+			// < 단계 5 > : 메타 데이터를 초기화
+
+			//추가 22.5.18 [v1.4.0] 지연된 애니메이션 실행 요청
+			if (_animPlayDeferredRequest == null)
+			{
+				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
+			}
+			_animPlayDeferredRequest.Ready();
+
+
+			//추가 21.9.24 : 유니티 이벤트를 사용하는 경우
+			if (_animEventCallMode == ANIM_EVENT_CALL_MODE.Callback)
+			{
+				if (_unityEventWrapper == null)
+				{
+					_unityEventWrapper = new apUnityEventWrapper();
+				}
+				_unityEventWrapper.Link(this);
+			}
+
+			//추가 22.6.8 : 애니메이션, 텍스쳐등을 빠르게 접근하기 위한 매핑 변수 생성
+			MakeFastReferMapping();
+
+
+			//여기로 옮기기
+			HideRootUnits();
+
+
+			//추가 21.10.7 : 배속 옵션 초기화 (함수 호출이 없었다면)
+			if (!_isDeltaTimeOptionChanged)
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
+				_deltaTimeMultiplier = 1.0f;
+				_funcDeltaTimeRequested = null;
+				_deltaTimeRequestSavedObject = null;
+			}
+
+			//추가 21.12.22 : 재질 병합 관련 변수 초기화
+			_isUseMergedMat = false;
+			_mergeMatMainPortrait = null;
+			_mergedMatSubPortraits = null;
+
+			//추가 22.7.7 : 텔레포트 관련 변수 초기화
+			_isTeleportChecked = false;//이전에 텔레포트가 체크되었는가.
+			_teleportCheck_PosPrev = Vector3.zero;//이전 프레임에서의 텔레포트
+			_teleportCheck_ScalePrev = Vector3.one;//[v1.5.0] 텔레포트의 스케일 체크
+			_teleportCheck_RotationPrev = Vector3.zero;//[v1.5.0] 텔레포트의 회전 체크
+
+			_isCurrentTeleporting = false;//현재 프레임에서 텔레포트가 발생했는가
+			_isPhysicsEnabledInPrevFrame = false;//이전에 물리 연산이 있었는가
+			_curPlayingOptRootUnit = null;
+
+			//추가 v1.4.7 : 루트유닛 변경에 따른 물리 튀는 문제 변수 초기화
+			_isCurrentRootUnitChanged = false;
+
+			//추가 v1.4.8 : 루트 모션 유효성 체크
+			ValidateRootMotion();
+
+
+
+			//로딩 끝
+			_initStatus = INIT_STATUS.Completed;
+
+			CleanUpMeshesCommandBuffers();
+
+			//추가 : 초기화시 카메라 갱신 로직 필요
+			CheckAndRefreshCameras(false);//false : 여기서는 카메라 변경(초기화>발견)시에도 커맨드 버퍼를 갱신하지 않는다. ShowRootUnit에서 버퍼가 생성될 것임
+
+			ShowRootUnit();
+
+			return true;
+		}
+
+
+
+		//-------------------------------------------
+		// 비동기 방식의 로딩
+		//-------------------------------------------
+		/// <summary>
+		/// Initialize asynchronously using coroutine. It does the same thing as the "Initialize ()" function.
+		/// </summary>
+		/// <returns>It returns False if it is already initialized or in progress. If it is true, it means that the initialization starts normally.</returns>
+		public bool AsyncInitialize()
+		{
+			if (_initStatus != INIT_STATUS.Ready)
+			{
+				//오잉 비동기 로딩중이거나 로딩이 끝났네염
+				return false;
+			}
+
+			//비동기 로딩 시작
+			_initStatus = INIT_STATUS.AsyncLoading;
+
+			if (_transform == null)
+			{
+				_transform = transform;
+			}
+
+			//Transform 추가시 위치를 초기화하자 (20.9.15)
+			_posW_Prev1F = _transform.position;
+			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+			if (_FPS < 10) { _FPS = 10; }
+
+			//[v1.6.0] 마스크 렌더링 카메라는 초기화 초반에 생성해둬야 한다.
+			//메시 초기화시 참조되기 때문
+			if(_maskRenderCamera == null)
+			{
+				_maskRenderCamera = new apOptMaskRenderCamera(this);
+			}
+
+			_prevOptRootUnit = null;//추가 v1.4.7
+
+			//지연된 플레이 요청 초기화 (여기선 HideRootUnits보단 미리 호출되어야 한다.)
+			if (_animPlayDeferredRequest == null)
+			{
+				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
+			}
+			_animPlayDeferredRequest.Ready();
+
+
+
+			HideRootUnits();
+
+
+
+			StartCoroutine(LinkOptCoroutine());
+
+			return true;
+		}
+
+
+		/// <summary>
+		/// Initialize asynchronously using coroutine. It does the same thing as the "Initialize ()" function.
+		/// </summary>
+		/// <param name="onAsyncLinkCompleted">Functions to receive callbacks when initialization is complete.</param>
+		/// <returns>It returns False if it is already initialized or in progress. If it is true, it means that the initialization starts normally.></returns>
+		public bool AsyncInitialize(OnAsyncLinkCompleted onAsyncLinkCompleted)
+		{
+			if (_initStatus != INIT_STATUS.Ready)
+			{
+				//오잉 비동기 로딩중이거나 로딩이 끝났네염
+				return false;
+			}
+
+			//비동기 로딩 시작
+			_initStatus = INIT_STATUS.AsyncLoading;
+
+			_funcAyncLinkCompleted = onAsyncLinkCompleted;
+
+			if (_transform == null)
+			{
+				_transform = transform;
+			}
+
+			//Transform 추가시 위치를 초기화하자 (20.9.15)
+			_posW_Prev1F = _transform.position;
+			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+			if (_FPS < 10) { _FPS = 10; }
+
+			//[v1.6.0] 마스크 렌더링 카메라는 초기화 초반에 생성해둬야 한다.
+			//메시 초기화시 참조되기 때문
+			if(_maskRenderCamera == null)
+			{
+				_maskRenderCamera = new apOptMaskRenderCamera(this);
+			}
+
+			_prevOptRootUnit = null;//추가 v1.4.7
+
+
+			//지연된 플레이 요청 초기화 (여기선 HideRootUnits보단 미리 호출되어야 한다.)
+			if (_animPlayDeferredRequest == null)
+			{
+				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
+			}
+			_animPlayDeferredRequest.Ready();
+
+
+
+			HideRootUnits();
+
+			StartCoroutine(LinkOptCoroutine());
+
+			return true;
+
+		}
+
+		/// <summary>
+		/// Initialize using coroutine. 
+		/// This function runs at low CPU usage by setting the "time interval at which Yield is called" by the user. 
+		/// However, the processing time may be very long.
+		/// </summary>
+		/// <param name="timePerYield">Time value for whether Yield is called every few milliseconds during initialization.(10ms ~ 1000ms)</param>
+		/// <param name="onAsyncLinkCompleted">Functions to receive callbacks when initialization is complete.</param>
+		/// <returns>It returns False if it is already initialized or in progress. If it is true, it means that the initialization starts normally.></returns>
+		public bool AsyncInitialize(int timePerYield, OnAsyncLinkCompleted onAsyncLinkCompleted = null)
+		{
+			if (_initStatus != INIT_STATUS.Ready)
+			{
+				//오잉 비동기 로딩중이거나 로딩이 끝났네염
+				return false;
+			}
+
+			//비동기 로딩 시작
+			_initStatus = INIT_STATUS.AsyncLoading;
+
+			apAsyncTimer asyncTimer = new apAsyncTimer(timePerYield);
+
+			_funcAyncLinkCompleted = onAsyncLinkCompleted;
+
+			if (_transform == null)
+			{
+				_transform = transform;
+			}
+
+			//Transform 추가시 위치를 초기화하자 (20.9.15)
+			_posW_Prev1F = _transform.position;
+			_rotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+			_invRotationOnlyMatrixIfBillboard = Matrix4x4.identity;
+
+			if (_FPS < 10) { _FPS = 10; }
+
+			//[v1.6.0] 마스크 렌더링 카메라는 초기화 초반에 생성해둬야 한다.
+			//메시 초기화시 참조되기 때문
+			if(_maskRenderCamera == null)
+			{
+				_maskRenderCamera = new apOptMaskRenderCamera(this);
+			}
+
+			_prevOptRootUnit = null;//추가 v1.4.7
+
+			//지연된 플레이 요청 초기화 (여기선 HideRootUnits보단 미리 호출되어야 한다.)
+			if (_animPlayDeferredRequest == null)
+			{
+				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
+			}
+			_animPlayDeferredRequest.Ready();
+
+
+			HideRootUnits();
+
+
+			StartCoroutine(LinkOptCoroutineWithAsyncTimer(asyncTimer));
+
+			return true;
+
+		}
+
+
+		private IEnumerator LinkOptCoroutine()
+		{
+			// < 단계 2 > : Hide Root Unit 전의 초기화 | 비동기에서는 첫 Yield 이전의 실행될 코드
+
+			//추가 20.7.5 : 컨트롤 파라미터를 초기화 (이게 왜 없었지)
+			_controller.InitRuntime(this);
+
+			//추가 20.11.23 : 모디파이어 최적화를 위한 애니메이션 매핑 클래스
+			//생성과 동시에 링크가 된다.
+			if (_animPlayMapping == null)
+			{
+				_animPlayMapping = new apAnimPlayMapping(this);
+			}
+			else
+			{
+				//다시 링크를 하자
+				_animPlayMapping.Link(this);
+			}
+
+
+			//추가 12.7 : OptRootUnit도 Link를 해야한다.
+			int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+			if (nRootUnits > 0)
+			{
+				for (int iOptRootUnit = 0; iOptRootUnit < nRootUnits; iOptRootUnit++)
+				{
+					_optRootUnitList[iOptRootUnit].Link(this);
+				}
+			}
+
+
+			//MeshGroup -> OptTransform을 돌면서 처리
+			int nTransforms = _optTransforms != null ? _optTransforms.Count : 0;
+			if(nTransforms > 0)
+			{
+				for (int iOptTransform = 0; iOptTransform < nTransforms; iOptTransform++)
+				{
+					_optTransforms[iOptTransform].ClearResultParams(false);
+				}
+			}
+
+			HideRootUnits();//비동기에서는 일단 첫 yield 직전에 Hide를 호출해야한다.
+
+
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+			// < 단계 3 > : Batched Mat, OptTransform, 초기화
+
+			//추가 : BatchedMat도 연결
+			_optBatchedMaterial.Link(this);
+
+			apOptMesh curMesh = null;
+			int nMeshes = _optMeshes != null ? _optMeshes.Count : 0;
+			if(nMeshes > 0)
+			{
+				for (int i = 0; i < nMeshes; i++)
+				{
+					curMesh = _optMeshes[i];
+					curMesh.InitMesh(true);//<<이때 ShowHide도 결정된다.
+				}
+
+				//Mask 관련 초기화 및 링크를 한다.
+				//연결 - Parent 등록 - Child 등록 순서대로 해야한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					//마스크 정보 연결
+					_optMeshes[i].LinkMaskInfo();
+				}
+
+				for (int i = 0; i < nMeshes; i++)
+				{
+					curMesh = _optMeshes[i];
+					curMesh.InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
+					curMesh.Hide();//비동기에서는 초기화 직후 Hide를 하자
+				}
+
+				//연결 정보를 바탕으로 Render Camera에 연결을 한다.
+				// Mask Parent 먼저 호출한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].LinkSendMaskToRenderCamera(_maskRenderCamera);
+				}
+
+				// Mask Child를 호출한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].LinkReceiveMaskInfoToRenderCamera(_maskRenderCamera);
+				}
+			}
+
+			//Mesh 초기화 후엔 마스크 렌더러의 실행 순서를 정렬한다.
+			_maskRenderCamera.SortRenderers();
+
+			int nLoad = 0;
+
+			apOptTransform curOptTransform = null;
+			List<apOptModifierUnitBase> curModifiers = null;
+			apOptModifierUnitBase curModifier = null;
+			List<apOptParamSetGroup> curParamSetGroups = null;
+			apOptParamSetGroup curParamSetGroup = null;
+			List<apOptParamSet> curParamSets = null;
+
+			if(nTransforms > 0)
+			{
+				for (int iOptTransform = 0; iOptTransform < nTransforms; iOptTransform++)
+				{
+					curOptTransform = _optTransforms[iOptTransform];
+
+					curModifiers = curOptTransform._modifierStack._modifiers;
+
+					int nModifiers = curModifiers != null ? curModifiers.Count : 0;
+					if(nModifiers == 0)
+					{
+						continue;
+					}
+
+					for (int iMod = 0; iMod < nModifiers; iMod++)
+					{
+						curModifier = curModifiers[iMod];
+
+						//Portrait를 연결해준다.
+						curModifier.Link(this, curOptTransform);
+
+						//Wait
+						nLoad++;
+						if (nLoad > 5)
+						{
+							nLoad = 0;
+							yield return new WaitForEndOfFrame();
+						}
+
+
+						curParamSetGroups = curModifier._paramSetGroupList;
+
+						int nPSGs = curParamSetGroups != null ? curParamSetGroups.Count : 0;
+						if(nPSGs == 0)
+						{
+							continue;
+						}
+
+						for (int iPSGroup = 0; iPSGroup < nPSGs; iPSGroup++)
+						{
+							curParamSetGroup = curParamSetGroups[iPSGroup];
+
+							//List<apModifierParamSet> paramSets = mod._paramSetList;
+							//1. Key를 세팅해주자
+							switch (curParamSetGroup._syncTarget)
+							{
+								case apModifierParamSetGroup.SYNC_TARGET.Static:
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.Controller:
+									curParamSetGroup._keyControlParam = GetControlParam(curParamSetGroup._keyControlParamID);
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
+									break;
+							}
+
+
+							curParamSets = curParamSetGroup._paramSetList;
+
+							int nPSs = curParamSets != null ? curParamSets.Count : 0;
+							if(nPSs == 0)
+							{
+								continue;
+							}
+
+							for (int iParamSet = 0; iParamSet < nPSs; iParamSet++)
+							{
+								//Param Set Link
+								curParamSets[iParamSet].LinkParamSetGroup(curParamSetGroup, this);
+							}
+						}
+
+						//Wait
+						nLoad++;
+						if (nLoad > 5)
+						{
+							nLoad = 0;
+							yield return new WaitForEndOfFrame();
+						}
+					}
+
+					//이전
+					//optTransform.RefreshModifierLink();
+
+				}
+			}
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+
+
+			// < 단계 4 > : Root Unit, Anim Clip 초기화
+
+			apOptRootUnit curRootUnit = null;
+			if(nRootUnits > 0)
+			{
+				for (int i = 0; i < nRootUnits; i++)
+				{
+					curRootUnit = _optRootUnitList[i];
+
+					curRootUnit._rootOptTransform.ClearResultParams(true);
+					curRootUnit._rootOptTransform.RefreshModifierLink(true, true);
+
+					//추가 20.8.30
+					curRootUnit._rootOptTransform.Initialize(true, true, this);
+				}
+			}
+
+			int nAnims = _animClips != null ? _animClips.Count : 0;
+			if (nAnims > 0)
+			{
+				for (int i = 0; i < nAnims; i++)
+				{
+					_animClips[i].LinkOpt(this);
+				}
+			}
+
+
+			//추가) AnimPlayer를 추가했다.
+			_animPlayManager.LinkPortrait(this);
+			_isAutoPlayCheckable = true;
+
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+			// < 단계 5 > : 메타 데이터를 초기화
+
+			//추가 22.5.18 [v1.4.0] 지연된 애니메이션 실행 요청
+			if (_animPlayDeferredRequest == null)
+			{
+				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
+			}
+			_animPlayDeferredRequest.Ready();
+
+
+			//추가 21.9.24 : 유니티 이벤트를 사용하는 경우
+			if (_animEventCallMode == ANIM_EVENT_CALL_MODE.Callback)
+			{
+				if (_unityEventWrapper == null)
+				{
+					_unityEventWrapper = new apUnityEventWrapper();
+				}
+				_unityEventWrapper.Link(this);
+			}
+
+			//추가 22.6.8 : 애니메이션, 텍스쳐등을 빠르게 접근하기 위한 매핑 변수 생성
+			MakeFastReferMapping();
+
+
+			//추가 21.10.7 : 배속 옵션 초기화 (함수 호출이 없었다면)
+			if (!_isDeltaTimeOptionChanged)
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
+				_deltaTimeMultiplier = 1.0f;
+				_funcDeltaTimeRequested = null;
+				_deltaTimeRequestSavedObject = null;
+			}
+
+			//추가 21.12.22 : 재질 병합 관련 변수 초기화
+			_isUseMergedMat = false;
+			_mergeMatMainPortrait = null;
+			_mergedMatSubPortraits = null;
+
+
+			//추가 22.7.7 : 텔레포트 관련 변수 초기화
+			_isTeleportChecked = false;//이전에 텔레포트가 체크되었는가.
+			_teleportCheck_PosPrev = Vector3.zero;//이전 프레임에서의 텔레포트
+			_teleportCheck_ScalePrev = Vector3.one;//[v1.5.0] 텔레포트의 스케일 체크
+			_teleportCheck_RotationPrev = Vector3.zero;//[v1.5.0] 텔레포트의 회전 체크
+
+			_isCurrentTeleporting = false;//현재 프레임에서 텔레포트가 발생했는가
+			_isPhysicsEnabledInPrevFrame = false;//이전에 물리 연산이 있었는가
+			_curPlayingOptRootUnit = null;
+
+			//추가 v1.4.7 : 루트유닛 변경에 따른 물리 튀는 문제 변수 초기화
+			_isCurrentRootUnitChanged = false;
+
+
+			//추가 v1.4.8 : 루트 모션 유효성 체크
+			ValidateRootMotion();
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+
+			//끝!
+			_initStatus = INIT_STATUS.Completed;
+
+			CleanUpMeshesCommandBuffers();
+
+			//if(_optRootUnitList.Count > 0)
+			//{
+			//	ShowRootUnit(_optRootUnitList[0]);//일단 첫번째 RootUnit이 나온다.
+			//}
+
+			//추가 : 초기화시 카메라 갱신 로직 필요
+			CheckAndRefreshCameras(false);//false : 초기화시엔 카메라 변경(초기화>발견)시에도 커맨드 버퍼를 리셋하지 않는다.
+
+			ShowRootUnit();
+
+
+
+			if (_funcAyncLinkCompleted != null)
+			{
+				//콜백 이벤트 호출
+				_funcAyncLinkCompleted(this);
+				_funcAyncLinkCompleted = null;
+			}
+
+
+		}
+
+
+		//추가 19.5.28 : AsyncTimer를 이용하여 LinkOpCoroutine를 개선한 버전.
+		//실제로 실행 시간 타이머가 동작한다.
+		private IEnumerator LinkOptCoroutineWithAsyncTimer(apAsyncTimer asyncTimer)
+		{
+			// < 단계 2 > : Hide Root Unit 전의 초기화 | 비동기에서는 첫 Yield 이전의 실행될 코드
+
+			//추가 20.7.5 : 컨트롤 파라미터를 초기화 (이게 왜 없었지)
+			_controller.InitRuntime(this);
+
+
+			//랜덤하게 프레임을 쉬어주자
+			int nWaitRandom = UnityEngine.Random.Range(0, 5);
+			for (int i = 0; i < nWaitRandom; i++)
+			{
+				yield return new WaitForEndOfFrame();
+			}
+
+
+			//추가 20.11.23 : 모디파이어 최적화를 위한 애니메이션 매핑 클래스
+			//생성과 동시에 링크가 된다.
+			if (_animPlayMapping == null)
+			{
+				_animPlayMapping = new apAnimPlayMapping(this);
+			}
+			else
+			{
+				//다시 링크를 하자
+				_animPlayMapping.Link(this);
+			}
+
+
+
+			//추가 12.7 : OptRootUnit도 Link를 해야한다.
+			int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+			if (nRootUnits > 0)
+			{
+				for (int iOptRootUnit = 0; iOptRootUnit < nRootUnits; iOptRootUnit++)
+				{
+					yield return _optRootUnitList[iOptRootUnit].LinkAsync(this, asyncTimer);
+				}
+			}
+
+
+			//MeshGroup -> OptTransform을 돌면서 처리
+			int nTransforms = _optTransforms != null ? _optTransforms.Count : 0;
+			if(nTransforms > 0)
+			{
+				for (int iOptTransform = 0; iOptTransform < nTransforms; iOptTransform++)
+				{
+					_optTransforms[iOptTransform].ClearResultParams(false);
+				}
+			}
+
+			HideRootUnits();//비동기에서는 일단 첫 yield 직전에 Hide를 호출해야한다. (< 위에서yield 했는데?)
+
+
+			//타이머에 의해서 Wait
+			if (asyncTimer.IsYield())
+			{
+				yield return asyncTimer.WaitAndRestart();
+			}
+
+
+			// < 단계 3 > : Batched Mat, OptTransform, 초기화
+
+			//BatchedMat도 연결
+			_optBatchedMaterial.Link(this);
+
+
+			apOptMesh curMesh = null;
+			int nMeshes = _optMeshes != null ? _optMeshes.Count : 0;
+			if(nMeshes > 0)
+			{
+				for (int i = 0; i < nMeshes; i++)
+				{
+					curMesh = _optMeshes[i];
+					curMesh.InitMesh(true);//<<이때 ShowHide도 결정된다.
+				}
+
+				//Mask 관련 초기화 및 링크를 한다.
+				//연결 - Parent 등록 - Child 등록 순서대로 해야한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					//마스크 정보 연결
+					_optMeshes[i].LinkMaskInfo();
+				}
+
+				for (int i = 0; i < nMeshes; i++)
+				{
+					curMesh = _optMeshes[i];
+					curMesh.InstantiateMaterial(_optBatchedMaterial);//재질 Batch 정보를 넣고 초기화
+					curMesh.Hide();//비동기에서는 초기화 직후 Hide를 하자
+				}
+
+				//연결 정보를 바탕으로 Render Camera에 연결을 한다.
+				// Mask Parent 먼저 호출한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].LinkSendMaskToRenderCamera(_maskRenderCamera);
+				}
+
+				// Mask Child를 호출한다.
+				for (int i = 0; i < nMeshes; i++)
+				{
+					_optMeshes[i].LinkReceiveMaskInfoToRenderCamera(_maskRenderCamera);
+				}
+			}
+
+			//Mesh 초기화 후엔 마스크 렌더러의 실행 순서를 정렬한다.
+			_maskRenderCamera.SortRenderers();
+
+			//타이머에 의해서 Wait
+			if (asyncTimer.IsYield())
+			{
+				yield return asyncTimer.WaitAndRestart();
+			}
+
+			apOptTransform curOptTransform = null;
+			List<apOptModifierUnitBase> curModifiers = null;
+			apOptModifierUnitBase curModifier = null;
+			List<apOptParamSetGroup> curParamSetGroups = null;
+			apOptParamSetGroup curParamSetGroup = null;
+			List<apOptParamSet> curParamSets = null;
+
+
+			if(nTransforms > 0)
+			{
+				for (int iOptTransform = 0; iOptTransform < nTransforms; iOptTransform++)
+				{
+					curOptTransform = _optTransforms[iOptTransform];
+
+					curModifiers = curOptTransform._modifierStack._modifiers;
+					for (int iMod = 0; iMod < curModifiers.Count; iMod++)
+					{
+						curModifier = curModifiers[iMod];
+
+						//추가 : Portrait를 연결해준다.
+						curModifier.Link(this, curOptTransform);
+
+						//타이머에 의해서 Wait
+						if (asyncTimer.IsYield())
+						{
+							yield return asyncTimer.WaitAndRestart();
+						}
+
+
+						curParamSetGroups = curModifier._paramSetGroupList;
+
+						int nPSGs = curParamSetGroups != null ? curParamSetGroups.Count : 0;
+						if(nPSGs == 0)
+						{
+							continue;
+						}
+
+						for (int iPSGroup = 0; iPSGroup < nPSGs; iPSGroup++)
+						{
+							curParamSetGroup = curParamSetGroups[iPSGroup];
+
+							//List<apModifierParamSet> paramSets = mod._paramSetList;
+							//1. Key를 세팅해주자
+							switch (curParamSetGroup._syncTarget)
+							{
+								case apModifierParamSetGroup.SYNC_TARGET.Static:
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.Controller:
+									curParamSetGroup._keyControlParam = GetControlParam(curParamSetGroup._keyControlParamID);
+									break;
+
+								case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
+									break;
+							}
+
+
+							curParamSets = curParamSetGroup._paramSetList;
+
+							int nPSs = curParamSets != null ? curParamSets.Count : 0;
+							if(nPSs == 0)
+							{
+								continue;
+							}
+
+							for (int iParamSet = 0; iParamSet < nPSs; iParamSet++)
+							{
+								apOptParamSet paramSet = curParamSets[iParamSet];
+
+								//Link를 해주자
+								paramSet.LinkParamSetGroup(curParamSetGroup, this);
+							}
+
+							//타이머에 의해서 Wait
+							if (asyncTimer.IsYield())
+							{
+								yield return asyncTimer.WaitAndRestart();
+							}
+						}
+					}
+				}
+			}
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+
+			// < 단계 4 > : Root Unit, Anim Clip 초기화
+			apOptRootUnit curRootUnit = null;
+			if(nRootUnits > 0)
+			{
+				for (int i = 0; i < nRootUnits; i++)
+				{
+					curRootUnit = _optRootUnitList[i];
+
+					curRootUnit._rootOptTransform.ClearResultParams(true);
+					yield return curRootUnit._rootOptTransform.RefreshModifierLinkAsync(true, true, asyncTimer);
+
+					//추가 20.8.30
+					yield return curRootUnit._rootOptTransform.InitializeAsync(true, true, asyncTimer, this);
+				}
+			}
+
+			//타이머에 의해서 Wait
+			if (asyncTimer.IsYield())
+			{
+				yield return asyncTimer.WaitAndRestart();
+			}
+
+
+
+			int nAnims = _animClips != null ? _animClips.Count : 0;
+			if (nAnims > 0)
+			{
+				for (int i = 0; i < nAnims; i++)
+				{
+					yield return _animClips[i].LinkOptAsync(this, asyncTimer);
+				}
+			}
+
+
+
+			//타이머에 의해서 Wait
+			if (asyncTimer.IsYield())
+			{
+				yield return asyncTimer.WaitAndRestart();
+			}
+
+
+			//추가) AnimPlayer를 추가했다.
+			yield return _animPlayManager.LinkPortraitAsync(this, asyncTimer);
+			_isAutoPlayCheckable = true;
+
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+
+			// < 단계 5 > : 메타 데이터를 초기화
+			//추가 22.5.18 [v1.4.0] 지연된 애니메이션 실행 요청
+			if (_animPlayDeferredRequest == null)
+			{
+				_animPlayDeferredRequest = new apAnimPlayDeferredRequest(_animPlayManager);
+			}
+			_animPlayDeferredRequest.Ready();
+
+
+			//추가 21.9.24 : 유니티 이벤트를 사용하는 경우
+			if (_animEventCallMode == ANIM_EVENT_CALL_MODE.Callback)
+			{
+				if (_unityEventWrapper == null)
+				{
+					_unityEventWrapper = new apUnityEventWrapper();
+				}
+				_unityEventWrapper.Link(this);
+			}
+
+			//추가 22.6.8 : 애니메이션, 텍스쳐등을 빠르게 접근하기 위한 매핑 변수 생성
+			MakeFastReferMapping();
+
+
+
+			//추가 21.10.7 : 배속 옵션 초기화 (함수 호출이 없었다면)
+			if (!_isDeltaTimeOptionChanged)
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
+				_deltaTimeMultiplier = 1.0f;
+				_funcDeltaTimeRequested = null;
+				_deltaTimeRequestSavedObject = null;
+			}
+
+			//추가 21.12.22 : 재질 병합 관련 변수 초기화
+			_isUseMergedMat = false;
+			_mergeMatMainPortrait = null;
+			_mergedMatSubPortraits = null;
+
+
+			//추가 22.7.7 : 텔레포트 관련 변수 초기화
+			_isTeleportChecked = false;//이전에 텔레포트가 체크되었는가.
+			_teleportCheck_PosPrev = Vector3.zero;//이전 프레임에서의 텔레포트
+			_teleportCheck_ScalePrev = Vector3.one;//[v1.5.0] 텔레포트의 스케일 체크
+			_teleportCheck_RotationPrev = Vector3.zero;//[v1.5.0] 텔레포트의 회전 체크
+
+			_isCurrentTeleporting = false;//현재 프레임에서 텔레포트가 발생했는가
+			_isPhysicsEnabledInPrevFrame = false;//이전에 물리 연산이 있었는가.
+			_curPlayingOptRootUnit = null;
+
+			//추가 v1.4.7 : 루트유닛 변경에 따른 물리 튀는 문제 변수 초기화
+			_isCurrentRootUnitChanged = false;
+
+			//추가 v1.4.8 : 루트 모션 유효성 체크
+			ValidateRootMotion();
+
+			//Wait
+			yield return new WaitForEndOfFrame();
+
+
+
+			//끝!
+			_initStatus = INIT_STATUS.Completed;
+
+			CleanUpMeshesCommandBuffers();
+
+			//추가 : 초기화시 카메라 갱신 로직 필요
+			CheckAndRefreshCameras(false);//false : 초기화시엔 카메라 변경(초기화 > 발견)시에도 커맨드 버퍼를 초기화하지 않는다.
+
+			ShowRootUnit();
+
+			//AsyncTimer 끝
+			asyncTimer.OnCompleted();
+			asyncTimer = null;
+
+			if (_funcAyncLinkCompleted != null)
+			{
+				//콜백 이벤트 호출
+				_funcAyncLinkCompleted(this);
+				_funcAyncLinkCompleted = null;
+			}
+		}
+
+
+
+		//--------------------------------------------------------------------------------
+		// Show / Hide Root Units
+		//--------------------------------------------------------------------------------
+		/// <summary>
+		/// Show one of the Root Units. 
+		/// The Root Unit can have an animation clip that starts automatically, or it can be the first Root Unit.
+		/// </summary>
+		public void ShowRootUnit()
+		{
+			//RootUnit 플레이 조건
+			//1. 자동 시작 AnimClip이 있다면 그걸 가지고 있는 RootUnit을 시작한다.
+			//2. 없다면 0번 RootUnit을 재생
+
+			apOptRootUnit targetOptRootUnit = null;
+			apAnimClip firstPlayAnimClip = null;
+
+			if (_isAutoPlayCheckable && _autoPlayAnimClipID >= 0)
+			{
+				apAnimClip curAnimClip = null;
+				for (int i = 0; i < _animClips.Count; i++)
+				{
+					curAnimClip = _animClips[i];
+					if (curAnimClip._uniqueID == _autoPlayAnimClipID
+						&& curAnimClip._targetOptTranform != null)
+					{
+						if (curAnimClip._targetOptTranform._rootUnit != null)
+						{
+							//자동 재생할 Root Unit을 찾았다.
+							targetOptRootUnit = curAnimClip._targetOptTranform._rootUnit;
+							firstPlayAnimClip = curAnimClip;
+
+							break;
+						}
+					}
+				}
+			}
+
+			_isAutoPlayCheckable = false;
+
+			//없다면 0번 RootUnit 을 선택한다.
+			if (targetOptRootUnit == null)
+			{
+				if (_optRootUnitList.Count > 0)
+				{
+					targetOptRootUnit = _optRootUnitList[0];
+				}
+			}
+
+
+			apOptRootUnit prevRootUnit = _curPlayingOptRootUnit;//v1.4.7 추가
+
+			_curPlayingOptRootUnit = null;
+			apOptRootUnit optRootUnit = null;
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				optRootUnit = _optRootUnitList[i];
+				if (optRootUnit == targetOptRootUnit)
+				{
+					//이건 Show를 하자
+					optRootUnit.Show();
+					_curPlayingOptRootUnit = targetOptRootUnit;
+				}
+				else
+				{
+					//이건 Hide
+					optRootUnit.Hide();
+				}
+			}
+
+			//v1.4.7 : 루트 유닛이 변경되는 것을 체크한다.
+			_isCurrentRootUnitChanged = prevRootUnit != _curPlayingOptRootUnit;
+
+			//자동 재생을 한다.
+			if (firstPlayAnimClip != null)
+			{
+				//이전
+				//PlayNoDebug(firstPlayAnimClip._name);
+
+				if (!_isUsingMecanim)
+				{
+					//변경
+					Play(firstPlayAnimClip._name);
+				}
+
+			}
+
+			//만약 숨어있다가 나타날때 위치가 바뀌어있었다면 워프 가능성이 있다.
+			//이 경우를 대비해서 물리 위치를 현재 위치로 갱신해두자
+			if (_transform != null)
+			{
+				_transform = transform;
+			}
+			_posW_Prev1F = _transform.position;
+
+
+			//v1.4.9 : 루트유닛이 바뀌면 한번이 아닌 3번의 프레임동안 물리가 비활성화된다.
+			//1번으로는 물리가 이상하게 작동하는 듯
+			if (_isCurrentRootUnitChanged)
+			{
+				_preventPhysicsCount = 3;
+			}
+
+			//추가 v1.6.0
+			//마스크 렌더링도 RT/커맨드 버퍼 등록
+			if(_maskRenderCamera != null)
+			{
+				_maskRenderCamera.EnableRender();
+			}
+		}
+
+		/// <summary>
+		/// Makes the input Root Unit visible. 
+		/// If it has an animation clip that plays automatically, this animation clip will play automatically.
+		/// </summary>
+		/// <param name="targetOptRootUnit">Root Unit to be visible</param>
+		public void ShowRootUnit(apOptRootUnit targetOptRootUnit)
+		{
+			apAnimClip firstPlayAnimClip = null;
+			if (_isAutoPlayCheckable && _autoPlayAnimClipID >= 0)
+			{
+				//자동 재생은 제한적으로 실행한다.
+				//targetOptRootUnit에 포함된 AnimClip만 실행된다.
+				apAnimClip curAnimClip = null;
+				for (int i = 0; i < _animClips.Count; i++)
+				{
+					curAnimClip = _animClips[i];
+					if (curAnimClip._uniqueID == _autoPlayAnimClipID
+						&& curAnimClip._targetOptTranform != null)
+					{
+						if (curAnimClip._targetOptTranform._rootUnit != null
+							&& curAnimClip._targetOptTranform._rootUnit == targetOptRootUnit)
+						{
+							//자동 재생할 AnimClip을 찾았다.
+							firstPlayAnimClip = curAnimClip;
+							break;
+						}
+					}
+				}
+			}
+
+			_isAutoPlayCheckable = false;
+
+
+			apOptRootUnit prevRootUnit = _curPlayingOptRootUnit;//v1.4.7 추가
+
+			_curPlayingOptRootUnit = null;
+			apOptRootUnit optRootUnit = null;
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				optRootUnit = _optRootUnitList[i];
+				if (optRootUnit == targetOptRootUnit)
+				{
+					//이건 Show를 하자
+					optRootUnit.Show();
+					_curPlayingOptRootUnit = targetOptRootUnit;
+				}
+				else
+				{
+					//이건 Hide
+					optRootUnit.Hide();
+				}
+			}
+
+
+			//v1.4.7 : 루트 유닛이 변경되는 것을 체크한다.
+			_isCurrentRootUnitChanged = prevRootUnit != _curPlayingOptRootUnit;
+
+
+			//자동 재생을 한다.
+			if (firstPlayAnimClip != null)
+			{
+				//Play(firstPlayAnimClip._name);
+
+				if (!_isUsingMecanim)
+				{
+					//변경
+					Play(firstPlayAnimClip._name);
+				}
+			}
+
+			//v1.4.9 : 루트유닛이 바뀌면 한번이 아닌 3번의 프레임동안 물리가 비활성화된다.
+			//1번으로는 물리가 이상하게 작동하는 듯
+			if (_isCurrentRootUnitChanged)
+			{
+				_preventPhysicsCount = 3;
+			}
+
+			//추가 v1.6.0
+			//마스크 렌더링도 RT/커맨드 버퍼 등록
+			if(_maskRenderCamera != null)
+			{
+				_maskRenderCamera.EnableRender();
+			}
+		}
+
+
+		/// <summary>
+		/// Hide all Root Units
+		/// </summary>
+		public void HideRootUnits()
+		{
+			StopAll();
+
+			//추가 21.4.3
+			//StopAll이 적용되려면 업데이트가 한번 되어야 한다.
+			//Hide되면 애니메이션이 업데이트되지 않으므로, 여기서 강제로 업데이트를 한번 더 하자
+			if (!_isUsingMecanim)
+			{
+				//_animPlayManager.Update(0.0f);
+				_animPlayManager.ReleaseAllPlayUnitAndQueues();
+			}
+
+			//모두 숨기기
+			_curPlayingOptRootUnit = null;
+
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				_optRootUnitList[i].Hide();
+			}
+
+			_isCurrentRootUnitChanged = false;
+
+
+			//추가 v1.6.0
+			//마스크 렌더링도 RT/커맨드 버퍼 해제
+			if(_maskRenderCamera != null)
+			{
+				_maskRenderCamera.DisableRender();
+			}
+		}
+
+
+		/// <summary>
+		/// Show Portrait (A default Root Unit)
+		/// </summary>
+		public void Show()
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				ShowRootUnit();
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+		/// <summary>
+		/// Hide Portrait (All Root Units)
+		/// </summary>
+		public void Hide()
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				HideRootUnits();
+
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+		//추가 21.3.14 : 실행중인 RootUnit을 리턴한다.
+		/// <summary>
+		/// Return the currently playing Root Unit.
+		/// </summary>
+		/// <returns>Root Unit currently playing. If not, return null</returns>
+		public apOptRootUnit GetCurrentRootUnit()
+		{
+			return _curPlayingOptRootUnit;
+		}
+
+		/// <summary>
+		/// Return the index of the currently playing Root Unit.
+		/// </summary>
+		/// <returns>Index of the currently playing Root Unit. If not, return -1</returns>
+		public int GetCurrentRootUnitIndex()
+		{
+			if (_curPlayingOptRootUnit == null)
+			{
+				return -1;
+			}
+			return _optRootUnitList.IndexOf(_curPlayingOptRootUnit);
+		}
+
+
+
+		//----------------------------------------------------------
+		// Important Option
+		//----------------------------------------------------------
+		/// <summary>
+		/// If the "Important" setting is True, the physics effect and animation are activated and updated every frame.
+		/// </summary>
+		/// <param name="isImportant"></param>
+		public void SetImportant(bool isImportant)
+		{
+			if (_isImportant != isImportant)
+			{
+				_isImportant = isImportant;
+			}
+		}
+
+
+		/// <summary>
+		/// If the "Important" option is off, the character is executed according to the specified FPS or lower.
+		/// </summary>
+		/// <param name="fps"></param>
+		public void SetFPSForNotImportant(int fps)
+		{
+			_FPS = fps;
+		}
+
+
+
+		//----------------------------------------------------------
+		// Clean up / Reset Command Buffers
+		//----------------------------------------------------------
+		/// <summary>
+		/// Initialize all Command Buffers for clipping mask processing.
+		/// </summary>
+		public void CleanUpMeshesCommandBuffers()
+		{
+			//이전
+			// int nOptMeshes = _optMeshes != null ? _optMeshes.Count : 0;
+			// if(nOptMeshes > 0)
+			// {
+			// 	for (int i = 0; i < nOptMeshes; i++)
+			// 	{
+			// 		_optMeshes[i].ClearCameraData();
+			// 	}
+			// }
+
+			//변경 v1.6.0 : Mesh에서 MaskRenderCamera로 마스크 로직을 옮김
+			if(_maskRenderCamera != null)
+			{
+				_maskRenderCamera.DisableRender();
+			}
+		}
+
+
+		//추가 v1.6.0 커맨드 버퍼 갱신 함수가 변경됨
+		/// <summary>
+		/// Initialize and Re-register all Command Buffers for clipping mask processing.
+		/// </summary>
+		public void ResetMeshesCommandBuffers()
+		{
+			//변경 v1.6.0
+			//마스크 렌더링을 관리하는 MaskRenderCamera를 이용하여 초기화하자
+			//EnableRender는 초기화 또는 갱신시에도 사용할 수 있다.
+			if(_maskRenderCamera != null)
+			{
+				_maskRenderCamera.EnableRender();
+			}
+		}
+
+
+		[Obsolete("This function is deprecated due to changes in the Mask operation logic. Use apPortrait's [ResetMeshesCommandBuffers()] instead.")]
+		/// <summary>
+		/// Initialize or re-register all Command Buffers for clipping mask processing.
+		/// </summary>
+		/// <param name="isOnlyActiveRootUnit">If True, all Command Buffers of Root Units except the currently executing are initialized. If false, re-register the buffers of all Root Units.</param>
+		public void ResetMeshesCommandBuffers(bool isOnlyActiveRootUnit)
+		{
+			//이전 : Mesh에서 마스크 렌더링을 하는 방식에서의 초기화
+			//if (isOnlyActiveRootUnit)
+			//{
+			//	// [ 활성화된 루트 유닛만 갱신 ]
+			//	//RootUnit 단위로 Reset을 한다. ]
+			//	int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+			//	apOptRootUnit rootUnit = null;
+			//	if(nRootUnits > 0)
+			//	{
+			//		for (int i = 0; i < nRootUnits; i++)
+			//		{
+			//			rootUnit = _optRootUnitList[i];
+			//			bool isRegistToCamera = (rootUnit == _curPlayingOptRootUnit);
+			//			ResetMeshCommandBuffer(rootUnit, isRegistToCamera);
+			//		}
+			//	}
+				
+			//}
+			//else
+			//{
+			//	// [ 모든 Opt Mesh 대상으로 갱신 ]				
+			//	int nOptMeshes = _optMeshes != null ? _optMeshes.Count : 0;
+			//	if(nOptMeshes > 0)
+			//	{
+			//		for (int i = 0; i < nOptMeshes; i++)
+			//		{
+			//			_optMeshes[i].ResetMaskParentSetting();
+			//		}
+			//	}
+				
+			//}
+
+			// Fallback
+			ResetMeshesCommandBuffers();
+			
+
+		}
+
+
+		[Obsolete("This function is deprecated due to changes in the Mask operation logic. Use apPortrait's [ResetMeshesCommandBuffers()] instead.")]
+		/// <summary>
+		/// Initializes the command buffer for clipping mask processing.
+		/// </summary>
+		/// <param name="targetOptRootUnit">Target Root Unit</param>
+		/// <param name="isRegistToCamera">If True, re-register the command buffers to the camera after initialization.</param>
+		public void ResetMeshCommandBuffer(apOptRootUnit targetOptRootUnit, bool isRegistToCamera)
+		{
+			//if (targetOptRootUnit == null)
+			//{
+			//	return;
+			//}
+			//targetOptRootUnit.ResetCommandBuffer(isRegistToCamera);
+
+			// Fallback
+			ResetMeshesCommandBuffers();
+		}
+
+
+		//: 실시간으로 카메라를 자동으로 감지하는 기능을 사용하고 있을 때,
+		//현재 카메라를 주로 감지할 지, 항상 모든 카메라를 감지할지 결정하는 옵션
+		/// <summary>
+		/// When using the automatic camera detection function, set whether to mainly check the current camera or always check all cameras.
+		/// </summary>
+		/// <param name="cameraCheckMode">How to check cameras</param>
+		public void SetCameraCheckMethod(CAMERA_CHECK_MODE cameraCheckMode)
+		{
+			_cameraCheckMode = cameraCheckMode;
+		}
+
+		/// <summary>
+		/// Reset to automatically detect cameras in the scene.
+		/// </summary>
+		public void FindRenderingCamerasAutomatically()
+		{
+			if(_mainCamera == null)
+			{
+				Debug.LogError("AnyPortrait - The camera module has not been initialized yet.");
+				return;
+			}
+
+
+			//자동으로 갱신되도록 설정
+			_mainCamera.SetRefreshAutomatically();
+
+			//함수가 호출된 김에 한번 갱신
+			bool isCameraChanged = _mainCamera.Refresh(true, _billboardType != BILLBOARD_TYPE.None, _cameraCheckMode);
+
+			if (isCameraChanged)
+			{
+				//이전
+				//ResetMeshesCommandBuffers(false);
+
+				//변경 v1.6.0
+				ResetMeshesCommandBuffers();
+			}
+		}
+
+		/// <summary>
+		/// Manually set the cameras that render this character.
+		/// When this function is called, the character does not automatically recognize the change even if the cameras in the scene change.
+		/// Call the "FindRenderingCamerasAutomatically()" function to make the character automatically recognize the cameras again.
+		/// </summary>
+		/// <param name="cameras">Cameras placed in the scene you want to set</param>
+		/// <returns>The number of cameras that can actually render the character. Returns -1 if an error occurs</returns>
+		public int SetRenderingCameras(params Camera[] cameras)
+		{
+			if(_mainCamera == null)
+			{
+				Debug.LogError("AnyPortrait - The camera module has not been initialized yet.");
+				return -1;
+			}
+
+			int result = _mainCamera.SetCameras(cameras);
+
+			//추가 v1.5.0 : 이 함수를 호출하면 클리핑 마스크를 위한 커맨드 버퍼를 같이 갱신해야 한다.
+			//(사용자에게 맡기지만 말자)
+
+			//이전
+			//ResetMeshesCommandBuffers(false);
+
+			//변경 v1.6.0
+			ResetMeshesCommandBuffers();
+
+			return result;
+		}
+
+
+		//--------------------------------------------------------------
+		// Sorting Order/Layer
+		//--------------------------------------------------------------
+		/// <summary>
+		/// Set the Sorting Layer.
+		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
+		/// </summary>
+		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
+		public void SetSortingLayer(string sortingLayerName)
+		{
+			//이름으로부터 SortingLayerID를 찾자
+			if (SortingLayer.layers == null || SortingLayer.layers.Length == 0)
+			{
+				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. There is no SortingLayer is this project.");
+				return;
+			}
+			int targetSortingLayerID = -1;
+			bool isTargetSortingLayerFound = false;
+			for (int i = 0; i < SortingLayer.layers.Length; i++)
+			{
+				if (string.Equals(SortingLayer.layers[i].name, sortingLayerName))
+				{
+					isTargetSortingLayerFound = true;
+					targetSortingLayerID = SortingLayer.layers[i].id;
+					break;
+				}
+			}
+			//못찾았다.
+			if (!isTargetSortingLayerFound)
+			{
+				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. Could not find layer with requested name. <" + sortingLayerName + ">");
+				return;
+			}
+
+			//Sorting Layer 적용
+			_sortingLayerID = targetSortingLayerID;
+			for (int i = 0; i < _optMeshes.Count; i++)
+			{
+				_optMeshes[i].SetSortingLayer(sortingLayerName, _sortingLayerID);
+			}
+		}
+
+		/// <summary>
+		/// Changes the Sorting Layer of the specified OptTransform.
+		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
+		/// </summary>
+		/// <param name="optTransform">Target OptTransform</param>
+		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
+		public void SetSortingLayer(apOptTransform optTransform, string sortingLayerName)
+		{
+			//이름으로부터 SortingLayerID를 찾자
+			if (SortingLayer.layers == null || SortingLayer.layers.Length == 0)
+			{
+				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. There is no SortingLayer is this project.");
+				return;
+			}
+			if (optTransform == null || optTransform._childMesh == null)
+			{
+				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. OptTransform is null or it does not have a mesh.");
+				return;
+			}
+			int targetSortingLayerID = -1;
+			bool isTargetSortingLayerFound = false;
+			for (int i = 0; i < SortingLayer.layers.Length; i++)
+			{
+				if (string.Equals(SortingLayer.layers[i].name, sortingLayerName))
+				{
+					isTargetSortingLayerFound = true;
+					targetSortingLayerID = SortingLayer.layers[i].id;
+					break;
+				}
+			}
+			//못찾았다.
+			if (!isTargetSortingLayerFound)
+			{
+				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. Could not find layer with requested name. <" + sortingLayerName + ">");
+				return;
+			}
+
+			//Sorting Layer 적용
+			optTransform._childMesh.SetSortingLayer(sortingLayerName, targetSortingLayerID);
+		}
+
+		/// <summary>
+		/// Changes the Sorting Layer of the specified OptTransform.
+		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
+		/// </summary>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
+		public void SetSortingLayer(string transformName, string sortingLayerName)
+		{
+			SetSortingLayer(GetOptTransform(transformName), sortingLayerName);
+		}
+
+		/// <summary>
+		/// Changes the Sorting Layer of the specified OptTransform.
+		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
+		/// </summary>
+		/// <param name="rootUnitIndex">Root Unit Index</param>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
+		public void SetSortingLayer(int rootUnitIndex, string transformName, string sortingLayerName)
+		{
+			SetSortingLayer(GetOptTransform(rootUnitIndex, transformName), sortingLayerName);
+		}
+
+
+
+		/// <summary>
+		/// Set the Sorting Order
+		/// </summary>
+		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
+		public void SetSortingOrder(int sortingOrder)
+		{
+			_sortingOrder = sortingOrder;
+			for (int i = 0; i < _optMeshes.Count; i++)
+			{
+				_optMeshes[i].SetSortingOrder(sortingOrder);
+			}
+		}
+		
+
+		/// <summary>
+		/// Set the Sorting Order of the specified OptTransform.
+		/// </summary>
+		/// <param name="optTransform">Target OptTransform</param>
+		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
+		public void SetSortingOrder(apOptTransform optTransform, int sortingOrder)
+		{
+			if (optTransform == null || optTransform._childMesh == null)
+			{
+				Debug.LogError("AnyPortrait : SetSortingOrder() Failed. OptTransform is null or it does not have a mesh.");
+				return;
+			}
+
+			_sortingOrder = sortingOrder;
+			optTransform._childMesh.SetSortingOrder(sortingOrder);
+		}
+
+		/// <summary>
+		/// Set the Sorting Order of the specified OptTransform.
+		/// </summary>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
+		public void SetSortingOrder(string transformName, int sortingOrder)
+		{
+			SetSortingOrder(GetOptTransform(transformName), sortingOrder);
+		}
+
+		/// <summary>
+		/// Set the Sorting Order of the specified OptTransform.
+		/// </summary>
+		/// <param name="rootUnitIndex">Root Unit Index</param>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
+		public void SetSortingOrder(int rootUnitIndex, string transformName, int sortingOrder)
+		{
+			SetSortingOrder(GetOptTransform(rootUnitIndex, transformName), sortingOrder);
+		}
+
+
+		/// <summary>
+		/// Get Name of Sorting Layer
+		/// If Failed, "Unknown Layer" is returned
+		/// </summary>
+		/// <returns></returns>
+		public string GetSortingLayerName()
+		{
+			if (SortingLayer.layers == null || SortingLayer.layers.Length == 0)
+			{
+				return "Unknown Layer";
+			}
+
+			for (int i = 0; i < SortingLayer.layers.Length; i++)
+			{
+				if (SortingLayer.layers[i].id == _sortingLayerID)
+				{
+					return SortingLayer.layers[i].name;
+				}
+			}
+
+			return "Unknown Layer";
+		}
+
+		/// <summary>
+		/// Get Sorting Order
+		/// </summary>
+		/// <returns></returns>
+		public int GetSortingOrder()
+		{
+			return _sortingOrder;
+		}
+
+
+		/// <summary>
+		/// Get the Sorting Order of the specified OptTransform.
+		/// </summary>
+		/// <param name="optTransform">Target OptTransform</param>
+		/// <returns>Sorting Order value. -1 is returned if the requested OptTransform does not exist or does not have a mesh.</returns>
+		public int GetSortingOrder(apOptTransform optTransform)
+		{
+			if (optTransform == null)
+			{
+				Debug.LogError("AnyPortrait : GetSortingOrder() Failed. The OptTransform entered as an argument is null.");
+				return -1;
+			}
+			if (optTransform._childMesh == null)
+			{
+				Debug.LogError("AnyPortrait : GetSortingOrder() Failed. The requested OptTransform does not have a mesh.");
+				return -1;
+			}
+			return optTransform._childMesh.GetSortingOrder();
+		}
+
+
+		/// <summary>
+		/// Get the Sorting Order of the specified OptTransform.
+		/// </summary>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		/// <returns>Sorting Order value. -1 is returned if the requested OptTransform does not exist or does not have a mesh.</returns>
+		public int GetSortingOrder(string transformName)
+		{
+			return GetSortingOrder(GetOptTransform(transformName));
+		}
+
+		/// <summary>
+		/// Get the Sorting Order of the specified OptTransform.
+		/// </summary>
+		/// <param name="rootUnitIndex">Root Unit Index</param>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		/// <returns>Sorting Order value. -1 is returned if the requested OptTransform does not exist or does not have a mesh.</returns>
+		public int GetSortingOrder(int rootUnitIndex, string transformName)
+		{
+			return GetSortingOrder(GetOptTransform(rootUnitIndex, transformName));
+		}
+
+
+		/// <summary>
+		/// Set whether the [Sorting Order] of the meshes will be changed automatically.
+		/// This function works only when the value of [Sorting Order Option] of apPortrait is [Depth To Order] or [Reverse Depth To Order].
+		/// </summary>
+		/// <param name="isEnabled">Whether the sorting order is automatically updated (Default is true)</param>
+		public void SetSortingOrderChangedAutomatically(bool isEnabled)
+		{
+			if (_optRootUnitList == null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < _optRootUnitList.Count; i++)
+			{
+				_optRootUnitList[i].SetSortingOrderChangedAutomatically(isEnabled);
+			}
+		}
+
+
+
+		//---------------------------------------------------
+		// Synchronize
+		//---------------------------------------------------
+		/// <summary>
+		/// If it is synchronized with other apPortraits, unsynchronize it.
+		/// If this is a synchronized parent, all child objects are unsynchronized.
+		/// If this is a synchronized child, exclude it from its parent.
+		/// </summary>
+		public void Unsynchronize()
+		{
+			if(_isSyncParent)
+			{
+				if(_syncChildPortraits != null)
+				{
+					//자식들의 동기화를 모두 해제한다.
+					apPortrait childPortrait = null;
+					for (int i = 0; i < _syncChildPortraits.Count; i++)
+					{	
+						childPortrait = _syncChildPortraits[i];
+						if(childPortrait == null || childPortrait == this)
+						{
+							continue;
+						}
+						childPortrait._isSyncChild = false;
+						childPortrait._isSyncParent = false;
+						childPortrait._syncChildPortraits = null;
+						childPortrait._syncParentPortrait = null;
+						childPortrait._syncPlay = null;
+					}
+				}
+				_isSyncParent = false;
+				_syncChildPortraits = null;
+			}
+			if(_isSyncChild)
+			{
+				if(_syncParentPortrait != null)
+				{
+					//부모로부터 동기화를 해제한다.
+					if(_syncParentPortrait._syncChildPortraits != null
+						&& _syncParentPortrait._syncChildPortraits.Contains(this))
+					{
+						_syncParentPortrait._syncChildPortraits.Remove(this);
+
+						if(_syncParentPortrait._syncChildPortraits.Count == 0)
+						{
+							//부모 객체의 모든 동기화가 해제되었다.
+							_syncParentPortrait._isSyncParent = false;
+							_syncParentPortrait._syncChildPortraits = null;
+							_syncParentPortrait._isSyncChild = false;
+							_syncParentPortrait._syncParentPortrait = null;
+							_syncParentPortrait._syncPlay = null;
+						}
+					}
+				}
+				
+				_isSyncChild = false;
+				_syncParentPortrait = null;
+				
+				//이전
+				//_syncMethod = SYNC_METHOD.None;
+
+				//변경
+				_isSync_Animation = false;
+				_isSync_ControlParam = false;
+				_isSync_Bone = false;
+				_isSync_RootUnit = false;
+
+				if(_syncPlay != null)
+				{
+					_syncPlay.Unsynchronize();
+				}
+				_syncPlay = null;
+
+				//중요 : 동기화가 해제 되면 일부 모디파이어의 코드가 다르게 동작해야한다.
+				int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+				if (nRootUnits > 0)
+				{
+					for (int i = 0; i < nRootUnits; i++)
+					{
+						_optRootUnitList[i]._rootOptTransform._modifierStack.DisableSync();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Synchronizes the updated values of animation or control parameters with other apPortrait.
+		/// If synchronization succeeds, this apPortrait is registered and updated as a child of the target's apPortrait.
+		/// </summary>
+		/// <param name="targetPortrait">Target parent apPortrait.</param>
+		/// <param name="syncAnimation">Synchronize the playback state of animation clips of the same name.</param>
+		/// <param name="syncControlParam">Synchronize the values of control parameters of the same name.</param>
+		/// <returns>Returns True if synchronization is successful.</returns>
+		public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam)
+		{
+			return Synchronize(targetPortrait, syncAnimation, syncControlParam, 
+								false, false, SYNC_BONE_OPTION.MatchFromRoot);
+		}
+
+
+		/// <summary>
+		/// Synchronizes the updated values of animation, control parameters or root units with other apPortrait.
+		/// If synchronization succeeds, this apPortrait is registered and updated as a child of the target's apPortrait.
+		/// </summary>
+		/// <param name="targetPortrait">Target parent apPortrait.</param>
+		/// <param name="syncAnimation">Synchronize the playback state of animation clips of the same name.</param>
+		/// <param name="syncControlParam">Synchronize the values of control parameters of the same name.</param>
+		/// <param name="syncRootUnit">Synchronize the transition of Root Units.(If animation is synchronized, this value is forced to false.)</param>
+		/// <returns>Returns True if synchronization is successful.</returns>
+		public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam, bool syncRootUnit)
+		{
+			return Synchronize(targetPortrait, syncAnimation, syncControlParam, 
+								syncRootUnit, 
+								false, SYNC_BONE_OPTION.MatchFromRoot);
+		}
+
+		/// <summary>
+		/// Synchronizes the updated values of animation, control parameters, bones or root units with other apPortrait.
+		/// If synchronization succeeds, this apPortrait is registered and updated as a child of the target's apPortrait.
+		/// </summary>
+		/// <param name="targetPortrait">Target parent apPortrait.</param>
+		/// <param name="syncAnimation">Synchronize the playback state of animation clips of the same name.</param>
+		/// <param name="syncControlParam">Synchronize the values of control parameters of the same name.</param>
+		/// <param name="syncBones">Synchronize the movement of bones with the same name and structure.</param>
+		/// <param name="syncBoneOption">Option to synchronize bones (this option is ignored if syncBones is false)</param>
+		/// <param name="syncRootUnit">Synchronize the transition of Root Units.(If animation is synchronized, this value is forced to false.)</param>
+		/// <returns>Returns True if synchronization is successful.</returns>
+		public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam, bool syncRootUnit, bool syncBones, SYNC_BONE_OPTION syncBoneOption)//인자 순서를 바꾼다.
+		{
+			if (targetPortrait == null || targetPortrait == this)
+			{
+				Debug.LogError("AnyPortrait : [Sync failed] Target is null");
+				return false;
+			}
+			if(_isSyncParent)
+			{
+				Debug.LogError("AnyPortrait : [Sync failed] This apPortrait is a parent object that has already been synced.");
+				return false;
+			}
+
+			if(targetPortrait._isSyncChild)
+			{
+				Debug.LogError("AnyPortrait : [Sync failed] The target is already synced to another apPortrait.");
+				return false;
+			}
+
+			if(syncAnimation)
+			{
+				syncRootUnit = true;
+			}
+
+			if(!syncAnimation && !syncControlParam && !syncBones && !syncRootUnit)
+			{
+				Debug.LogError("AnyPortrait : [Sync failed] This function does not work because all arguments are false. To unsynchronize, use the Unsynchronize() function instead.");
+				return false;
+			}
+
+			//연동할게 없다면 요청 항목에서 삭제
+			if (syncAnimation)
+			{
+				int nAnimClips = _animClips != null ? _animClips.Count : 0;
+				int nTargetAnimClips = targetPortrait._animClips != null ? targetPortrait._animClips.Count : 0;
+
+				if (nAnimClips == 0 || nTargetAnimClips == 0)
+				{
+					syncAnimation = false;
+				}
+			}
+
+			if (syncControlParam)
+			{
+				if(_controller._controlParams == null || targetPortrait._controller._controlParams == null)
+				{
+					syncControlParam = false;
+				}
+			}
+			
+			if(syncRootUnit)
+			{
+				//루트 유닛이 모두 2개 이상이어야 하고, 개수가 같아야 한다.
+				int nRootUnit_Target = targetPortrait._optRootUnitList != null ? targetPortrait._optRootUnitList.Count : 0;
+				int nRootUnit_Self = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+
+				if(nRootUnit_Target <= 1 || nRootUnit_Self <= 1)
+				{
+					//루트 유닛이 1 이하라면 syncRootUnit 요청은 무시된다.
+					
+					if(!syncAnimation)
+					{
+						//단 경고문은 애니메이션 동기화가 아닌 경우에만 보여주자
+						Debug.LogWarning("AnyPortrait : If there are 1 or fewer Root Units, the synchronization request to the Root Unit is ignored.");
+					}
+					
+					syncRootUnit = false;
+				}
+				else if(nRootUnit_Target != nRootUnit_Self)
+				{
+					//루트 유닛의 개수가 다르다면 syncRootUnit 요청은 무시된다.
+					
+					Debug.LogError("AnyPortrait : Since the number of Root Units between the two Portraits is different, the synchronization request for switching Root Units is ignored.");
+					syncRootUnit = false;
+				}
+			}
+
+
+			if(!syncAnimation && !syncControlParam && !syncBones && !syncRootUnit)
+			{
+				return false;
+			}
+
+			
+
+			if(_isSyncChild)
+			{
+				if(targetPortrait == _syncParentPortrait)
+				{
+					//이미 동기화가 되었다.
+					//부모의 입장에서 이 객체가 등록되었는지 한번 더 확인하자
+					_syncParentPortrait._isSyncParent = true;
+					if(_syncParentPortrait._syncChildPortraits == null)
+					{
+						_syncParentPortrait._syncChildPortraits = new List<apPortrait>();
+					}
+					if(!_syncParentPortrait._syncChildPortraits.Contains(this))
+					{
+						_syncParentPortrait._syncChildPortraits.Add(this);
+					}
+					return true;
+				}
+			}
+
+			//만약 새로 등록하는 거라면
+			_isSyncChild = true;
+			_syncParentPortrait = targetPortrait;
+
+			
+			//변경 21.9.18
+			_isSync_Animation = syncAnimation;
+			_isSync_ControlParam = syncControlParam;
+			_isSync_Bone = syncBones;
+			_isSync_RootUnit = syncRootUnit;
+
+
+
+			//동기화용 객체 생성
+			_syncPlay = new apSyncPlay(this, _syncParentPortrait, syncAnimation, syncControlParam, syncBones, syncBoneOption, syncRootUnit);
+
+			_syncParentPortrait._isSyncParent = true;
+			if(_syncParentPortrait._syncChildPortraits == null)
+			{
+				_syncParentPortrait._syncChildPortraits = new List<apPortrait>();
+			}
+			if(!_syncParentPortrait._syncChildPortraits.Contains(this))
+			{
+				_syncParentPortrait._syncChildPortraits.Add(this);
+			}
+
+
+			//중요 : 동기화가 되면 일부 모디파이어의 코드가 다르게 동작해야한다.
+			int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
+			if (nRootUnits > 0)
+			{
+				for (int i = 0; i < nRootUnits; i++)
+				{
+					//모디파이어 스택에서 Sync를 활성화
+					//- 리깅 LUT가 Sync용으로 변경된다.
+					//- 이 코드는 SyncPlay를 생성한 후에 실행되어야 한다.
+					_optRootUnitList[i]._rootOptTransform._modifierStack.EnableSync();
+				}
+			}
+			
+
+			return true;
+		}
+
+
+		//---------------------------------------------------
+		// Update Time Method
+		//---------------------------------------------------
+		/// <summary>
+		/// Decide which the interval value of time will be used when updating the apPortrait.
+		/// If the Important option is disabled or Mecanim (Animator) is used, this option does not apply except for some features.
+		/// </summary>
+		/// <param name="useUnscaleDeltaTime">If true, Time.unscaledDeltaTime is used, if false, Time.deltaTime is used. (Default is false)</param>
+		public void SetUpdateTimeMethod(bool useUnscaleDeltaTime)
+		{
+			_isDeltaTimeOptionChanged = true;
+
+			if(useUnscaleDeltaTime)
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.UnscaledDeltaTime;
+			}
+			else
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
+			}
+			_deltaTimeMultiplier = 1.0f;
+			_funcDeltaTimeRequested = null;
+			_deltaTimeRequestSavedObject = null;
+		}
+
+		/// <summary>
+		/// Decide which the interval value of time will be used when updating the apPortrait.
+		/// If the Important option is disabled or Mecanim (Animator) is used, this option does not apply except for some features.
+		/// </summary>
+		/// <param name="useUnscaleDeltaTime">If true, Time.unscaledDeltaTime is used, if false, Time.deltaTime is used. (Default is false)</param>
+		/// <param name="multiplier">The multiplier that accelerates the update. (Default is 1.0f)</param>
+		public void SetUpdateTimeMethod(bool useUnscaleDeltaTime, float multiplier)
+		{
+			_isDeltaTimeOptionChanged = true;
+
+			if(useUnscaleDeltaTime)
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.MultipliedUnscaledDeltaTime;
+			}
+			else
+			{
+				_deltaTimeOption = DELTA_TIME_OPTION.MultipliedDeltaTime;
+			}
+			_deltaTimeMultiplier = multiplier;
+			_funcDeltaTimeRequested = null;
+			_deltaTimeRequestSavedObject = null;
+		}
+
+		//추가 1.3.5 22.1.8 : 콜백으로 업데이트 시간 제어
+		/// <summary>
+		/// Decide which the interval value of time will be used when updating the apPortrait.
+		/// You can control the update rate of multiple characters at once by using a callback function that return the Delta Time.
+		/// If the Important option is disabled or Mecanim (Animator) is used, this option does not apply except for some features.
+		/// </summary>
+		/// <param name="onDeltaTimeRequested">A callback function that returns the Delta Time (float OnDeltaTimeRequested(object))</param>
+		/// <param name="savedObject">A key object for distinguishing characters. It is passed as an argument when calling the callback function. (nullable)</param>
+		public void SetUpdateTimeMethod(OnDeltaTimeRequested onDeltaTimeRequested, object savedObject = null)
+		{
+			_isDeltaTimeOptionChanged = true;
+
+			if(onDeltaTimeRequested == null)
+			{
+				Debug.Log("AnyPortrait : onDeltaTimeRequested is null, so it will be restored to the default option.");
+				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
+				_deltaTimeMultiplier = 1.0f;
+				_funcDeltaTimeRequested = null;
+				_deltaTimeRequestSavedObject = null;
+				return;
+			}
+
+			_deltaTimeOption = DELTA_TIME_OPTION.CustomFunction;
+			_deltaTimeMultiplier = 1.0f;
+			_funcDeltaTimeRequested = onDeltaTimeRequested;
+			_deltaTimeRequestSavedObject = savedObject;
+		}
+
+
+		/// <summary>
+		/// Set the meshes to be updated Every Frame. The animation plays smoothly. (default)
+		/// </summary>
+		public void SetUpdateMeshesEveryFrame()
+		{
+			_meshRefreshRateOption = MESH_UPDATE_FREQUENCY.EveryFrames;			
+		}
+
+		/// <summary>
+		/// Set the meshes to be updated at regular intervals. Enter the update frequency as FPS.
+		/// </summary>
+		/// <param name="fps">Frames per second, which refers to the update frequency. Please enter a value between 1 and 30.</param>
+		/// <param name="isSyncUpdate">If True, it updates at the same frame as other characters with the same FPS settings.</param>
+		public void SetUpdateMeshesPerTime(int fps, bool isSyncUpdate)
+		{
+			if(isSyncUpdate)
+			{
+				_meshRefreshRateOption = MESH_UPDATE_FREQUENCY.FixedFrames_Sync;
+			}
+			else
+			{
+				_meshRefreshRateOption = MESH_UPDATE_FREQUENCY.FixedFrames_NotSync;
+			}
+			_meshRefreshRateFPS = fps;
+			//Min ~ Max 사이 값으로 설정하자
+			if(_meshRefreshRateFPS < MESH_REFRESH_FPS_MIN)
+			{
+				_meshRefreshRateFPS = MESH_REFRESH_FPS_MIN;
+			}
+			else if(_meshRefreshRateFPS > MESH_REFRESH_FPS_MAX)
+			{
+				_meshRefreshRateFPS = MESH_REFRESH_FPS_MAX;
+			}
+		}
+
+		//------------------------------------------------------------
+		// Control Parameters
+		//------------------------------------------------------------
+		/// <summary>
+		/// Is there a parameter with the requested name?
+		/// </summary>
+		/// <param name="controlParamName">Name of Control Parameter</param>
+		/// <returns></returns>
+		public bool IsControlParamExist(string controlParamName)
+		{
+			return GetControlParam(controlParamName) != null;
+		}
+
+		/// <summary>
+		/// Set the value of the Control Parameter with an "Integer" value.
+		/// </summary>
+		/// <param name="controlParamName">Name of the target Control Parameter</param>
+		/// <param name="intValue">Integer Value</param>
+		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamInt(string controlParamName, int intValue, float overlapWeight = 1.0f)
+		{
+			apControlParam controlParam = GetControlParam(controlParamName);
+			if (controlParam == null)
+			{ return false; }
+
+			controlParam.RequestSetValueInt(intValue, overlapWeight);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Set the value of the Control Parameter with an "Float" value.
+		/// </summary>
+		/// <param name="controlParamName">Name of the target Control Parameter</param>
+		/// <param name="floatValue">Float Value</param>
+		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamFloat(string controlParamName, float floatValue, float overlapWeight = 1.0f)
+		{
+			apControlParam controlParam = GetControlParam(controlParamName);
+			if (controlParam == null)
+			{ return false; }
+
+			controlParam.RequestSetValueFloat(floatValue, overlapWeight);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Set the value of the Control Parameter with an "Vector2" value.
+		/// </summary>
+		/// <param name="controlParamName">Name of the target Control Parameter</param>
+		/// <param name="vec2Value">Vector2 Value</param>
+		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamVector2(string controlParamName, Vector2 vec2Value, float overlapWeight = 1.0f)
+		{
+			apControlParam controlParam = GetControlParam(controlParamName);
+			if (controlParam == null)
+			{ return false; }
+
+			controlParam.RequestSetValueVector2(vec2Value, overlapWeight);
+
+			return true;
+		}
+
+
+		/// <summary>
+		/// Set the value of the Control Parameter with an "Integer" value.
+		/// </summary>
+		/// <param name="controlParam">Tareget Control Parameter</param>
+		/// <param name="intValue">Integer Value</param>
+		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamInt(apControlParam controlParam, int intValue, float overlapWeight = 1.0f)
+		{
+			if (controlParam == null)
+			{ return false; }
+
+			controlParam.RequestSetValueInt(intValue, overlapWeight);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Set the value of the Control Parameter with an "Float" value.
+		/// </summary>
+		/// <param name="controlParam">Target Control Parameter</param>
+		/// <param name="floatValue">Float Value</param>
+		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamFloat(apControlParam controlParam, float floatValue, float overlapWeight = 1.0f)
+		{
+			if (controlParam == null)
+			{ return false; }
+
+			controlParam.RequestSetValueFloat(floatValue, overlapWeight);
+
+			return true;
+		}
+
+
+		/// <summary>
+		/// Set the value of the Control Parameter with an "Vector2" value.
+		/// </summary>
+		/// <param name="controlParam">Target Control Parameter</param>
+		/// <param name="vec2Value">Vector2 Value</param>
+		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamVector2(apControlParam controlParam, Vector2 vec2Value, float overlapWeight = 1.0f)
+		{
+			if (controlParam == null)
+			{ return false; }
+
+			controlParam.RequestSetValueVector2(vec2Value, overlapWeight);
+
+			return true;
+		}
+
+
+		
+
+		/// <summary>
+		/// Restores the value of the parameter to its default value.
+		/// </summary>
+		/// <param name="controlParamName">Name of Control Parameter</param>
+		/// <returns>If the requested parameter is not found, it returns false.</returns>
+		public bool SetControlParamDefaultValue(string controlParamName)
+		{
+			apControlParam controlParam = GetControlParam(controlParamName);
+			if (controlParam == null)
+			{ return false; }
+
+			switch (controlParam._valueType)
+			{
+				case apControlParam.TYPE.Int:
+					controlParam._int_Cur = controlParam._int_Def;
+					break;
+
+				case apControlParam.TYPE.Float:
+					controlParam._float_Cur = controlParam._float_Def;
+					break;
+
+				case apControlParam.TYPE.Vector2:
+					controlParam._vec2_Cur = controlParam._vec2_Def;
+					break;
+			}
+
+			return true;
+		}
+
+
+
+
+
+		//-----------------------------------------------------------
+		// Animation Play
+		//-----------------------------------------------------------
+		
+		// [ Play / Play At ]
+
 		/// <summary>
 		/// Play the animation
 		/// </summary>
@@ -4177,28 +8168,110 @@ namespace AnyPortrait
 		}
 
 
-
-
-
-		private apAnimPlayData PlayNoDebug(string animClipName,
+		/// <summary>
+		/// Play the animation at the specified frame.
+		/// </summary>
+		/// <param name="animClipName">Name of the Animation Clip</param>
+		/// <param name="frame">Frame at the time the animation is played</param>
+		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
+		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
+		/// <param name="playOption">How to stop which animations</param>
+		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
+		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
+		public apAnimPlayData PlayAt(string animClipName, int frame,
 									int layer = 0,
 									apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
 									apAnimPlayManager.PLAY_OPTION playOption = apAnimPlayManager.PLAY_OPTION.StopSameLayer,
 									bool isAutoEndIfNotloop = false)
 		{
-			if (_animPlayManager == null)
-			{ return null; }
 
-			if (_isUsingMecanim)
+#if UNITY_EDITOR
+			try
 			{
-				//메카님이 켜진 경우 함수를 제어할 수 없다.
-				//Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-				return null;
-			}
+#endif
 
-			return _animPlayManager.Play(animClipName, layer, blendMethod, playOption, isAutoEndIfNotloop, false);
+				if (_animPlayManager == null) { return null; }
+
+				if (_isUsingMecanim)
+				{
+					//메카님이 켜진 경우 함수를 제어할 수 없다.
+					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
+					return null;
+				}
+
+				//이전
+				//return _animPlayManager.PlayAt(animClipName, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
+
+				//변경 22.5.18 : 지연된 플레이 요청
+				apAnimPlayData animPlayData = _animPlayManager.GetAnimPlayData_Opt(animClipName);
+				if (animPlayData == null)
+				{
+					return null;
+				}
+				_animPlayDeferredRequest.PlayAt(animPlayData, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
+				return animPlayData;
+
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
 		}
 
+
+		/// <summary>
+		/// Play the animation at the specified frame.
+		/// </summary>
+		/// <param name="animPlayData">Target animation playdata</param>
+		/// <param name="frame">Frame at the time the animation is played</param>
+		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
+		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
+		/// <param name="playOption">How to stop which animations</param>
+		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
+		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
+		public apAnimPlayData PlayAt(apAnimPlayData animPlayData,
+									int frame,
+									int layer = 0,
+									apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
+									apAnimPlayManager.PLAY_OPTION playOption = apAnimPlayManager.PLAY_OPTION.StopSameLayer,
+									bool isAutoEndIfNotloop = false)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (_animPlayManager == null) { return null; }
+
+				if (_isUsingMecanim)
+				{
+					//메카님이 켜진 경우 함수를 제어할 수 없다.
+					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
+					return null;
+				}
+
+				//이전
+				//return _animPlayManager.PlayAt(animPlayData, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
+
+				//변경 22.5.18 : 지연된 플레이 요청
+				_animPlayDeferredRequest.PlayAt(animPlayData, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
+				return animPlayData;
+
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+		// [ Play Queued / Play Queued At ]
 
 		/// <summary>
 		/// Wait for the previous animation to finish, then play it.
@@ -4304,6 +8377,108 @@ namespace AnyPortrait
 		}
 
 		/// <summary>
+		/// Wait for the previous animation to finish, then play it at the specified frame.
+		/// (If the previously playing animation is a loop animation, it will not be executed.)
+		/// </summary>
+		/// <param name="animClipName">Name of the Animation Clip</param>
+		/// <param name="frame">Frame at the time the animation is played</param>
+		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
+		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
+		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
+		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
+		public apAnimPlayData PlayQueuedAt(string animClipName, int frame,
+											int layer = 0,
+											apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
+											bool isAutoEndIfNotloop = false)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (_animPlayManager == null) { return null; }
+
+				if (_isUsingMecanim)
+				{
+					//메카님이 켜진 경우 함수를 제어할 수 없다.
+					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
+					return null;
+				}
+
+				//이전
+				//return _animPlayManager.PlayQueuedAt(animClipName, frame, layer, blendMethod, isAutoEndIfNotloop);
+
+				//변경 22.5.18 : 지연된 플레이 요청
+				apAnimPlayData animPlayData = _animPlayManager.GetAnimPlayData_Opt(animClipName);
+				if (animPlayData == null)
+				{
+					return null;
+				}
+				_animPlayDeferredRequest.PlayQueuedAt(animPlayData, frame, layer, blendMethod, isAutoEndIfNotloop);
+				return animPlayData;
+
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+
+		/// <summary>
+		/// Wait for the previous animation to finish, then play it at the specified frame.
+		/// (If the previously playing animation is a loop animation, it will not be executed.)
+		/// </summary>
+		/// <param name="animPlayData">Target animation playdata</param>
+		/// <param name="frame">Frame at the time the animation is played</param>
+		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
+		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
+		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
+		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
+		public apAnimPlayData PlayQueuedAt(apAnimPlayData animPlayData, int frame,
+											int layer = 0,
+											apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
+											bool isAutoEndIfNotloop = false)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (_animPlayManager == null) { return null; }
+
+				if (_isUsingMecanim)
+				{
+					//메카님이 켜진 경우 함수를 제어할 수 없다.
+					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
+					return null;
+				}
+
+				//이전
+				//return _animPlayManager.PlayQueuedAt(animPlayData, frame, layer, blendMethod, isAutoEndIfNotloop);
+
+				//변경 22.5.18 : 지연된 플레이 요청
+				_animPlayDeferredRequest.PlayQueuedAt(animPlayData, frame, layer, blendMethod, isAutoEndIfNotloop);
+				return animPlayData;
+
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+		// [ Cross Fade / Cross Fade At ]
+
+		/// <summary>
 		/// Play the animation smoothly.
 		/// </summary>
 		/// <param name="animClipName">Name of the Animation Clip</param>
@@ -4393,315 +8568,6 @@ namespace AnyPortrait
 
 				//변경 22.5.18 : 지연된 플레이 요청
 				_animPlayDeferredRequest.CrossFade(animPlayData, layer, blendMethod, fadeTime, playOption, isAutoEndIfNotloop);
-				return animPlayData;
-
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-		/// <summary>
-		/// Wait for the previous animation to finish, then play it smoothly.
-		/// (If the previously playing animation is a loop animation, it will not be executed.)
-		/// </summary>
-		/// <param name="animClipName">Name of the Animation Clip</param>
-		/// <param name="fadeTime">Fade Time</param>
-		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
-		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
-		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
-		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
-		public apAnimPlayData CrossFadeQueued(string animClipName,
-												float fadeTime = 0.3f,
-												int layer = 0,
-												apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
-												bool isAutoEndIfNotloop = false)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (_animPlayManager == null) { return null; }
-
-				if (_isUsingMecanim)
-				{
-					//메카님이 켜진 경우 함수를 제어할 수 없다.
-					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-					return null;
-				}
-
-				//이전
-				//return _animPlayManager.CrossFadeQueued(animClipName, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
-
-				//변경 22.5.18 : 지연된 플레이 요청
-				apAnimPlayData animPlayData = _animPlayManager.GetAnimPlayData_Opt(animClipName);
-				if (animPlayData == null)
-				{
-					return null;
-				}
-				_animPlayDeferredRequest.CrossFadeQueued(animPlayData, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
-				return animPlayData;
-
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-		/// <summary>
-		/// Wait for the previous animation to finish, then play it smoothly.
-		/// (If the previously playing animation is a loop animation, it will not be executed.)
-		/// </summary>
-		/// <param name="animPlayData">Target animation playdata</param>
-		/// <param name="fadeTime">Fade Time</param>
-		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
-		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
-		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
-		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
-		public apAnimPlayData CrossFadeQueued(apAnimPlayData animPlayData,
-												float fadeTime = 0.3f,
-												int layer = 0,
-												apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
-												bool isAutoEndIfNotloop = false)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (_animPlayManager == null) { return null; }
-
-				if (_isUsingMecanim)
-				{
-					//메카님이 켜진 경우 함수를 제어할 수 없다.
-					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-					return null;
-				}
-
-				//이전
-				//return _animPlayManager.CrossFadeQueued(animPlayData, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
-
-				//변경 22.5.18 : 지연된 플레이 요청
-				_animPlayDeferredRequest.CrossFadeQueued(animPlayData, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
-				return animPlayData;
-				
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-
-		}
-		//----------------------------------------------------------------------------
-
-		//추가 1.14 : 특정 프레임부터 재생을 한다. (Play, PlayQueued, CrossFade, CrossFadeQueued + At)
-
-		//그 외에는 동일
-		/// <summary>
-		/// Play the animation at the specified frame.
-		/// </summary>
-		/// <param name="animClipName">Name of the Animation Clip</param>
-		/// <param name="frame">Frame at the time the animation is played</param>
-		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
-		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
-		/// <param name="playOption">How to stop which animations</param>
-		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
-		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
-		public apAnimPlayData PlayAt(string animClipName, int frame,
-									int layer = 0,
-									apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
-									apAnimPlayManager.PLAY_OPTION playOption = apAnimPlayManager.PLAY_OPTION.StopSameLayer,
-									bool isAutoEndIfNotloop = false)
-		{
-
-#if UNITY_EDITOR
-			try
-			{
-#endif
-
-				if (_animPlayManager == null) { return null; }
-
-				if (_isUsingMecanim)
-				{
-					//메카님이 켜진 경우 함수를 제어할 수 없다.
-					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-					return null;
-				}
-
-				//이전
-				//return _animPlayManager.PlayAt(animClipName, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
-
-				//변경 22.5.18 : 지연된 플레이 요청
-				apAnimPlayData animPlayData = _animPlayManager.GetAnimPlayData_Opt(animClipName);
-				if (animPlayData == null)
-				{
-					return null;
-				}
-				_animPlayDeferredRequest.PlayAt(animPlayData, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
-				return animPlayData;
-
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-		/// <summary>
-		/// Play the animation at the specified frame.
-		/// </summary>
-		/// <param name="animPlayData">Target animation playdata</param>
-		/// <param name="frame">Frame at the time the animation is played</param>
-		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
-		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
-		/// <param name="playOption">How to stop which animations</param>
-		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
-		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
-		public apAnimPlayData PlayAt(apAnimPlayData animPlayData,
-									int frame,
-									int layer = 0,
-									apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
-									apAnimPlayManager.PLAY_OPTION playOption = apAnimPlayManager.PLAY_OPTION.StopSameLayer,
-									bool isAutoEndIfNotloop = false)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (_animPlayManager == null) { return null; }
-
-				if (_isUsingMecanim)
-				{
-					//메카님이 켜진 경우 함수를 제어할 수 없다.
-					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-					return null;
-				}
-
-				//이전
-				//return _animPlayManager.PlayAt(animPlayData, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
-
-				//변경 22.5.18 : 지연된 플레이 요청
-				_animPlayDeferredRequest.PlayAt(animPlayData, frame, layer, blendMethod, playOption, isAutoEndIfNotloop);
-				return animPlayData;
-
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-		/// <summary>
-		/// Wait for the previous animation to finish, then play it at the specified frame.
-		/// (If the previously playing animation is a loop animation, it will not be executed.)
-		/// </summary>
-		/// <param name="animClipName">Name of the Animation Clip</param>
-		/// <param name="frame">Frame at the time the animation is played</param>
-		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
-		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
-		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
-		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
-		public apAnimPlayData PlayQueuedAt(string animClipName, int frame,
-											int layer = 0,
-											apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
-											bool isAutoEndIfNotloop = false)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (_animPlayManager == null) { return null; }
-
-				if (_isUsingMecanim)
-				{
-					//메카님이 켜진 경우 함수를 제어할 수 없다.
-					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-					return null;
-				}
-
-				//이전
-				//return _animPlayManager.PlayQueuedAt(animClipName, frame, layer, blendMethod, isAutoEndIfNotloop);
-
-				//변경 22.5.18 : 지연된 플레이 요청
-				apAnimPlayData animPlayData = _animPlayManager.GetAnimPlayData_Opt(animClipName);
-				if (animPlayData == null)
-				{
-					return null;
-				}
-				_animPlayDeferredRequest.PlayQueuedAt(animPlayData, frame, layer, blendMethod, isAutoEndIfNotloop);
-				return animPlayData;
-
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-
-		/// <summary>
-		/// Wait for the previous animation to finish, then play it at the specified frame.
-		/// (If the previously playing animation is a loop animation, it will not be executed.)
-		/// </summary>
-		/// <param name="animPlayData">Target animation playdata</param>
-		/// <param name="frame">Frame at the time the animation is played</param>
-		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
-		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
-		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
-		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
-		public apAnimPlayData PlayQueuedAt(apAnimPlayData animPlayData, int frame,
-											int layer = 0,
-											apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
-											bool isAutoEndIfNotloop = false)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (_animPlayManager == null) { return null; }
-
-				if (_isUsingMecanim)
-				{
-					//메카님이 켜진 경우 함수를 제어할 수 없다.
-					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
-					return null;
-				}
-
-				//이전
-				//return _animPlayManager.PlayQueuedAt(animPlayData, frame, layer, blendMethod, isAutoEndIfNotloop);
-
-				//변경 22.5.18 : 지연된 플레이 요청
-				_animPlayDeferredRequest.PlayQueuedAt(animPlayData, frame, layer, blendMethod, isAutoEndIfNotloop);
 				return animPlayData;
 
 #if UNITY_EDITOR
@@ -4822,6 +8688,110 @@ namespace AnyPortrait
 		}
 
 
+		// [ Cross Fade Queued / Cross Fade Queued At ]
+
+		/// <summary>
+		/// Wait for the previous animation to finish, then play it smoothly.
+		/// (If the previously playing animation is a loop animation, it will not be executed.)
+		/// </summary>
+		/// <param name="animClipName">Name of the Animation Clip</param>
+		/// <param name="fadeTime">Fade Time</param>
+		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
+		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
+		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
+		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
+		public apAnimPlayData CrossFadeQueued(string animClipName,
+												float fadeTime = 0.3f,
+												int layer = 0,
+												apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
+												bool isAutoEndIfNotloop = false)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (_animPlayManager == null) { return null; }
+
+				if (_isUsingMecanim)
+				{
+					//메카님이 켜진 경우 함수를 제어할 수 없다.
+					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
+					return null;
+				}
+
+				//이전
+				//return _animPlayManager.CrossFadeQueued(animClipName, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
+
+				//변경 22.5.18 : 지연된 플레이 요청
+				apAnimPlayData animPlayData = _animPlayManager.GetAnimPlayData_Opt(animClipName);
+				if (animPlayData == null)
+				{
+					return null;
+				}
+				_animPlayDeferredRequest.CrossFadeQueued(animPlayData, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
+				return animPlayData;
+
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+		/// <summary>
+		/// Wait for the previous animation to finish, then play it smoothly.
+		/// (If the previously playing animation is a loop animation, it will not be executed.)
+		/// </summary>
+		/// <param name="animPlayData">Target animation playdata</param>
+		/// <param name="fadeTime">Fade Time</param>
+		/// <param name="layer">The layer to which the animation is applied. From 0 to 20</param>
+		/// <param name="blendMethod">How it is blended with the animation of the lower layers</param>
+		/// <param name="isAutoEndIfNotloop">If True, animation that does not play repeatedly is automatically terminated.</param>
+		/// <returns>Animation data to be played. If it fails, null is returned.</returns>
+		public apAnimPlayData CrossFadeQueued(apAnimPlayData animPlayData,
+												float fadeTime = 0.3f,
+												int layer = 0,
+												apAnimPlayUnit.BLEND_METHOD blendMethod = apAnimPlayUnit.BLEND_METHOD.Interpolation,
+												bool isAutoEndIfNotloop = false)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (_animPlayManager == null) { return null; }
+
+				if (_isUsingMecanim)
+				{
+					//메카님이 켜진 경우 함수를 제어할 수 없다.
+					Debug.LogError("AnyPortrait : This function does not work because Mecanim Animator is active. Please use _animator.");
+					return null;
+				}
+
+				//이전
+				//return _animPlayManager.CrossFadeQueued(animPlayData, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
+
+				//변경 22.5.18 : 지연된 플레이 요청
+				_animPlayDeferredRequest.CrossFadeQueued(animPlayData, layer, blendMethod, fadeTime, isAutoEndIfNotloop);
+				return animPlayData;
+				
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+
+		}
+
+
 		/// <summary>
 		/// Wait for the previous animation to finish, then play it at the specified frame smoothly.
 		/// (If the previously playing animation is a loop animation, it will not be executed.)
@@ -4926,7 +8896,8 @@ namespace AnyPortrait
 #endif
 
 		}
-		//-------------------------------------------------------------
+
+		// [ Stop / Pause / Resume ]
 
 		/// <summary>
 		/// End all animations playing on the target layer.
@@ -5073,6 +9044,7 @@ namespace AnyPortrait
 #endif
 		}
 
+
 		/// <summary>
 		/// Resume all animations paused on the target layer.
 		/// </summary>
@@ -5146,14 +9118,8 @@ namespace AnyPortrait
 
 
 
-		/// <summary>
-		/// Register the listener object to receive animation events. It must be a class inherited from MonoBehaviour.
-		/// </summary>
-		/// <param name="listenerObject">Listener</param>
-		public void RegistAnimationEventListener(MonoBehaviour listenerObject)
-		{
-			_optAnimEventListener = listenerObject;
-		}
+
+		// [ Play Manager / Is Playing ]
 
 		/// <summary>
 		/// Animation PlayManager
@@ -5179,6 +9145,19 @@ namespace AnyPortrait
 
 
 
+		// [ Listener ]
+
+		/// <summary>
+		/// Register the listener object to receive animation events. It must be a class inherited from MonoBehaviour.
+		/// </summary>
+		/// <param name="listenerObject">Listener</param>
+		public void RegistAnimationEventListener(MonoBehaviour listenerObject)
+		{
+			_optAnimEventListener = listenerObject;
+		}
+
+
+		// [ Speed ]
 
 		/// <summary>
 		/// Sets the speed of the animation.
@@ -5206,6 +9185,10 @@ namespace AnyPortrait
 		{
 			_animPlayManager.ResetAnimSpeed();
 		}
+
+
+
+		// [ Get Animation Play Data ]
 
 		/// <summary>
 		/// Returns a list of AnimPlayData instances with animation information.
@@ -5286,9 +9269,44 @@ namespace AnyPortrait
 		}
 
 
+		//v1.5.2
+		/// <summary>
+		/// Returns the total length of the animation in seconds.
+		/// This value is not affected by playback speed.
+		/// Return -1 if there is no target animation clip.
+		/// </summary>
+		/// <param name="animClipName">Animation Clip Name</param>
+		public float GetAnimationTimeLength(string animClipName)
+		{
+			return _animPlayManager.GetAnimationTimeLength(animClipName);
+		}
 
-		//추가 3.6 : 타임라인 관련 함수들
-		// 외부 제어 함수들 - 주로 Timeline
+		/// <summary>
+		/// Returns the total length of the animation in seconds.
+		/// This value changes depending on the playback speed.
+		/// If the target animation clip does not exist or its playback speed is 0, -1 is returned.
+		/// </summary>
+		/// <param name="animClipName">Animation Clip Name</param>
+		public float GetAnimationDuration(string animClipName)
+		{
+			return _animPlayManager.GetAnimationDuration(animClipName);
+		}
+
+		/// <summary>
+		/// Returns whether the animation is looping.
+		/// </summary>
+		/// <param name="animClipName">Animation Clip Name</param>
+		public bool IsAnimationLoop(string animClipName)
+		{
+			return _animPlayManager.IsAnimationLoop(animClipName);
+		}
+
+
+
+		//-----------------------------------------------------------------
+		// Timeline
+		//-----------------------------------------------------------------
+
 #if UNITY_2017_1_OR_NEWER
 		/// <summary>
 		/// Connect the Timeline to apPortrait.
@@ -5342,377 +9360,9 @@ namespace AnyPortrait
 #endif
 
 
-		//---------------------------------------------------------------------------------------
-		// apPortrait의 외부 노출 함수에서 초기화 안된 경우 안내문 보여주기 (에디터만)
-		//---------------------------------------------------------------------------------------
-
-#if UNITY_EDITOR
-		//v1.4.7 : 초기화 전에 실행했다면 에러 원인에 대한 로그를 보여주자
-		private void ShowErrorMsgIfNotInitialized_Editor(Exception ex)
-		{	
-			if(InitializationStatus != INIT_STATUS.Completed)
-			{
-				Debug.LogWarning("AnyPortrait : An error occurred because the function was called before [Initialization].\n"
-								+ "Please call the Initialize() function directly or try again after initialization (approx. 1 frame).\n"
-								+ "Please check the manual for more details.\n"
-								+ "( https://rainyrizzle.github.io/en/AdvancedManual/AD_InitializeScript.html )", this.gameObject);
-			}
-			Debug.LogException(ex, this.gameObject);
-		}
-#endif
-		//---------------------------------------------------------------------------------------
-		// 물리 제어
-		//---------------------------------------------------------------------------------------
-		/// <summary>
-		/// Initialize all forces and physical effects by touch.
-		/// This function is equivalent to executing "ClearForce()" and "ClearTouch()" together.
-		/// </summary>
-		public void ClearForceAndTouch()
-		{
-			_forceManager.ClearAll();
-		}
-
-		/// <summary>Initialize all physical forces.</summary>
-		public void ClearForce()
-		{
-			_forceManager.ClearForce();
-		}
-
-		/// <summary>
-		/// Remove the target force.
-		/// </summary>
-		/// <param name="forceUnit">The target force you want to remove</param>
-		public void RemoveForce(apForceUnit forceUnit)
-		{
-			_forceManager.RemoveForce(forceUnit);
-		}
-
-
-
-
-		/// <summary>
-		/// Adds force applied radially at a specific point.
-		/// </summary>
-		/// <param name="pointPosW">Center position of force in world space</param>
-		/// <param name="radius">Radius to which force is applied</param>
-		/// <returns>Applied force information</returns>
-		public apForceUnit AddForce_Point(Vector2 pointPosW, float radius)
-		{
-			return _forceManager.AddForce_Point(pointPosW, radius);
-		}
-
-		/// <summary>
-		/// Add force with direction.
-		/// </summary>
-		/// <param name="directionW">Direction vector</param>
-		/// <returns>Applied force information</returns>
-		public apForceUnit AddForce_Direction(Vector2 directionW)
-		{
-			return _forceManager.AddForce_Direction(directionW);
-		}
-
-		/// <summary>
-		/// Add a force that changes direction periodically.
-		/// </summary>
-		/// <param name="directionW">Direction vector</param>
-		/// <param name="waveSizeX">How much the direction changes on the X axis</param>
-		/// <param name="waveSizeY">How much the direction changes on the Y axis</param>
-		/// <param name="waveTimeX">The time the force changes on the X axis</param>
-		/// <param name="waveTimeY">The time the force changes on the Y axis</param>
-		/// <returns>Applied force information</returns>
-		public apForceUnit AddForce_Direction(Vector2 directionW, float waveSizeX, float waveSizeY, float waveTimeX, float waveTimeY)
-		{
-			return _forceManager.AddForce_Direction(directionW, new Vector2(waveSizeX, waveSizeY), new Vector2(waveTimeX, waveTimeY));
-		}
-
-		/// <summary>
-		/// Is any force being applied?
-		/// </summary>
-		public bool IsAnyForceEvent
-		{
-			get { return _forceManager.IsAnyForceEvent; }
-		}
-
-		/// <summary>
-		/// The force applied at the requested position is calculated
-		/// </summary>
-		/// <param name="targetPosW">Position in world space</param>
-		/// <returns>Calculated Force</returns>
-		public Vector2 GetForce(Vector2 targetPosW)
-		{
-			return _forceManager.GetForce(targetPosW);
-		}
-
-		/// <summary>
-		/// Add a physics effect to pull meshes using the touch.
-		/// </summary>
-		/// <param name="posW">First touch position in world space</param>
-		/// <param name="radius">Radius of pulling force</param>
-		/// <returns>Added touch information with "TouchID"</returns>
-		public apPullTouch AddTouch(Vector2 posW, float radius)
-		{
-			return _forceManager.AddTouch(posW, radius);
-		}
-
-		/// <summary>Initialize all physical forces by touch.</summary>
-		public void ClearTouch()
-		{
-			_forceManager.ClearTouch();
-		}
-
-		/// <summary>
-		/// Removes physical effects by touch with the requested ID.
-		/// </summary>
-		/// <param name="touchID">Touch ID</param>
-		public void RemoveTouch(int touchID)
-		{
-			_forceManager.RemoveTouch(touchID);
-		}
-
-		/// <summary>
-		/// Removes physical effects by touch with the requested Data.
-		/// </summary>
-		/// <param name="touchID">Touch Data</param>
-		public void RemoveTouch(apPullTouch touch)
-		{
-			_forceManager.RemoveTouch(touch);
-		}
-
-		/// <summary>
-		/// Returns a physical effect by touch with the requested ID.
-		/// </summary>
-		/// <param name="touchID">Touch ID</param>
-		/// <returns>Requested touch information (return null if touchID is not valid)</returns>
-		public apPullTouch GetTouch(int touchID)
-		{
-			return _forceManager.GetTouch(touchID);
-		}
-
-		/// <summary>
-		/// Update the position of the added touch.
-		/// </summary>
-		/// <param name="touchID">Touch ID</param>
-		/// <param name="posW">World Position</param>
-		public void SetTouchPosition(int touchID, Vector2 posW)
-		{
-			_forceManager.SetTouchPosition(touchID, posW);
-		}
-
-		/// <summary>
-		/// Update the position of the added touch.
-		/// </summary>
-		/// <param name="touch">Added Touch information</param>
-		/// <param name="posW">World Position</param>
-		public void SetTouchPosition(apPullTouch touch, Vector2 posW)
-		{
-			_forceManager.SetTouchPosition(touch, posW);
-		}
-
-		/// <summary>
-		/// Is any force by touch being applied?
-		/// </summary>
-		public bool IsAnyTouchEvent { get { return _forceManager.IsAnyTouchEvent; } }
-
-		/// <summary>
-		/// [Please do not use it] Temporary code used for touch calculations
-		/// </summary>
-		public int TouchProcessCode { get { return _forceManager.TouchProcessCode; } }
-
-
-
-		//--------------------------------------------------------------------------------------
-		// Control Param 제어 요청
-		//--------------------------------------------------------------------------------------
-		/// <summary>
-		/// Set the value of the Control Parameter with an "Integer" value.
-		/// </summary>
-		/// <param name="controlParamName">Name of the target Control Parameter</param>
-		/// <param name="intValue">Integer Value</param>
-		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamInt(string controlParamName, int intValue, float overlapWeight = 1.0f)
-		{
-			apControlParam controlParam = GetControlParam(controlParamName);
-			if (controlParam == null)
-			{ return false; }
-
-			controlParam.RequestSetValueInt(intValue, overlapWeight);
-
-			//controlParam._int_Cur = intValue;
-			////if(controlParam._isRange)
-			//{
-			//	controlParam._int_Cur = Mathf.Clamp(controlParam._int_Cur, controlParam._int_Min, controlParam._int_Max);
-			//}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Set the value of the Control Parameter with an "Float" value.
-		/// </summary>
-		/// <param name="controlParamName">Name of the target Control Parameter</param>
-		/// <param name="floatValue">Float Value</param>
-		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamFloat(string controlParamName, float floatValue, float overlapWeight = 1.0f)
-		{
-			apControlParam controlParam = GetControlParam(controlParamName);
-			if (controlParam == null)
-			{ return false; }
-
-			controlParam.RequestSetValueFloat(floatValue, overlapWeight);
-
-			//controlParam._float_Cur = floatValue;
-			////if(controlParam._isRange)
-			//{
-			//	controlParam._float_Cur = Mathf.Clamp(controlParam._float_Cur, controlParam._float_Min, controlParam._float_Max);
-			//}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Set the value of the Control Parameter with an "Vector2" value.
-		/// </summary>
-		/// <param name="controlParamName">Name of the target Control Parameter</param>
-		/// <param name="vec2Value">Vector2 Value</param>
-		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamVector2(string controlParamName, Vector2 vec2Value, float overlapWeight = 1.0f)
-		{
-			apControlParam controlParam = GetControlParam(controlParamName);
-			if (controlParam == null)
-			{ return false; }
-
-			controlParam.RequestSetValueVector2(vec2Value, overlapWeight);
-
-			//controlParam._vec2_Cur = vec2Value;
-			////if(controlParam._isRange)
-			//{
-			//	controlParam._vec2_Cur.x = Mathf.Clamp(controlParam._vec2_Cur.x, controlParam._vec2_Min.x, controlParam._vec2_Max.x);
-			//	controlParam._vec2_Cur.y = Mathf.Clamp(controlParam._vec2_Cur.y, controlParam._vec2_Min.y, controlParam._vec2_Max.y);
-			//}
-
-			return true;
-		}
-
-
-		/// <summary>
-		/// Set the value of the Control Parameter with an "Integer" value.
-		/// </summary>
-		/// <param name="controlParam">Tareget Control Parameter</param>
-		/// <param name="intValue">Integer Value</param>
-		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamInt(apControlParam controlParam, int intValue, float overlapWeight = 1.0f)
-		{
-			if (controlParam == null)
-			{ return false; }
-
-			controlParam.RequestSetValueInt(intValue, overlapWeight);
-
-			//controlParam._int_Cur = intValue;
-			////if(controlParam._isRange)
-			//{
-			//	controlParam._int_Cur = Mathf.Clamp(controlParam._int_Cur, controlParam._int_Min, controlParam._int_Max);
-			//}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Set the value of the Control Parameter with an "Float" value.
-		/// </summary>
-		/// <param name="controlParam">Target Control Parameter</param>
-		/// <param name="floatValue">Float Value</param>
-		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamFloat(apControlParam controlParam, float floatValue, float overlapWeight = 1.0f)
-		{
-			if (controlParam == null)
-			{ return false; }
-
-			controlParam.RequestSetValueFloat(floatValue, overlapWeight);
-
-			//controlParam._float_Cur = floatValue;
-			////if(controlParam._isRange)
-			//{
-			//	controlParam._float_Cur = Mathf.Clamp(controlParam._float_Cur, controlParam._float_Min, controlParam._float_Max);
-			//}
-
-			return true;
-		}
-
-
-		/// <summary>
-		/// Set the value of the Control Parameter with an "Vector2" value.
-		/// </summary>
-		/// <param name="controlParam">Target Control Parameter</param>
-		/// <param name="vec2Value">Vector2 Value</param>
-		/// <param name="overlapWeight">The degree to which the value is applied (0.0 ~ 1.0)</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamVector2(apControlParam controlParam, Vector2 vec2Value, float overlapWeight = 1.0f)
-		{
-			if (controlParam == null)
-			{ return false; }
-
-			controlParam.RequestSetValueVector2(vec2Value, overlapWeight);
-
-			//controlParam._vec2_Cur = vec2Value;
-			////if(controlParam._isRange)
-			//{
-			//	controlParam._vec2_Cur.x = Mathf.Clamp(controlParam._vec2_Cur.x, controlParam._vec2_Min.x, controlParam._vec2_Max.x);
-			//	controlParam._vec2_Cur.y = Mathf.Clamp(controlParam._vec2_Cur.y, controlParam._vec2_Min.y, controlParam._vec2_Max.y);
-			//}
-
-			return true;
-		}
-
-
-		/// <summary>
-		/// Is there a parameter with the requested name?
-		/// </summary>
-		/// <param name="controlParamName">Name of Control Parameter</param>
-		/// <returns></returns>
-		public bool IsControlParamExist(string controlParamName)
-		{
-			return GetControlParam(controlParamName) != null;
-		}
-
-		/// <summary>
-		/// Restores the value of the parameter to its default value.
-		/// </summary>
-		/// <param name="controlParamName">Name of Control Parameter</param>
-		/// <returns>If the requested parameter is not found, it returns false.</returns>
-		public bool SetControlParamDefaultValue(string controlParamName)
-		{
-			apControlParam controlParam = GetControlParam(controlParamName);
-			if (controlParam == null)
-			{ return false; }
-
-			switch (controlParam._valueType)
-			{
-				case apControlParam.TYPE.Int:
-					controlParam._int_Cur = controlParam._int_Def;
-					break;
-
-				case apControlParam.TYPE.Float:
-					controlParam._float_Cur = controlParam._float_Def;
-					break;
-
-				case apControlParam.TYPE.Vector2:
-					controlParam._vec2_Cur = controlParam._vec2_Def;
-					break;
-			}
-
-			return true;
-		}
-
-
-		//--------------------------------------------------------------------------------------------------
-		// Bone Transform 요청 (Rotation, Scale, Position-IK, LookAt)
-		// 요청된 Bone을 검색하는 기능도 추가하고, 한번 검색된 Bone은 별도의 리스트로 넣어서 관리하자
-		//--------------------------------------------------------------------------------------------------
+		//--------------------------------------------------------------------
+		// Bone
+		//--------------------------------------------------------------------
 		/// <summary>
 		/// Returns the Bone with the requested name.
 		/// (It first searches for the currently executing Root Unit, and returns the bones retrieved from all Root Units.)
@@ -6294,9 +9944,11 @@ namespace AnyPortrait
 														maxSurfacePosition,
 														constraintSurface, space);
 		}
-		//-------------------------------------------------------------------------------------------------------
-		// OptTransform에 대한 참조/제어
-		//-------------------------------------------------------------------------------------------------------
+
+
+		//----------------------------------------------------------------
+		// Transform (Mesh / MeshGroup)
+		//----------------------------------------------------------------
 		/// <summary>
 		/// Find the Optimized Transform and return it.
 		/// </summary>
@@ -6345,6 +9997,8 @@ namespace AnyPortrait
 
 			return null;
 		}
+
+
 
 		/// <summary>
 		/// Returns the socket of the Optimized Transform.
@@ -6533,11 +10187,13 @@ namespace AnyPortrait
 
 
 
-		//-------------------------------------------------------------------------------------------------------
-		// 텍스쳐 교체. 
-		// Opt Transform 하나만 바꾸거나
-		// 전체 Atlas를 교체한다.
-		//-------------------------------------------------------------------------------------------------------
+
+
+
+		//-----------------------------------------------------------
+		// Material of Meshes
+		//-----------------------------------------------------------
+
 		/// <summary>
 		/// Find and return the texture applied to Opt-Meshes.
 		/// </summary>
@@ -6995,10 +10651,6 @@ namespace AnyPortrait
 		}
 
 
-
-
-
-
 		/// <summary>
 		/// Change the color's alpha of the shader in a batch.
 		/// </summary>
@@ -7417,59 +11069,9 @@ namespace AnyPortrait
 #endif
 		}
 
-		/// <summary>
-		/// Initialize all Command Buffers for clipping mask processing.
-		/// </summary>
-		public void CleanUpMeshesCommandBuffers()
-		{
-			int nOptMeshes = _optMeshes != null ? _optMeshes.Count : 0;
-			if(nOptMeshes > 0)
-			{
-				for (int i = 0; i < nOptMeshes; i++)
-				{
-					_optMeshes[i].ClearCameraData();
-				}
-			}
-		}
+		
 
-		/// <summary>
-		/// Initialize or re-register all Command Buffers for clipping mask processing.
-		/// </summary>
-		/// <param name="isOnlyActiveRootUnit">If True, all Command Buffers of Root Units except the currently executing are initialized. If false, re-register the buffers of all Root Units.</param>
-		public void ResetMeshesCommandBuffers(bool isOnlyActiveRootUnit)
-		{
-			if (isOnlyActiveRootUnit)
-			{
-				// [ 활성화된 루트 유닛만 갱신 ]
-				//RootUnit 단위로 Reset을 한다. ]
-				int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
-				apOptRootUnit rootUnit = null;
-				if(nRootUnits > 0)
-				{
-					for (int i = 0; i < nRootUnits; i++)
-					{
-						rootUnit = _optRootUnitList[i];
-						bool isRegistToCamera = (rootUnit == _curPlayingOptRootUnit);
-						ResetMeshCommandBuffer(rootUnit, isRegistToCamera);
-					}
-				}
-				
-			}
-			else
-			{
-				// [ 모든 Opt Mesh 대상으로 갱신 ]				
-				int nOptMeshes = _optMeshes != null ? _optMeshes.Count : 0;
-				if(nOptMeshes > 0)
-				{
-					for (int i = 0; i < nOptMeshes; i++)
-					{
-						_optMeshes[i].ResetMaskParentSetting();
-					}
-				}
-				
-			}
-
-		}
+		
 
 		/// <summary>
 		/// Set the main texture of the Opt-Mesh.
@@ -7818,10 +11420,7 @@ namespace AnyPortrait
 #endif
 		}
 
-
-
-
-
+		
 
 		/// <summary>
 		/// Set the texture property of the Opt-Mesh.
@@ -8083,8 +11682,7 @@ namespace AnyPortrait
 		}
 
 
-
-
+		
 
 
 		/// <summary>
@@ -8260,9 +11858,7 @@ namespace AnyPortrait
 		}
 
 
-
-
-
+		
 
 		/// <summary>
 		/// Set the color's alpha property of the Opt-Mesh.
@@ -8766,6 +12362,7 @@ namespace AnyPortrait
 #endif
 		}
 
+		
 
 		/// <summary>
 		/// Set the Vector4 property of the Opt-Mesh.
@@ -9006,6 +12603,10 @@ namespace AnyPortrait
 #endif
 		}
 
+		
+
+
+
 		//[v1.4.5] SetMeshCustomTextureScale(str propName)의 오버로드 추가
 		/// <summary>
 		/// Set the TextureScale property of the Opt-Mesh.
@@ -9067,199 +12668,7 @@ namespace AnyPortrait
 
 
 
-
-
-
-		/// <summary>
-		/// Show Opt-Mesh
-		/// </summary>
-		/// <param name="optTransform">Opt-Transform with the target Opt-Mesh</param>
-		public void ShowMesh(apOptTransform optTransform)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (optTransform == null || optTransform._childMesh == null) { return; }
-				optTransform._childMesh.SetHideForce(false);
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-		/// <summary>
-		/// Show Opt-Mesh
-		/// </summary>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		public void ShowMesh(string transformName)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				apOptTransform optTransform = GetOptTransform(transformName);
-				if (optTransform == null || optTransform._childMesh == null) { return; }
-				optTransform._childMesh.SetHideForce(false);
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-		/// <summary>
-		/// Show Opt-Mesh
-		/// </summary>
-		/// <param name="rootUnitIndex">Root Unit Index</param>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		public void ShowMesh(int rootUnitIndex, string transformName)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				apOptTransform optTransform = GetOptTransform(rootUnitIndex, transformName);
-				if (optTransform == null || optTransform._childMesh == null) { return; }
-				optTransform._childMesh.SetHideForce(false);
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-		/// <summary>
-		/// Hide Opt-Mesh
-		/// </summary>
-		/// <param name="optTransform">Opt-Transform with the target Opt-Mesh</param>
-		public void HideMesh(apOptTransform optTransform)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				if (optTransform == null || optTransform._childMesh == null) { return; }
-				optTransform._childMesh.SetHideForce(true);
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-		/// <summary>
-		/// Hide Opt-Mesh
-		/// </summary>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		public void HideMesh(string transformName)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				apOptTransform optTransform = GetOptTransform(transformName);
-				if (optTransform == null || optTransform._childMesh == null) { return; }
-				optTransform._childMesh.SetHideForce(true);
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
-		/// <summary>
-		/// Hide Opt-Mesh
-		/// </summary>
-		/// <param name="rootUnitIndex">Root Unit Index</param>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		public void HideMesh(int rootUnitIndex, string transformName)
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				apOptTransform optTransform = GetOptTransform(rootUnitIndex, transformName);
-				if (optTransform == null || optTransform._childMesh == null) { return; }
-				optTransform._childMesh.SetHideForce(true);
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-		/// <summary>
-		/// Hide Portrait (All Root Units)
-		/// </summary>
-		public void Hide()
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				HideRootUnits();
-
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-		/// <summary>
-		/// Show Portrait (A default Root Unit)
-		/// </summary>
-		public void Show()
-		{
-#if UNITY_EDITOR
-			try
-			{
-#endif
-				ShowRootUnit();
-#if UNITY_EDITOR
-			}
-			catch(Exception ex)
-			{
-				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
-				ShowErrorMsgIfNotInitialized_Editor(ex);
-				throw;
-			}
-#endif
-		}
-
-
+		
 
 		/// <summary>
 		/// Set alpha for all meshes (main color)
@@ -9587,6 +12996,7 @@ namespace AnyPortrait
 		}
 
 
+		
 
 		/// <summary>
 		/// Set Float Property of shader for all meshes
@@ -9784,3627 +13194,9 @@ namespace AnyPortrait
 
 
 
-
-
-
-
-		//Added 3.22 (1.0.2)
-		//Sorting Order Features
-		/// <summary>
-		/// Set the Sorting Layer.
-		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
-		/// </summary>
-		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
-		public void SetSortingLayer(string sortingLayerName)
-		{
-			//이름으로부터 SortingLayerID를 찾자
-			if (SortingLayer.layers == null || SortingLayer.layers.Length == 0)
-			{
-				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. There is no SortingLayer is this project.");
-				return;
-			}
-			int targetSortingLayerID = -1;
-			bool isTargetSortingLayerFound = false;
-			for (int i = 0; i < SortingLayer.layers.Length; i++)
-			{
-				if (string.Equals(SortingLayer.layers[i].name, sortingLayerName))
-				{
-					isTargetSortingLayerFound = true;
-					targetSortingLayerID = SortingLayer.layers[i].id;
-					break;
-				}
-			}
-			//못찾았다.
-			if (!isTargetSortingLayerFound)
-			{
-				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. Could not find layer with requested name. <" + sortingLayerName + ">");
-				return;
-			}
-
-			//Sorting Layer 적용
-			_sortingLayerID = targetSortingLayerID;
-			for (int i = 0; i < _optMeshes.Count; i++)
-			{
-				_optMeshes[i].SetSortingLayer(sortingLayerName, _sortingLayerID);
-			}
-		}
-
-		/// <summary>
-		/// Set the Sorting Order
-		/// </summary>
-		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
-		public void SetSortingOrder(int sortingOrder)
-		{
-			_sortingOrder = sortingOrder;
-			for (int i = 0; i < _optMeshes.Count; i++)
-			{
-				_optMeshes[i].SetSortingOrder(sortingOrder);
-			}
-		}
-
-
-
-
-		/// <summary>
-		/// Changes the Sorting Layer of the specified OptTransform.
-		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
-		/// </summary>
-		/// <param name="optTransform">Target OptTransform</param>
-		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
-		public void SetSortingLayer(apOptTransform optTransform, string sortingLayerName)
-		{
-			//이름으로부터 SortingLayerID를 찾자
-			if (SortingLayer.layers == null || SortingLayer.layers.Length == 0)
-			{
-				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. There is no SortingLayer is this project.");
-				return;
-			}
-			if (optTransform == null || optTransform._childMesh == null)
-			{
-				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. OptTransform is null or it does not have a mesh.");
-				return;
-			}
-			int targetSortingLayerID = -1;
-			bool isTargetSortingLayerFound = false;
-			for (int i = 0; i < SortingLayer.layers.Length; i++)
-			{
-				if (string.Equals(SortingLayer.layers[i].name, sortingLayerName))
-				{
-					isTargetSortingLayerFound = true;
-					targetSortingLayerID = SortingLayer.layers[i].id;
-					break;
-				}
-			}
-			//못찾았다.
-			if (!isTargetSortingLayerFound)
-			{
-				Debug.LogError("AnyPortrait : SetSortingLayer() Failed. Could not find layer with requested name. <" + sortingLayerName + ">");
-				return;
-			}
-
-			//Sorting Layer 적용
-			optTransform._childMesh.SetSortingLayer(sortingLayerName, targetSortingLayerID);
-		}
-
-		/// <summary>
-		/// Changes the Sorting Layer of the specified OptTransform.
-		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
-		/// </summary>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
-		public void SetSortingLayer(string transformName, string sortingLayerName)
-		{
-			SetSortingLayer(GetOptTransform(transformName), sortingLayerName);
-		}
-
-		/// <summary>
-		/// Changes the Sorting Layer of the specified OptTransform.
-		/// Use the name of the sorting layer set in the "Tags and Layers Manager" of the Unity project.
-		/// </summary>
-		/// <param name="rootUnitIndex">Root Unit Index</param>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		/// <param name="sortingLayerName">Layer Name in Sorting Layers</param>
-		public void SetSortingLayer(int rootUnitIndex, string transformName, string sortingLayerName)
-		{
-			SetSortingLayer(GetOptTransform(rootUnitIndex, transformName), sortingLayerName);
-		}
-
-		/// <summary>
-		/// Set the Sorting Order of the specified OptTransform.
-		/// </summary>
-		/// <param name="optTransform">Target OptTransform</param>
-		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
-		public void SetSortingOrder(apOptTransform optTransform, int sortingOrder)
-		{
-			if (optTransform == null || optTransform._childMesh == null)
-			{
-				Debug.LogError("AnyPortrait : SetSortingOrder() Failed. OptTransform is null or it does not have a mesh.");
-				return;
-			}
-
-			_sortingOrder = sortingOrder;
-			optTransform._childMesh.SetSortingOrder(sortingOrder);
-		}
-
-		/// <summary>
-		/// Set the Sorting Order of the specified OptTransform.
-		/// </summary>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
-		public void SetSortingOrder(string transformName, int sortingOrder)
-		{
-			SetSortingOrder(GetOptTransform(transformName), sortingOrder);
-		}
-
-		/// <summary>
-		/// Set the Sorting Order of the specified OptTransform.
-		/// </summary>
-		/// <param name="rootUnitIndex">Root Unit Index</param>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		/// <param name="sortingOrder">Sorting Order (Default is 0)</param>
-		public void SetSortingOrder(int rootUnitIndex, string transformName, int sortingOrder)
-		{
-			SetSortingOrder(GetOptTransform(rootUnitIndex, transformName), sortingOrder);
-		}
-
-
-		/// <summary>
-		/// Get Name of Sorting Layer
-		/// If Failed, "Unknown Layer" is returned
-		/// </summary>
-		/// <returns></returns>
-		public string GetSortingLayerName()
-		{
-			if (SortingLayer.layers == null || SortingLayer.layers.Length == 0)
-			{
-				return "Unknown Layer";
-			}
-
-			for (int i = 0; i < SortingLayer.layers.Length; i++)
-			{
-				if (SortingLayer.layers[i].id == _sortingLayerID)
-				{
-					return SortingLayer.layers[i].name;
-				}
-			}
-
-			return "Unknown Layer";
-		}
-
-		/// <summary>
-		/// Get Sorting Order
-		/// </summary>
-		/// <returns></returns>
-		public int GetSortingOrder()
-		{
-			return _sortingOrder;
-		}
-
-
-		//추가 21.1.31
-		/// <summary>
-		/// Get the Sorting Order of the specified OptTransform.
-		/// </summary>
-		/// <param name="optTransform">Target OptTransform</param>
-		/// <returns>Sorting Order value. -1 is returned if the requested OptTransform does not exist or does not have a mesh.</returns>
-		public int GetSortingOrder(apOptTransform optTransform)
-		{
-			if (optTransform == null)
-			{
-				Debug.LogError("AnyPortrait : GetSortingOrder() Failed. The OptTransform entered as an argument is null.");
-				return -1;
-			}
-			if (optTransform._childMesh == null)
-			{
-				Debug.LogError("AnyPortrait : GetSortingOrder() Failed. The requested OptTransform does not have a mesh.");
-				return -1;
-			}
-			return optTransform._childMesh.GetSortingOrder();
-		}
-
-		/// <summary>
-		/// Get the Sorting Order of the specified OptTransform.
-		/// </summary>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		/// <returns>Sorting Order value. -1 is returned if the requested OptTransform does not exist or does not have a mesh.</returns>
-		public int GetSortingOrder(string transformName)
-		{
-			return GetSortingOrder(GetOptTransform(transformName));
-		}
-
-		/// <summary>
-		/// Get the Sorting Order of the specified OptTransform.
-		/// </summary>
-		/// <param name="rootUnitIndex">Root Unit Index</param>
-		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
-		/// <returns>Sorting Order value. -1 is returned if the requested OptTransform does not exist or does not have a mesh.</returns>
-		public int GetSortingOrder(int rootUnitIndex, string transformName)
-		{
-			return GetSortingOrder(GetOptTransform(rootUnitIndex, transformName));
-		}
-
-
-
-
-
-		//추가 19.8.19
-		//Sorting Order Option에 관련된 함수들 추가
-		/// <summary>
-		/// Set whether the [Sorting Order] of the meshes will be changed automatically.
-		/// This function works only when the value of [Sorting Order Option] of apPortrait is [Depth To Order] or [Reverse Depth To Order].
-		/// </summary>
-		/// <param name="isEnabled">Whether the sorting order is automatically updated (Default is true)</param>
-		public void SetSortingOrderChangedAutomatically(bool isEnabled)
-		{
-			if (_optRootUnitList == null)
-			{
-				return;
-			}
-
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				_optRootUnitList[i].SetSortingOrderChangedAutomatically(isEnabled);
-			}
-		}
-
-#if UNITY_EDITOR
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void RefreshSortingOrderByDepth()
-		{
-			if (_optRootUnitList == null)
-			{
-				return;
-			}
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				_optRootUnitList[i].RefreshSortingOrderByDepth();
-			}
-		}
-
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void ApplySortingOptionToOptRootUnits()
-		{
-			if (_optRootUnitList == null)
-			{
-				return;
-			}
-			for (int i = 0; i < _optRootUnitList.Count; i++)
-			{
-				_optRootUnitList[i].SetSortingOrderOption(_sortingOrderOption, _sortingOrderPerDepth);
-			}
-		}
-#endif
-
-		//-------------------------------------------------------------------------------------------------------
-		// 업데이트 관련 처리
-		//-------------------------------------------------------------------------------------------------------
-		/// <summary>
-		/// If the "Important" setting is True, the physics effect and animation are activated and updated every frame.
-		/// </summary>
-		/// <param name="isImportant"></param>
-		public void SetImportant(bool isImportant)
-		{
-			if (_isImportant != isImportant)
-			{
-				_isImportant = isImportant;
-			}
-		}
-
-		/// <summary>
-		/// If the "Important" option is off, the character is executed according to the specified FPS or lower.
-		/// </summary>
-		/// <param name="fps"></param>
-		public void SetFPSForNotImportant(int fps)
-		{
-			_FPS = fps;
-		}
-
-
-		//v1.4.5 추가 : 메시 갱신 빈도
-		/// <summary>
-		/// Set the meshes to be updated Every Frame. The animation plays smoothly. (default)
-		/// </summary>
-		public void SetUpdateMeshesEveryFrame()
-		{
-			_meshRefreshRateOption = MESH_UPDATE_FREQUENCY.EveryFrames;			
-		}
-
-		/// <summary>
-		/// Set the meshes to be updated at regular intervals. Enter the update frequency as FPS.
-		/// </summary>
-		/// <param name="fps">Frames per second, which refers to the update frequency. Please enter a value between 1 and 30.</param>
-		/// <param name="isSyncUpdate">If True, it updates at the same frame as other characters with the same FPS settings.</param>
-		public void SetUpdateMeshesPerTime(int fps, bool isSyncUpdate)
-		{
-			if(isSyncUpdate)
-			{
-				_meshRefreshRateOption = MESH_UPDATE_FREQUENCY.FixedFrames_Sync;
-			}
-			else
-			{
-				_meshRefreshRateOption = MESH_UPDATE_FREQUENCY.FixedFrames_NotSync;
-			}
-			_meshRefreshRateFPS = fps;
-			//Min ~ Max 사이 값으로 설정하자
-			if(_meshRefreshRateFPS < MESH_REFRESH_FPS_MIN)
-			{
-				_meshRefreshRateFPS = MESH_REFRESH_FPS_MIN;
-			}
-			else if(_meshRefreshRateFPS > MESH_REFRESH_FPS_MAX)
-			{
-				_meshRefreshRateFPS = MESH_REFRESH_FPS_MAX;
-			}
-		}
-
-
-		// 초기화
-		//-------------------------------------------------------------------------------------------------------
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void ReadyToEdit()
-		{
-			//ID리셋 / 텍스쳐 준비 / Null 메시 삭제
-			ReadyToEdit_Step1();
-
-			//메시 준비
-			ReadyToEdit_Step2();
-
-			//메시 그룹 기본 연결
-			ReadyToEdit_Step3();
-
-			//클리핑 레이어 연결
-			ReadyToEdit_Step4();
-
-			//부모-자식 메시 그룹 연결 / Bone 준비
-			ReadyToEdit_Step5();
-
-			//Render Unit 연결
-			ReadyToEdit_Step6();
-
-			//Anim Clip 준비
-			ReadyToEdit_Step7();
-
-			//모디파이어 준비 (LinkAndRefreshInEditor)
-			ReadyToEdit_Step8();
-
-			//Root Unit 연결
-			ReadyToEdit_Step9();
-		}
-
-
-
-
-		// ReadyToStep의 내용들을 각각의 서브 함수들로 분리한다.
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step1()
-		{
-			//ID 리스트 일단 리셋
-			ClearRegisteredUniqueIDs();
-
-			//컨트롤 / 컨트롤 파라미터 리셋
-			_controller.Ready(this);
-			_controller.SetDefaultAll();
-
-
-			for (int iTexture = 0; iTexture < _textureData.Count; iTexture++)
-			{
-				_textureData[iTexture].ReadyToEdit(this);
-			}
-
-			_meshes.RemoveAll(delegate (apMesh a)
-			{
-				return a == null;
-			});
-		}
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step2()
-		{
-			for (int iMeshes = 0; iMeshes < _meshes.Count; iMeshes++)
-			{
-				//내부 MeshComponent들의 레퍼런스를 연결하자
-				_meshes[iMeshes].ReadyToEdit(this);
-
-				//텍스쳐를 연결하자
-				int textureID = -1;
-
-				if (!_meshes[iMeshes].IsTextureDataLinked)//연결이 안된 경우
-				{
-					textureID = _meshes[iMeshes].LinkedTextureDataID;
-					_meshes[iMeshes].SetTextureData(GetTexture(textureID));
-				}
-
-				_meshes[iMeshes].LinkEdgeAndVertex();
-			}
-		}
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step3()
-		{
-			_meshGroups.RemoveAll(delegate (apMeshGroup a)
-			{
-				return a == null;
-			});
-
-
-			//메시 그룹도 비슷하게 해주자
-			//1. 메시/메시 그룹을 먼저 연결
-			//2. Parent-Child는 그 다음에 연결 (Child 먼저 / Parent는 나중에)
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-
-				meshGroup.Init(this);
-
-				//1. Mesh 연결
-				for (int iChild = 0; iChild < meshGroup._childMeshTransforms.Count; iChild++)
-				{
-					meshGroup._childMeshTransforms[iChild].RegistIDToPortrait(this);//추가 : ID를 알려주자
-
-					int childIndex = meshGroup._childMeshTransforms[iChild]._meshUniqueID;
-					if (childIndex >= 0)
-					{
-						apMesh existMesh = GetMesh(childIndex);
-						if (existMesh != null)
-						{
-							meshGroup._childMeshTransforms[iChild]._mesh = existMesh;
-						}
-						else
-						{
-							meshGroup._childMeshTransforms[iChild]._mesh = null;
-						}
-					}
-					else
-					{
-						meshGroup._childMeshTransforms[iChild]._mesh = null;
-					}
-				}
-
-				//1-2. MeshGroup 연결
-				for (int iChild = 0; iChild < meshGroup._childMeshGroupTransforms.Count; iChild++)
-				{
-					meshGroup._childMeshGroupTransforms[iChild].RegistIDToPortrait(this);//추가 : ID를 알려주자
-
-					int childIndex = meshGroup._childMeshGroupTransforms[iChild]._meshGroupUniqueID;
-					if (childIndex >= 0)
-					{
-						apMeshGroup existMeshGroup = GetMeshGroup(childIndex);
-						if (existMeshGroup != null)
-						{
-							meshGroup._childMeshGroupTransforms[iChild]._meshGroup = existMeshGroup;
-						}
-						else
-						{
-							meshGroup._childMeshGroupTransforms[iChild]._meshGroup = null;
-						}
-					}
-					else
-					{
-						meshGroup._childMeshGroupTransforms[iChild]._meshGroup = null;
-					}
-				}
-			}
-
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-
-				//2. 하위 MeshGroup 연결
-				for (int iChild = 0; iChild < meshGroup._childMeshGroupTransforms.Count; iChild++)
-				{
-					apTransform_MeshGroup childMeshGroupTransform = meshGroup._childMeshGroupTransforms[iChild];
-
-					if (childMeshGroupTransform._meshGroupUniqueID >= 0)
-					{
-						apMeshGroup existMeshGroup = GetMeshGroup(childMeshGroupTransform._meshGroupUniqueID);
-						if (existMeshGroup != null)
-						{
-							childMeshGroupTransform._meshGroup = existMeshGroup;
-
-							childMeshGroupTransform._meshGroup._parentMeshGroupID = meshGroup._uniqueID;
-							childMeshGroupTransform._meshGroup._parentMeshGroup = meshGroup;
-
-
-						}
-						else
-						{
-							childMeshGroupTransform._meshGroup = null;
-						}
-					}
-					else
-					{
-						childMeshGroupTransform._meshGroup = null;
-					}
-				}
-
-				//다만, 없어진 Mesh Group은 정리해주자
-				meshGroup._childMeshTransforms.RemoveAll(delegate (apTransform_Mesh a)
-				{
-					return a._mesh == null;
-				});
-				meshGroup._childMeshGroupTransforms.RemoveAll(delegate (apTransform_MeshGroup a)
-				{
-					return a._meshGroup == null;
-				});
-			}
-		}
-
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step4()
-		{
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-
-				//추가) Clipping Layer를 위해서 Mesh Transform끼리 연결을 해준다.
-				for (int iChild = 0; iChild < meshGroup._childMeshTransforms.Count; iChild++)
-				{
-					//연결하기 전에
-					//Child는 초기화해준다.
-					apTransform_Mesh meshTransform = meshGroup._childMeshTransforms[iChild];
-					meshTransform._isClipping_Child = false;
-					meshTransform._clipIndexFromParent = -1;
-					meshTransform._clipParentMeshTransform = null;
-
-					if (meshTransform._clipChildMeshes == null)
-					{
-						meshTransform._clipChildMeshes = new List<apTransform_Mesh.ClipMeshSet>();
-					}
-
-					meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
-					{
-						//조건에 맞지 않는 Clipping Child를 삭제한다.
-						//1. ID가 맞지 않다.
-						//2. MeshGroup에 존재하지 않다.
-						return a._transformID < 0 || (meshGroup.GetMeshTransform(a._transformID) == null);
-					});
-
-
-					//추가 19.6.9 : Material Set 연결
-					if (meshTransform._isUseDefaultMaterialSet)
-					{
-						//Default MatSet을 사용하는 경우
-						meshTransform._linkedMaterialSet = GetDefaultMaterialSet();
-						if (meshTransform._linkedMaterialSet != null)
-						{
-							meshTransform._materialSetID = meshTransform._linkedMaterialSet._uniqueID;
-						}
-					}
-					else
-					{
-						//별도의 MatSet을 설정한 경우
-						if (meshTransform._materialSetID >= 0)
-						{
-							meshTransform._linkedMaterialSet = GetMaterialSet(meshTransform._materialSetID);
-							if (meshTransform._linkedMaterialSet == null)
-							{
-								//존재하지 않는 Material Set
-								meshTransform._materialSetID = -1;
-								//Debug.LogError("Material Set 잘못 연결 후 초기화");
-							}
-						}
-						else
-						{
-							meshTransform._linkedMaterialSet = null;
-						}
-
-						//만약 연결이 안된다면 > Default를 찾아서 무조건 연결한다.
-						if (meshTransform._linkedMaterialSet == null)
-						{
-							meshTransform._linkedMaterialSet = GetDefaultMaterialSet();
-							if (meshTransform._linkedMaterialSet != null)
-							{
-								meshTransform._materialSetID = meshTransform._linkedMaterialSet._uniqueID;
-							}
-						}
-					}
-				}
-
-				for (int iChild = 0; iChild < meshGroup._childMeshTransforms.Count; iChild++)
-				{
-					apTransform_Mesh meshTransform = meshGroup._childMeshTransforms[iChild];
-					if (meshTransform._isClipping_Parent)
-					{
-						//최대 3개의 하위 Mesh를 검색해서 연결한다.
-						//찾은 이후엔 Sort를 해준다.
-
-						for (int iClip = 0; iClip < meshTransform._clipChildMeshes.Count; iClip++)
-						{
-							apTransform_Mesh.ClipMeshSet clipSet = meshTransform._clipChildMeshes[iClip];
-							int childMeshID = clipSet._transformID;
-							apTransform_Mesh childMeshTF = meshGroup.GetMeshTransform(childMeshID);
-							if (childMeshTF != null)
-							{
-								clipSet._meshTransform = childMeshTF;
-								//clipSet._renderUnit = meshGroup.GetRenderUnit(childMeshTF);//삭제 v1.5.0
-							}
-							else
-							{
-								clipSet._meshTransform = null;
-								clipSet._transformID = -1;
-								//clipSet._renderUnit = null;//삭제 v1.5.0
-							}
-						}
-
-						meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
-						{
-							return a._transformID < 0;
-						});
-
-
-					}
-					else
-					{
-						meshTransform._clipChildMeshes.Clear();
-
-
-					}
-
-					meshTransform.SortClipMeshTransforms();
-				}
-
-			}
-		}
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step5()
-		{
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-
-				//2. 상위 MeshGroup 연결
-				int parentUniqueID = meshGroup._parentMeshGroupID;
-				if (parentUniqueID >= 0)
-				{
-					meshGroup._parentMeshGroup = GetMeshGroup(parentUniqueID);
-					if (meshGroup._parentMeshGroup == null)
-					{
-						meshGroup._parentMeshGroupID = -1;
-					}
-				}
-				else
-				{
-					meshGroup._parentMeshGroup = null;
-				}
-			}
-
-			//Bone 연결 
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-
-				//Root 리스트는 일단 날리고 BoneAll 리스트를 돌면서 필요한걸 넣어주자
-				//이후엔 Root -> Child 방식으로 순회
-				meshGroup._boneList_Root.Clear();
-				if (meshGroup._boneList_All != null)
-				{
-					for (int iBone = 0; iBone < meshGroup._boneList_All.Count; iBone++)
-					{
-						apBone bone = meshGroup._boneList_All[iBone];
-
-						//먼저 ID를 ID Manager에 등록한다.
-						RegistUniqueID(apIDManager.TARGET.Bone, bone._uniqueID);
-
-						apBone parentBone = null;
-						if (bone._parentBoneID >= 0)
-						{
-							parentBone = meshGroup.GetBone(bone._parentBoneID);
-						}
-
-						bone.Link(meshGroup, parentBone, this);
-
-						if (parentBone == null)
-						{
-							//Parent가 없다면 Root 본이다.
-							meshGroup._boneList_Root.Add(bone);
-						}
-					}
-
-					//추가 5.9 : Bone의 Check Validation 함수를 호출해야 한다.
-					for (int iBone = 0; iBone < meshGroup._boneList_All.Count; iBone++)
-					{
-						meshGroup._boneList_All[iBone].CheckIKControllerValidation();
-					}
-				}
-
-
-				int curBoneIndex = 0;
-				for (int iRoot = 0; iRoot < meshGroup._boneList_Root.Count; iRoot++)
-				{
-					apBone rootBone = meshGroup._boneList_Root[iRoot];
-					//TODO : MeshGroup이 Transform으로 있는 경우에 Transform Matrix를 넣어줘야한다.
-					rootBone.LinkRecursive(0);
-					curBoneIndex = rootBone.SetBoneIndex(curBoneIndex) + 1;
-				}
-			}
-
-			////본 계층 / IK Chain도 다시 점검
-			//for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			//{
-			//	apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-
-			//}
-		}
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step6()
-		{
-			//Render Unit도 체크해주자
-			//아무 순서대로 하지 말고, Root이 MeshGroup을 찾아서 재귀적으로 한 뒤, 처리되지 못한 MeshGroup을 체크해야한다.
-			//Step5에서 MeshGroup간의 Parent-Child 연결이 완료되었으니 가능하다.
-			List<apMeshGroup> processedMeshGroups = new List<apMeshGroup>();
-
-			//이전
-			//for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			//{
-			//	apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-			//	//meshGroup.SetAllRenderUnitForceUpdate();
-			//	meshGroup.RefreshForce();
-			//	meshGroup.SortRenderUnits(true);
-			//	meshGroup.SortBoneListByLevelAndDepth();
-			//}
-
-			//변경 v1.4.2 : 루트 메시 그룹을 중심으로 재귀적으로 호출하자 (Sort RenderUnit 특성상)
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-				if(meshGroup._parentMeshGroup == null)
-				{
-					//루트 메시 그룹에 대해서만 재귀 함수 호출
-					ReadyToEdit_RefrestMeshGroupRecursive(meshGroup, meshGroup, processedMeshGroups);
-				}
-			}
-
-			//다시 돌면서, 처리되지 않은 나머지 메시 그룹을 찾아서 처리하자
-			for (int iMeshGroup = 0; iMeshGroup < _meshGroups.Count; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-				if(processedMeshGroups.Contains(meshGroup))
-				{
-					//이미 처리가 되었다.
-					continue;
-				}
-
-				//누락된 메시 그룹에 대해서도 호출
-				ReadyToEdit_RefrestMeshGroupRecursive(meshGroup, meshGroup._parentMeshGroup != null ? meshGroup._parentMeshGroup : meshGroup, processedMeshGroups);
-			}
-		}
-
-		//추가 v1.4.2 : 초기화시 메시 그룹의 Refresh/SortRenderUnit을 호출할 때, 그냥하는게 아니라 재귀적으로 하도록
-		private void ReadyToEdit_RefrestMeshGroupRecursive(apMeshGroup curMeshGroup, apMeshGroup rootMeshGroup, List<apMeshGroup> processedList)
-		{
-			if (curMeshGroup == null)
-			{
-				return;
-			}
-
-			curMeshGroup.SetDirtyToReset();//추가 1.4.2 : 초기화시 Reset 플래그를 올리자
-			curMeshGroup.RefreshForce();
-			if(curMeshGroup._parentMeshGroup == null || curMeshGroup == rootMeshGroup)
-			{
-				//이게 루트 메시 그룹이라면
-				//Sort 후 TF에 Depth Assign까지 수행한다.
-				curMeshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.AssignDepth);
-			}
-			else
-			{
-				//이게 루트 메시 그룹이 아니라면, 위에서 이미 Depth Assign이 되었으므로 정렬만 한다.
-				curMeshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.OnlySort);
-			}
-			curMeshGroup.SortBoneListByLevelAndDepth();
-
-			//결과 리스트에 추가
-			processedList.Add(curMeshGroup);
-
-			//자식 메시 그룹이 있다면 (이건 Step3에서 연결이 된다)
-			int nChildMeshGroups = curMeshGroup._childMeshGroupTransforms != null ? curMeshGroup._childMeshGroupTransforms.Count : 0;
-			if(nChildMeshGroups == 0)
-			{
-				return;
-			}
-
-			apTransform_MeshGroup childMeshGroupTF = null;
-			for (int i = 0; i < nChildMeshGroups; i++)
-			{
-				childMeshGroupTF = curMeshGroup._childMeshGroupTransforms[i];
-				if(childMeshGroupTF == null)
-				{
-					continue;
-				}
-				if(childMeshGroupTF._meshGroup == null
-					|| childMeshGroupTF._meshGroup == curMeshGroup
-					|| childMeshGroupTF._meshGroup == rootMeshGroup)
-				{
-					continue;
-				}
-
-				ReadyToEdit_RefrestMeshGroupRecursive(childMeshGroupTF._meshGroup, rootMeshGroup, processedList);
-
-			}
-		}
-
-
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step7()
-		{
-			//Anim Clip 준비도 하자
-			_animClips.RemoveAll(delegate(apAnimClip a)
-			{
-				return 
-				a == null || //Null이거나
-				(a._targetMeshGroupID >= 0 && GetMeshGroup(a._targetMeshGroupID) == null);//TargetMeshGroup ID는 있는데, MeshGroup은 존재하지 않는 경우
-			});
-
-			for (int i = 0; i < _animClips.Count; i++)
-			{
-				_animClips[i].LinkEditor(this);
-				_animClips[i].RemoveUnlinkedTimeline();
-			}
-		}
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step8()
-		{
-			//5. Modifier 세팅
-			LinkAndRefreshInEditor(true, apUtil.LinkRefresh.Set_AllObjects(null));
-
-			
-		}
-
-
-		/// <summary>[Please do not use it]</summary>
-		public void ReadyToEdit_Step9()
-		{
-			// Main MeshGroup 연결
-			// 수정) "다중" MainMeshGroup으로 변경
-
-			if (_mainMeshGroupList == null)		{ _mainMeshGroupList = new List<apMeshGroup>(); }
-			else								{ _mainMeshGroupList.Clear(); }
-
-			if (_mainMeshGroupIDList == null)
-			{
-				_mainMeshGroupIDList = new List<int>();
-			}
-
-
-			for (int iMGID = 0; iMGID < _mainMeshGroupIDList.Count; iMGID++)
-			{
-				int mainMeshGroupID = _mainMeshGroupIDList[iMGID];
-				bool isValidMeshGroupID = false;
-
-				if (mainMeshGroupID >= 0)
-				{
-					apMeshGroup mainMeshGroup = GetMeshGroup(mainMeshGroupID);
-					if (mainMeshGroup != null)
-					{
-						if (!_mainMeshGroupList.Contains(mainMeshGroup))
-						{
-							_mainMeshGroupList.Add(mainMeshGroup);
-							isValidMeshGroupID = true;
-						}
-					}
-				}
-				if (!isValidMeshGroupID)
-				{
-					_mainMeshGroupIDList[iMGID] = -1;//<<이건 삭제하자
-				}
-			}
-
-			//일단 유효하지 못한 ID는 삭제하자
-			_mainMeshGroupIDList.RemoveAll(delegate (int a)
-			{
-				return a < 0;
-			});
-
-			_rootUnits.Clear();
-
-			for (int iMainMesh = 0; iMainMesh < _mainMeshGroupList.Count; iMainMesh++)
-			{
-				apMeshGroup meshGroup = _mainMeshGroupList[iMainMesh];
-
-				apRootUnit newRootUnit = new apRootUnit();
-
-				newRootUnit.SetPortrait(this);
-				newRootUnit.SetMeshGroup(meshGroup);
-
-				_rootUnits.Add(newRootUnit);
-			}
-		}
-
-
-		//-------------------------------------------------------------------------------------------------
-		// LinkAndRefreshInEditor
-		//-------------------------------------------------------------------------------------------------
-
-		//Editor 상태에서
-		//MeshGroup을 참조하는 객체들 간의 레퍼런스를 연결하고 갱신한다.
-		//Editor 실행시와 객체 추가/삭제시 호출해주자
-		//최적화 코드 추가 20.4.3
-		//- 1. 모든 항목을 링크할 지, 특정 애니메이션만 링크를 다시 할지 결정한다. (애니메이션 편집 정보는 해당 메시 그룹 외에는 다른 영향이 없으므로)
-		//- 2. Async 처리도 가능하도록 개선.
-		/// <summary>[Please do not use it]</summary>
-		/// <param name="curSelectedMeshGroup">현재 선택된 메시 그룹. RenderUnit과 Mod 정보를 한번 더 갱신한다. (이것 외의 링크를 제한하는 역할은 없음)</param>
-		/// <param name="targetAnimClip">현재 편집중인 AnimClip. 이게 null이면 전체 갱신. 대상이 있다면 불필요한 링크 작업은 생략된다.(isResetLink가 false인 경우에 한해서)</param>
-		public void LinkAndRefreshInEditor(bool isResetLink,
-											apUtil.LinkRefreshRequest linkRefreshRequest
-											//apMeshGroup editorSelectedMeshGroup
-											//, apAnimClip targetAnimClip
-											)
-		{
-			//UnityEngine.Profiling.Profiler.BeginSample("AnyPortrait Link And Refresh In Editor");
-			
-			//4.1 리셋이 필요한지 검사한다.
-			//겸사겸사 불필요한 데이터도 삭제한다.
-
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 1 - Remove null");
-			
-			//노트 v1.5.0 : 이 대리자 코드는 GC를 발생시키지 않는다.
-			int nTextureRemoved = _textureData.RemoveAll(delegate(apTextureData a)
-			{
-				return a == null;
-			});
-			int nMeshRemoved = _meshes.RemoveAll(delegate(apMesh a)
-			{
-				return a == null;
-			});
-			int nMeshGroupRemoved = _meshGroups.RemoveAll(delegate(apMeshGroup a)
-			{
-				return a == null;
-			});
-			int nAnimClipRemoved = _animClips.RemoveAll(delegate(apAnimClip a)
-			{
-				return a == null;
-			});
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-
-
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 2 - Remove Null Mod");
-
-			//TODO : 단순히 MeshGroup을 루틴을 돌아서 처리하면, Root Mesh Group보다 Child Mesh Group이 나중에 처리되서,
-			//Root Mesh Group의 Link가 다 끊기게 된다.
-			//따라서 Child 부터 처리를 해야한다.
-			//<REV_MG>
-			List<apMeshGroup> revMeshGroups = GetReverseMeshGroupList(_meshGroups);
-			int nRevMeshGroups = revMeshGroups != null ? revMeshGroups.Count : 0;
-
-			int nModRemoved = 0;
-
-			//<REV_MG>
-			apMeshGroup curMeshGroup = null;
-			for (int i = 0; i < nRevMeshGroups; i++)
-			{
-				curMeshGroup = revMeshGroups[i];
-
-				//유효하지 않은 모디파이어들을 여기서 삭제한다.
-				//int curNumModRemoved = curMeshGroup._modifierStack.RemoveInvalidModifiers();
-				if(curMeshGroup._modifierStack._modifiers != null)
-				{
-					int curNumModRemoved = curMeshGroup._modifierStack._modifiers.RemoveAll(delegate(apModifierBase a)
-					{
-						return a == null;
-					});
-
-					nModRemoved += (curNumModRemoved > 0) ? curNumModRemoved : 0;
-				}
-			}
-
-			if(!isResetLink)
-			{
-				if(nTextureRemoved > 0 ||
-					nMeshRemoved > 0 ||
-					nMeshGroupRemoved > 0 ||
-					nAnimClipRemoved > 0 ||
-					nModRemoved > 0)
-				{
-					isResetLink = true;
-				}
-			}
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-			
-
-			//4.1 추가
-			// 만약 isResetLink= true라면
-			// ReadyToEdit와 같이 
-			if (isResetLink)
-			{
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3 - Reset <체크>");
-
-				//변경. 이 코드를 isResetLink 안으로 이동시킴 (20.4.3)
-				//--------------------------------------
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-1");
-
-				_controller.Ready(this);
-
-				int nMeshes = _meshes != null ? _meshes.Count : 0;
-				if(nMeshes > 0)
-				{
-					for (int iMesh = 0; iMesh < nMeshes; iMesh++)
-					{
-						_meshes[iMesh].LinkEdgeAndVertex();
-					}
-				}
-				
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-				//--------------------------------------
-
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-2");
-
-				//텍스쳐도 리셋
-				int nTextureData = _textureData != null ? _textureData.Count : 0;
-				if(nTextureData > 0)
-				{
-					for (int iTexture = 0; iTexture < nTextureData; iTexture++)
-					{
-						_textureData[iTexture].ReadyToEdit(this);
-					}
-				}
-				
-
-				nMeshes = _meshes != null ? _meshes.Count : 0;
-				if(nMeshes > 0)
-				{
-					apMesh mesh = null;
-					for (int iMeshes = 0; iMeshes < nMeshes; iMeshes++)
-					{
-						//내부 MeshComponent들의 레퍼런스를 연결하자
-						mesh = _meshes[iMeshes];
-						
-						mesh.ReadyToEdit(this);
-
-						//텍스쳐를 연결하자
-						int textureID = mesh.LinkedTextureDataID;
-						mesh.SetTextureData(GetTexture(textureID));
-
-						mesh.LinkEdgeAndVertex();
-					}
-				}
-				
-
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-3");
-
-				//1. 메시/메시 그룹을 먼저 연결
-				//2. Parent-Child는 그 다음에 연결 (Child 먼저 / Parent는 나중에)
-				//<REV_MG>
-				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
-				{
-					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
-
-					meshGroup.Init(this);
-
-					int nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
-					if(nChildMeshTFs > 0)
-					{
-						meshGroup._childMeshTransforms.RemoveAll(delegate(apTransform_Mesh a)
-						{
-							return a == null;
-						});
-
-						//개수 변경
-						nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
-
-						//1. Mesh 연결 + Clipping 연결
-						apTransform_Mesh meshTransform = null;
-						for (int iChild = 0; iChild < nChildMeshTFs; iChild++)
-						{
-							meshTransform = meshGroup._childMeshTransforms[iChild];
-							meshTransform.RegistIDToPortrait(this);//추가 : ID를 알려주자
-
-							int meshID = meshTransform._meshUniqueID;
-							if (meshID >= 0)
-							{
-								if (meshTransform._mesh == null)
-								{
-									//Mesh가 연결 안된 경우
-									apMesh existMesh = GetMesh(meshID);
-									if (existMesh != null)
-									{
-										meshTransform._mesh = existMesh;
-									}
-									else
-									{
-										meshTransform._mesh = null;
-									}
-								}
-
-								//--------------
-								//추가) Clipping Layer를 위해서 Mesh Transform끼리 연결을 해준다.
-
-								
-								if (meshTransform._clipChildMeshes == null)
-								{
-									meshTransform._clipChildMeshes = new List<apTransform_Mesh.ClipMeshSet>();
-								}
-
-								meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
-								{
-									//조건에 맞지 않는 Clipping Child를 삭제한다.
-									//1. ID가 맞지 않다.
-									//2. MeshGroup에 존재하지 않다.
-									return a._transformID < 0 || (meshGroup.GetMeshTransform(a._transformID) == null);
-								});
-								
-								//-------------
-							}
-							else
-							{
-								//Mesh ID가 유효하지 않은 MeshTransform
-								meshTransform._mesh = null;
-							}
-
-							//추가 19.6.9 : Material Set 연결
-							if (meshTransform._isUseDefaultMaterialSet)
-							{
-								//기본값의 MatSet을 사용하자.
-								meshTransform._linkedMaterialSet = GetDefaultMaterialSet();
-								if(meshTransform._linkedMaterialSet != null)
-								{
-									//ID도 바꿔주자.
-									meshTransform._materialSetID = meshTransform._linkedMaterialSet._uniqueID;
-								}
-							}
-							else
-							{
-								if (meshTransform._materialSetID >= 0)
-								{
-									meshTransform._linkedMaterialSet = GetMaterialSet(meshTransform._materialSetID);
-									if (meshTransform._linkedMaterialSet == null)
-									{
-										//존재하지 않는 Material Set
-										meshTransform._materialSetID = -1;
-									}
-								}
-								else
-								{
-									meshTransform._linkedMaterialSet = null;
-								}
-							}
-						}
-					}
-
-					
-
-					
-
-
-					//1-2. MeshGroup 연결
-					int nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;
-					if(nChildMeshGroupTFs > 0)
-					{
-						meshGroup._childMeshGroupTransforms.RemoveAll(delegate(apTransform_MeshGroup a)
-						{
-							return a == null;
-						});
-
-						nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;
-
-						apTransform_MeshGroup meshGroupTF = null;
-
-						for (int iChild = 0; iChild < nChildMeshGroupTFs; iChild++)
-						{
-							meshGroupTF = meshGroup._childMeshGroupTransforms[iChild];
-							meshGroupTF.RegistIDToPortrait(this);//추가 : ID를 알려주자
-
-							int meshGroupID = meshGroupTF._meshGroupUniqueID;
-							if (meshGroupID >= 0)
-							{	
-								if (meshGroupTF._meshGroup == null)
-								{
-									//MeshGroup이 연결이 안된 경우
-									apMeshGroup existMeshGroup = GetMeshGroup(meshGroupID);
-									if (existMeshGroup != null)
-									{
-										meshGroupTF._meshGroup = existMeshGroup;
-									}
-									else
-									{
-										meshGroupTF._meshGroup = null;
-										//Debug.LogError("MeshGroup이 없는 MeshGroupTransform 발견 : " + meshGroup._childMeshGroupTransforms[iChild]._nickName);
-									}
-								}
-							}
-							else
-							{
-								//MeshGroup ID가 유효하지 않은 MeshGroupTransform 발견
-								meshGroupTF._meshGroup = null;
-							}
-						}						
-					}
-				}
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-4");
-
-				//<REV_MG>
-				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
-				{
-					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
-
-					//2. 하위 MeshGroup 연결
-					int nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;
-					if(nChildMeshGroupTFs > 0)
-					{
-						for (int iChild = 0; iChild < nChildMeshGroupTFs; iChild++)
-						{
-							apTransform_MeshGroup childMeshGroupTransform = meshGroup._childMeshGroupTransforms[iChild];
-
-							if (childMeshGroupTransform._meshGroupUniqueID >= 0)
-							{
-								apMeshGroup existMeshGroup = GetMeshGroup(childMeshGroupTransform._meshGroupUniqueID);
-								if (existMeshGroup != null)
-								{
-									childMeshGroupTransform._meshGroup = existMeshGroup;
-
-									childMeshGroupTransform._meshGroup._parentMeshGroupID = meshGroup._uniqueID;
-									childMeshGroupTransform._meshGroup._parentMeshGroup = meshGroup;
-								}
-								else
-								{
-									childMeshGroupTransform._meshGroup = null;
-								}
-							}
-							else
-							{
-								childMeshGroupTransform._meshGroup = null;
-							}
-						}
-					}
-					
-
-					//다만, 없어진 Mesh Group은 정리해주자
-					int nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
-					if(nChildMeshTFs > 0)
-					{
-						meshGroup._childMeshTransforms.RemoveAll(delegate (apTransform_Mesh a)
-						{
-							return a._mesh == null;
-						});
-					}
-
-					nChildMeshGroupTFs = meshGroup._childMeshGroupTransforms != null ? meshGroup._childMeshGroupTransforms.Count : 0;					
-					if(nChildMeshGroupTFs > 0)
-					{
-						meshGroup._childMeshGroupTransforms.RemoveAll(delegate (apTransform_MeshGroup a)
-						{
-							return a._meshGroup == null;
-						});
-					}
-				}
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//Link에서 SortRenderUnit 변경사항 (v1.4.2)
-				//이전 : SortRenderUnit을 호출하여 RenderUnit / TF의 Depth를 갱신한 후 Clipping, RenderUnit 리셋과 같은 후속 처리를 한다.
-				// >> 렌더유닛이 완성되지 않았거나 서브 메시 그룹이 먼저 호출되는 경우 Depth가 잘못 적용되는 문제가 발생한다.
-
-				//변경
-				//- 순서를 변경하여 RenderUnit을 먼저 체크 및 생성한다.
-				//- Sort는 값 할당 없이 먼저 수행한다.
-				//- Link 이후, Root Mesh Group에 한해서 Depth 할당을 다시 한다.
-
-				//참고 REV_MG는 Child > Root 순서로 호출되는 리스트다.
-
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-5");
-
-				//<REV_MG>
-				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
-				{
-					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
-
-					//기존 렌더유닛 검토 및 다시 생성) (위치 변경 v1.4.2)
-					meshGroup.ResetRenderUnitsWithoutRefreshEditor();
-
-					//단순 정렬
-					meshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.OnlySort);
-
-
-					//추가 : Clipping 후속 처리를 한다.
-					apTransform_Mesh meshTransform = null;
-					int nChildMeshTFs = meshGroup._childMeshTransforms != null ? meshGroup._childMeshTransforms.Count : 0;
-					if(nChildMeshTFs > 0)
-					{
-						for (int iChild = 0; iChild < nChildMeshTFs; iChild++)
-						{
-							meshTransform = meshGroup._childMeshTransforms[iChild];
-
-							if (meshTransform._isClipping_Parent)
-							{
-								//Clipped Mesh를 검색해서 연결한다.
-								//찾은 이후엔 Sort를 해준다.
-								int nClipMeshes = meshTransform._clipChildMeshes != null ? meshTransform._clipChildMeshes.Count : 0;
-								if(nClipMeshes > 0)
-								{
-									for (int iClip = 0; iClip < nClipMeshes; iClip++)
-									{
-										apTransform_Mesh.ClipMeshSet clipSet = meshTransform._clipChildMeshes[iClip];
-										int childMeshID = clipSet._transformID;
-										apTransform_Mesh childMeshTF = meshGroup.GetMeshTransform(childMeshID);
-										if (childMeshTF != null)
-										{
-											clipSet._meshTransform = childMeshTF;
-											//clipSet._renderUnit = meshGroup.GetRenderUnit(childMeshTF);//삭제 v1.5.0
-										}
-										else
-										{
-											clipSet._meshTransform = null;
-											clipSet._transformID = -1;
-											//clipSet._renderUnit = null;//삭제 v1.5.0
-										}
-									}
-
-									meshTransform._clipChildMeshes.RemoveAll(delegate (apTransform_Mesh.ClipMeshSet a)
-									{
-										return a._transformID < 0;
-									});
-								}
-							}
-							else
-							{
-								if(meshTransform._clipChildMeshes == null)
-								{
-									meshTransform._clipChildMeshes = new List<apTransform_Mesh.ClipMeshSet>();
-								}
-								meshTransform._clipChildMeshes.Clear();//<<이건 일단 초기화 하지말자
-							}
-
-							meshTransform.SortClipMeshTransforms();
-						}
-					}
-					
-
-
-					//이전 >> 위치가 변경되었다 [v1.4.2]
-					////여기서 RenderUnit을 모두 리셋한다. (기존 렌더유닛 검토 및 다시 생성)
-					//meshGroup.ResetRenderUnitsWithoutRefreshEditor();
-
-
-					meshGroup.RefreshAutoClipping();
-					if (meshGroup._rootRenderUnit != null)
-					{
-						meshGroup._rootRenderUnit.ReadyToUpdate();
-					}
-				}
-
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-6");
-
-				//추가 [v1.4.2] Root Mesh Group에 대해 Depth를 갱신하는 Sorting을 여기서 하자
-				//Root Mesh Group만 체크하므로 [REV_MG]를 따르지 않는다.
-				int nMeshGroups = _meshGroups != null ? _meshGroups.Count : 0;
-				if(nMeshGroups > 0)
-				{
-					for (int iMeshGroup = 0; iMeshGroup < nMeshGroups; iMeshGroup++)
-					{
-						apMeshGroup meshGroup = _meshGroups[iMeshGroup];
-						if(meshGroup._parentMeshGroup == null && meshGroup._parentMeshGroupID < 0)
-						{
-							//Root MeshGroup인 경우
-							//Sort 후 Depth 할당까지 하자
-							meshGroup.SortRenderUnits(true, apMeshGroup.DEPTH_ASSIGN.AssignDepth);
-						}
-					}
-				}
-				
-
-				//Debug.LogWarning("<Link And Refresh In Editor> : Modifier Test");
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-7");
-
-				//3. MeshGroup -> Modifier를 돌면서 삭제된 meshTransform / meshGroupTransform / Bone을 잡고 있는 경우 삭제한다.
-				//<REV_MG>
-				for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
-				{
-					apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
-
-					int nModifiers = meshGroup._modifierStack._modifiers != null ? meshGroup._modifierStack._modifiers.Count : 0;
-					if(nModifiers == 0)
-					{
-						continue;
-					}
-					
-					meshGroup._modifierStack._modifiers.RemoveAll(delegate(apModifierBase a)
-					{
-						return a == null;
-					});
-
-					//모디파이어 개수 다시 계산
-					nModifiers = meshGroup._modifierStack._modifiers != null ? meshGroup._modifierStack._modifiers.Count : 0;
-
-					for (int iMod = 0; iMod < nModifiers; iMod++)
-					{
-						apModifierBase modifier = meshGroup._modifierStack._modifiers[iMod];
-						if(modifier == null)
-						{
-							continue;
-						}
-
-						//여기서 Modifier Link를 다시 해야한다.
-						
-						//apMeshGroup meshGroupOfTransform = null;
-						apMeshGroup meshGroupOfBone = null;
-
-						int nPSGs = modifier._paramSetGroup_controller != null ? modifier._paramSetGroup_controller.Count : 0;
-
-						if(nPSGs > 0)
-						{
-							continue;
-						}
-
-						for (int iPSG = 0; iPSG < nPSGs; iPSG++)
-						{
-							apModifierParamSetGroup modPSG = modifier._paramSetGroup_controller[iPSG];
-
-							switch (modPSG._syncTarget)
-							{
-								case apModifierParamSetGroup.SYNC_TARGET.Bones:
-								case apModifierParamSetGroup.SYNC_TARGET.ControllerWithoutKey:
-									//안쓰는 값
-									break;
-								case apModifierParamSetGroup.SYNC_TARGET.Controller:
-									//Controller 체크해볼 필요 있다.
-									modPSG._keyControlParam = _controller.FindParam(modPSG._keyControlParamID);
-									
-									break;
-
-								case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
-									modPSG._keyAnimClip = GetAnimClip(modPSG._keyAnimClipID);
-									modPSG._keyAnimTimeline = null;
-									modPSG._keyAnimTimelineLayer = null;
-									if(modPSG._keyAnimClip != null)
-									{
-										modPSG._keyAnimTimeline = modPSG._keyAnimClip.GetTimeline(modPSG._keyAnimTimelineID);
-										if(modPSG._keyAnimTimeline != null)
-										{
-											modPSG._keyAnimTimelineLayer = modPSG._keyAnimTimeline.GetTimelineLayer(modPSG._keyAnimTimelineLayerID);
-										}
-									}
-									
-									break;
-							}
-
-							int nParamSets = modPSG._paramSetList != null ? modPSG._paramSetList.Count : 0;
-							if(nParamSets == 0)
-							{
-								continue;
-							}
-
-							for (int iPS = 0; iPS < nParamSets; iPS++)
-							{
-								apModifierParamSet modPS = modPSG._paramSetList[iPS];
-
-								if (modPS._meshData != null)
-								{
-									//하위의 MeshGroup Transform이 삭제될 수 있도록
-									//적절하지 않은 MeshData를 삭제하자
-									//int nRemoved = modPS._meshData.RemoveAll(delegate (apModifiedMesh a)
-									modPS._meshData.RemoveAll(delegate (apModifiedMesh a)
-									{
-										if (meshGroup != null)
-										{
-											if (a._isMeshTransform)
-											{
-												//MeshTransform이 유효한지 찾자
-												a._transform_Mesh = meshGroup.GetMeshTransformRecursive(a._transformUniqueID);
-												if (a._transform_Mesh == null || a._transform_Mesh._mesh == null)
-												{
-													//Mesh Transform이 없다. 삭제
-													return true;
-												}
-											}
-											else
-											{
-												//MeshGroupTransform이 유효한지 찾자
-												a._transform_MeshGroup = meshGroup.GetMeshGroupTransformRecursive(a._transformUniqueID);
-												if (a._transform_MeshGroup == null || a._transform_MeshGroup._meshGroup == null)
-												{
-													//MeshGroup Transform이 없다. 삭제
-													return true;
-												}
-											}
-										}
-
-										return false;
-									});
-								}
-
-								//적절하지 않은 Bone Data를 삭제하자
-								if (modPS._boneData != null)
-								{
-									modPS._boneData.RemoveAll(delegate (apModifiedBone a)
-									{
-										meshGroupOfBone = GetMeshGroup(a._meshGropuUniqueID_Bone);
-
-										if(meshGroupOfBone != null)
-										{
-											a._bone = meshGroupOfBone.GetBone(a._boneID);
-											if(a._bone == null)
-											{
-												//Bone이 없다. 삭제
-												//Debug.LogError("ModBone - Bone : 삭제됨");
-												return true;
-											}
-										}
-
-										return false;
-									});
-								}
-							}
-						}
-					}
-				}
-				
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-8");
-
-				//Root Unit도 갱신하자
-				if (_mainMeshGroupList == null)		{ _mainMeshGroupList = new List<apMeshGroup>(); }
-				else								{ _mainMeshGroupList.Clear(); }
-
-				if (_mainMeshGroupIDList == null) { _mainMeshGroupIDList = new List<int>(); }
-
-				for (int iMGID = 0; iMGID < _mainMeshGroupIDList.Count; iMGID++)
-				{
-					int mainMeshGroupID = _mainMeshGroupIDList[iMGID];
-					bool isValidMeshGroupID = false;
-
-					if (mainMeshGroupID >= 0)
-					{
-						apMeshGroup mainMeshGroup = GetMeshGroup(mainMeshGroupID);
-						if (mainMeshGroup != null)
-						{
-							if (!_mainMeshGroupList.Contains(mainMeshGroup))
-							{
-								_mainMeshGroupList.Add(mainMeshGroup);
-								isValidMeshGroupID = true;
-							}
-						}
-					}
-					if (!isValidMeshGroupID)
-					{
-						_mainMeshGroupIDList[iMGID] = -1;//<<이건 삭제하자
-					}
-				}
-
-				//일단 유효하지 못한 ID는 삭제하자
-				_mainMeshGroupIDList.RemoveAll(delegate (int a)
-				{
-					return a < 0;
-				});
-
-				//기존의 RootUnit중 삭제할 것 먼저 빼자
-				if (_rootUnits == null)
-				{
-					_rootUnits = new List<apRootUnit>();
-				}
-				_rootUnits.RemoveAll(delegate (apRootUnit a)
-				{
-					//유효한 MeshGroup을 가지지 않는 경우
-					return a._childMeshGroup == null
-							|| !_meshGroups.Contains(a._childMeshGroup)
-							|| !_mainMeshGroupList.Contains(a._childMeshGroup);
-				});
-				
-
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 3-9");
-
-				//재활용을 위해서 리스트를 새로 만들자
-				List<apRootUnit> prevRootUnits = new List<apRootUnit>();
-				for (int iRootUnit = 0; iRootUnit < _rootUnits.Count; iRootUnit++)
-				{
-					prevRootUnits.Add(_rootUnits[iRootUnit]);
-				}
-
-				//리스트 클리어
-				_rootUnits.Clear();
-				for (int iMainMesh = 0; iMainMesh < _mainMeshGroupList.Count; iMainMesh++)
-				{
-					apMeshGroup meshGroup = _mainMeshGroupList[iMainMesh];
-					
-					//재활용 가능한지 확인하자
-					//이전 (GC 발생)
-					//apRootUnit existRootUnit = prevRootUnits.Find(delegate(apRootUnit a)
-					//{
-					//	return a._childMeshGroup == meshGroup;
-					//});
-
-					//변경 v1.5.0
-					s_LinkRefresh_RootUnitMeshGroup = meshGroup;
-					apRootUnit existRootUnit = prevRootUnits.Find(s_LinkRefresh_FindRootUnitByMeshGroup_Func);
-
-
-					if (existRootUnit != null)
-					{
-						//있다. 리스트에 넣자
-						existRootUnit.SetPortrait(this);
-						_rootUnits.Add(existRootUnit);
-					}
-					else
-					{
-						//없다. 새로 추가
-						apRootUnit newRootUnit = new apRootUnit();
-
-						newRootUnit.SetPortrait(this);
-						newRootUnit.SetMeshGroup(meshGroup);
-
-						_rootUnits.Add(newRootUnit);
-					}
-				}
-
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-				
-				//UnityEngine.Profiling.Profiler.EndSample();
-			}
-			//isResetLink 끝-------------------
-			
-			//모든 모디파이어가 아닌 특정 AnimClip에 대한 모디파이어를 제외할 것인가.
-			bool isLinkAllMeshGroups = false;
-			bool isSkipAllAnimModifier = false;//모든 Anim 모디파이어 스킵
-			bool isSkipUnselectedAnimPSGs = false;//선택되지 않은 Anim 모디파이어의 PSG 스킵
-			apAnimClip selectedAnimClip = null;
-
-			
-			bool isNeedToRefreshOtherMeshGroups = false;
-			apMeshGroup curSelectedMeshGroup = null;
-
-
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 4");
-
-			//메시 그룹 링크 다시 확인하는 코드
-			//최적화 20.4.3 : 이 코드들이 에디터를 무겁게 한다.
-			//만약 특정 메시 그룹을 선택했거나, 특정 AnimClip을 선택했다면, 그 외의 메시 그룹을 갱신하지 말자.
-			//revMeshGroups에서 대상이 되는 메시 그룹의 부모/자식들은 제외한다.
-			if(linkRefreshRequest != null)
-			{
-				if(linkRefreshRequest.Request_MeshGroup == apUtil.LR_REQUEST__MESHGROUP.SelectedMeshGroup && linkRefreshRequest.MeshGroup != null)
-				{
-					//대상이 되는 메시 그룹과 관련된 모든 메시 그룹을 찾자.
-					List<apMeshGroup> targetMeshGroups = new List<apMeshGroup>();
-
-					if(linkRefreshRequest.MeshGroup != null)
-					{
-						FindAllParentAndChildrenMeshGroups(linkRefreshRequest.MeshGroup, targetMeshGroups);
-					}
-
-					revMeshGroups = targetMeshGroups;//일부 메시 그룹만 선택을 한다.
-					nRevMeshGroups = revMeshGroups != null ? revMeshGroups.Count : 0;//개수도 다시 계산
-
-					//Debug.LogWarning("Cur MeshGroups : " + revMeshGroups.Count);
-				}
-
-				//모든 객체를 대상으로 Link를 한다.
-				isLinkAllMeshGroups = linkRefreshRequest.Request_MeshGroup == apUtil.LR_REQUEST__MESHGROUP.AllMeshGroups;
-
-				//모든 Anim 모디파이어를 생략한다. (그 외의 모디파이어는 생략하지 않음)
-				isSkipAllAnimModifier = linkRefreshRequest.Request_Modifier == apUtil.LR_REQUEST__MODIFIER.AllModifiers_ExceptAnimMods;
-
-				//특정 AnimClip에 대한 PSG를 제외한 나머지를 생략한다. (Anim 모디파이어 중에서)
-				isSkipUnselectedAnimPSGs = linkRefreshRequest.Request_PSG == apUtil.LR_REQUEST__PSG.SelectedAnimClipPSG_IfAnimModifier;
-				selectedAnimClip = linkRefreshRequest.AnimClip;
-
-				isNeedToRefreshOtherMeshGroups = (revMeshGroups.Count > 1);
-				curSelectedMeshGroup = linkRefreshRequest.MeshGroup;
-			}
-			else
-			{
-				isLinkAllMeshGroups = true;//Request가 없다면 모든 객체를 대상으로 Link 수행
-			}
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-
-
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 5");
-
-			//<REV_MG>
-			for (int iMeshGroup = 0; iMeshGroup < nRevMeshGroups; iMeshGroup++)
-			{
-				apMeshGroup meshGroup = revMeshGroups[iMeshGroup];
-
-				//meshGroup._modifierStack.RefreshAndSort(false);//이전
-				//첫 Link시, 잘못된 데이터가 있으면 삭제를 한다.
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 5-1 - Refresh And Sort");
-
-				meshGroup._modifierStack.RefreshAndSort(	apModifierStack.REFRESH_OPTION_ACTIVE.Keep,
-															apModifierStack.REFRESH_OPTION_REMOVE.RemoveNullModifiers);//변경 22.12.13
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 5-2 - Bone");
-
-				//Bone 연결 
-				//Root 리스트는 일단 날리고 BoneAll 리스트를 돌면서 필요한걸 넣어주자
-				//이후엔 Root -> Child 방식으로 순회
-				if(meshGroup._boneList_Root == null) { meshGroup._boneList_Root = new List<apBone>(); }
-				meshGroup._boneList_Root.Clear();
-
-				int nBoneListAll = meshGroup._boneList_All != null ? meshGroup._boneList_All.Count : 0;
-				if(nBoneListAll > 0)
-				{
-					apBone bone = null;
-					for (int iBone = 0; iBone < nBoneListAll; iBone++)
-					{
-						bone = meshGroup._boneList_All[iBone];
-						if (bone._childBones == null)
-						{
-							bone._childBones = new List<apBone>();
-						}
-						bone._childBones.Clear();
-					}
-
-					for (int iBone = 0; iBone < nBoneListAll; iBone++)
-					{
-						bone = meshGroup._boneList_All[iBone];
-
-						apBone parentBone = null;
-						if (bone._parentBoneID >= 0)
-						{
-							parentBone = meshGroup.GetBone(bone._parentBoneID);
-						}
-
-						bone.Link(meshGroup, parentBone, this);
-
-						if (parentBone == null)
-						{
-							//Parent가 없다면 Root 본이다.
-							meshGroup._boneList_Root.Add(bone);
-						}
-					}
-
-					//추가 5.9 : Bone의 Check Validation 함수를 호출해야 한다.
-					for (int iBone = 0; iBone < nBoneListAll; iBone++)
-					{
-						meshGroup._boneList_All[iBone].CheckIKControllerValidation();
-					}
-				}
-
-
-				int curBoneIndex = 0;
-				int nRootBoneList = meshGroup._boneList_Root != null ? meshGroup._boneList_Root.Count : 0;
-				if(nRootBoneList > 0)
-				{
-					for (int iRoot = 0; iRoot < nRootBoneList; iRoot++)
-					{
-						apBone rootBone = meshGroup._boneList_Root[iRoot];
-						//TODO : MeshGroup이 Transform으로 있는 경우에 Transform Matrix를 넣어줘야한다.
-						rootBone.LinkRecursive(0);
-						curBoneIndex = rootBone.SetBoneIndex(curBoneIndex) + 1;
-					}
-				}
-				
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 5-3 - Modifier");
-
-				List<apModifierBase> modifiers = meshGroup._modifierStack._modifiers;
-				int nModifiers = modifiers != null ? modifiers.Count : 0;
-				if (nModifiers > 0)
-				{
-					for (int iMod = 0; iMod < nModifiers; iMod++)
-					{
-						apModifierBase mod = modifiers[iMod];
-
-						//추가 : Portrait를 연결해준다.
-						mod.LinkPortrait(this);
-
-						mod._meshGroup = GetMeshGroup(mod._meshGroupUniqueID);
-
-						//삭제 조건1 - MeshGroup이 없다
-						if (mod._meshGroup == null)
-						{
-							//Debug.LogError("No MeshGroup Modifier");
-							continue;
-						}
-
-						//>> 최적화 20.4.3
-						if (isSkipAllAnimModifier && mod.IsAnimated)
-						{
-							//요청에 따라 Anim 모디파이어는 생략하자
-							continue;
-						}
-
-
-						List<apModifierParamSetGroup> paramSetGroups = mod._paramSetGroup_controller;
-						int nPSGs = paramSetGroups != null ? paramSetGroups.Count : 0;
-						if (nPSGs > 0)
-						{
-							for (int iPSGroup = 0; iPSGroup < nPSGs; iPSGroup++)
-							{
-								apModifierParamSetGroup paramSetGroup = paramSetGroups[iPSGroup];
-
-								//>> 최적화 20.4.3 : 만약 애니메이션 설정시, 해당 애니메이션에 관련된 것들만 갱신한다.
-								if (isSkipUnselectedAnimPSGs && mod.IsAnimated)
-								{
-									if (paramSetGroup._keyAnimClip != linkRefreshRequest.AnimClip)
-									{
-
-										//특정 AnimClip을 제외한 다른 AnimClip에 대한 ParamSetGroup은 Link를 생략한다.
-										continue;
-									}
-								}
-
-								int nParamSets = paramSetGroup._paramSetList != null ? paramSetGroup._paramSetList.Count : 0;
-
-								//List<apModifierParamSet> paramSets = mod._paramSetList;
-								//1. Key를 세팅해주자
-								switch (paramSetGroup._syncTarget)
-								{
-									case apModifierParamSetGroup.SYNC_TARGET.Static:
-										break;
-
-									case apModifierParamSetGroup.SYNC_TARGET.Controller:
-										paramSetGroup._keyControlParam = GetControlParam(paramSetGroup._keyControlParamID);
-										break;
-
-									case apModifierParamSetGroup.SYNC_TARGET.KeyFrame:
-										{
-											//AnimClip과 연동을 먼저 한다.
-											// ParamSetGroup -> AnimClip과 연동
-											paramSetGroup._keyAnimClip = GetAnimClip(paramSetGroup._keyAnimClipID);
-											if (paramSetGroup._keyAnimClip == null)
-											{
-												paramSetGroup._keyAnimClipID = -1;//<<삭제 하자
-												break;
-											}
-
-											paramSetGroup._keyAnimTimeline = paramSetGroup._keyAnimClip.GetTimeline(paramSetGroup._keyAnimTimelineID);
-
-											if (paramSetGroup._keyAnimTimeline == null)
-											{
-												paramSetGroup._keyAnimTimelineID = -1;
-												break;
-											}
-
-											paramSetGroup._keyAnimTimelineLayer = paramSetGroup._keyAnimTimeline.GetTimelineLayer(paramSetGroup._keyAnimTimelineLayerID);
-
-											if (paramSetGroup._keyAnimTimelineLayer == null)
-											{
-												paramSetGroup._keyAnimTimelineLayerID = -1;
-												break;
-											}
-
-											//추가) 상호 연동을 해주자
-											paramSetGroup._keyAnimTimelineLayer.LinkParamSetGroup(paramSetGroup);
-
-											//키프레임이면 여기서 한번더 링크를 해주자
-											
-											if (nParamSets > 0)
-											{
-												//[v1.5.0]
-												//버그로 인하여 "동일한 키프레임"을 가리키는 ParamSet이 생성되기도 한다.
-												//리스트를 만들어서 이미 동일한 키프레임의 경우 무효로 만들자
-												List<apAnimKeyframe> checkedKeyframes = new List<apAnimKeyframe>();
-
-												apModifierParamSet paramSet = null;
-												for (int iPS = 0; iPS < nParamSets; iPS++)
-												{
-													paramSet = paramSetGroup._paramSetList[iPS];
-													int keyframeID = paramSet._keyframeUniqueID;
-
-													apAnimKeyframe targetKeyframe = paramSetGroup._keyAnimTimelineLayer.GetKeyframeByID(keyframeID);
-													if (targetKeyframe != null)
-													{
-														if(!checkedKeyframes.Contains(targetKeyframe))
-														{
-															//연결되지 않은 키프레임이다.
-															paramSet.LinkSyncKeyframe(targetKeyframe);
-															checkedKeyframes.Add(targetKeyframe);
-														}
-														else
-														{
-															//Debug.LogError("에러 : 이미 연결이 완료된 키프레임에 다른 ModParamSet이 연결을 시도했다.");
-															paramSet._keyframeUniqueID = -1;//삭제 처리
-														}
-														
-													}
-													else
-													{
-														//못찾았다. > Keyframe 연동 에러
-														paramSet._keyframeUniqueID = -1;
-													}
-
-												}
-
-												//"키프레임 연동" 방식에서 비어있는 키프레임이라면?
-												paramSetGroup._paramSetList.RemoveAll(delegate (apModifierParamSet a)
-												{
-													return a._keyframeUniqueID < 0;
-												});
-											}
-										}
-										break;
-								}
-
-
-
-
-								List<apModifierParamSet> paramSets = paramSetGroup._paramSetList;
-								nParamSets = paramSetGroup._paramSetList != null ? paramSetGroup._paramSetList.Count : 0;
-								if (nParamSets > 0)
-								{
-									apModifierParamSet paramSet = null;
-									for (int iParamSet = 0; iParamSet < nParamSets; iParamSet++)
-									{
-										paramSet = paramSets[iParamSet];
-
-										//Link를 해주자
-										paramSet.LinkParamSetGroup(paramSetGroup);
-
-										List<apModifiedMesh> meshData = paramSet._meshData;
-										apTransform_Mesh meshTransform = null;
-										apTransform_MeshGroup meshGroupTransform = null;
-										apRenderUnit renderUnit = null;
-
-
-										//1. ModMesh
-										int nMeshData = meshData != null ? meshData.Count : 0;
-										if (nMeshData > 0)
-										{
-											for (int iMesh = 0; iMesh < meshData.Count; iMesh++)
-											{
-												apModifiedMesh modMesh = meshData[iMesh];
-
-												//추가 : Modifier의 meshGroup과 Transform의 MeshGroup을 분리한다.
-												apMeshGroup meshGroupOfTransform = null;
-
-												if (modMesh._isRecursiveChildTransform)
-												{
-													//Mesh Group 다시 링크 (다르다)
-													meshGroupOfTransform = GetMeshGroup(modMesh._meshGroupUniqueID_Transform);
-												}
-												else
-												{
-													//동일한 MeshGroup이다.
-													meshGroupOfTransform = meshGroup;
-												}
-
-												modMesh._meshGroupUniqueID_Modifier = meshGroup._uniqueID;
-
-
-
-												//변경 : 타입 대신 값을 보고 판단한다.
-												if (modMesh._transformUniqueID >= 0 && meshGroupOfTransform != null)
-												{
-													if (modMesh._isMeshTransform)
-													{
-														meshTransform = meshGroupOfTransform.GetMeshTransform(modMesh._transformUniqueID);
-
-														if (meshTransform != null)
-														{
-															renderUnit = meshGroup.GetRenderUnit(meshTransform);
-															modMesh.Link_MeshTransform(meshGroup, meshGroupOfTransform, meshTransform, renderUnit, this);
-														}
-													}
-													else
-													{
-														meshGroupTransform = meshGroupOfTransform.GetMeshGroupTransform(modMesh._transformUniqueID);
-
-														if (meshGroupTransform != null)
-														{
-															renderUnit = meshGroup.GetRenderUnit(meshGroupTransform);
-															modMesh.Link_MeshGroupTransform(meshGroup, meshGroupOfTransform, meshGroupTransform, renderUnit);
-														}
-													}
-												}
-											}
-
-
-											//int nRemove = paramSet._meshData.RemoveAll(delegate (apModifiedMesh a)
-											paramSet._meshData.RemoveAll(delegate (apModifiedMesh a)
-											{
-												return a._meshGroupOfModifier == null || a._meshGroupOfTransform == null;
-											});
-										}
-										
-
-
-										//---------------------------------------------------------------------------------
-										//2. Bone 연동을 하자
-
-										List<apModifiedBone> boneData = paramSet._boneData;
-										apModifiedBone modBone = null;
-
-										int nBoneData = boneData != null ? boneData.Count : 0;
-										if (nBoneData > 0)
-										{
-											for (int iModBone = 0; iModBone < nBoneData; iModBone++)
-											{
-												modBone = boneData[iModBone];
-												apMeshGroup meshGroupOfBone = GetMeshGroup(modBone._meshGropuUniqueID_Bone);
-												apMeshGroup meshGroupOfModifier = GetMeshGroup(modBone._meshGroupUniqueID_Modifier);
-												if (meshGroupOfBone == null || meshGroupOfModifier == null)
-												{
-													//Link Error : Mod Bone 링크 실패 [MeshGroup]
-													continue;
-												}
-
-												apBone bone = meshGroupOfBone.GetBone(modBone._boneID);
-												if (bone == null)
-												{
-													//Link Error : Mod Bone 링크 실패
-													continue;
-												}
-
-												meshGroupTransform = meshGroupOfModifier.GetMeshGroupTransformRecursive(modBone._transformUniqueID);
-												if (meshGroupTransform == null)
-												{
-													//Link Error : Mod Bone 링크 실패 [MeshGroup Transform]
-													continue;
-												}
-
-												renderUnit = meshGroupOfModifier.GetRenderUnit(meshGroupTransform._transformUniqueID, false);
-												if (renderUnit == null)
-												{
-													//Debug.LogError("Link Error : Mod Bone 링크 실패 [Render Unit]");
-													//continue;
-													//다시 체크 및 보정
-													if (meshGroupOfBone == meshGroupOfModifier)
-													{
-														meshGroupTransform = meshGroupOfModifier._rootMeshGroupTransform;
-													}
-													else
-													{
-														meshGroupTransform = meshGroupOfModifier.FindChildMeshGroupTransform(meshGroupOfBone);
-													}
-
-													if (meshGroupTransform != null)
-													{
-														renderUnit = meshGroupOfModifier.GetRenderUnit(meshGroupTransform._transformUniqueID, false);
-														//Debug.LogError("잘못된 ModBone 연결이 보정되었다.");
-														modBone.Init(meshGroupOfModifier._uniqueID, meshGroupOfBone._uniqueID, meshGroupTransform._transformUniqueID, bone);
-													}
-												}
-
-												modBone.Link(meshGroupOfModifier, meshGroupOfBone, bone, renderUnit, meshGroupTransform);
-											}
-
-											//연동 안된 ModBone은 삭제하자
-											//---------------------------------------------------------------------------------
-											boneData.RemoveAll(delegate (apModifiedBone a)
-											{
-												return a._bone == null || a._meshGroup_Bone == null || a._meshGroup_Modifier == null;
-											});
-										}
-										
-
-									}
-								}
-							}
-						}
-						
-
-
-						//mod.RefreshParamSet();
-						if (mod.IsAnimated)
-						{
-							//애니메이션 타입이라면 > 일부 AnimClip에 대한 처리하자.
-							mod.RefreshParamSet(linkRefreshRequest);//<<단순 변경시 linkRefreshRequest로 입력 되어야 한다.
-																	//mod.RefreshParamSet(null);//<<삭제시 이게 null로 입력되어야 한다.
-						}
-						else
-						{
-							mod.RefreshParamSet(null);
-						}
-					}
-
-					meshGroup._modifierStack._modifiers.RemoveAll(delegate (apModifierBase a)
-					{
-						return a._meshGroup == null;
-					});
-				}
-				
-				//UnityEngine.Profiling.Profiler.EndSample();
-				//ModStack의 CalculateParam을 모두 지우고 다시 만들자
-				
-				//이 조건문 추가 20.4.3 : 모든 메시 그룹에 대해서 Refresh를 할 경우에만
-				//단, 여러개의 메시그룹을 대상으로 하는 경우에는 타겟을 제외한 나머지 객체는 Refresh를 해야한다.
-				//UnityEngine.Profiling.Profiler.BeginSample("Link 5-4 - Refresh Link");
-
-				if(isLinkAllMeshGroups)
-				{
-					//Debug.Log(">>>> All MeshGroups (Other)");
-					meshGroup.RefreshModifierLink(null);
-				}
-				else if(curSelectedMeshGroup != null 
-					&& isNeedToRefreshOtherMeshGroups
-					&& curSelectedMeshGroup != meshGroup)
-				{
-					//Debug.Log(">>>> 타겟이 아닌 다른 메시 그룹의 모디파이어를 Refresh [" + meshGroup._name + "]");
-					meshGroup.RefreshModifierLink(linkRefreshRequest);
-				}
-
-				//UnityEngine.Profiling.Profiler.EndSample();
-			}
-
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 6");
-
-			if(curSelectedMeshGroup != null && !isLinkAllMeshGroups)
-			{
-				//모든 메시 그룹을 대상으로 한게 아닌데 대상 메시 그룹이 있다면
-				curSelectedMeshGroup.RefreshModifierLink(linkRefreshRequest);
-			}
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 7");
-
-			if (isSkipUnselectedAnimPSGs && linkRefreshRequest.AnimClip != null)
-			{
-				//특정 AnimClip만 검사
-				linkRefreshRequest.AnimClip.LinkEditor(this);
-				linkRefreshRequest.AnimClip.RemoveUnlinkedTimeline();
-			}
-			else
-			{
-				//전체 검사
-				int nAnimClips = _animClips != null ? _animClips.Count : 0;
-				if (nAnimClips > 0)
-				{
-					apAnimClip animClip = null;
-					for (int i = 0; i < _animClips.Count; i++)
-					{
-						animClip = _animClips[i];
-						animClip.LinkEditor(this);
-						animClip.RemoveUnlinkedTimeline();
-					}
-				}
-				
-			}
-			
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-			//UnityEngine.Profiling.Profiler.BeginSample("Link 8");
-			
-			//추가 9.30 : 만약, 선택한 MeshGroup에 하위 MeshGroup이 있다면,
-			//전체적으로 하위 MeshGroup으로의 연결을 다시 해야한다.
-			//위에서 연결이 흐트러졌기 때문
-			
-			if(linkRefreshRequest != null && curSelectedMeshGroup != null)
-			{
-				//하위에 메시 그룹이 있거나, 모든 메시 그룹을 대상으로 하지 않았을 경우
-				if((curSelectedMeshGroup._childMeshGroupTransforms != null && curSelectedMeshGroup._childMeshGroupTransforms.Count > 0)
-					|| !isLinkAllMeshGroups)
-				{
-					//UnityEngine.Profiling.Profiler.BeginSample("Link 8-1");
-					curSelectedMeshGroup.LinkModMeshRenderUnits(linkRefreshRequest);
-					//UnityEngine.Profiling.Profiler.EndSample();
-
-					//UnityEngine.Profiling.Profiler.BeginSample("Link 8-2");
-					curSelectedMeshGroup.RefreshModifierLink(linkRefreshRequest);
-					//UnityEngine.Profiling.Profiler.EndSample();
-				}
-			}
-
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-
-			//삭제 v1.5.0 : GC.Collect는 너무 많은 성능 스파이크를 일으킨다.
-			//Debug.LogError("TODO : GC가 너무 커서 여기서 성능이 크게 떨어진다.");
-			//Debug.LogError("일반적인 작업에서는 GC를 호출하지 않고, 메뉴 전환시에 GC를 호출하자");
-			//System.GC.Collect();
-
-			//UnityEngine.Profiling.Profiler.EndSample();
-			
-		}
-
-
-		private static apMeshGroup s_LinkRefresh_RootUnitMeshGroup = null;
-		private static Predicate<apRootUnit> s_LinkRefresh_FindRootUnitByMeshGroup_Func = FUNC_LinkRefresh_FindRootUnitByMeshGroup;
-		private static bool FUNC_LinkRefresh_FindRootUnitByMeshGroup(apRootUnit a)
-		{
-			return a._childMeshGroup == s_LinkRefresh_RootUnitMeshGroup;
-		}
-
-
-
-		// Bake
-		//----------------------------------------------------------------
-
-
-
-		// 참조용 리스트 관리
-		//----------------------------------------------------------------
-
-		//메모리 할당을 방지하는 변수
-		private List<apMeshGroup> _tmpReverseMeshGroups = null;
-
-		/// <summary>
-		/// 계층적으로 설계된 MeshGroup에 맞게 리스트를 다시 정리하여 리턴한다.
-		/// 인덱스 앞쪽에는 Child가 위치하고, 뒤로 갈 수록 Parent/Root가 나타난다.
-		/// </summary>
-		/// <param name="srcMeshGroup"></param>
-		/// <returns></returns>
-		private List<apMeshGroup> GetReverseMeshGroupList(List<apMeshGroup> srcMeshGroups)
-		{
-			if(_tmpReverseMeshGroups == null)
-			{
-				_tmpReverseMeshGroups = new List<apMeshGroup>();
-			}
-			_tmpReverseMeshGroups.Clear();
-
-			int nSrcMeshGroups = srcMeshGroups != null ? srcMeshGroups.Count : 0;
-			if (nSrcMeshGroups > 0)
-			{
-				apMeshGroup curMeshGroup = null;
-				for (int i = 0; i < nSrcMeshGroups; i++)
-				{
-					curMeshGroup = srcMeshGroups[i];
-					if (!_tmpReverseMeshGroups.Contains(curMeshGroup))
-					{
-						FindReverseMeshGroupListRecursive(curMeshGroup, _tmpReverseMeshGroups);
-					}
-				}
-			}
-			
-			return _tmpReverseMeshGroups;
-		}
-
-
-		private void FindReverseMeshGroupListRecursive(apMeshGroup curMeshGroup, List<apMeshGroup> resultList)
-		{
-			int nChildTFs = curMeshGroup._childMeshGroupTransforms != null ? curMeshGroup._childMeshGroupTransforms.Count : 0;
-			if(nChildTFs > 0)
-			{
-				apTransform_MeshGroup childMeshGroupTransform = null;
-				apMeshGroup childMeshGroup = null;
-				for (int iChild = 0; iChild < nChildTFs; iChild++)
-				{
-					childMeshGroupTransform = curMeshGroup._childMeshGroupTransforms[iChild];
-					childMeshGroup = childMeshGroupTransform._meshGroup;
-					if (childMeshGroup != null && childMeshGroup != curMeshGroup)
-					{
-						FindReverseMeshGroupListRecursive(childMeshGroup, resultList);
-					}
-				}
-			}
-			if (!resultList.Contains(curMeshGroup))
-			{
-				resultList.Add(curMeshGroup);
-			}
-		}
-
-
-		/// <summary>
-		/// 추가 20.4.3 : 입력된 메시 그룹을 포함하여 관련된 모든 메시 그룹을 찾는다. (부모/자식 모두)
-		/// </summary>
-		/// <param name="targetMeshGroup"></param>
-		/// <param name="resultList"></param>
-		private void FindAllParentAndChildrenMeshGroups(apMeshGroup targetMeshGroup, List<apMeshGroup> resultList)
-		{
-			//먼저 최상위 부모를 찾자
-			apMeshGroup rootParentMG = targetMeshGroup;
-			if (rootParentMG._parentMeshGroup != null)
-			{
-				while (true)
-				{
-					if(rootParentMG._parentMeshGroup == null)
-					{
-						break;
-					}
-					rootParentMG = rootParentMG._parentMeshGroup;
-				}
-			}
-			
-			//Recursive 방식ㅇ로 Root MG
-			FindReverseMeshGroupListRecursive(rootParentMG, resultList);
-		}
-
-
-		// ID 관리
-		//----------------------------------------------------------------
-		//유니크 아이디는 몇가지 타입에 맞게 통합해서 관리한다.
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void ClearRegisteredUniqueIDs()
-		{
-			_IDManager.Clear();
-		}
-
-		// 발급된 ID는 관리를 위해 회수한다.
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		/// <param name="target"></param>
-		/// <param name="ID"></param>
-		public void RegistUniqueID(apIDManager.TARGET target, int ID)
-		{
-			_IDManager.RegistID(target, ID);
-		}
-#region [미사용 코드]
-		//public void RegistUniqueID_Texture(int uniqueID)
-		//{
-		//	if (!_registeredUniqueIDs_Texture.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_Texture.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_Vertex(int uniqueID)
-		//{
-		//	if (!_registeredUniqueIDs_Vert.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_Vert.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_Mesh(int uniqueID)
-		//{
-		//	if (!_registeredUniqueIDs_Mesh.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_Mesh.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_MeshGroup(int uniqueID)
-		//{
-		//	if (!_registeredUniqueIDs_MeshGroup.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_MeshGroup.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_Transform(int uniqueID)
-		//{
-		//	if (!_registeredUniqueIDs_Transform.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_Transform.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_Moifier(int uniqueID)
-		//{
-		//	if (!_registeredUniqueIDs_Modifier.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_Modifier.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_ControlParam(int uniqueID)
-		//{
-		//	if(!_registeredUniqueIDs_ControlParam.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_ControlParam.Add(uniqueID);
-		//	}
-		//}
-
-		//public void RegistUniqueID_AnimClip(int uniqueID)
-		//{
-		//	if(!_registeredUniqueIDs_AnimClip.Contains(uniqueID))
-		//	{
-		//		_registeredUniqueIDs_AnimClip.Add(uniqueID);
-		//	}
-		//} 
-#endregion
-
-
-
-		// 새로운 ID를 발급한다.
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		/// <param name="targetType"></param>
-		/// <returns></returns>
-		public int MakeUniqueID(apIDManager.TARGET targetType)
-		{
-			int resultID = _IDManager.MakeUniqueID(targetType);
-			//수정 20.1.16 : 발급 즉시 등록하자 (중복 막기 위함)
-			//if(resultID >= 0)
-			//{
-			//	RegistUniqueID(taTyperget, resultID);
-			//}
-
-			//MakeUniqueID에서 이미 등록이 되었다. (22.7.12)
-
-			return resultID;
-		}
-#region [미사용 코드]
-		//private int MakeUniqueID(List<int> IDList)
-		//{
-		//	int nextID = -1;
-		//	int cntCheck = 0;
-		//	while(true)
-		//	{
-		//		nextID = UnityEngine.Random.Range(1000, 99999999);
-		//		if(!IDList.Contains(nextID))
-		//		{
-		//			IDList.Add(nextID);
-		//			return nextID;
-		//		}
-
-		//		cntCheck++;
-		//		//회수 제한에 걸렸다.
-		//		if(cntCheck > 100)
-		//		{
-		//			break;
-		//		}
-		//	}
-
-		//	for (int i = 1; i < 99999999; i++)
-		//	{
-		//		if(!IDList.Contains(i))
-		//		{
-		//			IDList.Add(i);
-		//			return i;
-		//		}
-		//	}
-		//	return -1;//<< 실패
-		//}
-		//public int MakeUniqueID_Texture()		{ return MakeUniqueID(_registeredUniqueIDs_Texture); }
-		//public int MakeUniqueID_Vertex()		{ return MakeUniqueID(_registeredUniqueIDs_Vert); }
-		//public int MakeUniqueID_Mesh()			{ return MakeUniqueID(_registeredUniqueIDs_Mesh); }
-		//public int MakeUniqueID_MeshGroup()		{ return MakeUniqueID(_registeredUniqueIDs_MeshGroup); }
-		//public int MakeUniqueID_Transform()		{ return MakeUniqueID(_registeredUniqueIDs_Transform); }
-		//public int MakeUniqueID_Modifier()		{ return MakeUniqueID(_registeredUniqueIDs_Modifier); }
-		//public int MakeUniqueID_ControlParam()	{ return MakeUniqueID(_registeredUniqueIDs_ControlParam); }
-		//public int MakeUniqueID_AnimClip()		{ return MakeUniqueID(_registeredUniqueIDs_AnimClip); } 
-#endregion
-
-
-		// 객체 삭제시 ID 회수
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		/// <param name="target"></param>
-		/// <param name="unusedID"></param>
-		public void PushUnusedID(apIDManager.TARGET target, int unusedID)
-		{
-			_IDManager.PushUnusedID(target, unusedID);
-		}
-
-
-		//모든 ID를 리셋하고 다시 등록한다.
-		//Undo용
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void RefreshAllUniqueIDs()
-		{
-			_IDManager.Clear();
-			
-			
-			//1. Texture
-			apTextureData curTextureData = null;
-			for (int i = 0; i < _textureData.Count; i++)
-			{
-				curTextureData = _textureData[i];
-				if(curTextureData == null) { continue; }
-
-				_IDManager.RegistID(apIDManager.TARGET.Texture, curTextureData._uniqueID);
-			}
-
-			//2. Mesh + Vertex + Pin
-			apMesh curMesh = null;
-			for (int i = 0; i < _meshes.Count; i++)
-			{
-				curMesh = _meshes[i];
-				if(curMesh == null) { continue; }
-
-				_IDManager.RegistID(apIDManager.TARGET.Mesh, curMesh._uniqueID);
-				curMesh.RefreshVertexAndPinIDs();//<<Vertex ID를 등록한다.
-			}
-
-			//3. MeshGroup + Transform + Modifier + Bone
-			apMeshGroup curMeshGroup = null;
-			for (int i = 0; i < _meshGroups.Count; i++)
-			{
-				curMeshGroup = _meshGroups[i];
-				if(curMeshGroup == null) { continue; }
-				
-				_IDManager.RegistID(apIDManager.TARGET.MeshGroup, curMeshGroup._uniqueID);
-
-
-				//MeshGroup -> Transform
-				apTransform_Mesh meshTF = null;
-				for (int iMeshTF = 0; iMeshTF < curMeshGroup._childMeshTransforms.Count; iMeshTF++)
-				{
-					meshTF = curMeshGroup._childMeshTransforms[iMeshTF];
-					if(meshTF == null) { continue; }
-
-					_IDManager.RegistID(apIDManager.TARGET.Transform, meshTF._transformUniqueID);
-				}
-
-				apTransform_MeshGroup mgTF = null;
-				for (int iMGTF = 0; iMGTF < curMeshGroup._childMeshGroupTransforms.Count; iMGTF++)
-				{
-					mgTF = curMeshGroup._childMeshGroupTransforms[iMGTF];
-					if(mgTF == null) { continue; }
-
-					_IDManager.RegistID(apIDManager.TARGET.Transform, mgTF._transformUniqueID);
-				}
-
-				if(curMeshGroup._rootMeshGroupTransform != null)
-				{
-					_IDManager.RegistID(	apIDManager.TARGET.Transform, 
-											curMeshGroup._rootMeshGroupTransform._transformUniqueID);
-				}
-
-				//MeshGroup -> Modifier
-				apModifierBase modifier = null;
-				for (int iMod = 0; iMod < curMeshGroup._modifierStack._modifiers.Count; iMod++)
-				{
-					modifier = curMeshGroup._modifierStack._modifiers[iMod];
-					if(modifier == null) { continue; }
-
-					_IDManager.RegistID(	apIDManager.TARGET.Modifier,
-											modifier._uniqueID);
-				}
-
-				apBone bone = null;
-				for (int iBone = 0; iBone < curMeshGroup._boneList_All.Count; iBone++)
-				{
-					bone = curMeshGroup._boneList_All[iBone];
-					if(bone == null) { continue; }
-
-					_IDManager.RegistID(	apIDManager.TARGET.Bone,
-											bone._uniqueID);
-
-				}
-			}
-
-			//4. Control Param
-			apControlParam controlParam = null;
-			for (int i = 0; i < _controller._controlParams.Count; i++)
-			{
-				controlParam = _controller._controlParams[i];
-				if(controlParam == null) { continue; }
-
-				_IDManager.RegistID(	apIDManager.TARGET.ControlParam,
-										controlParam._uniqueID);
-			}
-
-			//5. AnimClip + AnimTimeline + AnimTimeline Layer + AnimKeyframe
-			apAnimClip animClip = null;
-			apAnimTimeline timeline = null;
-			apAnimTimelineLayer timelineLayer = null;
-			apAnimKeyframe keyframe = null;
-			for (int iAnimClip = 0; iAnimClip < _animClips.Count; iAnimClip++)
-			{
-				animClip = _animClips[iAnimClip];
-				if(animClip == null) { continue; }
-
-				_IDManager.RegistID(	apIDManager.TARGET.AnimClip,
-										animClip._uniqueID);
-
-				//Timeline
-				for (int iTimeline = 0; iTimeline < animClip._timelines.Count; iTimeline++)
-				{
-					timeline = animClip._timelines[iTimeline];
-					if(timeline == null) { continue; }
-
-					_IDManager.RegistID(	apIDManager.TARGET.AnimTimeline,
-											timeline._uniqueID);
-
-					//Timeline Layer
-					for (int iTimelineLayer = 0; iTimelineLayer < timeline._layers.Count; iTimelineLayer++)
-					{
-						timelineLayer = timeline._layers[iTimelineLayer];
-						if(timelineLayer == null) { continue; }
-
-						_IDManager.RegistID(	apIDManager.TARGET.AnimTimelineLayer,
-												timelineLayer._uniqueID);
-
-						//Keyframe
-						for (int iKeyframe = 0; iKeyframe < timelineLayer._keyframes.Count; iKeyframe++)
-						{
-							keyframe = timelineLayer._keyframes[iKeyframe];
-							if(keyframe == null)
-							{
-								continue;
-							}
-
-							_IDManager.RegistID(	apIDManager.TARGET.AnimKeyFrame,
-													keyframe._uniqueID);
-
-						}
-					}
-				}
-			}
-
-
-		}
-
-
-
-		// 추가 20.7.9 : 물리 타이머 갱신 (런타임/에디터 갱신시 호출할 것)
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void CalculatePhysicsTimer()
-		{
-			if(_physicsTimer == null)
-			{
-				_physicsTimer = new System.Diagnostics.Stopwatch();
-				_physicsTimer.Start();
-			}
-			float nextDeltaTime = (float)(_physicsTimer.ElapsedMilliseconds / 1000.0f);
-			if(nextDeltaTime > 0.0f)
-			{
-				_physicsDeltaTime = nextDeltaTime;
-
-				//변경
-				//v1.4.2 : 경과 시간이 지나치게 크다면 앱이 중단되었거나 FPS가 떨어졌던 것이다.
-				//이 경우엔 아예 Delta Time을 0으로 만들어서 현재 프레임을 무효로 만들어야 한다.
-				if (_physicsDeltaTime > PHYSICS_SKIP_DELTA_TIME)
-				{
-					//지나치게 긴 물리 시간 > 0초로 만든다.
-					_physicsDeltaTime = 0.0f;
-				}
-				else if (_physicsDeltaTime > PHYSICS_MAX_DELTA_TIME)
-				{
-					//적당히 시간이 조금 오버했다. Max로 한정하자
-					_physicsDeltaTime = PHYSICS_MAX_DELTA_TIME;
-				}
-
-
-				_physicsTimer.Stop();
-				_physicsTimer.Reset();
-				_physicsTimer.Start();
-			}
-
-			//_physicsDeltaTime = Time.unscaledDeltaTime;
-		}
-
-		//화면 캡쳐시에는 물리 시간이 강제된다.
-		/// <summary>
-		/// [Please do not use it]
-		/// </summary>
-		public void SetPhysicsTimerWhenCapture(float tDelta)
-		{
-			if(_physicsTimer == null)
-			{
-				_physicsTimer = new System.Diagnostics.Stopwatch();
-				_physicsTimer.Start();
-			}
-
-			_physicsDeltaTime = tDelta;
-			_physicsTimer.Stop();
-			_physicsTimer.Reset();
-			_physicsTimer.Start();
-		}
-
-
-		/// <summary>
-		/// 추가 22.6.11 : 물리 타이머의 시간을 리셋한다.
-		/// </summary>
-		public void ResetPhysicsTimer()
-		{
-			if(_physicsTimer == null)
-			{
-				_physicsTimer = new System.Diagnostics.Stopwatch();
-				_physicsTimer.Start();
-			}
-			_physicsDeltaTime = 0;
-			_physicsTimer.Stop();
-			_physicsTimer.Reset();
-			_physicsTimer.Start();
-		}
-
-
-#region [미사용 코드]
-		//public void PushUniqueID_Texture(int uniquedID)			{ _registeredUniqueIDs_Texture.Remove(uniquedID); }
-		//public void PushUniqueID_Vertex(int uniquedID)			{ _registeredUniqueIDs_Vert.Remove(uniquedID); }
-		//public void PushUniqueID_Mesh(int uniquedID)			{ _registeredUniqueIDs_Mesh.Remove(uniquedID); }
-		//public void PushUniqueID_MeshGroup(int uniquedID)		{ _registeredUniqueIDs_MeshGroup.Remove(uniquedID); }
-		//public void PushUniqueID_Transform(int uniquedID)		{ _registeredUniqueIDs_Transform.Remove(uniquedID); }
-		//public void PushUniqueID_Modifier(int uniquedID)		{ _registeredUniqueIDs_Modifier.Remove(uniquedID); }
-		//public void PushUniqueID_ControlParam(int uniquedID)	{ _registeredUniqueIDs_ControlParam.Remove(uniquedID); }
-		//public void PushUniqueID_AnimClip(int uniquedID)		{ _registeredUniqueIDs_AnimClip.Remove(uniquedID); } 
-#endregion
-
-		//카메라 관련
-		//-------------------------------------------------------------------------------------------------------
-		private void CheckAndRefreshCameras(bool isResetCommandBufferWhenCameraChanged = true)
-		{
-			if(_mainCamera == null)
-			{
-				_mainCamera = new apOptMainCamera(this);
-			}
-
-			if(_transform == null)
-			{
-				_transform = transform;
-			}
-
-			//변경 v1.5.0
-			//Refresh의 단계를 세분화
-			//1. 빌보드 여부
-			//- 빌보드가 아닌 경우 : 카메라 갱신만 한다.
-			//- 빌보드인 경우 : 카메라의 Matrix 비교 및 재연산도 한다.
-
-			//2. 멀티 카메라 여부
-			//- 멀티 카메라가 아닌 경우 : "지금 카메라가 유효하지 않은 경우"만 갱신을 한다.
-			//- 멀티 카메라인 경우 : 항상 씬의 모든 카메라와 비교를 한다. < 이거 옵션으로 설정 가능 (기본 비활성)
-			//>> 이걸 멀티 카메라 여부 대신 옵션을 별도로 둔다.
-
-			bool isCameraChanged = false;
-
-			//변경 2019.9.24 : 멀티 카메라도 지원하도록 래핑
-			if(_billboardType == BILLBOARD_TYPE.None)
-			{
-				//빌보드가 아니라면 단순 카메라 리스트 검사(false, false)
-				isCameraChanged = _mainCamera.Refresh(false, false, _cameraCheckMode);
-				if(isCameraChanged && isResetCommandBufferWhenCameraChanged)
-				{
-					//카메라가 변경되었다면 > 커맨드 버퍼를 갱신한다.
-					ResetMeshesCommandBuffers(false);
-				}
-				return;
-			}
-			
-			//빌보드라면 카메라의 매트릭스까지 계산(false, true)
-			isCameraChanged = _mainCamera.Refresh(false, true, _cameraCheckMode);
-			if(isCameraChanged && isResetCommandBufferWhenCameraChanged)
-			{
-				//카메라가 변경되었다면 > 커맨드 버퍼를 갱신한다.
-				ResetMeshesCommandBuffers(false);
-			}
-
-			//조건문 추가 v1.5.0 : 바라보는 카메라가 없는 경우에 갱신하면 안된다.
-			if(_mainCamera.GetNumberOfCamera() != apOptMainCamera.NumberOfCamera.None)
-			{
-				if(_billboardType == BILLBOARD_TYPE.Billboard)
-				{
-					//전체 빌보드
-					_transform.rotation = _mainCamera.Rotation;
-				}
-				else
-				{
-					//Up 고정 빌보드
-					_transform.rotation = Quaternion.LookRotation(_mainCamera.Forward, Vector3.up);//변경
-				}
-
-				//추가 v1.5.0
-				//옵션에 따라선, 부모 Transform의 Rotation을 더하거나 Up Vector를 맞춘다.
-				if(_billboardParentRotation != BILLBOARD_PARENT_ROTATION.Ignore)
-				{
-					//Ignore 외의 값을 갖는 경우
-					Transform parentTF = _transform.parent;
-					if(parentTF != null)
-					{
-						if(_billboardParentRotation == BILLBOARD_PARENT_ROTATION.PitchYawRoll)
-						{
-							//일반 더하기 연산 (Local) - Yaw-Pitch-Roll로 동작
-							//_transform.rotation *= parentTF.rotation;
-							_transform.rotation *= parentTF.localRotation;
-						}
-						else
-						{
-							//Up Vector 동기화
-							_transform.rotation = Quaternion.LookRotation(_mainCamera.Forward, parentTF.up);
-						}
-						
-					}
-				}
-				
-				
-				//카메라 좌표계에서의 Z값 (ZDepth)
-				//_zDepthOnPerspectiveCam = _curCamera.worldToCameraMatrix.MultiplyPoint3x4(_transform.position).z;//미사용 코드
-
-				//여기선 Orthographic SortMode로 해야한다.
-				//_curCamera.transparencySortMode = TransparencySortMode.Orthographic;
-
-				//추가 20.9.15
-				//Rotation 전용의 행렬/역행렬을 준비한다.
-				_rotationOnlyMatrixIfBillboard = Matrix4x4.TRS(Vector3.zero, _transform.rotation, Vector3.one);
-				_invRotationOnlyMatrixIfBillboard = _rotationOnlyMatrixIfBillboard.inverse;
-			}
-			
-		}
-
-		//추가. 업데이트가 끝나면 이 함수를 호출하자.
-		private void PostUpdate()
-		{
-			//빌보드인 경우, 현재 프레임에서의 위치를 저장한다. (나중에 "이전 프레임의 위치"로서 가져올 수 있게)
-			_posW_Prev1F = _transform.position;
-
-
-			//추가 v1.4.7 : 루트 유닛 변경에 따른 물리 튐 현상 버그 변수 초기화
-			_isCurrentRootUnitChanged = false;
-		}
-
-
-		/// <summary>
-		/// [Please do not use it] 
-		/// </summary>
-		/// <returns></returns>
-		public apOptMainCamera GetMainCamera()
-		{
-			return _mainCamera;
-		}
-
-		//v1.5.0 추가
-		//: 실시간으로 카메라를 자동으로 감지하는 기능을 사용하고 있을 때,
-		//현재 카메라를 주로 감지할 지, 항상 모든 카메라를 감지할지 결정하는 옵션
-		/// <summary>
-		/// When using the automatic camera detection function, set whether to mainly check the current camera or always check all cameras.
-		/// </summary>
-		/// <param name="cameraCheckMode">How to check cameras</param>
-		public void SetCameraCheckMethod(CAMERA_CHECK_MODE cameraCheckMode)
-		{
-			_cameraCheckMode = cameraCheckMode;
-		}
-	
-
-
-		//카메라를 직접 지정하는 함수
-		/// <summary>
-		/// Reset to automatically detect cameras in the scene.
-		/// </summary>
-		public void FindRenderingCamerasAutomatically()
-		{
-			if(_mainCamera == null)
-			{
-				Debug.LogError("AnyPortrait - The camera module has not been initialized yet.");
-				return;
-			}
-
-			if (_mainCamera.SetRefreshAutomatically())
-			{
-				//기존에는 자동이 아니었는데 이번에 자동으로 갱신되도록 변경되었다.
-				//>> 강제로 갱신
-				bool isCameraChanged = _mainCamera.Refresh(true, _billboardType != BILLBOARD_TYPE.None, _cameraCheckMode);
-				if(isCameraChanged)
-				{
-					ResetMeshesCommandBuffers(false);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Manually set the cameras that render this character.
-		/// When this function is called, the character does not automatically recognize the change even if the cameras in the scene change.
-		/// Call the "FindRenderingCamerasAutomatically()" function to make the character automatically recognize the cameras again.
-		/// </summary>
-		/// <param name="cameras">Cameras placed in the scene you want to set</param>
-		/// <returns>The number of cameras that can actually render the character. Returns -1 if an error occurs</returns>
-		public int SetRenderingCameras(params Camera[] cameras)
-		{
-			if(_mainCamera == null)
-			{
-				Debug.LogError("AnyPortrait - The camera module has not been initialized yet.");
-				return -1;
-			}
-
-			int result = _mainCamera.SetCameras(cameras);
-
-			//추가 v1.5.0 : 이 함수를 호출하면 클리핑 마스크를 위한 커맨드 버퍼를 같이 갱신해야 한다.
-			//(사용자에게 맡기지만 말자)
-			ResetMeshesCommandBuffers(false);
-
-			return result;
-		}
-		
-
-
-		//추가 20.9.15 : 지글본의 좌표계 변환 처리를 위한 특별 함수
-		//이 함수의 내용은 지글본 코드(apOptBone)를 확인하자
-		/// <summary>
-		/// [Please do not use it] 
-		/// </summary>
-		public Vector3 OffsetPos2World_Prev(Vector3 posOffset)
-		{
-			//Debug.Log("Offset Pos Check : Cur : " + _transform.position.x + " / Prev : " + _posW_Prev1F.x);
-			return _rotationOnlyMatrixIfBillboard.MultiplyPoint3x4(posOffset) + _posW_Prev1F;
-		}
-
-		/// <summary>
-		/// [Please do not use it] 
-		/// </summary>
-		public Vector3 WorldPos2OffsetPos(Vector3 worldPos)
-		{
-			return _invRotationOnlyMatrixIfBillboard.MultiplyPoint3x4(worldPos - _transform.position);
-		}
-
-
-		// ID로 오브젝트 참조
-		//-------------------------------------------------------------------------------------------------------
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="uniqueID"></param>
-		/// <returns></returns>
-		public apTextureData GetTexture(int uniqueID)
-		{
-			//이전 (GC 발생)
-			//return _textureData.Find(delegate (apTextureData a)
-			//{
-			//	return a._uniqueID == uniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetTexture_ID = uniqueID;
-			return _textureData.Find(s_GetTextureByID_Func);
-		}
-
-		private static int s_GetTexture_ID = -1;
-		private static Predicate<apTextureData> s_GetTextureByID_Func = FUNC_GetTextureByID;
-		private static bool FUNC_GetTextureByID(apTextureData a)
-		{
-			return a._uniqueID == s_GetTexture_ID;
-		}
-
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="uniqueID"></param>
-		/// <returns></returns>
-		public apMesh GetMesh(int uniqueID)
-		{
-			//이전 (GC 발생)
-			//return _meshes.Find(delegate (apMesh a)
-			//{
-			//	return a._uniqueID == uniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetMesh_ID = uniqueID;
-			return _meshes.Find(s_GetMeshByID_Func);
-		}
-
-		private static int s_GetMesh_ID = -1;
-		private static Predicate<apMesh> s_GetMeshByID_Func = FUNC_GetMeshByID;
-		private static bool FUNC_GetMeshByID(apMesh a)
-		{
-			return a._uniqueID == s_GetMesh_ID;
-		}
-
-
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="uniqueID"></param>
-		/// <returns></returns>
-		public apMeshGroup GetMeshGroup(int uniqueID)
-		{
-			//이전 (GC 발생)
-			//return _meshGroups.Find(delegate (apMeshGroup a)
-			//{
-			//	return a._uniqueID == uniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetMeshGroup_ID = uniqueID;
-			return _meshGroups.Find(s_GetMeshGroupByID_Func);
-		}
-
-		private static int s_GetMeshGroup_ID = -1;
-		private static Predicate<apMeshGroup> s_GetMeshGroupByID_Func = FUNC_GetMeshGroupByID;
-		private static bool FUNC_GetMeshGroupByID(apMeshGroup a)
-		{
-			return a._uniqueID == s_GetMeshGroup_ID;
-		}
-
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="uniqueID"></param>
-		/// <returns></returns>
-		public apControlParam GetControlParam(int uniqueID)
-		{
-			//이전 (GC 발생)
-			//return _controller._controlParams.Find(delegate (apControlParam a)
-			//{
-			//	return a._uniqueID == uniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetControlParam_ID = uniqueID;
-			return _controller._controlParams.Find(s_GetControlParamByID_Func);
-		}
-
-		private static int s_GetControlParam_ID = -1;
-		private static Predicate<apControlParam> s_GetControlParamByID_Func = FUNC_GetControlParamByID;
-		private static bool FUNC_GetControlParamByID(apControlParam a)
-		{
-			return a._uniqueID == s_GetControlParam_ID;
-		}
-
-		/// <summary>
-		/// Get Control Parameter
-		/// </summary>
-		/// <param name="controlParamName">Control Parameter Name</param>
-		/// <returns></returns>
-		public apControlParam GetControlParam(string controlParamName)
-		{
-			//이전 (GC 발생)
-			//return _controller._controlParams.Find(delegate (apControlParam a)
-			//{
-			//	return string.Equals(a._keyName, controlParamName);
-			//});
-
-			//변경 v1.5.0
-			s_GetControlParam_Name = controlParamName;
-			return _controller._controlParams.Find(s_GetControlParamByName_Func);
-		}
-
-		private static string s_GetControlParam_Name = null;
-		private static Predicate<apControlParam> s_GetControlParamByName_Func = FUNC_GetControlParamByName;
-		private static bool FUNC_GetControlParamByName(apControlParam a)
-		{
-			return string.Equals(a._keyName, s_GetControlParam_Name);
-		}
-
-
-
-
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="uniqueID"></param>
-		/// <returns></returns>
-		public apAnimClip GetAnimClip(int uniqueID)
-		{
-			//이전 (GC 발생)
-			//return _animClips.Find(delegate (apAnimClip a)
-			//{
-			//	return a._uniqueID == uniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetAnimClip_ID = uniqueID;
-			return _animClips.Find(s_GetAnimClipByID);
-		}
-
-		private static int s_GetAnimClip_ID = -1;
-		private static Predicate<apAnimClip> s_GetAnimClipByID = FUNC_GetAnimClipByID;
-		private static bool FUNC_GetAnimClipByID(apAnimClip a)
-		{
-			return a._uniqueID == s_GetAnimClip_ID;
-		}
-
-
-		// ID로 오브젝트 참조 - RealTime
-		//-------------------------------------------------------------------------------------------------------
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="transformID"></param>
-		/// <returns></returns>
-		public apOptTransform GetOptTransform(int transformID)
-		{
-			if (transformID < -1)
-			{
-				return null;
-			}
-
-			if (_optTransforms == null)
-			{
-				return null;
-			}
-			//이전 (GC 발생)
-			//return _optTransforms.Find(delegate (apOptTransform a)
-			//{
-			//	return a._transformID == transformID;
-			//});
-
-			//변경 v1.5.0
-			s_GetOptTransform_ID = transformID;
-			return _optTransforms.Find(s_GetOptTransformByID_Func);
-		}
-
-		private static int s_GetOptTransform_ID = -1;
-		private static Predicate<apOptTransform> s_GetOptTransformByID_Func = FUNC_GetOptTransformByID;
-		private static bool FUNC_GetOptTransformByID(apOptTransform a)
-		{
-			return a._transformID == s_GetOptTransform_ID;
-		}
-
-
-
-		/// <summary>
-		/// [Please do not use it] (For Editor, not Runtime)
-		/// </summary>
-		/// <param name="meshGroupUniqueID"></param>
-		/// <returns></returns>
-		public apOptTransform GetOptTransformAsMeshGroup(int meshGroupUniqueID)
-		{
-			//Debug.Log("GetOptTransformAsMeshGroup [" + meshGroupUniqueID + "]");
-			if (meshGroupUniqueID < 0)
-			{
-				//Debug.LogError("ID < 0");
-				return null;
-			}
-			if (_optTransforms == null)
-			{
-				//Debug.LogError("OptTranforms is Null");
-				return null;
-			}
-
-			//이전 (GC 발생)
-			//return _optTransforms.Find(delegate (apOptTransform a)
-			//{
-			//	return a._meshGroupUniqueID == meshGroupUniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetOptTransformAsMeshGroup_ID = meshGroupUniqueID;
-			return _optTransforms.Find(s_GetOptTransformAsMeshGroup_Func);
-		}
-
-		private static int s_GetOptTransformAsMeshGroup_ID = -1;
-		private static Predicate<apOptTransform> s_GetOptTransformAsMeshGroup_Func = FUNC_GetOptTransformAsMeshGroup;
-		private static bool FUNC_GetOptTransformAsMeshGroup(apOptTransform a)
-		{
-			return a._meshGroupUniqueID == s_GetOptTransformAsMeshGroup_ID;
-		}
-
-		/// <summary>
-		/// Get Root Unit with Index
-		/// </summary>
-		/// <param name="rootUnitIndex"></param>
-		/// <returns></returns>
-		public apOptRootUnit GetOptRootUnit(int rootUnitIndex)
-		{
-			if(_optRootUnitList.Count == 0)
-			{
-				return null;
-			}
-			if(rootUnitIndex < 0 || rootUnitIndex >= _optRootUnitList.Count)
-			{
-				return null;
-			}
-			return _optRootUnitList[rootUnitIndex];
-		}
-
-		
-
-
-		//추가 19.6.3 : MaterialSet에 관련
-		public apMaterialSet GetMaterialSet(int uniqueID)
-		{
-			//이전 (GC 발생)
-			//return _materialSets.Find(delegate(apMaterialSet a)
-			//{
-			//	return a._uniqueID == uniqueID;
-			//});
-
-			//변경 v1.5.0
-			s_GetMaterialSet_ID = uniqueID;
-			return _materialSets.Find(s_GetMaterialSetByID_Func);
-		}
-
-
-		private static int s_GetMaterialSet_ID = -1;
-		private static Predicate<apMaterialSet> s_GetMaterialSetByID_Func = FUNC_GetMaterialSetByID;
-		private static bool FUNC_GetMaterialSetByID(apMaterialSet a)
-		{
-			return a._uniqueID == s_GetMaterialSet_ID;
-		}
-
-
-		public apMaterialSet GetDefaultMaterialSet()
-		{
-			//이전 (GC 발생)
-			//return _materialSets.Find(delegate (apMaterialSet a)
-			//{
-			//	return a._isDefault;
-			//});
-
-			//변경 v1.5.0
-			return _materialSets.Find(s_GetDefaultMaterialSet);
-		}
-
-		private static Predicate<apMaterialSet> s_GetDefaultMaterialSet = FUNC_GetDefaultMaterialSet;
-		private static bool FUNC_GetDefaultMaterialSet(apMaterialSet a)
-		{
-			return a._isDefault;
-		}
-
-
-
-		// 다른 포트레이트와 동기화 (21.6.7)
-		//--------------------------------------------------------------------------
-		/// <summary>
-		/// If it is synchronized with other apPortraits, unsynchronize it.
-		/// If this is a synchronized parent, all child objects are unsynchronized.
-		/// If this is a synchronized child, exclude it from its parent.
-		/// </summary>
-		public void Unsynchronize()
-		{
-			if(_isSyncParent)
-			{
-				if(_syncChildPortraits != null)
-				{
-					//자식들의 동기화를 모두 해제한다.
-					apPortrait childPortrait = null;
-					for (int i = 0; i < _syncChildPortraits.Count; i++)
-					{	
-						childPortrait = _syncChildPortraits[i];
-						if(childPortrait == null || childPortrait == this)
-						{
-							continue;
-						}
-						childPortrait._isSyncChild = false;
-						childPortrait._isSyncParent = false;
-						childPortrait._syncChildPortraits = null;
-						childPortrait._syncParentPortrait = null;
-						childPortrait._syncPlay = null;
-					}
-				}
-				_isSyncParent = false;
-				_syncChildPortraits = null;
-			}
-			if(_isSyncChild)
-			{
-				if(_syncParentPortrait != null)
-				{
-					//부모로부터 동기화를 해제한다.
-					if(_syncParentPortrait._syncChildPortraits != null
-						&& _syncParentPortrait._syncChildPortraits.Contains(this))
-					{
-						_syncParentPortrait._syncChildPortraits.Remove(this);
-
-						if(_syncParentPortrait._syncChildPortraits.Count == 0)
-						{
-							//부모 객체의 모든 동기화가 해제되었다.
-							_syncParentPortrait._isSyncParent = false;
-							_syncParentPortrait._syncChildPortraits = null;
-							_syncParentPortrait._isSyncChild = false;
-							_syncParentPortrait._syncParentPortrait = null;
-							_syncParentPortrait._syncPlay = null;
-						}
-					}
-				}
-				
-				_isSyncChild = false;
-				_syncParentPortrait = null;
-				
-				//이전
-				//_syncMethod = SYNC_METHOD.None;
-
-				//변경
-				_isSync_Animation = false;
-				_isSync_ControlParam = false;
-				_isSync_Bone = false;
-				_isSync_RootUnit = false;
-
-				if(_syncPlay != null)
-				{
-					_syncPlay.Unsynchronize();
-				}
-				_syncPlay = null;
-
-				//중요 : 동기화가 해제 되면 일부 모디파이어의 코드가 다르게 동작해야한다.
-				int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
-				if (nRootUnits > 0)
-				{
-					for (int i = 0; i < nRootUnits; i++)
-					{
-						_optRootUnitList[i]._rootOptTransform._modifierStack.DisableSync();
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Synchronizes the updated values of animation or control parameters with other apPortrait.
-		/// If synchronization succeeds, this apPortrait is registered and updated as a child of the target's apPortrait.
-		/// </summary>
-		/// <param name="targetPortrait">Target parent apPortrait.</param>
-		/// <param name="syncAnimation">Synchronize the playback state of animation clips of the same name.</param>
-		/// <param name="syncControlParam">Synchronize the values of control parameters of the same name.</param>
-		/// <returns>Returns True if synchronization is successful.</returns>
-		public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam)
-		{
-			return Synchronize(targetPortrait, syncAnimation, syncControlParam, 
-								false, false, SYNC_BONE_OPTION.MatchFromRoot);
-		}
-
-
-		/// <summary>
-		/// Synchronizes the updated values of animation, control parameters or root units with other apPortrait.
-		/// If synchronization succeeds, this apPortrait is registered and updated as a child of the target's apPortrait.
-		/// </summary>
-		/// <param name="targetPortrait">Target parent apPortrait.</param>
-		/// <param name="syncAnimation">Synchronize the playback state of animation clips of the same name.</param>
-		/// <param name="syncControlParam">Synchronize the values of control parameters of the same name.</param>
-		/// <param name="syncRootUnit">Synchronize the transition of Root Units.(If animation is synchronized, this value is forced to false.)</param>
-		/// <returns>Returns True if synchronization is successful.</returns>
-		public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam, bool syncRootUnit)
-		{
-			return Synchronize(targetPortrait, syncAnimation, syncControlParam, 
-								syncRootUnit, 
-								false, SYNC_BONE_OPTION.MatchFromRoot);
-		}
-
-		/// <summary>
-		/// Synchronizes the updated values of animation, control parameters, bones or root units with other apPortrait.
-		/// If synchronization succeeds, this apPortrait is registered and updated as a child of the target's apPortrait.
-		/// </summary>
-		/// <param name="targetPortrait">Target parent apPortrait.</param>
-		/// <param name="syncAnimation">Synchronize the playback state of animation clips of the same name.</param>
-		/// <param name="syncControlParam">Synchronize the values of control parameters of the same name.</param>
-		/// <param name="syncBones">Synchronize the movement of bones with the same name and structure.</param>
-		/// <param name="syncBoneOption">Option to synchronize bones (this option is ignored if syncBones is false)</param>
-		/// <param name="syncRootUnit">Synchronize the transition of Root Units.(If animation is synchronized, this value is forced to false.)</param>
-		/// <returns>Returns True if synchronization is successful.</returns>
-		//public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam, bool syncBones, SYNC_BONE_OPTION syncBoneOption, bool syncRootUnit)
-		public bool Synchronize(apPortrait targetPortrait, bool syncAnimation, bool syncControlParam, bool syncRootUnit, bool syncBones, SYNC_BONE_OPTION syncBoneOption)//인자 순서를 바꾼다.
-		{
-			if (targetPortrait == null || targetPortrait == this)
-			{
-				Debug.LogError("AnyPortrait : [Sync failed] Target is null");
-				return false;
-			}
-			if(_isSyncParent)
-			{
-				Debug.LogError("AnyPortrait : [Sync failed] This apPortrait is a parent object that has already been synced.");
-				return false;
-			}
-
-			if(targetPortrait._isSyncChild)
-			{
-				Debug.LogError("AnyPortrait : [Sync failed] The target is already synced to another apPortrait.");
-				return false;
-			}
-
-			
-			//잘못된 코드
-			//if(syncAnimation && syncRootUnit)
-			//{
-			//	//만약 애니메이션 동기화를 하면 루트 유닛 동기화는 false가 된다.
-			//	syncRootUnit = false;
-			//}
-
-			//반대. Animation에 RootUnit 동기화 기능이 없었다!
-			//Animation을 켜면 RootUnit 동기화를 같이 켜야한다.
-			
-			if(syncAnimation)
-			{
-				syncRootUnit = true;
-			}
-
-			if(!syncAnimation && !syncControlParam && !syncBones && !syncRootUnit)
-			{
-				Debug.LogError("AnyPortrait : [Sync failed] This function does not work because all arguments are false. To unsynchronize, use the Unsynchronize() function instead.");
-				return false;
-			}
-
-			//연동할게 없다면 요청 항목에서 삭제
-			if (syncAnimation)
-			{
-				int nAnimClips = _animClips != null ? _animClips.Count : 0;
-				int nTargetAnimClips = targetPortrait._animClips != null ? targetPortrait._animClips.Count : 0;
-
-				if (nAnimClips == 0 || nTargetAnimClips == 0)
-				{
-					syncAnimation = false;
-				}
-			}
-
-			if (syncControlParam)
-			{
-				if(_controller._controlParams == null || targetPortrait._controller._controlParams == null)
-				{
-					syncControlParam = false;
-				}
-			}
-			
-			if(syncRootUnit)
-			{
-				//루트 유닛이 모두 2개 이상이어야 하고, 개수가 같아야 한다.
-				int nRootUnit_Target = targetPortrait._optRootUnitList != null ? targetPortrait._optRootUnitList.Count : 0;
-				int nRootUnit_Self = _optRootUnitList != null ? _optRootUnitList.Count : 0;
-
-				if(nRootUnit_Target <= 1 || nRootUnit_Self <= 1)
-				{
-					//루트 유닛이 1 이하라면 syncRootUnit 요청은 무시된다.
-					
-					if(!syncAnimation)
-					{
-						//단 경고문은 애니메이션 동기화가 아닌 경우에만 보여주자
-						Debug.LogWarning("AnyPortrait : If there are 1 or fewer Root Units, the synchronization request to the Root Unit is ignored.");
-					}
-					
-					syncRootUnit = false;
-				}
-				else if(nRootUnit_Target != nRootUnit_Self)
-				{
-					//루트 유닛의 개수가 다르다면 syncRootUnit 요청은 무시된다.
-					
-					Debug.LogError("AnyPortrait : Since the number of Root Units between the two Portraits is different, the synchronization request for switching Root Units is ignored.");
-					syncRootUnit = false;
-				}
-			}
-
-
-			if(!syncAnimation && !syncControlParam && !syncBones && !syncRootUnit)
-			{
-				return false;
-			}
-
-			
-
-			if(_isSyncChild)
-			{
-				if(targetPortrait == _syncParentPortrait)
-				{
-					//이미 동기화가 되었다.
-					//부모의 입장에서 이 객체가 등록되었는지 한번 더 확인하자
-					_syncParentPortrait._isSyncParent = true;
-					if(_syncParentPortrait._syncChildPortraits == null)
-					{
-						_syncParentPortrait._syncChildPortraits = new List<apPortrait>();
-					}
-					if(!_syncParentPortrait._syncChildPortraits.Contains(this))
-					{
-						_syncParentPortrait._syncChildPortraits.Add(this);
-					}
-					return true;
-				}
-			}
-
-			//만약 새로 등록하는 거라면
-			_isSyncChild = true;
-			_syncParentPortrait = targetPortrait;
-
-			
-			//이전
-			//if(syncAnimation && syncControlParam)
-			//{
-			//	_syncMethod = SYNC_METHOD.AnimationAndControlParam;
-			//}
-			//else if(syncAnimation && !syncControlParam)
-			//{
-			//	_syncMethod = SYNC_METHOD.AnimationOnly;
-			//}
-			//else if(!syncAnimation && syncControlParam)
-			//{
-			//	_syncMethod = SYNC_METHOD.ControlParamOnly;
-			//}
-			//else
-			//{
-			//	_syncMethod = SYNC_METHOD.None;
-			//}
-
-			//변경 21.9.18
-			_isSync_Animation = syncAnimation;
-			_isSync_ControlParam = syncControlParam;
-			_isSync_Bone = syncBones;
-			_isSync_RootUnit = syncRootUnit;
-
-
-
-			//동기화용 객체 생성
-			_syncPlay = new apSyncPlay(this, _syncParentPortrait, syncAnimation, syncControlParam, syncBones, syncBoneOption, syncRootUnit);
-
-			_syncParentPortrait._isSyncParent = true;
-			if(_syncParentPortrait._syncChildPortraits == null)
-			{
-				_syncParentPortrait._syncChildPortraits = new List<apPortrait>();
-			}
-			if(!_syncParentPortrait._syncChildPortraits.Contains(this))
-			{
-				_syncParentPortrait._syncChildPortraits.Add(this);
-			}
-
-
-			//중요 : 동기화가 되면 일부 모디파이어의 코드가 다르게 동작해야한다.
-			int nRootUnits = _optRootUnitList != null ? _optRootUnitList.Count : 0;
-			if (nRootUnits > 0)
-			{
-				for (int i = 0; i < nRootUnits; i++)
-				{
-					//모디파이어 스택에서 Sync를 활성화
-					//- 리깅 LUT가 Sync용으로 변경된다.
-					//- 이 코드는 SyncPlay를 생성한 후에 실행되어야 한다.
-					_optRootUnitList[i]._rootOptTransform._modifierStack.EnableSync();
-				}
-			}
-			
-
-			return true;
-		}
-
-		
-
-		// 추가 21.10.7 : 업데이트 시간 배속 설정
-		/// <summary>
-		/// Decide which the interval value of time will be used when updating the apPortrait.
-		/// If the Important option is disabled or Mecanim (Animator) is used, this option does not apply except for some features.
-		/// </summary>
-		/// <param name="useUnscaleDeltaTime">If true, Time.unscaledDeltaTime is used, if false, Time.deltaTime is used. (Default is false)</param>
-		public void SetUpdateTimeMethod(bool useUnscaleDeltaTime)
-		{
-			_isDeltaTimeOptionChanged = true;
-
-			if(useUnscaleDeltaTime)
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.UnscaledDeltaTime;
-			}
-			else
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
-			}
-			_deltaTimeMultiplier = 1.0f;
-			_funcDeltaTimeRequested = null;
-			_deltaTimeRequestSavedObject = null;
-		}
-
-		/// <summary>
-		/// Decide which the interval value of time will be used when updating the apPortrait.
-		/// If the Important option is disabled or Mecanim (Animator) is used, this option does not apply except for some features.
-		/// </summary>
-		/// <param name="useUnscaleDeltaTime">If true, Time.unscaledDeltaTime is used, if false, Time.deltaTime is used. (Default is false)</param>
-		/// <param name="multiplier">The multiplier that accelerates the update. (Default is 1.0f)</param>
-		public void SetUpdateTimeMethod(bool useUnscaleDeltaTime, float multiplier)
-		{
-			_isDeltaTimeOptionChanged = true;
-
-			if(useUnscaleDeltaTime)
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.MultipliedUnscaledDeltaTime;
-			}
-			else
-			{
-				_deltaTimeOption = DELTA_TIME_OPTION.MultipliedDeltaTime;
-			}
-			_deltaTimeMultiplier = multiplier;
-			_funcDeltaTimeRequested = null;
-			_deltaTimeRequestSavedObject = null;
-		}
-
-		//추가 1.3.5 22.1.8 : 콜백으로 업데이트 시간 제어
-		/// <summary>
-		/// Decide which the interval value of time will be used when updating the apPortrait.
-		/// You can control the update rate of multiple characters at once by using a callback function that return the Delta Time.
-		/// If the Important option is disabled or Mecanim (Animator) is used, this option does not apply except for some features.
-		/// </summary>
-		/// <param name="onDeltaTimeRequested">A callback function that returns the Delta Time (float OnDeltaTimeRequested(object))</param>
-		/// <param name="savedObject">A key object for distinguishing characters. It is passed as an argument when calling the callback function. (nullable)</param>
-		public void SetUpdateTimeMethod(OnDeltaTimeRequested onDeltaTimeRequested, object savedObject = null)
-		{
-			_isDeltaTimeOptionChanged = true;
-
-			if(onDeltaTimeRequested == null)
-			{
-				Debug.Log("AnyPortrait : onDeltaTimeRequested is null, so it will be restored to the default option.");
-				_deltaTimeOption = DELTA_TIME_OPTION.DeltaTime;
-				_deltaTimeMultiplier = 1.0f;
-				_funcDeltaTimeRequested = null;
-				_deltaTimeRequestSavedObject = null;
-				return;
-			}
-
-			_deltaTimeOption = DELTA_TIME_OPTION.CustomFunction;
-			_deltaTimeMultiplier = 1.0f;
-			_funcDeltaTimeRequested = onDeltaTimeRequested;
-			_deltaTimeRequestSavedObject = savedObject;
-		}
-
-		
-
-
-		// 추가 21.12.22 : 재질 합치기
-		//모든 함수들은 부모에게 가서 시도해야한다.
-		//Merge된 재질들을 모두 해제한다.
+		//-----------------------------------------------------------
+		// Merge Materials
+		//-----------------------------------------------------------
 		/// <summary>
 		/// Release all merged materials. You can also call it from apPortrait rather than Main.
 		/// </summary>
@@ -13589,6 +13381,330 @@ namespace AnyPortrait
 			_optMergedMaterial.MakeMergeMaterials(targetPortraits);
 
 		}
+
+
+
+		//-----------------------------------------------------------
+		// Show / Hide Meshes
+		//-----------------------------------------------------------
+
+
+		/// <summary>
+		/// Show Opt-Mesh
+		/// </summary>
+		/// <param name="optTransform">Opt-Transform with the target Opt-Mesh</param>
+		public void ShowMesh(apOptTransform optTransform)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (optTransform == null || optTransform._childMesh == null) { return; }
+				optTransform._childMesh.SetHideForce(false);
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+		/// <summary>
+		/// Show Opt-Mesh
+		/// </summary>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		public void ShowMesh(string transformName)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				apOptTransform optTransform = GetOptTransform(transformName);
+				if (optTransform == null || optTransform._childMesh == null) { return; }
+				optTransform._childMesh.SetHideForce(false);
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+		/// <summary>
+		/// Show Opt-Mesh
+		/// </summary>
+		/// <param name="rootUnitIndex">Root Unit Index</param>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		public void ShowMesh(int rootUnitIndex, string transformName)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				apOptTransform optTransform = GetOptTransform(rootUnitIndex, transformName);
+				if (optTransform == null || optTransform._childMesh == null) { return; }
+				optTransform._childMesh.SetHideForce(false);
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+		/// <summary>
+		/// Hide Opt-Mesh
+		/// </summary>
+		/// <param name="optTransform">Opt-Transform with the target Opt-Mesh</param>
+		public void HideMesh(apOptTransform optTransform)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				if (optTransform == null || optTransform._childMesh == null) { return; }
+				optTransform._childMesh.SetHideForce(true);
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+		/// <summary>
+		/// Hide Opt-Mesh
+		/// </summary>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		public void HideMesh(string transformName)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				apOptTransform optTransform = GetOptTransform(transformName);
+				if (optTransform == null || optTransform._childMesh == null) { return; }
+				optTransform._childMesh.SetHideForce(true);
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+
+		/// <summary>
+		/// Hide Opt-Mesh
+		/// </summary>
+		/// <param name="rootUnitIndex">Root Unit Index</param>
+		/// <param name="transformName">Name of Opt-Transform with the target Opt-Mesh</param>
+		public void HideMesh(int rootUnitIndex, string transformName)
+		{
+#if UNITY_EDITOR
+			try
+			{
+#endif
+				apOptTransform optTransform = GetOptTransform(rootUnitIndex, transformName);
+				if (optTransform == null || optTransform._childMesh == null) { return; }
+				optTransform._childMesh.SetHideForce(true);
+#if UNITY_EDITOR
+			}
+			catch(Exception ex)
+			{
+				//v1.4.7 : 초기화 전에 함수 호출시 에러 로그가 찍히도록
+				ShowErrorMsgIfNotInitialized_Editor(ex);
+				throw;
+			}
+#endif
+		}
+
+		
+		//----------------------------------------------------------------------------------
+		// Physics Effect
+		//----------------------------------------------------------------------------------
+		/// <summary>Turn physical effects on or off.</summary>
+		/// <param name="isPhysicEnabled"></param>
+		public void SetPhysicEnabled(bool isPhysicEnabled)
+		{
+			_isPhysicsPlay_Opt = isPhysicEnabled;
+		}
+
+		/// <summary>
+		/// Initialize all forces and physical effects by touch.
+		/// This function is equivalent to executing "ClearForce()" and "ClearTouch()" together.
+		/// </summary>
+		public void ClearForceAndTouch()
+		{
+			_forceManager.ClearAll();
+		}
+
+		/// <summary>Initialize all physical forces.</summary>
+		public void ClearForce()
+		{
+			_forceManager.ClearForce();
+		}
+
+		/// <summary>
+		/// Remove the target force.
+		/// </summary>
+		/// <param name="forceUnit">The target force you want to remove</param>
+		public void RemoveForce(apForceUnit forceUnit)
+		{
+			_forceManager.RemoveForce(forceUnit);
+		}
+
+
+
+
+		/// <summary>
+		/// Adds force applied radially at a specific point.
+		/// </summary>
+		/// <param name="pointPosW">Center position of force in world space</param>
+		/// <param name="radius">Radius to which force is applied</param>
+		/// <returns>Applied force information</returns>
+		public apForceUnit AddForce_Point(Vector2 pointPosW, float radius)
+		{
+			return _forceManager.AddForce_Point(pointPosW, radius);
+		}
+
+		/// <summary>
+		/// Add force with direction.
+		/// </summary>
+		/// <param name="directionW">Direction vector</param>
+		/// <returns>Applied force information</returns>
+		public apForceUnit AddForce_Direction(Vector2 directionW)
+		{
+			return _forceManager.AddForce_Direction(directionW);
+		}
+
+		/// <summary>
+		/// Add a force that changes direction periodically.
+		/// </summary>
+		/// <param name="directionW">Direction vector</param>
+		/// <param name="waveSizeX">How much the direction changes on the X axis</param>
+		/// <param name="waveSizeY">How much the direction changes on the Y axis</param>
+		/// <param name="waveTimeX">The time the force changes on the X axis</param>
+		/// <param name="waveTimeY">The time the force changes on the Y axis</param>
+		/// <returns>Applied force information</returns>
+		public apForceUnit AddForce_Direction(Vector2 directionW, float waveSizeX, float waveSizeY, float waveTimeX, float waveTimeY)
+		{
+			return _forceManager.AddForce_Direction(directionW, new Vector2(waveSizeX, waveSizeY), new Vector2(waveTimeX, waveTimeY));
+		}
+
+		/// <summary>
+		/// Is any force being applied?
+		/// </summary>
+		public bool IsAnyForceEvent
+		{
+			get { return _forceManager.IsAnyForceEvent; }
+		}
+
+		/// <summary>
+		/// The force applied at the requested position is calculated
+		/// </summary>
+		/// <param name="targetPosW">Position in world space</param>
+		/// <returns>Calculated Force</returns>
+		public Vector2 GetForce(Vector2 targetPosW)
+		{
+			return _forceManager.GetForce(targetPosW);
+		}
+
+		/// <summary>
+		/// Add a physics effect to pull meshes using the touch.
+		/// </summary>
+		/// <param name="posW">First touch position in world space</param>
+		/// <param name="radius">Radius of pulling force</param>
+		/// <returns>Added touch information with "TouchID"</returns>
+		public apPullTouch AddTouch(Vector2 posW, float radius)
+		{
+			return _forceManager.AddTouch(posW, radius);
+		}
+
+		/// <summary>Initialize all physical forces by touch.</summary>
+		public void ClearTouch()
+		{
+			_forceManager.ClearTouch();
+		}
+
+		/// <summary>
+		/// Removes physical effects by touch with the requested ID.
+		/// </summary>
+		/// <param name="touchID">Touch ID</param>
+		public void RemoveTouch(int touchID)
+		{
+			_forceManager.RemoveTouch(touchID);
+		}
+
+		/// <summary>
+		/// Removes physical effects by touch with the requested Data.
+		/// </summary>
+		/// <param name="touchID">Touch Data</param>
+		public void RemoveTouch(apPullTouch touch)
+		{
+			_forceManager.RemoveTouch(touch);
+		}
+
+		/// <summary>
+		/// Returns a physical effect by touch with the requested ID.
+		/// </summary>
+		/// <param name="touchID">Touch ID</param>
+		/// <returns>Requested touch information (return null if touchID is not valid)</returns>
+		public apPullTouch GetTouch(int touchID)
+		{
+			return _forceManager.GetTouch(touchID);
+		}
+
+		/// <summary>
+		/// Update the position of the added touch.
+		/// </summary>
+		/// <param name="touchID">Touch ID</param>
+		/// <param name="posW">World Position</param>
+		public void SetTouchPosition(int touchID, Vector2 posW)
+		{
+			_forceManager.SetTouchPosition(touchID, posW);
+		}
+
+		/// <summary>
+		/// Update the position of the added touch.
+		/// </summary>
+		/// <param name="touch">Added Touch information</param>
+		/// <param name="posW">World Position</param>
+		public void SetTouchPosition(apPullTouch touch, Vector2 posW)
+		{
+			_forceManager.SetTouchPosition(touch, posW);
+		}
+
+		/// <summary>
+		/// Is any force by touch being applied?
+		/// </summary>
+		public bool IsAnyTouchEvent { get { return _forceManager.IsAnyTouchEvent; } }
+
+
+		//이건 사용 불가 (별도로 두기에 애매해서 여기에 작성)
+		/// <summary>
+		/// [Please do not use it] Temporary code used for touch calculations
+		/// </summary>
+		public int TouchProcessCode { get { return _forceManager.TouchProcessCode; } }
+
+
+
 	}
 
 }

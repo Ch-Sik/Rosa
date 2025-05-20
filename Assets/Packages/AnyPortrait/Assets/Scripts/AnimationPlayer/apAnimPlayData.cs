@@ -100,6 +100,12 @@ namespace AnyPortrait
 			_linkedAnimClip = animClip;
 			_linkedOptRootUnit = optRootUnit;
 			_isValid = true;
+
+			if(_linkedAnimClip != null)
+			{
+				//상호 연결을 하자
+				_linkedAnimClip.LinkPlayData(this);
+			}
 		}
 
 
@@ -214,6 +220,67 @@ namespace AnyPortrait
 
 				return Mathf.Clamp01(fFrame / (float)length);
 
+			}
+		}
+
+
+		//v1.5.2
+		/// <summary>
+		/// Returns the total length of the animation in seconds.
+		/// This value is not affected by playback speed.
+		/// Return -1 if there is no target animation clip.
+		/// </summary>
+		public float TimeLength
+		{
+			get
+			{
+				if (_linkedAnimClip == null)
+				{
+					return -1.0f;
+				}
+
+				return _linkedAnimClip.TimeLength;
+			}
+		}
+
+		/// <summary>
+		/// Returns the total length of the animation in seconds.
+		/// This value changes depending on the playback speed.
+		/// If the target animation clip does not exist or its playback speed is 0, -1 is returned.
+		/// </summary>
+		public float Duration
+		{
+			get
+			{
+				if(_linkedAnimClip == null)
+				{
+					return -1.0f;
+				}
+
+				float speedRatio = Mathf.Abs(_linkedAnimClip.SpeedRatio);
+				if(speedRatio > 0.0f)
+				{
+					return _linkedAnimClip.TimeLength / speedRatio;
+				}
+
+				return -1.0f;
+			}
+
+		}
+
+		/// <summary>
+		/// Returns whether the animation is looping.
+		/// </summary>
+		public bool IsLoop
+		{
+			get
+			{
+				if(_linkedAnimClip == null)
+				{
+					return false;
+				}
+
+				return _linkedAnimClip.IsLoop;
 			}
 		}
 	}

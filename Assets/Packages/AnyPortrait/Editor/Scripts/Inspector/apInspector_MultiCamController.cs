@@ -41,16 +41,16 @@ namespace AnyPortrait
 			}
 			
 			GUILayout.Space(10);
-			Dictionary<apOptMesh, apOptMultiCameraController.FUNC_MESH_PRE_RENDERED> preRenderedEvents = targetMCC.GetPreRenderedEvents();
-			if(preRenderedEvents != null && preRenderedEvents.Count > 0)
-			{
-				int index = 0;
-				foreach (KeyValuePair<apOptMesh, apOptMultiCameraController.FUNC_MESH_PRE_RENDERED> pair in preRenderedEvents)
-				{
-					EditorGUILayout.LabelField("[" + index + "] : " + pair.Key.name);
-					index++;
-				}
-			}
+			// Dictionary<apOptMesh, apOptMultiCameraController.FUNC_MESH_PRE_RENDERED> preRenderedEvents = targetMCC.GetPreRenderedEvents();
+			// if(preRenderedEvents != null && preRenderedEvents.Count > 0)
+			// {
+			// 	int index = 0;
+			// 	foreach (KeyValuePair<apOptMesh, apOptMultiCameraController.FUNC_MESH_PRE_RENDERED> pair in preRenderedEvents)
+			// 	{
+			// 		EditorGUILayout.LabelField("[" + index + "] : " + pair.Key.name);
+			// 		index++;
+			// 	}
+			// }
 		}
 	}
 }

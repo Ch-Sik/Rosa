@@ -151,8 +151,6 @@ namespace AnyPortrait
 			
 			//추가 20.7.19
 			_lastClickTimelineLayer = null;
-
-
 			
 			_isBoneDefaultEditing = false;
 
@@ -229,15 +227,11 @@ namespace AnyPortrait
 				//동기화는 해제된다.
 				_portrait.VisiblePreset.ClearSync();
 			}
-			
-
 
 			//추가 21.2.28 : 로토스코핑 초기화
 			Editor._isEnableRotoscoping = false;
 			Editor._selectedRotoscopingData = null;
 			Editor._iRotoscopingImageFile = 0;
-
-
 
 			//Capture 변수 초기화
 			_captureSelectedAnimClip = null;
@@ -303,6 +297,13 @@ namespace AnyPortrait
 			_snapPin = null;
 			_isPinMouseWire = false;
 			_pinMouseWirePosW = Vector2.zero;
+
+			//v1.6.0
+			//EditorRT를 초기화한다.
+			if(Editor.RenderTex != null)
+			{
+				Editor.RenderTex.ReleaseAll();
+			}
 		}
 
 
@@ -1291,7 +1292,7 @@ namespace AnyPortrait
 				AutoSelectModMeshOrModBone();
 			}
 			if (SelectionType == SELECTION_TYPE.Animation && AnimClip != null)
-			{
+			{	
 				AutoSelectAnimTimelineLayer(true);
 			}
 
@@ -2160,10 +2161,10 @@ namespace AnyPortrait
 				Editor.Gizmos.RevertFFDTransformForce();//<추가
 			}
 
-			if(ExEditingMode == EX_EDIT.None)
-			{
-				Debug.LogError("Ex Mode > None");
-			}
+			//if(ExEditingMode == EX_EDIT.None)
+			//{
+			//	Debug.LogError("Ex Mode > None");
+			//}
 
 		}
 
@@ -5107,7 +5108,7 @@ namespace AnyPortrait
 				//선택된 타임라인이 있는 경우
 				bool isChanged = _subAnimTimeline != resultTimeline;
 				_subAnimTimeline = resultTimeline;
-				
+
 				AutoSelectAnimWorkKeyframe(out isWorkKeyframeChanged);
 
 				if(isWorkKeyframeChanged && Editor.Gizmos.IsFFDMode)
@@ -5116,20 +5117,26 @@ namespace AnyPortrait
 					Editor.Gizmos.CheckAdaptOrRevertFFD_WithoutCancel();
 				}
 
+				
 				//여기서는 아예 Work Keyframe 뿐만아니라 Keyframe으로도 선택을 한다.
 				SelectAnimKeyframe(_subObjects.WorkKeyframe, false, apGizmos.SELECT_TYPE.New);//<<이것도 다중 처리?
 
 				_modRegistableBones.Clear();//<<이것도 갱신해주자 [타임라인에 등록된 Bone]
 				if (_subAnimTimeline != null)
 				{
-					for (int i = 0; i < _subAnimTimeline._layers.Count; i++)
+					int nLayers = _subAnimTimeline._layers != null ? _subAnimTimeline._layers.Count : 0;
+					if(nLayers > 0)
 					{
-						apAnimTimelineLayer timelineLayer = _subAnimTimeline._layers[i];
-						if (timelineLayer._linkedBone != null)
+						for (int i = 0; i < _subAnimTimeline._layers.Count; i++)
 						{
-							_modRegistableBones.Add(timelineLayer._linkedBone);
+							apAnimTimelineLayer timelineLayer = _subAnimTimeline._layers[i];
+							if (timelineLayer._linkedBone != null)
+							{
+								_modRegistableBones.Add(timelineLayer._linkedBone);
+							}
 						}
 					}
+					
 				}
 
 				if (isChanged)

@@ -278,7 +278,12 @@ namespace AnyPortrait
 		//-------------------------------------------------
 		public void RemoveInvalidParamSet()
 		{
-			for (int i = 0; i < _paramSetList.Count; i++)
+			int nParamSet = _paramSetList != null ? _paramSetList.Count : 0;
+			if(nParamSet == 0)
+			{
+				return;
+			}
+			for (int i = 0; i < nParamSet; i++)
 			{
 				apModifierParamSet paramSet = _paramSetList[i];
 
@@ -685,7 +690,9 @@ namespace AnyPortrait
 						//이 ParamSet은 해당 MeshTF를 가지지 못했다.
 						//ModMesh를 생성해주자.
 						apModifiedMesh newModMesh = null;
+						
 						bool isAdd = AddMeshTransformToParamSet(curParamSet, meshTransform, out newModMesh);
+						//Debug.Log("[" + curParamSet._conSyncValue_Int + "] New ModMesh : " + isAdd);
 
 						if (isAdd)
 						{

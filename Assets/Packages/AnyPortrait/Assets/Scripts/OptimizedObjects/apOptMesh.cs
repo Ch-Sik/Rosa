@@ -27,10 +27,13 @@ namespace AnyPortrait
 	/// </summary>
 	public class apOptMesh : MonoBehaviour
 	{
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 멤버 변수들
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		// Members
 		//------------------------------------------------
 		/// <summary>[Please do not use it] Parent Portrait</summary>
-		public apPortrait _portrait = null;
+		[SerializeField] public apPortrait _portrait = null;
 
 		/// <summary>[Please do not use it] Unique ID</summary>
 		public int _uniqueID = -1;//meshID가 아니라 meshTransform의 ID를 사용한다.
@@ -217,23 +220,23 @@ namespace AnyPortrait
 		//"통합" Vertex으로 정의된 SubMeshData에서 통합 작업을 거친 후에 Vertex 업데이트를 한다.
 		//MaskMesh 업데이트는 Portrait에서 Calculate 후 일괄적으로 한다. (List로 관리한다.)
 		/// <summary>[Please do not use it] Is Parent Mesh of Clipping Masking</summary>
-		public bool _isMaskParent = false;
+		[SerializeField] public bool _isMaskParent = false;
 
 		/// <summary>[Please do not use it] Is Child Mesh of Clipping Masking</summary>
-		public bool _isMaskChild = false;
+		[SerializeField] public bool _isMaskChild = false;
 
 		//Child인 경우
 		/// <summary>[Please do not use it] Masking Parent Mesh ID if clipped</summary>
-		public int _clipParentID = -1;
+		[SerializeField] public int _clipParentID = -1;
 
 		/// <summary>[Please do not use it] Is Masking Parent Mesh if clipped</summary>
-		public apOptMesh _parentOptMesh = null;
+		[SerializeField] public apOptMesh _parentOptMesh = null;
 
 		//Parent인 경우
-		/// <summary>[Please do not use it] Children if clipping mask </summary>
-		public int[] _clipChildIDs = null;
-		//public apOptMesh[] _childOptMesh = null;
-
+		//삭제 v1.6.0 : Child > Parent로의 참조만 한지 오래됨
+		///// <summary>[Please do not use it] Children if clipping mask </summary>
+		//public int[] _clipChildIDs = null;
+		
 		[NonSerialized]
 		private Color _multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -278,41 +281,27 @@ namespace AnyPortrait
 		/// <summary>[Please do not use it] Mask Texture Size</summary>
 		[SerializeField]
 		public int _clippingRenderTextureSize = 256;
+
+
+		//[추가 v1.6.0] 범용 마스크
+		// 마스크 전달 정보 (Parent인 경우)
+		[SerializeField] public apOptSendMaskData[] _sendMaskDataList = null;
 		
+
+		//마스크 수신 정보 (Child인 경우)
+		[NonSerialized] private List<apOptMaskLinkInfo> _receiveMaskInfos = null;
+
+		//클리핑이 아닌 일반적인 마스크 Send/Receive 여부. [초기화시 결정]
+		[NonSerialized] private int _nSendMaskData = 0;
+		[NonSerialized] private int _nReceiveMaskInfo = 0;//이건 Clipped Child인 경우에도 포함한다.
+
+		//마스크로만 동작하는 렌더링되지 않는 메시
+		[SerializeField] public bool _isMaskOnlyMesh = false;
+
 		
 
-		#region [미사용 코드] 이전 : 단일 카메라만 지원
-		//[NonSerialized]
-		//private RenderTexture _maskRenderTexture = null;
 
-		//[NonSerialized]
-		//private RenderTargetIdentifier _maskRenderTargetID = -1;
-
-		//[NonSerialized]
-		//private Camera _targetCamera = null;
-
-		//[NonSerialized]
-		//private Transform cameraTransform = null;
-
-		//[NonSerialized]
-		//private CommandBuffer _commandBuffer = null;
-
-		//public RenderTexture MaskRenderTexture
-		//{
-		//	get
-		//	{
-		//		if(!_isRenderTextureCreated || !_isVisible)
-		//		{
-		//			return null;
-		//		}
-		//		return _maskRenderTexture;
-		//	}
-		//}
-
-		///// <summary>[Please do not use it]</summary>
-		//[NonSerialized]
-		//public Vector4 _maskScreenSpaceOffset = Vector4.zero; 
-		#endregion
+		
 
 		//변경 19.9.24 : 1개 또는 여러개의 카메라에 대한 처리를 위해 래핑을 하였다.
 		//Mask Child, Mask Parent인 경우에만 생성한다.
@@ -328,6 +317,12 @@ namespace AnyPortrait
 			if(_renderCamera == null) { return null; }
 			return _renderCamera.GetCameraData(camera);
 		}
+
+		//변경 v1.6.0 : RenderCamera를 두지 않고,
+		//Portrait에 통합된 RenderCamera를 두는 대신, 연결된 Renderer/Receiver를 받자 (이 값은 SendData와 ReceiveLinkInfo에도 있다)
+		[NonSerialized] private apOptMaskRenderer _linkedClippingMaskParentRenderer = null;
+		public apOptMaskRenderer LinkedClippingParentRenderer { get { return _linkedClippingMaskParentRenderer; } }
+
 
 
 		private RenderTexture _prevParentRenderTexture = null;
@@ -351,6 +346,38 @@ namespace AnyPortrait
 
 		private int _shaderID_MaskTexture_L = -1;
 		private int _shaderID_MaskTexture_R = -1;
+
+		//v1.6.0 : 추가된 Shader Property. 초기화시 사용된다.
+		private int _shaderID_MaskRatio = -1;
+		private int _shaderID_MaskRatio_1 = -1;
+		private int _shaderID_MaskRatio_2 = -1;
+		private int _shaderID_MaskRatio_3 = -1;
+		private int _shaderID_MaskRatio_4 = -1;
+
+		private int _shaderID_MaskTex_1 = -1;
+		private int _shaderID_MaskTex_2 = -1;
+		private int _shaderID_MaskTex_3 = -1;
+		private int _shaderID_MaskTex_4 = -1;
+
+		private int _shaderID_MaskScreenSpaceOffset_1 = -1;
+		private int _shaderID_MaskScreenSpaceOffset_2 = -1;
+		private int _shaderID_MaskScreenSpaceOffset_3 = -1;
+		private int _shaderID_MaskScreenSpaceOffset_4 = -1;
+
+		private int _shaderID_MaskOp_1 = -1;
+		private int _shaderID_MaskOp_2 = -1;
+		private int _shaderID_MaskOp_3 = -1;
+		private int _shaderID_MaskOp_4 = -1;
+
+		//마스크 프로퍼티를 가지고 있는지 체크하자 (버전에 따라서 없을 수 있다)
+		private bool _isHasProperty_MaskRatio = false;
+		private bool _isHasProperty_MaskChannel_1 = false;
+		private bool _isHasProperty_MaskChannel_2 = false;
+		private bool _isHasProperty_MaskChannel_3 = false;
+		private bool _isHasProperty_MaskChannel_4 = false;
+
+
+
 
 		//계산용 변수들
 		private Vector3 _cal_localPos_LT = Vector3.zero;
@@ -461,10 +488,131 @@ namespace AnyPortrait
 		private apOptCalculatedResultStack _cal_parentCalculateStack = null;
 
 
+
+		private bool _isInit = false;
+
+
+
+
+		//=====================================================================
+
+
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 기본 함수 (MonoBehaviour)
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 		// Init
 		//------------------------------------------------
 		void Awake()
 		{	
+			if(!_isInit)
+			{
+				Init();
+			}
+
+		}
+
+		void Start()
+		{
+			if(!_isInit)
+			{
+				Init();
+			}
+
+			//InitMesh(false);
+			//InstantiateMesh();
+
+			//this.enabled = true;
+			this.enabled = false;
+
+			//삭제 v1.6.0 : 마스크 연산은 MaskRenderCamera에서 일괄 처리
+			// //추가 9.26 : 생성이 안된 경우
+			// if (_isInitMesh && _isInitMaterial)
+			// {
+			// 	if (_isMaskParent)
+			// 	{
+			// 		Initialize_MaskParent();
+			// 	}
+			// 	else if (_isMaskChild)
+			// 	{
+			// 		Initialize_MaskChild();
+			// 	}
+			// }
+		}
+
+
+		void OnEnable()
+		{
+			//삭제 v1.6.0 : 마스크 연산은 MaskRenderCamera에서 일괄 처리
+			// if (_isInitMesh && _isInitMaterial)
+			// {
+			// 	//CleanUpMaskParent();//이전
+			// 	ClearCameraData();//변경
+			// }
+		}
+
+
+		//변경 : OnDisable이 아닌 Destroy 이벤트에서 Clipping Mask를 초기화하자
+		//void OnDisable()
+		void OnDestroy()
+		{
+			if (_isInitMesh && _isInitMaterial)
+			{
+				//ClearCameraData();//변경 > 삭제 v1.6.0 : Mask는 이제 외부에서 처리
+
+
+				//추가 12.12 : 재질 삭제
+				try
+				{
+					if(_material_Instanced != null)
+					{
+						UnityEngine.Object.Destroy(_material_Instanced);
+						_material_Instanced = null;
+					}
+				}
+				catch (Exception)
+				{
+
+				}
+			}
+		}
+
+		
+
+		void OnWillRenderObject()
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				return;
+			}
+#endif
+			//삭제 v1.6.0 : 마스크는 외부에서 처리. 단 이 부분은 확인 필요
+			//왜 OnWillRenderObject에서 굳이 초기화/갱신을 한번 더 했지?
+			// if (_isInitMesh && _isInitMaterial)
+			// {
+			// 	if (_isMaskParent)
+			// 	{
+			// 		Initialize_MaskParent();
+			// 	}
+			// 	else if (_isMaskChild)
+			// 	{
+			// 		Initialize_MaskChild();
+			// 	}
+			// }
+		}
+
+
+
+		private void Init()
+		{
+			if(_isInit)
+			{
+				return;
+			}
+
 			_transform = transform;
 
 			_cal_isRootFlipped_X = false;
@@ -487,166 +635,179 @@ namespace AnyPortrait
 			_shaderID_MaskTexture_L = Shader.PropertyToID("_MaskTex_L");
 			_shaderID_MaskTexture_R = Shader.PropertyToID("_MaskTex_R");
 
-		}
+			_shaderID_MaskRatio = Shader.PropertyToID("_MaskRatio");
+			_shaderID_MaskRatio_1 = Shader.PropertyToID("_MaskRatio_1");
+			_shaderID_MaskRatio_2 = Shader.PropertyToID("_MaskRatio_2");
+			_shaderID_MaskRatio_3 = Shader.PropertyToID("_MaskRatio_3");
+			_shaderID_MaskRatio_4 = Shader.PropertyToID("_MaskRatio_4");
 
-		void Start()
-		{
-			//InitMesh(false);
-			//InstantiateMesh();
+			_shaderID_MaskTex_1 = Shader.PropertyToID("_MaskTex_1");
+			_shaderID_MaskTex_2 = Shader.PropertyToID("_MaskTex_2");
+			_shaderID_MaskTex_3 = Shader.PropertyToID("_MaskTex_3");
+			_shaderID_MaskTex_4 = Shader.PropertyToID("_MaskTex_4");
 
-			//this.enabled = true;
-			this.enabled = false;
+			_shaderID_MaskScreenSpaceOffset_1 = Shader.PropertyToID("_MaskScreenSpaceOffset_1");
+			_shaderID_MaskScreenSpaceOffset_2 = Shader.PropertyToID("_MaskScreenSpaceOffset_2");
+			_shaderID_MaskScreenSpaceOffset_3 = Shader.PropertyToID("_MaskScreenSpaceOffset_3");
+			_shaderID_MaskScreenSpaceOffset_4 = Shader.PropertyToID("_MaskScreenSpaceOffset_4");
 
-			//추가 9.26 : 생성이 안된 경우
-			if (_isInitMesh && _isInitMaterial)
-			{
-				if (_isMaskParent)
-				{
-					Initialize_MaskParent();
-				}
-				else if (_isMaskChild)
-				{
-					Initialize_MaskChild();
-				}
-			}
-		}
+			_shaderID_MaskOp_1 = Shader.PropertyToID("_MaskOp_1");
+			_shaderID_MaskOp_2 = Shader.PropertyToID("_MaskOp_2");
+			_shaderID_MaskOp_3 = Shader.PropertyToID("_MaskOp_3");
+			_shaderID_MaskOp_4 = Shader.PropertyToID("_MaskOp_4");
 
-
-		void OnEnable()
-		{
-			if (_isInitMesh && _isInitMaterial)
-			{
-				//CleanUpMaskParent();//이전
-				ClearCameraData();//변경
-			}
-		}
-#if UNITY_EDITOR
-		public bool IsMeshOrMaterialMissingInEditor()
-		{
-			if (_meshFilter != null && _meshRenderer != null)
-			{
-				if (_meshFilter.sharedMesh == null
-					|| _meshRenderer.sharedMaterial == null)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public void ResetMeshAndMaterialIfMissing()
-		{
-			if (!IsMeshOrMaterialMissingInEditor())
-			{
-				return;
-			}
-			if (_meshFilter != null && _meshRenderer != null)
-			{
-				if (_meshFilter.sharedMesh == null)
-				{
-					InitMesh(true);
-				}
-
-				if (_meshRenderer.sharedMaterial == null)
-				{
-					MakeInstancedMaterial();
-					_meshRenderer.sharedMaterial = _material_Instanced;
-				}
-			}
-		}
-#endif
-
-		//변경 : OnDisable이 아닌 Destroy 이벤트에서 Clipping Mask를 초기화하자
-		//void OnDisable()
-		void OnDestroy()
-		{
-			if (_isInitMesh && _isInitMaterial)
-			{
-				//CleanUpMaskParent();
-				ClearCameraData();//변경
-
-
-				//추가 12.12 : 재질 삭제
-				try
-				{
-					if(_material_Instanced != null)
-					{
-						UnityEngine.Object.Destroy(_material_Instanced);
-						_material_Instanced = null;
-					}
-				}
-				catch (Exception)
-				{
-
-				}
-			}
-		}
-
-		void OnWillRenderObject()
-		{
-#if UNITY_EDITOR
-			if (!Application.isPlaying)
-			{
-				return;
-			}
-#endif
-			if (_isInitMesh && _isInitMaterial)
-			{
-				if (_isMaskParent)
-				{
-					Initialize_MaskParent();
-				}
-				else if (_isMaskChild)
-				{
-					Initialize_MaskChild();
-				}
-			}
+			_isInit = true;
 		}
 
 		// Bake
 		//------------------------------------------------
 #if UNITY_EDITOR
+
+		public class MeshBakeRequest
+		{
+			public apOptTransform _parentTransform = null;
+
+			public Vector3[] _vertPositions = null;
+			public Vector2[] _vertUVs = null;
+			public int[] _vertUniqueIDs = null;
+			public int[] _vertTris = null;
+			public float[] _depths = null;
+			public Vector2 _pivotPos = Vector2.zero;
+
+			public Texture2D _texture = null;
+			public int _textureID = -1;
+			
+			public apPortrait.SHADER_TYPE _shaderType = apPortrait.SHADER_TYPE.AlphaBlend;
+			public apOptMaterialInfo _materialInfo = null;
+			public int _batchedMatID = -1;
+
+			public Shader _alphaMask = null;
+			public int _maskRenderTextureSize = -1;
+			public bool _isVisibleDefault = false;
+
+			public bool _isMaskParent = false;
+			public bool _isMaskChild = false;
+			public List<apSendMaskData> _sendMaskData = null;
+			public bool _isMaskOnlyMesh = false;
+
+			
+			public bool _isAlways2Side = false;
+			public apPortrait.SHADOW_CASTING_MODE _shadowCastMode = apPortrait.SHADOW_CASTING_MODE.Off;
+			public bool _isReceiveShadow = false;
+			public apPortrait.LIGHT_PROBE_USAGE _lightProbeUsage = apPortrait.LIGHT_PROBE_USAGE.Off;
+			public apPortrait.REFLECTION_PROBE_USAGE _reflectionProbeUsage = apPortrait.REFLECTION_PROBE_USAGE.Off;
+			public bool _isUseSRP = false;
+
+			public MeshBakeRequest(apOptTransform parentTransform)
+			{
+				_parentTransform = parentTransform;
+			}
+
+			public void SetOption1_Vertices(	Vector3[] vertPositions, 
+												Vector2[] vertUVs, 
+												int[] vertUniqueIDs, 
+												int[] vertTris, 
+												float[] depths, 
+												Vector2 pivotPos)
+			{
+				_vertPositions = vertPositions;
+				_vertUVs = vertUVs;
+				_vertUniqueIDs = vertUniqueIDs;
+				_vertTris = vertTris;
+				_depths = depths;
+				_pivotPos = pivotPos;
+			}
+
+			public void SetOption2_Material(	Texture2D texture,
+												int textureID, 			
+												apPortrait.SHADER_TYPE shaderType,
+												apOptMaterialInfo materialInfo,
+												int batchedMatID, 
+												Shader alphaMask,
+												int maskRenderTextureSize,
+												bool isVisibleDefault)
+			{
+				_texture = texture;
+				_textureID = textureID;
+				_shaderType = shaderType;
+				_materialInfo = materialInfo;
+				_batchedMatID = batchedMatID;
+				_alphaMask = alphaMask;
+				_maskRenderTextureSize = maskRenderTextureSize;
+				_isVisibleDefault = isVisibleDefault;
+			}
+
+			public void SetOption3_Mask(bool isMaskParent,
+										bool isMaskChild,
+										List<apSendMaskData> sendMaskData,
+										bool isMaskOnlyMesh)
+			{
+				_isMaskParent = isMaskParent;
+				_isMaskChild = isMaskChild;
+				_sendMaskData = sendMaskData;
+				_isMaskOnlyMesh = isMaskOnlyMesh;
+			}
+
+			public void SetOption4_Render(bool isAlways2Side,
+											apPortrait.SHADOW_CASTING_MODE shadowCastMode,
+											bool isReceiveShadow,
+											apPortrait.LIGHT_PROBE_USAGE lightProbeUsage,
+											apPortrait.REFLECTION_PROBE_USAGE reflectionProbeUsage,
+											bool isUseSRP)
+			{
+				_isAlways2Side = isAlways2Side;
+				_shadowCastMode = shadowCastMode;
+				_isReceiveShadow = isReceiveShadow;
+				_lightProbeUsage = lightProbeUsage;
+				_reflectionProbeUsage = reflectionProbeUsage;
+				_isUseSRP = isUseSRP;
+			}
+		}
+
 		/// <summary>[Please do not use it] Bake Functions</summary>
-		public void BakeMesh(Vector3[] vertPositions,
-								Vector2[] vertUVs,
-								int[] vertUniqueIDs,
-								int[] vertTris,
-								float[] depths,
-								Vector2 pivotPos,
-								apOptTransform parentTransform,
-								Texture2D texture, int textureID,
-								apPortrait.SHADER_TYPE shaderType,
-								//Shader shaderNormal, Shader shaderClipping,//v1.1.6 또는 이전
-								apOptMaterialInfo materialInfo,//v1.1.7 또는 이후
-								Shader alphaMask,//<<AlphaMask는 따로
-								int maskRenderTextureSize,
-								bool isVisibleDefault,
-								bool isMaskParent, bool isMaskChild,
-								int batchedMatID, //Material batchedMaterial,//<<이건 필요없쩡..
-								bool isAlways2Side,
-								apPortrait.SHADOW_CASTING_MODE shadowCastMode,
-								bool isReceiveShadow,
-								apPortrait.LIGHT_PROBE_USAGE lightProbeUsage,
-								apPortrait.REFLECTION_PROBE_USAGE reflectionProbeUsage,
-								bool isUseSRP
+		public void BakeMesh(	
+								//Vector3[] vertPositions,
+								//Vector2[] vertUVs,
+								//int[] vertUniqueIDs,
+								//int[] vertTris,
+								//float[] depths,
+								//Vector2 pivotPos,
+								//apOptTransform parentTransform,
+								//Texture2D texture, int textureID,
+								//apPortrait.SHADER_TYPE shaderType,
+								////Shader shaderNormal, Shader shaderClipping,//v1.1.6 또는 이전
+								//apOptMaterialInfo materialInfo,//v1.1.7 또는 이후
+								//Shader alphaMask,//<<AlphaMask는 따로
+								//int maskRenderTextureSize,
+								//bool isVisibleDefault,
+								//bool isMaskParent, bool isMaskChild,
+								//List<apSendMaskData> sendMaskData,//v1.6.0
+								//int batchedMatID, //Material batchedMaterial,//<<이건 필요없쩡..
+								//bool isAlways2Side,
+								//apPortrait.SHADOW_CASTING_MODE shadowCastMode,
+								//bool isReceiveShadow,
+								//apPortrait.LIGHT_PROBE_USAGE lightProbeUsage,
+								//apPortrait.REFLECTION_PROBE_USAGE reflectionProbeUsage,
+								//bool isUseSRP
+								MeshBakeRequest bakeRequest
 								)
 		{
 			ClearMaterialForBake();
 
-			_parentTransform = parentTransform;
+			_parentTransform = bakeRequest._parentTransform;
 
 			//변경 21.5.22 : 그냥 할당하지 말고, Copy 이용
-			_vertPositions = new Vector3[vertPositions.Length];
-			Array.Copy(vertPositions, _vertPositions, vertPositions.Length);
+			_vertPositions = new Vector3[bakeRequest._vertPositions.Length];
+			Array.Copy(bakeRequest._vertPositions, _vertPositions, bakeRequest._vertPositions.Length);
 			
 			
 
 
-			_vertUVs = vertUVs;
+			_vertUVs = bakeRequest._vertUVs;
 			//_vertUniqueIDs = vertUniqueIDs;//<<삭제. 의미가 없다.
-			_vertTris = vertTris;
+			_vertTris = bakeRequest._vertTris;
 
-			_isAlways2Side = isAlways2Side;
+			_isAlways2Side = bakeRequest._isAlways2Side;
 
 			//추가 : Flipped Tris를 만들자
 			_vertTris_Flipped = new int[_vertTris.Length];
@@ -657,13 +818,13 @@ namespace AnyPortrait
 				_vertTris_Flipped[i + 2] = _vertTris[i + 0];
 			}
 
-			if(isAlways2Side)
+			if(bakeRequest._isAlways2Side)
 			{
 				//양면을 모두 만들자
 				int nTri = _vertTris.Length;
 				int nTri2Side = nTri * 2;
 
-				int nVert = vertPositions.Length;
+				int nVert = bakeRequest._vertPositions.Length;
 				int nVert2Side = nVert * 2;
 
 				int[] vertTris2Side = new int[nTri2Side];
@@ -697,11 +858,11 @@ namespace AnyPortrait
 				
 				for (int i = 0; i < nVert; i++)
 				{
-					_vertPositions[i] = vertPositions[i];
-					_vertPositions[i + nVert] = vertPositions[i];//<<nVert만큼 뒤에 더 추가
+					_vertPositions[i] = bakeRequest._vertPositions[i];
+					_vertPositions[i + nVert] = bakeRequest._vertPositions[i];//<<nVert만큼 뒤에 더 추가
 					
-					_vertUVs[i] = vertUVs[i];
-					_vertUVs[i + nVert] = vertUVs[i];
+					_vertUVs[i] = bakeRequest._vertUVs[i];
+					_vertUVs[i + nVert] = bakeRequest._vertUVs[i];
 				}
 				
 				//변경 19.7.3 : 양면 렌더링일때 (버텍스 수가 다름)
@@ -711,33 +872,27 @@ namespace AnyPortrait
 			else
 			{
 				//변경 19.7.3 : 단면 렌더링일때 (버텍스 수가 같음)
-				_nRenderVerts = vertPositions.Length;
+				_nRenderVerts = bakeRequest._vertPositions.Length;
 				//_nVertPos = vertPositions.Length;//사용하지 않음
 			}
-			_texture = texture;
-			_textureID = textureID;
+			_texture = bakeRequest._texture;
+			_textureID = bakeRequest._textureID;
 
-			_pivotPos = pivotPos;
-
-
+			_pivotPos = bakeRequest._pivotPos;
 
 			//추가 : 20.4.21
 			_textureMode = TEXTURE_MODE.Base;
 			_texture_Base = _texture;
 
-
-
-
-
 			//_nVert = _vertPositions.Length;///이전
-			_isVisibleDefault = isVisibleDefault;
+			_isVisibleDefault = bakeRequest._isVisibleDefault;
 
 			transform.localPosition += new Vector3(-_pivotPos.x, -_pivotPos.y, 0.0f);
 
 			_matrix_Vert2Mesh = apMatrix3x3.TRS(new Vector2(-_pivotPos.x, -_pivotPos.y), 0, Vector2.one);
 			_matrix_Vert2Mesh_Inverse = _matrix_Vert2Mesh.inverse;
 
-			_shaderType = shaderType;
+			_shaderType = bakeRequest._shaderType;
 
 			//이전 코드
 			//_shaderNormal = shaderNormal;
@@ -745,17 +900,43 @@ namespace AnyPortrait
 
 			//변경된 코드 19.6.15 : MaterialInfo 이용
 			_materialInfo = new apOptMaterialInfo[1];
-			_materialInfo[0] = materialInfo;
+			_materialInfo[0] = bakeRequest._materialInfo;
 
 
 
-			_shader_AlphaMask = alphaMask;//MaskShader를 넣는다.
+			_shader_AlphaMask = bakeRequest._alphaMask;//MaskShader를 넣는다.
 
 			//_materialAlphaMask = new Material(alphaMask);이건 나중에 처리
-			_clippingRenderTextureSize = maskRenderTextureSize;
+			_clippingRenderTextureSize = bakeRequest._maskRenderTextureSize;
 
-			_isMaskParent = isMaskParent;
-			_isMaskChild = isMaskChild;
+			_isMaskParent = bakeRequest._isMaskParent;
+			_isMaskChild = bakeRequest._isMaskChild;
+
+			//범용 마스크 정보는 일단 모두 false로 시작
+			//v1.6.0 : Send Mask Data를 저장한다.
+			int nSrcSendMaskData = bakeRequest._sendMaskData != null ? bakeRequest._sendMaskData.Count : 0;
+			if(nSrcSendMaskData > 0)
+			{
+				_sendMaskDataList = new apOptSendMaskData[nSrcSendMaskData];
+
+				apSendMaskData srcSendMaskData = null;
+				for (int i = 0; i < nSrcSendMaskData; i++)
+				{
+					srcSendMaskData = bakeRequest._sendMaskData[i];
+					apOptSendMaskData newSendMaskData = new apOptSendMaskData();
+					newSendMaskData.Bake(srcSendMaskData);
+
+					_sendMaskDataList[i] = newSendMaskData;
+				}
+			}
+			else
+			{
+				_sendMaskDataList = null;
+			}
+
+			_isMaskOnlyMesh = bakeRequest._isMaskOnlyMesh;
+
+
 
 			//Batch가 가능한 경우
 			//1. Mask Child가 아닐 경우
@@ -765,19 +946,11 @@ namespace AnyPortrait
 									Mathf.Abs(_parentTransform._meshColor2X_Default.b - 0.5f) < 0.004f &&
 									Mathf.Abs(_parentTransform._meshColor2X_Default.a - 1.0f) < 0.004f;
 			
-			_isBatchedMaterial = !isMaskChild && _isDefaultColorGray;
+			_isBatchedMaterial = !bakeRequest._isMaskChild && _isDefaultColorGray;
 
-			_batchedMatID = batchedMatID;
+			_batchedMatID = bakeRequest._batchedMatID;
 
-			//삭제 19.6.16 : 
-			//if (_shaderNormal == null)
-			//{
-			//	Debug.LogError("Shader Normal is Null");
-			//}
-			//if (_shaderClipping == null)
-			//{
-			//	Debug.LogError("Shader Clipping is Null");
-			//}
+			
 
 			//RenderVert를 만들어주자
 			_renderVerts = new apOptRenderVertex[_nRenderVerts];
@@ -789,10 +962,10 @@ namespace AnyPortrait
 			{
 				_renderVerts[i] = new apOptRenderVertex(
 											_parentTransform, this,
-											vertUniqueIDs[i], i,
-											new Vector2(vertPositions[i].x, vertPositions[i].y),
+											bakeRequest._vertUniqueIDs[i], i,
+											new Vector2(bakeRequest._vertPositions[i].x, bakeRequest._vertPositions[i].y),
 											_vertUVs[i],
-											depths[i]);
+											bakeRequest._depths[i]);
 
 				_renderVerts[i].SetMatrix_1_Static_Vert2Mesh(_matrix_Vert2Mesh);
 
@@ -802,7 +975,7 @@ namespace AnyPortrait
 
 				//변경 21.5.23
 				_renderVerts[i].Calculate_None(
-					ref parentTransform._matrix_TFResult_WorldWithoutMod._mtrxToSpace,
+					ref bakeRequest._parentTransform._matrix_TFResult_WorldWithoutMod._mtrxToSpace,
 					1.0f, 1.0f, ref _vertPositions_Updated[i]);
 			}
 
@@ -874,9 +1047,9 @@ namespace AnyPortrait
 			//_meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
 
 			//변경된 그림자 설정
-			_meshRenderer.receiveShadows = isReceiveShadow;
+			_meshRenderer.receiveShadows = bakeRequest._isReceiveShadow;
 			ShadowCastingMode castMode = ShadowCastingMode.Off;
-			switch (shadowCastMode)
+			switch (bakeRequest._shadowCastMode)
 			{
 				case apPortrait.SHADOW_CASTING_MODE.Off:
 					castMode = ShadowCastingMode.Off;
@@ -898,13 +1071,23 @@ namespace AnyPortrait
 			_meshRenderer.shadowCastingMode = castMode;
 
 
-			_meshRenderer.enabled = _isVisibleDefault;
+			if(_isMaskOnlyMesh)
+			{
+				//v1.6.0 : 마스크 전용 메시라면 항상 숨겨짐
+				_meshRenderer.enabled = false;//<마스크 전용
+			}
+			else
+			{
+				//일반 메시
+				_meshRenderer.enabled = _isVisibleDefault;
+			}
+				
 
 			//기존 : 무조건 끄기
 			//_meshRenderer.lightProbeUsage = LightProbeUsage.Off;
 
 			//변경 : v1.5.0 라이트 프로브 옵션
-			switch (lightProbeUsage)
+			switch (bakeRequest._lightProbeUsage)
 			{
 				case apPortrait.LIGHT_PROBE_USAGE.Off:
 					_meshRenderer.lightProbeUsage = LightProbeUsage.Off;
@@ -929,7 +1112,7 @@ namespace AnyPortrait
 					break;
 			}
 
-			switch (reflectionProbeUsage)
+			switch (bakeRequest._reflectionProbeUsage)
 			{
 				case apPortrait.REFLECTION_PROBE_USAGE.Off:
 					_meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
@@ -954,7 +1137,7 @@ namespace AnyPortrait
 
 			//추가 19.8.5
 #if UNITY_2019_1_OR_NEWER
-			_isUseSRP = isUseSRP;
+			_isUseSRP = bakeRequest._isUseSRP;
 #else
 			_isUseSRP = false;
 #endif
@@ -963,39 +1146,10 @@ namespace AnyPortrait
 			
 			//Mask 연결 정보는 일단 리셋
 			_clipParentID = -1;
-			_clipChildIDs = null;
-
-			//여기서 생성하는건 삭제. 위에서 생성하는 걸로 변경 (21.5.23)
-			////여기서 변수를 임시로 생성하자. (Refresh를 위해서)
-			//_vertPositions_Updated = new Vector3[_nRenderVerts];
-			////_vertPositions_Local = new Vector3[_nRenderVerts];//삭제 21.5.23
-			////_vertPositions_World = new Vector2[_nRenderVerts];//삭제 21.5.23
-			///
-
-
 			
-			if (!_isAlways2Side)
-			{
-				//일반 업데이트
-
-				//삭제 21.5.23 : _vertPositions_Updated가 위에서 이미 갱신되었다.
-				//for (int i = 0; i < _nRenderVerts; i++)
-				//{
-				//	//Calculate 전에는 직접 Pivot Pos를 적용해주자 (Calculate에서는 자동 적용)
-				//	_vertPositions_Updated[i] = _renderVerts[i]._vertPos3_LocalUpdated;
-				//}
-			}
-			else
+			if(_isAlways2Side)
 			{
 				//양면 업데이트
-				//이전 코드
-				//for (int i = 0; i < _nRenderVerts; i++)
-				//{
-				//	//Calculate 전에는 직접 Pivot Pos를 적용해주자 (Calculate에서는 자동 적용)
-				//	_vertPositions_Updated[i] = _renderVerts[i]._vertPos3_LocalUpdated;
-				//	_vertPositions_Updated[i + _nRenderVerts] = _renderVerts[i]._vertPos3_LocalUpdated;
-				//}
-
 				//변경 21.5.23
 				Vector3[] prevVertPositions_Update = _vertPositions_Updated;
 				_vertPositions_Updated = new Vector3[_vertPositions.Length];
@@ -1005,8 +1159,6 @@ namespace AnyPortrait
 				Array.Copy(prevVertPositions_Update, 0, _vertPositions_Updated, _nRenderVerts, _nRenderVerts);//뒤쪽
 			}
 			
-			
-
 			_transform = transform;
 
 			_shaderID_MainTex = Shader.PropertyToID("_MainTex");
@@ -1014,16 +1166,25 @@ namespace AnyPortrait
 			_shaderID_MaskTexture = Shader.PropertyToID("_MaskTex");
 			_shaderID_MaskScreenSpaceOffset = Shader.PropertyToID("_MaskScreenSpaceOffset");
 
-
 			InitMesh(true);
 
 			RefreshMesh();
 
 			if(_isVisibleDefault)
 			{
-				_meshRenderer.enabled = true;
+				if(!_isMaskOnlyMesh)
+				{
+					//일반 메시
+					_meshRenderer.enabled = true;
+				}
+				else
+				{
+					//v1.6.0
+					//[ 마스크 전용 메시라면 항상 숨겨짐 ]
+					_meshRenderer.enabled = false;//<마스크 전용
+				}
+
 				_isVisible = true;
-				
 			}
 			else
 			{
@@ -1034,10 +1195,10 @@ namespace AnyPortrait
 #endif
 
 
-					//-----------------------------------------------------------------------
+		//-----------------------------------------------------------------------
 #if UNITY_EDITOR
-					//Bake를 위해서 이전에 완성된 Material을 삭제하자.
-					public void ClearMaterialForBake()
+		//Bake를 위해서 이전에 완성된 Material을 삭제하자.
+		public void ClearMaterialForBake()
 		{
 			if(Application.isPlaying)
 			{
@@ -1153,8 +1314,17 @@ namespace AnyPortrait
 
 			
 
-
-			_meshRenderer.enabled = _isVisibleDefault;
+			if(_isMaskOnlyMesh)
+			{
+				//마스크 전용 메시는 렌더링되지 않는다.
+				_meshRenderer.enabled = false;//<마스크 전용
+			}
+			else
+			{
+				//일반 메시는 기본 속성에 맞게 보여짐
+				_meshRenderer.enabled = _isVisibleDefault;
+			}
+				
 			_isVisible = _isVisibleDefault;
 			
 
@@ -1162,34 +1332,8 @@ namespace AnyPortrait
 
 			_vertPositions_Updated = new Vector3[_vertPositions.Length];
 
-			//삭제 21.5.23 : 필요없는 배열들
-			//_vertPositions_Local = new Vector3[_vertPositions.Length];
-			//_vertPositions_World = new Vector2[_vertPositions.Length];
-
-			//다시 삭제 21.5.27
-			////추가 21.5.23 : 계산 변수가 RenderVertex에서 삭제되고 여기로 이동되었다.
-			////개수는 RenderVertex 만큼
-			//_renderVertCal_VertexLocalPos = new Vector2[_renderVerts.Length];
-			
-			////추가 21.5.24 : Rigging Matrix도 여기에 저장한다. RenderVertex의 Rigging Matrix를 대체한다.
-			//_renderVertCal_RiggingMatrix = new apMatrix3x3[_renderVerts.Length];
-
-
-			//이전
-			//for (int i = 0; i < _vertPositions.Length; i++)
-			//{
-			//	_vertPositions_Updated[i] = _vertPositions[i];
-			//}
-
 			//변경 21.5.22
 			Array.Copy(_vertPositions, _vertPositions_Updated, _vertPositions.Length);
-
-			//다시 삭제 21.5.27
-			//Array.Clear(_renderVertCal_VertexLocalPos, 0, _renderVerts.Length);			
-			//Array.Clear(_renderVertCal_RiggingMatrix, 0, _renderVerts.Length);
-
-
-			//_texture_Updated = _texture;
 
 			_isInitMesh = true;
 
@@ -1210,13 +1354,16 @@ namespace AnyPortrait
 
 			//여기서 생성되었을 것
 			_cal_parentCalculateStack = _parentTransform.CalculatedStack;
+
+			//마스크 연결 정보와 개수는 일단 초기화 (이후에 Link에서 계산한다)
+			_receiveMaskInfos = null;
+			_nSendMaskData = 0;
+			_nReceiveMaskInfo = 0;
 			
 		}
 
-		/// <summary>
-		/// [Please do not use it]
-		/// Initialize Mesh
-		/// </summary>
+		// MeshFilter에 Instance 메시 생성 후 할당
+		/// <summary>[Please do not use it] Initialize Mesh</summary>
 		public void InstantiateMesh()
 		{	
 			if(_mesh == null || _meshFilter == null || _meshFilter.mesh == null)
@@ -1230,242 +1377,128 @@ namespace AnyPortrait
 		}
 
 
-		//추가 : 먼저 바로 사용할 InstancedMaterial을 만든다.
-		//이전과 달리 Batched / Shared는 런타임에서 만들어져서 연결한다.
-		//기존 : Batched를 만들고 Instanced로 연결
-		//변경 : Instanced를 먼저 만든 뒤, 공유 가능한 재질이 있는지 런타임에서 확인
-		//AlphaMask와 Clipping도 만들자
-		private void MakeInstancedMaterial()
-		{
-			//1. Material Instanced를 만들자.
-			if (_material_Instanced == null)
-			{
-				//변경 19.6.16 : MaterialInfo를 이용하여 재질 만들기
-				if (IsUseMaterialInfo)
-				{
-					apOptMaterialInfo matInfo = MaterialInfo;
-					_material_Instanced = new Material(matInfo._shader);
-					_material_Instanced.name = "Instanced-" + _material_Instanced.name;
+		
 
-					_material_Instanced.SetColor("_Color", _parentTransform._meshColor2X_Default);
-					_material_Instanced.SetTexture("_MainTex", matInfo._mainTex);
+		// Update (실행되지 않음)
+		//------------------------------------------------
+		void Update() { }
 
-					//추가 속성도 적용하자.
-					matInfo.SetMaterialProperties(_material_Instanced);
-				}
-				else
-				{
-					//이전 방식
-					if (_isMaskChild)
-					{
-						_material_Instanced = new Material(_shaderClipping);
-					}
-					else
-					{
-						_material_Instanced = new Material(_shaderNormal);
-					}
-
-					_material_Instanced.name = "Instanced-" + _material_Instanced.name;
-					
-					_material_Instanced.SetColor("_Color", _parentTransform._meshColor2X_Default);
-					_material_Instanced.SetTexture("_MainTex", _texture);
-				}
-			}
-			
-
-			//2. Alpha Mask Material을 만들자.
-			if(_isMaskParent && _materialAlphaMask == null)
-			{
-				_materialAlphaMask = new Material(_shader_AlphaMask);
-			}
-
-			_materialType = MATERIAL_TYPE.Instanced;
-			_material_Cur = _material_Instanced;
-
-			if(_meshRenderer != null && _meshRenderer.sharedMaterial == null)
-			{
-				_meshRenderer.sharedMaterial = _material_Cur;
-			}
-		}
-
-
+		void LateUpdate() { }
+		
+		
+		// Functions
+		//------------------------------------------------
 		/// <summary>
-		/// [Please do not use it]
-		/// Initialize Materials
+		/// Show Mesh
 		/// </summary>
-		public void InstantiateMaterial(apOptBatchedMaterial batchedMaterial)
-		{
-			if(_isInitMaterial)
+		/// <param name="isResetHideFlag"></param>
+		public void Show(bool isResetHideFlag = false)
+		{	
+			if(isResetHideFlag)
 			{
-				return;
+				_isHide_External = false;
 			}
 
-			//1. Instanced Material(일반/Clipping)과 Alpha Mask Material을 만들자.
-			MakeInstancedMaterial();
-
-			//이제 Batched Material과 Shared Material을 각각 받아오자
-			if(_isMaskChild)
+			if(_isMaskOnlyMesh)
 			{
-				//Mask Child라면 Batched/Shared를 사용하지 못한다.
-				_material_Batched = null;
-				_material_Shared = null;
-				_materialUnit_Batched = null;
-
-				//추가 19.10.28 : 일괄 처리를 위해서 클리핑 메시도 다른 형태로 batchedMaterial에 등록해야한다.
-				batchedMaterial.LinkClippedMesh(this, _material_Instanced);
+				//v1.6.0 : 마스크 전용 메시라면 항상 숨겨짐
+				_meshRenderer.enabled = false;//<마스크 전용
 			}
 			else
 			{
-				_materialUnit_Batched = batchedMaterial.GetMaterialUnit(_batchedMatID, this);
-				if(_materialUnit_Batched != null)
-				{
-					_material_Batched = _materialUnit_Batched._material;
-				}
+				//일반 메시라면 Show
+				_meshRenderer.enabled = true;
+			}
 
-				//변경 19.6.16
-				if(IsUseMaterialInfo)
-				{
-					//Material Info를 사용한다면
-					_material_Shared = batchedMaterial.GetSharedMaterial_MatInfo(MaterialInfo);
-				}
-				else
-				{
-					//이전 버전이라면
-					_material_Shared = batchedMaterial.GetSharedMaterial_Prev(_texture, _shaderNormal);
-				}
 				
-			}
+			_isVisible = true;
 
-			_materialType = MATERIAL_TYPE.Instanced;
-			_meshRenderer.sharedMaterial = _material_Instanced;//<<일단 Instanced Material 넣기
-			
-			_isForceBatch2Shared = false;
+			//삭제 v1.6.0 : 마스크 처리는 MaskRenderCamera에서 일괄 처리
+// 			if (_isMaskParent)
+// 			{
+// 				//CleanUpMaskParent();
+// 				//ClearCameraData();//변경
 
-			//자동으로 선택해보자
-			AutoSelectMaterial();
-			
+// #if UNITY_EDITOR
+// 				if (!Application.isPlaying)
+// 				{
+// 					return;
+// 				}
+// #endif
+// 				Initialize_MaskParent();
+// 			}
+// 			else if(_isMaskChild)
+// 			{
+// 				//추가됨 19.9.24
+// 				//ClearCameraData();//변경
+// #if UNITY_EDITOR
+// 				if (!Application.isPlaying)
+// 				{
+// 					return;
+// 				}
+// #endif
+// 				Initialize_MaskChild();
+// 			}
 
-
-			//추가 20.4.21 : ExtraOption 초기화
-			_textureMode = TEXTURE_MODE.Base;
-			_texture_Base = _texture;
-
-
-			_isInitMaterial = true;
+			_isUseRiggingCache = false;
 		}
 
-		//---------------------------------------------------------------------------
-		// Mask 관련 초기화
-		//---------------------------------------------------------------------------
 		/// <summary>
-		/// [Please do not use it]
-		/// Initialize if it is Mask Parent
+		/// Hide Mesh
 		/// </summary>
-		public void SetMaskBasicSetting_Parent(List<int> clipChildIDs)
+		public void Hide()
 		{
-			if (clipChildIDs == null || clipChildIDs.Count == 0)
-			{
-				return;
-			}
-			_isMaskParent = true;
-			_clipParentID = -1;
-			_isMaskChild = false;
+			_meshRenderer.enabled = false;
+			_isVisible = false;
 
+			//삭제 v1.6.0 : 마스크는 MaskRenderCamera에서 일괄 처리
+			// if (_isMaskParent 
+			// 	|| _isMaskChild//추가
+			// 	)
+			// {
+			// 	ReleaseRenderEvents();//<<다시 변경. RT는 그대로 두고 이벤트만 날린다.
+			// }
 
-			if (_clipChildIDs == null || _clipChildIDs.Length != clipChildIDs.Count)
-			{
-				_clipChildIDs = new int[clipChildIDs.Count];
-			}
-
-			for (int i = 0; i < clipChildIDs.Count; i++)
-			{
-				_clipChildIDs[i] = clipChildIDs[i];
-			}
-			
+			_isUseRiggingCache = false;
 		}
 
 		/// <summary>
-		/// [Please do not use it]
-		/// Initialize if it is Mask Child
+		/// Show or Hide by default
 		/// </summary>
-		public void SetMaskBasicSetting_Child(int parentID)
+		public void SetVisibleByDefault()
 		{
-			_isMaskParent = false;
-			_clipParentID = parentID;
-			_isMaskChild = true;
-
-			_clipChildIDs = null;
+			if(_isVisibleDefault)
+			{
+				Show(true);
+			}
+			else
+			{
+				Hide();
+			}
 		}
-		
+
 		/// <summary>
-		/// [Please do not use it]
-		/// Initialize reference
+		/// Hide Mesh ignoring the result
 		/// </summary>
-		public void LinkAsMaskChild(apOptMesh parentMesh)
+		/// <param name="isHide"></param>
+		public void SetHideForce(bool isHide)
 		{
-			_parentOptMesh = parentMesh;
+			_isHide_External = isHide;
 
-			
-			if(_meshRenderer.sharedMaterial == null ||
-				_material_Instanced == null)
-			{
-				MakeInstancedMaterial();
-				_meshRenderer.sharedMaterial = _material_Instanced;
-			}
+			//실제 Visible 갱신은 다음 프레임의 업데이트때 수행된다.
 		}
 
-		//Mask Parent의 세팅을 리셋한다.
-		//카메라 설정이나 씬이 변경되었을 때 호출해야한다.
-		/// <summary>
-		/// If it is Mask Parent, reset Command Buffers to Camera
-		/// </summary>
-		public void ResetMaskParentSetting()
-		{
-			//CleanUpMaskParent();
-			//ClearCameraData();//변경
+		//=====================================================================
 
-#if UNITY_EDITOR
-			if (!Application.isPlaying)
-			{
-				return;
-			}
-#endif
-
-			
-			if (_isMaskParent)
-			{
-				Initialize_MaskParent();
-			}
-			else if(_isMaskChild)
-			{
-				Initialize_MaskChild();
-			}
-		}
-
-		
-		//---------------------------------------------------------------------------
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Calculate 메인 로직
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-		// Update
-		//------------------------------------------------
-		void Update()
-		{
-			
-		}
-
-		void LateUpdate()
-		{
-
-		}
-		
-
-
-
-
-
-		// 외부 업데이트
-		//------------------------------------------------
-		/// <summary>
+		//------------------------------------------
+        // Update 코드들. OptMesh는 외부에 의해서 업데이트된다.
+        //------------------------------------------
+        /// <summary>
 		/// [Please do not use it]
 		/// Update Visibility of Mesh
 		/// </summary>
@@ -1488,6 +1521,7 @@ namespace AnyPortrait
 
 			//추가
 			//Mask 메시가 있다면 Visibile 속성이 Parent를 따른다.
+			//코멘트 v1.6.0 : 이건 Clipped Child의 경우에만 
 			if(_isMaskChild)
 			{
 				if(_parentOptMesh != null)
@@ -1501,10 +1535,6 @@ namespace AnyPortrait
 		/// [Please do not use it]
 		/// Update Shape of Mesh
 		/// </summary>
-		/// <param name="isRigging"></param>
-		/// <param name="isVertexLocal"></param>
-		/// <param name="isVertexWorld"></param>
-		/// <param name="isVisible"></param>
 		public void UpdateCalculate(	bool isRigging,
 										bool isVertexLocal,
 										bool isVertexWorld,
@@ -1543,7 +1573,6 @@ namespace AnyPortrait
 					//안보인다면 업데이트하지 않는다 > 갱신
 					return;
 				}
-				
 			}
 			
 			//추가 2.25 : Flipped 관련 코드가 업데이트 초기에 등장한다.
@@ -1578,67 +1607,6 @@ namespace AnyPortrait
 			{
 				_cal_parentCalculateStack = _parentTransform.CalculatedStack;
 			}
-
-			#region [미사용 코드] 원칙에 충실한 이전 방식
-			//for (int i = 0; i < _nRenderVerts; i++)
-			//{
-
-			//	rVert = _renderVerts[i];
-
-			//	//리깅 추가
-			//	if (isRigging)
-			//	{	
-
-			//		//변경 20.11.26 : 더 개선된 버전!
-			//		if (!_isUseRiggingCache)
-			//		{
-			//			rVert._matrix_Rigging.SetMatrixWithWeight(
-			//				calculateStack.GetDeferredRiggingMatrix_WithLUT(i),
-			//				calculateStack._result_RiggingWeight * calculateStack.GetDeferredRiggingWeight(i)//<이 Weight는 런타임에서는 바뀌지 않는다.
-			//				);
-			//		}
-			//		else
-			//		{
-			//			//캐시를 이용해서 Weight를 가져온다.
-			//			rVert._matrix_Rigging.SetMatrixWithWeight(
-			//				calculateStack.GetDeferredRiggingMatrix_WithLUT(i),
-			//				//calculateStack._result_RiggingWeight * calculateStack.GetDeferredRiggingWeightCache(i)
-			//				calculateStack._result_RiggingWeight * calculateStack._result_RiggingVertWeight_Cache[i]//변경 21.5.22 : 직접 호출
-			//				);
-			//		}
-
-
-			//	}
-
-			//	if (isVertexLocal)
-			//	{
-			//		rVert._matrix_Cal_VertLocal.SetTRS(calculateStack.GetDeferredLocalPos(i));//<OPT : VertLocal도 Vector면 된다. + 미리 계산하고 값 복사?할 것>
-			//	}
-
-			//	rVert.SetMatrix_3_Transform_Mesh(_cal_Matrix_TFResult_World);//<OPT : _cal_Matrix_TFResult_World도 삭제하고, Calculate에서 바로 전달>
-
-			//	if (isVertexWorld)
-			//	{
-			//		rVert._matrix_Cal_VertWorld.SetTRS(calculateStack._result_VertWorld[i]);//<OPT : VertWorld는 Matrix가 아닌 Vector면 된다.>
-			//	}
-
-			//	//추가
-			//	if(isOrthoCorrection)
-			//	{
-			//		rVert.SetMatrix_5_OrthoCorrection(_parentTransform._convert2TargetMatrix3x3);//<OPT : 이거 할당 삭제할 것>
-			//	}
-
-			//	//추가
-			//	rVert.SetMatrix_6_FlipWeight(flipWeight_X, flipWeight_Y);//<OPT : 이거 할당 삭제할 것>
-
-			//	rVert.Calculate();
-
-			//	//업데이트 데이터를 넣어준다.
-			//	_vertPositions_Updated[i] =  rVert._vertPos3_LocalUpdated;
-			//	_vertPositions_World[i] = rVert._vertPos_World;
-
-			//} 
-			#endregion
 
 			//변경 21.5.23 : RenderVertex에서 계산하던 것을 외부로 뺐다.
 			//조건에 따라 Calculated가 모두 다르다.
@@ -1812,7 +1780,10 @@ namespace AnyPortrait
 			}
 			else
 			{
-				if(_materialType == MATERIAL_TYPE.Instanced && !_isMaskChild)
+				if(_materialType == MATERIAL_TYPE.Instanced 
+					&& !_isMaskChild
+					&& _nReceiveMaskInfo == 0 //v1.6.0 추가
+				)
 				{
 					//반대로 색상 선택이 없는데 Instance Material을 사용중이라면 Shared나 Batch를 써야할 것이다.
 					AutoSelectMaterial();
@@ -1820,28 +1791,180 @@ namespace AnyPortrait
 			}
 
 
-			if (_isMaskChild
-				&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Child_Calculate)
-			{
-				UpdateMaskChild_Basic();
-			}
+			//삭제 v1.6.0 : 마스크 연산은 MaskRenderCamera에서 일괄 처리
+			// if (_isMaskChild
+			// 	&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Child_Calculate)
+			// {
+			// 	UpdateMaskChild_Basic();
+			// }
 
 			RefreshMesh();
 
-			if(_isMaskParent 
+			//삭제 v1.6.0 : 마스크 연산은 MaskRenderCamera에서 일괄 처리
+			// if(_isMaskParent 
+			// 	&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Parent_Calculate
+			// 	&& _funcUpdateCommandBuffer != null)
+			// {
+			// 	//MaskParent면 CommandBuffer를 갱신한다. > Mask 렌더링
+			// 	_funcUpdateCommandBuffer();//변경
+			// }
+		}
+
+
+        // 업데이트 없이 Mask만 갱신하고자 하는 경우
+		[Obsolete]
+        public void RefreshMaskMesh_WithoutUpdateCalculate()
+		{
+			//Calculate는 하지 않고
+			if(_isMaskParent
 				&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Parent_Calculate
-				&& _funcUpdateCommandBuffer != null)
+				&& _funcUpdateCommandBuffer != null
+				)
 			{
-				//MaskParent면 CommandBuffer를 갱신한다. > Mask 렌더링
+				//MaskParent면 CommandBuffer를 갱신한다.
+				
+				//UpdateCommandBuffer();//이전
 				_funcUpdateCommandBuffer();//변경
+			}
+
+			if(_isMaskChild
+				&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Child_Calculate)
+			{
+				UpdateMaskChild_Basic();
 			}
 		}
 
 
 
+        //------------------------------------------
+        // Refresh Mesh (메시 갱신)
+        //------------------------------------------
+        /// <summary>
+		/// [Please do not use it]
+		/// </summary>
+		public void RefreshMesh()
+		{
+
+			//Flipped 계산
+			//Root의 Scale의 방향이 바뀌었으면 Flipped을 해야한다.
+			if (_cal_isRootFlipped)
+			{
+				//_cal_isRootFlipped_Prev = _cal_isRootFlipped;
+
+				_transform.localScale = new Vector3((_cal_isRootFlipped_X ? -1.0f : 1.0f),
+														(_cal_isRootFlipped_Y ? -1.0f : 1.0f),
+														1.0f);
+
+				_transform.localPosition = new Vector3((_cal_isRootFlipped_X ? _pivotPos.x : -_pivotPos.x),
+														(_cal_isRootFlipped_Y ? _pivotPos.y : -_pivotPos.y),
+														0);
+			}
 
 
-		//추가 21.5.23 : Render Vertex Calculate를 조건 4개에 따라 총 16개의 함수로 나뉘어 호출한다.
+
+			//플립 여부
+			//1. optTransform의 스케일이 "한쪽만 음수"인가
+			//- 리깅이 적용안되었다면 > optTransform의 worldMatrix의 스케일 검사
+			//- 리깅이 적용되었다면 > 리깅이 적용된 모든 본의 "공통 스케일"을 검사 (리깅 본이 없거나 스케일의 부호가 다르다면 처리 실패)
+			//2. RootGameObject가 반전되었는가.
+
+			//1또는 2 조건 하나만 적용되어야 한다.
+
+			//변경 20.8.11 : 리깅에도 적용되는 플립 조건
+			if(_parentTransform._isIgnoreParentModWorldMatrixByRigging)
+			{
+				//리깅이 적용된 경우
+				_cal_isUpdateFlipped = _parentTransform.IsFlippedByRiggingBones();
+			}
+			else
+			{
+				//일반적인 경우
+				_cal_isUpdateFlipped_X = _parentTransform._matrix_TFResult_World._scale.x < 0.0f;
+				_cal_isUpdateFlipped_Y = _parentTransform._matrix_TFResult_World._scale.y < 0.0f;
+
+				_cal_isUpdateFlipped = (_cal_isUpdateFlipped_X != _cal_isUpdateFlipped_Y);
+			}			
+
+			_cal_isFlippedBuffer = (_cal_isUpdateFlipped && !_cal_isRootFlipped)
+								|| (!_cal_isUpdateFlipped && _cal_isRootFlipped);
+
+			//Transform 제어 -> Vert 제어
+			//if (_isMaskParent)//이전
+			if (IsMaskParent())//변경 v1.6.0
+			{
+				//마스크 처리를 위해서 Vertex의 위치나 분포를 저장해야한다.
+				_vertPosCenter = Vector3.zero;
+
+				//Left < Right
+				//Bottom < Top
+				_vertRange_XMin = float.MaxValue;//Max -> Min
+				_vertRange_XMax = float.MinValue;//Min -> Max
+				_vertRange_YMin = float.MaxValue;//Max -> Min
+				_vertRange_YMax = float.MinValue;//Min -> Max
+				
+				Vector3 vertPos;
+				for (int i = 0; i < _nRenderVerts; i++)//모든 버텍스 체크 필요없다. RenderVertex 만큼만 체크하면 된다.
+				{
+					//변경 v1.6.0
+					vertPos = _vertPositions_Updated[i];
+					_vertRange_XMin = _vertRange_XMin < vertPos.x ? _vertRange_XMin : vertPos.x;
+					_vertRange_XMax = _vertRange_XMax > vertPos.x ? _vertRange_XMax : vertPos.x;
+					_vertRange_YMin = _vertRange_YMin < vertPos.y ? _vertRange_YMin : vertPos.y;
+					_vertRange_YMax = _vertRange_YMax > vertPos.y ? _vertRange_YMax : vertPos.y;
+					
+				}
+
+				//마스크를 만들 영역을 잡아준다.
+				//추가 6.6 : 약간의 공백을 더 넣어준다.
+				_vertRange_XMin -= 2.0f;
+				_vertRange_XMax += 2.0f;
+				_vertRange_YMin -= 2.0f;
+				_vertRange_YMax += 2.0f;
+
+				_vertPosCenter.x = (_vertRange_XMin + _vertRange_XMax) * 0.5f;
+				_vertPosCenter.y = (_vertRange_YMin + _vertRange_YMax) * 0.5f;
+				//_vertRangeMax = Mathf.Max(_vertRange_XMax - _vertRange_XMin, _vertRange_YMax - _vertRange_YMin);
+			}
+
+			//변경 21.5.23 : Update 배열 바로 사용하면 된다.
+			_mesh.vertices = _vertPositions_Updated;
+
+			//추가3.22 : Flip 여부에 따라서 다른 Vertex 배열을 사용한다.
+			if (_isAlways2Side)
+			{
+				_mesh.triangles = _vertTris;
+				//_mesh.RecalculateNormals();
+			}
+			else
+			{
+				if (_cal_isFlippedBuffer)
+				{
+					_mesh.triangles = _vertTris_Flipped;
+				}
+				else
+				{
+					_mesh.triangles = _vertTris;
+				}
+
+				if (_cal_isFlippedBuffer_Prev != _cal_isFlippedBuffer)
+				{
+					//Flip 여부가 바뀔 대
+					//Normal을 다시 계산한다.
+					_mesh.RecalculateNormals();
+					_cal_isFlippedBuffer_Prev = _cal_isFlippedBuffer;
+				}
+			}
+			
+			_mesh.RecalculateBounds();
+		}
+
+
+
+
+        //------------------------------------------
+        // Render Vertex Calculate
+        //------------------------------------------
+        //추가 21.5.23 : Render Vertex Calculate를 조건 4개에 따라 총 16개의 함수로 나뉘어 호출한다.
 		//다 비슷하지만 다르다..
 		
 		// Local + World + [Rigging] + OrthoCorrection
@@ -2129,291 +2252,2157 @@ namespace AnyPortrait
 			}
 		}
 
+		// Get
+		//-------------------------------------------------------
+		public bool IsVisible() { return _isVisible; }
+		
+		
+		
+		
+		
+		
+		
+		//=====================================================================
 
 
 
 
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// 재질 관련 함수들
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
-
-
-
-
-		public void RefreshMaskMesh_WithoutUpdateCalculate()
+		//--------------------------------
+        // (에디터) 메시 리셋
+        //--------------------------------
+        
+#if UNITY_EDITOR
+		public bool IsMeshOrMaterialMissingInEditor()
 		{
-			//Calculate는 하지 않고
-			if(_isMaskParent
-				&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Parent_Calculate
-				&& _funcUpdateCommandBuffer != null
-				)
+			if (_meshFilter != null && _meshRenderer != null)
 			{
-				//MaskParent면 CommandBuffer를 갱신한다.
-				
-				//UpdateCommandBuffer();//이전
-				_funcUpdateCommandBuffer();//변경
+				if (_meshFilter.sharedMesh == null
+					|| _meshRenderer.sharedMaterial == null)
+				{
+					return true;
+				}
 			}
+			return false;
+		}
 
-			if(_isMaskChild
-				&& _clippingFuncCallType == CLIPPING_FUNC_CALL_TYPE.Child_Calculate)
+		public void ResetMeshAndMaterialIfMissing()
+		{
+			if (!IsMeshOrMaterialMissingInEditor())
 			{
-				UpdateMaskChild_Basic();
+				return;
+			}
+			if (_meshFilter != null && _meshRenderer != null)
+			{
+				if (_meshFilter.sharedMesh == null)
+				{
+					InitMesh(true);
+				}
+
+				if (_meshRenderer.sharedMaterial == null)
+				{
+					MakeInstancedMaterial();
+					_meshRenderer.sharedMaterial = _material_Instanced;
+				}
+			}
+		}
+#endif
+
+
+        //--------------------------------
+        // 현재 재질 값 참조 (로직 무관)
+        //--------------------------------
+        /// <summary>
+		/// Calculated Mesh Color (2X)
+		/// </summary>
+		public Color MeshColor
+		{
+			get
+			{
+				//return _multiplyColor * 2.0f * _parentTransform._meshColor2X;
+				return _cal_MeshColor;
 			}
 		}
 
 
-		//테스트 : 낮은 프레임의 FPS
-		//private float testTime = 0.0f;
+		public MATERIAL_TYPE GetMaterialTypeForDebug()
+		{
+			return _materialType;
+		}
 
-		// Vertex Refresh
-		//------------------------------------------------
+
+        //--------------------------------
+        // 재질 생성 / 복제 / 자동 변경
+        //--------------------------------
+        
+
+
 		/// <summary>
 		/// [Please do not use it]
+		/// Initialize Materials
 		/// </summary>
-		public void RefreshMesh()
+		public void InstantiateMaterial(apOptBatchedMaterial batchedMaterial)
 		{
-
-			//Flipped 계산
-			//Root의 Scale의 방향이 바뀌었으면 Flipped을 해야한다.
-			if (_cal_isRootFlipped)
+			if(_isInitMaterial)
 			{
-				//_cal_isRootFlipped_Prev = _cal_isRootFlipped;
-
-				_transform.localScale = new Vector3((_cal_isRootFlipped_X ? -1.0f : 1.0f),
-														(_cal_isRootFlipped_Y ? -1.0f : 1.0f),
-														1.0f);
-
-				_transform.localPosition = new Vector3((_cal_isRootFlipped_X ? _pivotPos.x : -_pivotPos.x),
-														(_cal_isRootFlipped_Y ? _pivotPos.y : -_pivotPos.y),
-														0);
+				return;
 			}
 
+			//1. Instanced Material(일반/Clipping)과 Alpha Mask Material을 만들자.
+			MakeInstancedMaterial();
 
-
-			//플립 여부
-			//1. optTransform의 스케일이 "한쪽만 음수"인가
-			//- 리깅이 적용안되었다면 > optTransform의 worldMatrix의 스케일 검사
-			//- 리깅이 적용되었다면 > 리깅이 적용된 모든 본의 "공통 스케일"을 검사 (리깅 본이 없거나 스케일의 부호가 다르다면 처리 실패)
-			//2. RootGameObject가 반전되었는가.
-
-			//1또는 2 조건 하나만 적용되어야 한다.
-
-			//이전
-			//_cal_isUpdateFlipped_X = _parentTransform._matrix_TFResult_World._scale.x < 0.0f;
-			//_cal_isUpdateFlipped_Y = _parentTransform._matrix_TFResult_World._scale.y < 0.0f;
-			//_cal_isUpdateFlipped = (_cal_isUpdateFlipped_X != _cal_isUpdateFlipped_Y);
-
-			//변경 20.8.11 : 리깅에도 적용되는 플립 조건
-			if(_parentTransform._isIgnoreParentModWorldMatrixByRigging)
+			//이제 Batched Material과 Shared Material을 각각 받아오자
+			
+			//if(_isMaskChild)	//이전
+			if(IsMaskClipped())	//v1.6.0 : Mask Data 포함
 			{
-				//리깅이 적용된 경우
-				_cal_isUpdateFlipped = _parentTransform.IsFlippedByRiggingBones();
+				//Mask Child라면 Batched/Shared를 사용하지 못한다.
+				_material_Batched = null;
+				_material_Shared = null;
+				_materialUnit_Batched = null;
+
+				//추가 19.10.28 : 일괄 처리를 위해서 클리핑 메시도 다른 형태로 batchedMaterial에 등록해야한다.
+				batchedMaterial.LinkClippedMesh(this, _material_Instanced);
 			}
 			else
 			{
-				//일반적인 경우
-				_cal_isUpdateFlipped_X = _parentTransform._matrix_TFResult_World._scale.x < 0.0f;
-				_cal_isUpdateFlipped_Y = _parentTransform._matrix_TFResult_World._scale.y < 0.0f;
-
-				_cal_isUpdateFlipped = (_cal_isUpdateFlipped_X != _cal_isUpdateFlipped_Y);
-			}			
-
-			_cal_isFlippedBuffer = (_cal_isUpdateFlipped && !_cal_isRootFlipped)
-								|| (!_cal_isUpdateFlipped && _cal_isRootFlipped);
-
-			//Transform 제어 -> Vert 제어
-			if (_isMaskParent)
-			{
-				//마스크 처리를 위해서 Vertex의 위치나 분포를 저장해야한다.
-				_vertPosCenter = Vector3.zero;
-				//_vertRangeMax = -1.0f;
-
-				//Left < Right
-				//Bottom < Top
-				_vertRange_XMin = float.MaxValue;//Max -> Min
-				_vertRange_XMax = float.MinValue;//Min -> Max
-				_vertRange_YMin = float.MaxValue;//Max -> Min
-				_vertRange_YMax = float.MinValue;//Min -> Max
-				
-				//_vertPositions_Local를 삭제했다.
-				//Array.Copy(_vertPositions_Updated, _vertPositions_Local, _nVertPos);//추가 21.5.22
-
-				//for (int i = 0; i < _nVertPos; i++)
-				for (int i = 0; i < _nRenderVerts; i++)//모든 버텍스 체크 필요없다. RenderVertex 만큼만 체크하면 된다.
+				_materialUnit_Batched = batchedMaterial.GetMaterialUnit(_batchedMatID, this);
+				if(_materialUnit_Batched != null)
 				{
-					//_vertPositions_Local[i] = _vertPositions_Updated[i];//삭제 21.5.22 > Array.Copy로 변경
-
-					//이전
-					//_vertRange_XMin = Mathf.Min(_vertRange_XMin, _vertPositions_Local[i].x);
-					//_vertRange_XMax = Mathf.Max(_vertRange_XMax, _vertPositions_Local[i].x);
-					//_vertRange_YMin = Mathf.Min(_vertRange_YMin, _vertPositions_Local[i].y);
-					//_vertRange_YMax = Mathf.Max(_vertRange_YMax, _vertPositions_Local[i].y);
-
-					//변경 21.5.23 : Local 삭제 > Update 바로 이용
-					_vertRange_XMin = Mathf.Min(_vertRange_XMin, _vertPositions_Updated[i].x);
-					_vertRange_XMax = Mathf.Max(_vertRange_XMax, _vertPositions_Updated[i].x);
-					_vertRange_YMin = Mathf.Min(_vertRange_YMin, _vertPositions_Updated[i].y);
-					_vertRange_YMax = Mathf.Max(_vertRange_YMax, _vertPositions_Updated[i].y);
+					_material_Batched = _materialUnit_Batched._material;
 				}
 
-				//마스크를 만들 영역을 잡아준다.
-				//추가 6.6 : 약간의 공백을 더 넣어준다.
-				_vertRange_XMin -= 2.0f;
-				_vertRange_XMax += 2.0f;
-				_vertRange_YMin -= 2.0f;
-				_vertRange_YMax += 2.0f;
-
-				_vertPosCenter.x = (_vertRange_XMin + _vertRange_XMax) * 0.5f;
-				_vertPosCenter.y = (_vertRange_YMin + _vertRange_YMax) * 0.5f;
-				//_vertRangeMax = Mathf.Max(_vertRange_XMax - _vertRange_XMin, _vertRange_YMax - _vertRange_YMin);
-			}
-
-			//변경 21.5.23 : Update 배열 바로 사용하면 된다.
-			_mesh.vertices = _vertPositions_Updated;
-
-			//추가3.22 : Flip 여부에 따라서 다른 Vertex 배열을 사용한다.
-			if (_isAlways2Side)
-			{
-				_mesh.triangles = _vertTris;
-				//_mesh.RecalculateNormals();
-			}
-			else
-			{
-				if (_cal_isFlippedBuffer)
+				//변경 19.6.16
+				if(IsUseMaterialInfo)
 				{
-					_mesh.triangles = _vertTris_Flipped;
+					//Material Info를 사용한다면
+					_material_Shared = batchedMaterial.GetSharedMaterial_MatInfo(MaterialInfo);
 				}
 				else
 				{
-					_mesh.triangles = _vertTris;
+					//이전 버전이라면
+					_material_Shared = batchedMaterial.GetSharedMaterial_Prev(_texture, _shaderNormal);
 				}
-
-				if (_cal_isFlippedBuffer_Prev != _cal_isFlippedBuffer)
-				{
-					//Flip 여부가 바뀔 대
-					//Normal을 다시 계산한다.
-					_mesh.RecalculateNormals();
-					_cal_isFlippedBuffer_Prev = _cal_isFlippedBuffer;
-				}
-			}
-			
-			_mesh.RecalculateBounds();
-		}
-
-
-		//--------------------------------------------------------------------------------
-		// 클리핑 Mask Parent
-		//--------------------------------------------------------------------------------
-		#region [미사용 코드] ClearCameraData로 변경되었다.
-		//		//MaskParent일때, 커맨드 버퍼를 초기화한다.
-		//		/// <summary>
-		//		/// Clean up Command Buffers if it is Mask Parent
-		//		/// </summary>
-		//		public void CleanUpMaskParent()
-		//		{
-		//			if (!_isMaskParent)
-		//			{
-		//				return;
-		//			}
-
-		//			_isRenderTextureCreated = false;
-		//			if (_targetCamera != null && _commandBuffer != null)
-		//			{
-		//				_targetCamera.RemoveCommandBuffer(CameraEvent.BeforeForwardOpaque, _commandBuffer);
-
-		//#if UNITY_2019_1_OR_NEWER
-		//				RenderPipelineManager.beginCameraRendering -= ProcessSRP;
-		//#endif
-		//			}
-		//			_targetCamera = null;
-		//			cameraTransform = null;
-		//			_commandBuffer = null;
-
-		//			_maskRenderTargetID = -1;
-		//			if (_maskRenderTexture != null)
-		//			{
-		//				RenderTexture.ReleaseTemporary(_maskRenderTexture);
-		//				_maskRenderTexture = null;
-		//			}
-		//		} 
-		#endregion
-
-
-
-		public void ClearCameraData()
-		{	
-			if (_isMaskParent)
-			{
-				if (_renderCamera != null)
-				{
-					_renderCamera.Clear();
-				}
-
-#if UNITY_2019_1_OR_NEWER
-				if(_isUseSRP)//v1.5.1 : SRP 체크 코드 추가
-				{
-					RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskParent;
-				}
-#endif
-				//_isRenderTextureCreated = false;
-			}
-			else if (_isMaskChild)
-			{
-				//여기서도 RenderCamera가 초기화된다.
-				if (_renderCamera != null)
-				{
-					_renderCamera.Clear();
-				}
-
-#if UNITY_2019_1_OR_NEWER
-				if(_isUseSRP)//v1.5.1 : SRP 체크 코드 추가
-				{
-					RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskChild;
-				}
-#endif
 				
 			}
 
+			_materialType = MATERIAL_TYPE.Instanced;
+			_meshRenderer.sharedMaterial = _material_Instanced;//<<일단 Instanced Material 넣기
 			
-			//_renderCamera = null;
+			_isForceBatch2Shared = false;
+
+			//자동으로 선택해보자
+			AutoSelectMaterial();
+			
+
+
+			//추가 20.4.21 : ExtraOption 초기화
+			_textureMode = TEXTURE_MODE.Base;
+			_texture_Base = _texture;
+
+
+			_isInitMaterial = true;
 		}
 
-		public void ReleaseRenderEvents()
+
+		//추가 : 먼저 바로 사용할 InstancedMaterial을 만든다.
+		//이전과 달리 Batched / Shared는 런타임에서 만들어져서 연결한다.
+		//기존 : Batched를 만들고 Instanced로 연결
+		//변경 : Instanced를 먼저 만든 뒤, 공유 가능한 재질이 있는지 런타임에서 확인
+		//AlphaMask와 Clipping도 만들자
+		private void MakeInstancedMaterial()
 		{
-			//RenderTexture는 그대로 둔 상태로
-			//렌더링 관련 이벤트와 커맨드 버퍼만 삭제한다.
-
-			if (_isMaskParent)
+			if(!_isInit)
 			{
-				if (_renderCamera != null)
-				{
-					_renderCamera.ReleaseEvents();
-				}
-
-#if UNITY_2019_1_OR_NEWER
-				RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskParent;
-#endif
-				//_isRenderTextureCreated = false;
+				Init();
 			}
-			else if (_isMaskChild)
+
+			//1. Material Instanced를 만들자.
+			if (_material_Instanced == null)
 			{
-				//여기서도 RenderCamera가 초기화된다.
-				if (_renderCamera != null)
+				//변경 19.6.16 : MaterialInfo를 이용하여 재질 만들기
+				if (IsUseMaterialInfo)
 				{
-					_renderCamera.ReleaseEvents();
+					apOptMaterialInfo matInfo = MaterialInfo;
+					_material_Instanced = new Material(matInfo._shader);
+					_material_Instanced.name = "Instanced-" + _material_Instanced.name;
+
+					_material_Instanced.SetColor(_shaderID_Color, _parentTransform._meshColor2X_Default);
+					_material_Instanced.SetTexture(_shaderID_MainTex, matInfo._mainTex);
+
+					//추가 속성도 적용하자.
+					matInfo.SetMaterialProperties(_material_Instanced);
+				}
+				else
+				{
+					//이전 방식
+					//if (_isMaskChild)//이전
+					if(IsMaskClipped())//변경 v1.6.0
+					{
+						_material_Instanced = new Material(_shaderClipping);
+					}
+					else
+					{
+						_material_Instanced = new Material(_shaderNormal);
+					}
+
+					_material_Instanced.name = "Instanced-" + _material_Instanced.name;
+					
+					_material_Instanced.SetColor(_shaderID_Color, _parentTransform._meshColor2X_Default);
+					_material_Instanced.SetTexture(_shaderID_MainTex, _texture);
 				}
 
-#if UNITY_2019_1_OR_NEWER
-				RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskChild;
-#endif
-				//_isRenderMaskEventRegistered = false;
-				
+				//추가 v1.6.0
+				//이 함수가 호출되는건 Bake 또는 Mask Link가 끝난 직후다.
+				//따라서 Mask 연결 정보를 포함한 Clipped Shader의 초기화가 가능하다. (단, Bake 직후엔 조금 다를 수 있음)
+				if(IsMaskClipped())
+				{
+					InitClippedMaterial();
+				}
+			}
+			
+
+			//2. Alpha Mask Material을 만들자.
+			if(IsMaskParent() && _materialAlphaMask == null)
+			{
+				_materialAlphaMask = new Material(_shader_AlphaMask);
+			}
+
+			_materialType = MATERIAL_TYPE.Instanced;
+			_material_Cur = _material_Instanced;
+
+			if(_meshRenderer != null && _meshRenderer.sharedMaterial == null)
+			{
+				_meshRenderer.sharedMaterial = _material_Cur;
 			}
 		}
+
+
+		// Clipped라면 Received에 따라서 Mask Ratio를 초기화해야한다.
+		private void InitClippedMaterial()
+		{
+			if(!IsMaskClipped())
+			{
+				return;
+			}
+
+			if(_material_Instanced == null)
+			{
+				return;
+			}
+
+			//1. 초기화/갱신을 위해 마스크 프로퍼티를 가지고 있는지 체크한다.
+			_isHasProperty_MaskRatio = false;
+			_isHasProperty_MaskChannel_1 = false;
+			_isHasProperty_MaskChannel_2 = false;
+			_isHasProperty_MaskChannel_3 = false;
+			_isHasProperty_MaskChannel_4 = false;
+
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio))
+			{
+				_isHasProperty_MaskRatio = true;
+			}
+
+			//채널의 경우는 Ratio, Tex, Op를 모두 가져야만 유효하다
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_1)
+				&& _material_Instanced.HasProperty(_shaderID_MaskTex_1)
+				&& _material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_1)
+				&& _material_Instanced.HasProperty(_shaderID_MaskOp_1))
+			{
+				_isHasProperty_MaskChannel_1 = true;
+			}
+
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_2)
+				&& _material_Instanced.HasProperty(_shaderID_MaskTex_2)
+				&& _material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_2)
+				&& _material_Instanced.HasProperty(_shaderID_MaskOp_2))
+			{
+				_isHasProperty_MaskChannel_2 = true;
+			}
+
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_3)
+				&& _material_Instanced.HasProperty(_shaderID_MaskTex_3)
+				&& _material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_3)
+				&& _material_Instanced.HasProperty(_shaderID_MaskOp_3))
+			{
+				_isHasProperty_MaskChannel_3 = true;
+			}
+
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_4)
+				&& _material_Instanced.HasProperty(_shaderID_MaskTex_4)
+				&& _material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_4)
+				&& _material_Instanced.HasProperty(_shaderID_MaskOp_4))
+			{
+				_isHasProperty_MaskChannel_4 = true;
+			}
+
+
+
+			//마스크 관련 가중치를 초기화한다.
+			//1. 일단 0으로 초기화
+			if(_isHasProperty_MaskRatio)		{ _material_Instanced.SetFloat(_shaderID_MaskRatio, 0.0f); }
+			if(_isHasProperty_MaskChannel_1)	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_1, 0.0f); }
+			if(_isHasProperty_MaskChannel_2)	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_2, 0.0f); }
+			if(_isHasProperty_MaskChannel_3)	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_3, 0.0f); }
+			if(_isHasProperty_MaskChannel_4)	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_4, 0.0f); }
+
+			if (_nReceiveMaskInfo > 0)
+			{
+				//2. 사용되는 마스크 채널의 가중치를 올린다.
+				apOptMaskLinkInfo linkInfo = null;
+				for (int iReceive = 0; iReceive < _nReceiveMaskInfo; iReceive++)
+				{
+					linkInfo = _receiveMaskInfos[iReceive];
+					switch (linkInfo.LinkType)
+					{
+						case apOptMaskLinkInfo.LINK_TYPE.Clipping:
+							{
+								//클리핑 활성화
+								if (_isHasProperty_MaskRatio)
+								{
+									_material_Instanced.SetFloat(_shaderID_MaskRatio, 1.0f);
+								}
+							}
+							break;
+
+						case apOptMaskLinkInfo.LINK_TYPE.SendData:
+							{
+								//마스크 채널을 사용하는 경우에만 가중치 올림
+								if (linkInfo.ReceivedSendData == null)
+								{
+									break;
+								}
+								List<apOptSendMaskData.ReceivePropertySet> propSetList = linkInfo.ReceivedSendData._propertySets;
+								int nProps = propSetList != null ? propSetList.Count : 0;
+
+								if (nProps == 0)
+								{
+									break;
+								}
+
+								apOptSendMaskData.ReceivePropertySet curProp = null;
+								for (int iProp = 0; iProp < nProps; iProp++)
+								{
+									curProp = propSetList[iProp];
+									if (curProp._preset == apSendMaskData.SHADER_PROP_PRESET.AlphaMaskPreset)
+									{
+										//Mask Operation은 여기서 바로 값을 설정한다.
+										//MaskTex는 나중에 실시간으로 받는다.
+										float valueOp = apSendMaskData.MaskOperationToFloatValue(curProp._value_MaskOp);
+										switch (curProp._reservedChannel)
+										{
+											case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_1:
+												{
+													if(_isHasProperty_MaskChannel_1)
+													{
+														_material_Instanced.SetFloat(_shaderID_MaskRatio_1, 1.0f);
+														_material_Instanced.SetFloat(_shaderID_MaskOp_1, valueOp);
+													}
+												}
+												break;
+
+											case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_2:
+												{
+													if(_isHasProperty_MaskChannel_2)
+													{
+														_material_Instanced.SetFloat(_shaderID_MaskRatio_2, 1.0f);
+														_material_Instanced.SetFloat(_shaderID_MaskOp_2, valueOp);
+													}
+												}
+												break;
+
+											case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_3:
+												{
+													if(_isHasProperty_MaskChannel_3)
+													{
+														_material_Instanced.SetFloat(_shaderID_MaskRatio_3, 1.0f);
+														_material_Instanced.SetFloat(_shaderID_MaskOp_3, valueOp);
+													}
+												}
+												break;
+
+											case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_4:
+												{
+													if(_isHasProperty_MaskChannel_4)
+													{
+														_material_Instanced.SetFloat(_shaderID_MaskRatio_4, 1.0f);
+														_material_Instanced.SetFloat(_shaderID_MaskOp_4, valueOp);
+													}
+												}
+												break;
+										}
+									}
+								}
+							}
+							break;
+					}
+				}
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 현재 상태에 맞는 재질로 교체한다. (Batched / Instanced / Shared / Merged 등)
+        /// </summary>
+        private void AutoSelectMaterial(bool isCheckGrayColor = false)
+		{
+#if UNITY_EDITOR
+			if(!Application.isPlaying)
+			{
+				return;
+			}
+#endif
+			//if(_isMaskChild)
+			if(IsMaskClipped())//변경 v1.6.0 : Send Data를 받는 경우도 포함
+			{
+				//Mask Child는 무조건 Instanced를 이용한다.
+				if(_materialType != MATERIAL_TYPE.Instanced)
+				{
+					_materialType = MATERIAL_TYPE.Instanced;
+					_material_Cur = _material_Instanced;
+					_meshRenderer.sharedMaterial = _material_Cur;
+				}
+				
+				return;
+			}
+
+			//Batch된 재질이 작동하고 있는가 (Merged가 아닐 때에만 동작)
+			bool isBatched = false;
+			if (!_isMerged)
+			{
+				if (_materialUnit_Batched != null && _materialUnit_Batched.IsAnyChanged)
+				{
+					isBatched = true;
+				}
+
+				if (_isForceBatch2Shared)
+				{
+					//강제로 Shared로 전환해야하는 옵션이 켜질 수 있다.
+					isBatched = false;
+				}
+			}
+			
+
+			bool isColorChanged = _isAnyMeshColorRequest || _parentTransform._isAnyColorCalculated || !_isDefaultColorGray;
+			if(isCheckGrayColor 
+				&& isColorChanged
+				&& !_isAnyTextureRequest
+				&& !_isAnyCustomPropertyRequest
+				)
+			{
+				//만약, 색상 변경 이벤트가 있었는데, (게다가 다른 이벤트는 없었다면)
+				//Gray 체크 요청이 같이 왔다면 Instanced가 아니라 Shared로 바꿀 수 있을 것이다.
+				if(_isMerged)
+				{	
+					//추가 21.12.29 : 병합된 경우엔 Merged Material과 비교해야한다.
+					Color mergedColor = _material_Merged.color;
+
+					bool isMergedColor = Mathf.Abs(_cal_MeshColor.r - mergedColor.r) < 0.004f &&
+											Mathf.Abs(_cal_MeshColor.g - mergedColor.g) < 0.004f &&
+											Mathf.Abs(_cal_MeshColor.b - mergedColor.b) < 0.004f &&
+											Mathf.Abs(_cal_MeshColor.a - mergedColor.a) < 0.004f;
+
+					if (isMergedColor)
+					{
+						//Merged 재질과 같은 색상이다.
+						isColorChanged = false;
+					}
+				}	
+				else if (isBatched)
+				{
+					//만약, Batch 재질이 작동하고 있고, 계산된 MeshColor가 Batch의 색상과 유사하다면, 이건 Batch 쪽으로 전환되어야 한다.
+					//(색상에 한해서)
+
+					Color batchedColor = _material_Batched.color;
+
+					bool isBatchedColor = Mathf.Abs(_cal_MeshColor.r - batchedColor.r) < 0.004f &&
+											Mathf.Abs(_cal_MeshColor.g - batchedColor.g) < 0.004f &&
+											Mathf.Abs(_cal_MeshColor.b - batchedColor.b) < 0.004f &&
+											Mathf.Abs(_cal_MeshColor.a - batchedColor.a) < 0.004f;
+
+					if (isBatchedColor)
+					{
+						//Batch 재질과 같은 색상이다.
+						isColorChanged = false;
+					}
+				}
+				else
+				{
+					//일반적인 경우엔 Gray Color와 같다면 Instanced가 아닌 Shared로 전환한다.
+					bool isGrayColor = Mathf.Abs(_cal_MeshColor.r - 0.5f) < 0.004f &&
+								Mathf.Abs(_cal_MeshColor.g - 0.5f) < 0.004f &&
+								Mathf.Abs(_cal_MeshColor.b - 0.5f) < 0.004f &&
+								Mathf.Abs(_cal_MeshColor.a - 1.0f) < 0.004f;
+
+					if (isGrayColor)
+					{
+						//Gray 색상이라면 색상 이벤트를 무시해도 된다.
+						isColorChanged = false;
+					}
+				}
+			}
+			
+
+			if (_isAnyTextureRequest
+				|| _isAnyCustomPropertyRequest
+				|| isColorChanged)
+			{
+				//Instance Material을 선택해야한다.
+				if (_materialType != MATERIAL_TYPE.Instanced)
+				{
+					_materialType = MATERIAL_TYPE.Instanced;
+					_material_Cur = _material_Instanced;
+					_meshRenderer.sharedMaterial = _material_Cur;
+
+					_isForceBatch2Shared = false;
+
+					//추가 21.12.26
+					//만약 재질이 병합된 상태(Merged)라면, Instanced 되기 전에 버텍스 채널 칼라가 바뀌었을 것
+					//흰색으로 복원해야한다
+					if(_isMerged && _vertColors_NotMerged != null)
+					{
+						_mesh.colors = _vertColors_NotMerged;
+					}
+				}
+			}
+			else
+			{
+				//Batched / Shared / Merged 중에 선택해야한다.
+				//가장 우선 순위는 Merged
+
+				//Shared Material을 선택해야한다.
+				//기본적으론 Shared를 선택해야한다.
+				//Batched Material의 "일괄 적용 요청"이 있었다면, Shared와 Batch 중에서 결정해야한다.
+
+				if (_isMerged)
+				{
+					//병합된 재질로 변환
+					if (_materialType != MATERIAL_TYPE.Merged)
+					{
+						_materialType = MATERIAL_TYPE.Merged;
+						_material_Cur = _material_Merged;
+						_meshRenderer.sharedMaterial = _material_Cur;
+
+						//병합된 재질은 버텍스 색상도 제어해야한다.
+						_mesh.colors = _vertColors_Merged;
+					}
+				}
+				else
+				{
+					if (isBatched)
+					{
+						if (_materialType != MATERIAL_TYPE.Batched)
+						{
+							//-> Batched
+							_materialType = MATERIAL_TYPE.Batched;
+							_material_Cur = _material_Batched;
+							_meshRenderer.sharedMaterial = _material_Cur;
+						}
+					}
+					else
+					{
+						//가장 높은 최적화 단계인 Shared
+						//아무런 변화가 없을때 동작한다.
+						if (_materialType != MATERIAL_TYPE.Shared)
+						{
+							//-> Shared
+							_materialType = MATERIAL_TYPE.Shared;
+							_material_Cur = _material_Shared;
+							_meshRenderer.sharedMaterial = _material_Cur;
+						}
+					}
+				}
+			}
+		}
+
+
+
+        //--------------------------------
+        // Shader 리셋 / 동기화 (Batch 용)
+        //--------------------------------
+        //Material Property 값들을 초기화한다.
+		//이 함수를 호출하면 MaskChild를 제외하면 Batch를 위해 SharedMaterial로 변경된다.
+		/// <summary>
+		/// Return the material value to its initial state. Batch rendering is enabled.
+		/// </summary>
+		public void ResetMaterialToBatch()
+		{
+			//Debug.LogError("ResetMaterialToBatch");
+			//if(_isMaskChild)//이전
+			if(IsMaskClipped())//v1.6.0 : Mask Data 포함
+			{
+				return;
+			}
+
+			//Debug.Log("ResetMaterialToBatch : " + this.name);
+			if(_material_Shared != null)
+			{
+				//Shared로 변경
+				_material_Instanced.CopyPropertiesFromMaterial(_material_Shared);
+				_materialType = MATERIAL_TYPE.Shared;
+				_material_Cur = _material_Shared;
+				_meshRenderer.sharedMaterial = _material_Cur;
+
+				//Debug.Log(">> Shared");
+			}
+
+			//텍스쳐 모드 초기화
+			_textureMode = TEXTURE_MODE.Base;
+			_texture_Base = _texture;
+
+			//이전 코드
+			//if(_isUseSharedMaterial)
+			//{
+			//	return;
+			//}
+			//_isUseSharedMaterial = true;
+			//_material = _sharedMaterial;
+
+			////일단 InstanceMat도 복사를 해서 리셋을 해준다.
+			//_instanceMaterial.CopyPropertiesFromMaterial(_sharedMaterial);
+
+			//_meshRenderer.sharedMaterial = _material;
+
+			_isAnyMeshColorRequest = false;
+			_isAnyTextureRequest = false;
+			_isAnyCustomPropertyRequest = false;
+
+			//중요 : Batched에서 강제로 Shared로 전환하게 만들어야 한다.
+			_isForceBatch2Shared = true;
+
+			//색상 값도 초기화
+			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+
+			AutoSelectMaterial(true);
+
+			
+		}
+
+        
+		// Batch 관련 이벤트
+		//--------------------------------
+		public void SyncMaterialPropertyByBatch_Texture(Texture2D texture)
+		{
+			//추가 20.4.21 : Extra 옵션인 경우엔 적용하면 안된다.
+			_texture_Base = texture;
+
+			if (_textureMode == TEXTURE_MODE.Base)
+			{
+				//Debug.Log("SyncMaterialPropertyByBatch_Texture : " + texture.name + " >> " + this.name + " (Clipped : " + _isMaskChild + ")");
+				_material_Instanced.SetTexture(_shaderID_MainTex, texture);
+
+				//동기화 되었으므로, Instanced 자체의 옵션은 해제 - 텍스쳐
+				_isAnyTextureRequest = false;
+
+				_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+				AutoSelectMaterial();
+			}
+		}
+
+		public void SyncMaterialPropertyByBatch_Color(Color color2X)
+		{
+			//일단 Batch의 색상 값을 가져다 쓴다.
+			//이 상태에서 다시 Parent Opt Transform의 색상과 계산을 해서 _cal_MeshColor를 계산해야한다.
+			//Batch와 동기화한 것이므로 isAnyMeshColorRequest 여부는 확인하지 않는다.
+			_multiplyColor = color2X;
+
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			//_material_Instanced.SetColor(_shaderID_Color, _multiplyColor);//<<버그
+			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);//수정 19.10.28
+
+			//동기화 되었으므로, Instanced 자체의 옵션은 해제 - 색상
+			_isAnyMeshColorRequest = false;
+
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial(true);//<<색상 계산을 해야한다.
+		}
+
+		public void SyncMaterialPropertyByBatch_CustomTexture(Texture2D texture, string propertyName)
+		{
+			_material_Instanced.SetTexture(propertyName, texture);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+		public void SyncMaterialPropertyByBatch_CustomTexture(Texture2D texture, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
+		{
+			_material_Instanced.SetTexture(propertyNameID, texture);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+
+
+		public void SyncMaterialPropertyByBatch_CustomTextureOffset(Vector2 offset, string propertyName)
+		{
+			_material_Instanced.SetTextureOffset(propertyName, offset);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+		public void SyncMaterialPropertyByBatch_CustomTextureScale(Vector2 scale, string propertyName)
+		{
+			_material_Instanced.SetTextureScale(propertyName, scale);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+
+
+		public void SyncMaterialPropertyByBatch_CustomColor(Color color, string propertyName)
+		{
+			_material_Instanced.SetColor(propertyName, color);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+		public void SyncMaterialPropertyByBatch_CustomColor(Color color, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
+		{
+			_material_Instanced.SetColor(propertyNameID, color);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+
+
+		public void SyncMaterialPropertyByBatch_CustomFloat(float floatValue, string propertyName)
+		{
+			_material_Instanced.SetFloat(propertyName, floatValue);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+		
+		public void SyncMaterialPropertyByBatch_CustomFloat(float floatValue, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
+		{
+			_material_Instanced.SetFloat(propertyNameID, floatValue);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+
+		public void SyncMaterialPropertyByBatch_CustomInt(int intValue, string propertyName)
+		{
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyName, intValue);
+#else
+			_material_Instanced.SetInt(propertyName, intValue);
+#endif
+
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+		public void SyncMaterialPropertyByBatch_CustomInt(int intValue, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
+		{
+
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyNameID, intValue);
+#else
+			_material_Instanced.SetInt(propertyNameID, intValue);
+#endif
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+
+
+		public void SyncMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, string propertyName)
+		{
+			_material_Instanced.SetVector(propertyName, vecValue);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
+		public void SyncMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
+		{
+			_material_Instanced.SetVector(propertyNameID, vecValue);
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial();
+		}
+
 
 		
+		public void SyncMaterialPropertyByBatch_Reset(Material syncMaterial)
+		{
+			_material_Instanced.CopyPropertiesFromMaterial(syncMaterial);
 
-		private void Initialize_MaskParent()
+
+			//색상은 별도로 초기화
+			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			//Extra Texture 초기화
+			_textureMode = TEXTURE_MODE.Base;
+			_texture_Base = _texture;
+
+
+			//동기화 되었으므로, Instanced 자체의 옵션은 해제 - 전체
+			_isAnyMeshColorRequest = false;
+			_isAnyTextureRequest = false;
+			_isAnyCustomPropertyRequest = false;
+
+			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
+
+			AutoSelectMaterial(true);
+		}
+
+
+
+        //--------------------------------
+        // Shader 프로퍼티 제어 함수들
+        //--------------------------------
+        /// <summary>
+		/// Set Main Color (2X)
+		/// </summary>
+		/// <param name="color2X"></param>
+		public void SetMeshColor(Color color2X)
+		{
+			
+			_multiplyColor = color2X;
+			
+			if(Mathf.Abs(_multiplyColor.r - 0.5f) < 0.004f &&
+				Mathf.Abs(_multiplyColor.g - 0.5f) < 0.004f &&
+				Mathf.Abs(_multiplyColor.b - 0.5f) < 0.004f &&
+				Mathf.Abs(_multiplyColor.a - 1.0f) < 0.004f)
+			{
+				//기본 값이라면
+				_isAnyMeshColorRequest = false;
+				_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+			}
+			else
+			{
+				_isAnyMeshColorRequest = true;
+			}
+
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			//_material_Instanced.SetColor(_shaderID_MainTex, _cal_MeshColor);//버그
+			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);//수정
+
+			AutoSelectMaterial(true);//색상 변경 요청시에는 Gray 체크를 한번 더 해야한다.
+		}
+
+		public void SetMeshAlpha(float alpha)
+		{
+			_multiplyColor.a = alpha;
+			
+			if(Mathf.Abs(_multiplyColor.r - 0.5f) < 0.004f &&
+				Mathf.Abs(_multiplyColor.g - 0.5f) < 0.004f &&
+				Mathf.Abs(_multiplyColor.b - 0.5f) < 0.004f &&
+				Mathf.Abs(_multiplyColor.a - 1.0f) < 0.004f)
+			{
+				//기본 값이라면
+				_isAnyMeshColorRequest = false;
+				_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+			}
+			else
+			{
+				_isAnyMeshColorRequest = true;
+			}
+
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			_material_Instanced.SetColor(_shaderID_MainTex, _cal_MeshColor);
+
+			AutoSelectMaterial(true);//색상 변경 요청시에는 Gray 체크를 한번 더 해야한다.
+		}
+
+		/// <summary>
+		/// Set Main Texture
+		/// </summary>
+		/// <param name="texture"></param>
+		public void SetMeshTexture(Texture2D texture)
+		{
+			//추가 : 20.4.21 : 텍스쳐의 모드에 따라 작동 방식이 다르다.
+			//- Base : 기존과 같다. _texture_Base에 저장을 하여 언제든 다시 복구할 수 있게 만든다.
+			//- Extra : _texture_Base에 저장은 하지만 적용은 하지 않는다.
+
+			//공통적으로 _texture_Base에 저장을 한다.
+			_texture_Base = texture;
+
+			if (_textureMode == TEXTURE_MODE.Base)
+			{
+				//Base 모드일 때
+				//동일하게 적용을 한다.
+
+				//if (_isMaskChild)
+				if(IsMaskClipped()) //v1.6.0 : Send Data로 부터 받은 Mask Data가 있는 경우도 포함
+				{
+					//Mask Child라면 그냥 Instanced Material에 넣는다.
+					_material_Instanced.SetTexture(_shaderID_MainTex, texture);
+				}
+				else
+				{
+					//그 외에는 Shared Material과 비교한다.
+					if (_material_Shared.mainTexture == texture)
+					{
+						_isAnyTextureRequest = false;
+					}
+					else
+					{
+						_isAnyTextureRequest = true;
+					}
+					_material_Instanced.SetTexture(_shaderID_MainTex, texture);
+				}
+
+				AutoSelectMaterial();
+			}
+		}
+
+		/// <summary>
+		/// Set Color as shader property (not Main Color)
+		/// </summary>
+		/// <param name="color"></param>
+		/// <param name="propertyName"></param>
+		public void SetCustomColor(Color color, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//_instanceMaterial.SetColor(propertyName, color);//이전
+			_material_Instanced.SetColor(propertyName, color);
+
+			AutoSelectMaterial();
+		}
+
+		/// <summary>
+		/// Set Color as shader property (not Main Color)
+		/// </summary>
+		/// <param name="color"></param>
+		public void SetCustomColor(Color color, int propertyNameID)//ID 버전 [v1.4.3]
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			_material_Instanced.SetColor(propertyNameID, color);
+
+			AutoSelectMaterial();
+		}
+
+
+
+		/// <summary>
+		/// Set Alpha as shader property (not Main Color)
+		/// </summary>
+		/// <param name="color"></param>
+		/// <param name="propertyName"></param>
+		public void SetCustomAlpha(float alpha, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//Color color = _instanceMaterial.GetColor(propertyName);
+			//color.a = alpha;
+			//_instanceMaterial.SetColor(propertyName, color);
+
+			//변경 : 현재 Color -> Alpha 변경 -> Instanced에 전달
+			Color color = _material_Cur.GetColor(propertyName);
+			color.a = alpha;
+			_material_Instanced.SetColor(propertyName, color);
+
+			AutoSelectMaterial();
+		}
+
+
+
+		/// <summary>
+		/// Set Alpha as shader property (not Main Color)
+		/// </summary>
+		public void SetCustomAlpha(float alpha, int propertyNameID)//ID 버전 [v1.4.3]
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			Color color = _material_Cur.GetColor(propertyNameID);
+			color.a = alpha;
+			_material_Instanced.SetColor(propertyNameID, color);
+
+			AutoSelectMaterial();
+		}
+
+
+
+		/// <summary>
+		/// Set Texture as shader property (not Main Texture)
+		/// </summary>
+		/// <param name="texture"></param>
+		/// <param name="propertyName"></param>
+		public void SetCustomTexture(Texture2D texture, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//_instanceMaterial.SetTexture(propertyName, texture);//이전
+			_material_Instanced.SetTexture(propertyName, texture);
+
+			AutoSelectMaterial();
+		}
+
+		/// <summary>
+		/// Set Texture as shader property (not Main Texture)
+		/// </summary>
+		public void SetCustomTexture(Texture2D texture, int propertyNameID)//ID 버전 [v1.4.3]
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			_material_Instanced.SetTexture(propertyNameID, texture);
+
+			AutoSelectMaterial();
+		}
+
+
+
+		/// <summary>
+		/// Set Float Value as shader property
+		/// </summary>
+		/// <param name="floatValue"></param>
+		/// <param name="propertyName"></param>
+		public void SetCustomFloat(float floatValue, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//_instanceMaterial.SetFloat(propertyName, floatValue);//이전
+			_material_Instanced.SetFloat(propertyName, floatValue);
+
+			AutoSelectMaterial();
+		}
+
+		/// <summary>
+		/// Set Float Value as shader property
+		/// </summary>
+		/// <param name="floatValue"></param>
+		public void SetCustomFloat(float floatValue, int propertyNameID)//ID 버전 [v1.4.3]
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			_material_Instanced.SetFloat(propertyNameID, floatValue);
+
+			AutoSelectMaterial();
+		}
+
+
+		/// <summary>
+		/// Set Int Value as shader property
+		/// </summary>
+		/// <param name="intValue"></param>
+		/// <param name="propertyName"></param>
+		public void SetCustomInt(int intValue, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyName, intValue);
+#else
+			_material_Instanced.SetInt(propertyName, intValue);
+#endif
+			AutoSelectMaterial();
+		}
+
+
+		/// <summary>
+		/// Set Int Value as shader property
+		/// </summary>
+		/// <param name="intValue"></param>
+		public void SetCustomInt(int intValue, int propertyNameID)//ID 버전 [v1.4.3]
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyNameID, intValue);
+#else
+			_material_Instanced.SetInt(propertyNameID, intValue);
+#endif
+
+			AutoSelectMaterial();
+		}
+
+
+
+		/// <summary>
+		/// Set Vector4 Value as shader property
+		/// </summary>
+		/// <param name="vector4Value"></param>
+		/// <param name="propertyName"></param>
+		public void SetCustomVector4(Vector4 vector4Value, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//_instanceMaterial.SetVector(propertyName, vector4Value);//이전
+			_material_Instanced.SetVector(propertyName, vector4Value);
+
+			AutoSelectMaterial();
+		}
+
+		/// <summary>
+		/// Set Vector4 Value as shader property
+		/// </summary>
+		/// <param name="vector4Value"></param>
+		public void SetCustomVector4(Vector4 vector4Value, int propertyNameID)//ID 버전 [v1.4.3]
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			_material_Instanced.SetVector(propertyNameID, vector4Value);
+
+			AutoSelectMaterial();
+		}
+
+
+
+
+		// 추가 12.02 : UV Offset과 Size 조절
+		/// <summary>
+		/// Set UV Offset Value as shader property
+		/// </summary>
+		/// <param name="propertyName"></param>
+		public void SetCustomTextureOffset(Vector2 uvOffset, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//_instanceMaterial.SetTextureOffset(propertyName, uvOffset);//이전
+			_material_Instanced.SetTextureOffset(propertyName, uvOffset);
+
+			AutoSelectMaterial();
+		}
+
+
+
+		/// <summary>
+		/// Set UV Scale Value as shader property
+		/// </summary>
+		/// <param name="propertyName"></param>
+		public void SetCustomTextureScale(Vector2 uvScale, string propertyName)
+		{
+			//값에 상관없이 이 함수가 호출되면 True
+			_isAnyCustomPropertyRequest = true;
+			//_instanceMaterial.SetTextureScale(propertyName, uvScale);//이전
+			_material_Instanced.SetTextureScale(propertyName, uvScale);
+
+			AutoSelectMaterial();
+		}
+
+
+
+        //-----------------------------------------
+        // 클리핑 메시용 재질 제어 (Sync Batch)
+        //-----------------------------------------
+        //클리핑 메시에 관하여 일괄 요청을 하는 경우
+		//일반적인 Sync 함수와 다르다.
+		//Instance 방식을 유지해야한다.
+
+        public void SetClippedMaterialPropertyByBatch_Texture(Texture2D texture)
+		{
+			//if(!_isMaskChild)//이전
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			//Debug.Log("SyncMaterialPropertyByBatch_Clipped_Texture : " + texture.name + " >> " + this.name + " (Clipped : " + _isMaskChild + ")");
+			_material_Instanced.SetTexture(_shaderID_MainTex, texture);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_Color(Color color2X)
+		{
+			//if(!_isMaskChild)//이전
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			//일단 Batch의 색상 값을 가져다 쓴다.
+			//이 상태에서 다시 Parent Opt Transform의 색상과 계산을 해서 _cal_MeshColor를 계산해야한다.
+			//Batch와 동기화한 것이므로 isAnyMeshColorRequest 여부는 확인하지 않는다.
+			_multiplyColor = color2X;
+
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_Alpha(float alpha)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			//일단 Batch의 색상 값을 가져다 쓴다.
+			//이 상태에서 다시 Parent Opt Transform의 색상과 계산을 해서 _cal_MeshColor를 계산해야한다.
+			//Batch와 동기화한 것이므로 isAnyMeshColorRequest 여부는 확인하지 않는다.
+			_multiplyColor.a = alpha;
+
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
+		}
+
+
+		public void SetClippedMaterialPropertyByBatch_CustomTexture(Texture2D texture, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetTexture(propertyName, texture);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SetClippedMaterialPropertyByBatch_CustomTexture(Texture2D texture, int propertyNameID)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetTexture(propertyNameID, texture);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomTextureOffset(Vector2 offset, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetTextureOffset(propertyName, offset);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomTextureScale(Vector2 scale, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetTextureScale(propertyName, scale);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomColor(Color color, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetColor(propertyName, color);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SetClippedMaterialPropertyByBatch_CustomColor(Color color, int propertyNameID)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetColor(propertyNameID, color);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomAlpha(float alpha, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			if(!_material_Instanced.HasProperty(propertyName))
+			{
+				return;
+			}
+			Color curColor = _material_Instanced.GetColor(propertyName);
+			curColor.a = alpha;
+			_material_Instanced.SetColor(propertyName, curColor);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SetClippedMaterialPropertyByBatch_CustomAlpha(float alpha, int propertyNameID)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			if(!_material_Instanced.HasProperty(propertyNameID))
+			{
+				return;
+			}
+			Color curColor = _material_Instanced.GetColor(propertyNameID);
+			curColor.a = alpha;
+			_material_Instanced.SetColor(propertyNameID, curColor);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomFloat(float floatValue, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetFloat(propertyName, floatValue);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SetClippedMaterialPropertyByBatch_CustomFloat(float floatValue, int propertyNameID)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetFloat(propertyNameID, floatValue);
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomInt(int intValue, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyName, intValue);
+#else
+			_material_Instanced.SetInt(propertyName, intValue);
+#endif
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SetClippedMaterialPropertyByBatch_CustomInt(int intValue, int propertyNameID)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyNameID, intValue);
+#else
+			_material_Instanced.SetInt(propertyNameID, intValue);
+#endif
+		}
+
+		public void SetClippedMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, string propertyName)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetVector(propertyName, vecValue);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SetClippedMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, int propertyNameID)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+			_material_Instanced.SetVector(propertyNameID, vecValue);
+		}
+		
+		public void SetClippedMaterialPropertyByBatch_Reset(Material syncMaterial)
+		{
+			//if(!_isMaskChild)
+			if(!IsMaskClipped())//v1.6.0
+			{
+				return;
+			}
+
+			//Clipped인 경우엔 특정 프로퍼티는 복구해서는 안된다.
+			Texture maskTex = null;
+			Texture maskTex_L = null;
+			Texture maskTex_R = null;
+			Vector4 maskScreenSpaceOffset = new Vector4(0, 0, 1, 1);
+
+			//추가 v1.6.0 : 마스크 프로퍼티가 추가되어 복구 대상이 늘어남
+			float maskRatio = 0.0f;
+			float maskRatio_1 = 0.0f;
+			float maskRatio_2 = 0.0f;
+			float maskRatio_3 = 0.0f;
+			float maskRatio_4 = 0.0f;
+			Texture maskTex_1 = null;
+			Texture maskTex_2 = null;
+			Texture maskTex_3 = null;
+			Texture maskTex_4 = null;
+			Vector4 maskSSOffset_1 = Vector4.zero;
+			Vector4 maskSSOffset_2 = Vector4.zero;
+			Vector4 maskSSOffset_3 = Vector4.zero;
+			Vector4 maskSSOffset_4 = Vector4.zero;
+			float maskOp_1 = 0.0f;
+			float maskOp_2 = 0.0f;
+			float maskOp_3 = 0.0f;
+			float maskOp_4 = 0.0f;
+
+			if(_material_Instanced.HasProperty(_shaderID_MaskTexture))				{ maskTex = _material_Instanced.GetTexture(_shaderID_MaskTexture); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_L))			{ maskTex_L = _material_Instanced.GetTexture(_shaderID_MaskTexture_L); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_R))			{ maskTex_R = _material_Instanced.GetTexture(_shaderID_MaskTexture_R); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset))	{ maskScreenSpaceOffset = _material_Instanced.GetVector(_shaderID_MaskScreenSpaceOffset); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio))				{ maskRatio = _material_Instanced.GetFloat(_shaderID_MaskRatio); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_1))				{ maskRatio_1 = _material_Instanced.GetFloat(_shaderID_MaskRatio_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_2))				{ maskRatio_2 = _material_Instanced.GetFloat(_shaderID_MaskRatio_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_3))				{ maskRatio_3 = _material_Instanced.GetFloat(_shaderID_MaskRatio_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_4))				{ maskRatio_4 = _material_Instanced.GetFloat(_shaderID_MaskRatio_4); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_1))				{ maskTex_1 = _material_Instanced.GetTexture(_shaderID_MaskTex_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_2))				{ maskTex_2 = _material_Instanced.GetTexture(_shaderID_MaskTex_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_3))				{ maskTex_3 = _material_Instanced.GetTexture(_shaderID_MaskTex_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_4))				{ maskTex_4 = _material_Instanced.GetTexture(_shaderID_MaskTex_4); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_1))	{ maskSSOffset_1 = _material_Instanced.GetVector(_shaderID_MaskScreenSpaceOffset_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_2))	{ maskSSOffset_2 = _material_Instanced.GetVector(_shaderID_MaskScreenSpaceOffset_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_3))	{ maskSSOffset_3 = _material_Instanced.GetVector(_shaderID_MaskScreenSpaceOffset_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_4))	{ maskSSOffset_4 = _material_Instanced.GetVector(_shaderID_MaskScreenSpaceOffset_4); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_1))					{ maskOp_1 = _material_Instanced.GetFloat(_shaderID_MaskOp_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_2))					{ maskOp_2 = _material_Instanced.GetFloat(_shaderID_MaskOp_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_3))					{ maskOp_3 = _material_Instanced.GetFloat(_shaderID_MaskOp_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_4))					{ maskOp_4 = _material_Instanced.GetFloat(_shaderID_MaskOp_4); }
+
+			//Received Data에서 받는 값도 저장했다가 복구하자
+			//이름(String) + 값 조합을 저장한 후, 그대로 복구한다.
+			Dictionary<int, Texture> storedProp_Texture = null;
+			Dictionary<int, float> storedProp_Float = null;
+			Dictionary<int, int> storedProp_Int = null;
+			Dictionary<int, Vector4> storedProp_Vector = null;
+			Dictionary<int, Color> storedProp_Color = null;
+
+			if(_nReceiveMaskInfo > 0)
+			{
+				apOptMaskLinkInfo curLinkInfo = null;
+				apOptSendMaskData curSendData = null;
+				apOptSendMaskData.ReceivePropertySet curPropSet = null;
+				for (int iLinkInfo = 0; iLinkInfo < _nReceiveMaskInfo; iLinkInfo++)
+				{
+					curLinkInfo = _receiveMaskInfos[iLinkInfo];
+					if(curLinkInfo.LinkType != apOptMaskLinkInfo.LINK_TYPE.SendData)
+					{
+						//Send Data여야 한다.
+						continue;
+					}
+
+					curSendData = curLinkInfo.ReceivedSendData;
+					if(curSendData == null)
+					{
+						//수신된 데이터가 없으면 안됨
+						continue;
+					}
+
+					int nProps = curSendData._propertySets != null ? curSendData._propertySets.Count : 0;
+					if(nProps == 0)
+					{
+						continue;
+					}
+
+					for (int iProp = 0; iProp < nProps; iProp++)
+					{	
+						curPropSet = curSendData._propertySets[iProp];
+
+						//Alpha Preset 타입은 위에서 미리 처리했으므로, 여기서는 커스텀만 저장>복구한다.
+						if(curPropSet._preset != apSendMaskData.SHADER_PROP_PRESET.Custom)
+						{	
+							continue;
+						}
+
+						//이 프로퍼티가 유효한가
+						int propID = curPropSet.CustomShaderPropID;
+						if(!_material_Instanced.HasProperty(propID))
+						{
+							continue;
+						}
+
+						apSendMaskData.SHADER_PROP_REAL_TYPE propRealType = apSendMaskData.PropValueTypeToRealType(curPropSet._customPropType);
+
+						switch (propRealType)
+						{							
+							case apSendMaskData.SHADER_PROP_REAL_TYPE.Texture:
+								{
+									//텍스쳐 타입의 값을 저장한다.
+									Texture curValue_Texture = _material_Instanced.GetTexture(propID);
+
+									if(storedProp_Texture == null)
+									{
+										storedProp_Texture = new Dictionary<int, Texture>();
+									}
+									if(!storedProp_Texture.ContainsKey(propID))
+									{
+										storedProp_Texture.Add(propID, curValue_Texture);
+									}
+								}
+								break;
+							case apSendMaskData.SHADER_PROP_REAL_TYPE.Float:
+								{
+									//Float 타입의 값을 저장한다.
+									float curValue_Float = _material_Instanced.GetFloat(propID);
+
+									if(storedProp_Float == null)
+									{
+										storedProp_Float = new Dictionary<int, float>();
+									}
+									if (!storedProp_Float.ContainsKey(propID))
+									{
+										storedProp_Float.Add(propID, curValue_Float);
+									}
+								}
+								break;
+							case apSendMaskData.SHADER_PROP_REAL_TYPE.Int:
+								{
+									//Int 타입의 값을 저장한다.
+#if UNITY_2021_1_OR_NEWER
+									int curValue_Int = _material_Instanced.GetInteger(propID);
+#else
+									int curValue_Int = _material_Instanced.GetInt(propID);
+#endif
+									if (storedProp_Int == null)
+									{
+										storedProp_Int = new Dictionary<int, int>();
+									}
+									if (!storedProp_Int.ContainsKey(propID))
+									{
+										storedProp_Int.Add(propID, curValue_Int);
+									}
+								}
+								break;
+
+							case apSendMaskData.SHADER_PROP_REAL_TYPE.Vector:
+								{
+									//Vector 타입의 값을 저장한다.
+									Vector4 curValue_Vector = _material_Instanced.GetVector(propID);
+									if(storedProp_Vector == null)
+									{
+										storedProp_Vector = new Dictionary<int, Vector4>();
+									}
+									if (!storedProp_Vector.ContainsKey(propID))
+									{
+										storedProp_Vector.Add(propID, curValue_Vector);
+									}
+								}
+								break;
+
+							case apSendMaskData.SHADER_PROP_REAL_TYPE.Color:
+								{
+									//Color 타입의 값을 저장한다.
+									Color curValue_Color = _material_Instanced.GetColor(propID);
+									if (storedProp_Color == null)
+									{
+										storedProp_Color = new Dictionary<int, Color>();
+									}
+									if (!storedProp_Color.ContainsKey(propID))
+									{
+										storedProp_Color.Add(propID, curValue_Color);
+									}
+								}
+								break;
+						}
+					}
+				}
+			}
+
+			
+			//속성 복사
+			_material_Instanced.CopyPropertiesFromMaterial(syncMaterial);
+
+			//색상은 별도로 초기화
+			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
+
+
+
+			//텍스쳐 모드 초기화
+			_textureMode = TEXTURE_MODE.Base;
+			_texture_Base = _texture;
+
+
+			//Mask 속성 복구
+			if(_material_Instanced.HasProperty(_shaderID_MaskTexture) && maskTex != null)
+			{
+				_material_Instanced.SetTexture(_shaderID_MaskTexture, maskTex);
+			}
+			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_L) && maskTex_L != null)
+			{
+				 _material_Instanced.SetTexture(_shaderID_MaskTexture_L, maskTex_L);
+			}
+			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_R) && maskTex_R != null)
+			{
+				 _material_Instanced.SetTexture(_shaderID_MaskTexture_R, maskTex_R);
+			}
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset))
+			{
+				_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, maskScreenSpaceOffset);
+			}
+
+			//v1.6.0
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio))	{ _material_Instanced.SetFloat(_shaderID_MaskRatio, maskRatio);  }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_1))	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_1, maskRatio_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_2))	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_2, maskRatio_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_3))	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_3, maskRatio_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio_4))	{ _material_Instanced.SetFloat(_shaderID_MaskRatio_4, maskRatio_4); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_1))	{ _material_Instanced.SetTexture(_shaderID_MaskTex_1, maskTex_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_2))	{ _material_Instanced.SetTexture(_shaderID_MaskTex_2, maskTex_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_3))	{ _material_Instanced.SetTexture(_shaderID_MaskTex_3, maskTex_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskTex_4))	{ _material_Instanced.SetTexture(_shaderID_MaskTex_4, maskTex_4); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_1))	{ _material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset_1, maskSSOffset_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_2))	{ _material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset_2, maskSSOffset_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_3))	{ _material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset_3, maskSSOffset_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset_4))	{ _material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset_4, maskSSOffset_4); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_1))		{ _material_Instanced.SetFloat(_shaderID_MaskOp_1, maskOp_1); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_2))		{ _material_Instanced.SetFloat(_shaderID_MaskOp_2, maskOp_2); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_3))		{ _material_Instanced.SetFloat(_shaderID_MaskOp_3, maskOp_3); }
+			if(_material_Instanced.HasProperty(_shaderID_MaskOp_4))		{ _material_Instanced.SetFloat(_shaderID_MaskOp_4, maskOp_4); }
+
+			//Receive Mask에서 저장했던 값을 복구한다.
+			if(storedProp_Texture != null)
+			{
+				foreach (KeyValuePair<int, Texture> pair in storedProp_Texture)
+				{
+					_material_Instanced.SetTexture(pair.Key, pair.Value);
+				}
+			}
+			if (storedProp_Float != null)
+			{
+				foreach (KeyValuePair<int, float> pair in storedProp_Float)
+				{
+					_material_Instanced.SetFloat(pair.Key, pair.Value);
+				}
+			}
+			if (storedProp_Int != null)
+			{
+				foreach (KeyValuePair<int, int> pair in storedProp_Int)
+				{	
+#if UNITY_2021_1_OR_NEWER
+					_material_Instanced.SetInteger(pair.Key, pair.Value);
+#else
+					_material_Instanced.SetInt(pair.Key, pair.Value);				
+#endif
+				}
+			}
+
+			if (storedProp_Vector != null)
+			{
+				foreach (KeyValuePair<int, Vector4> pair in storedProp_Vector)
+				{
+					_material_Instanced.SetVector(pair.Key, pair.Value);
+				}
+			}
+
+			if (storedProp_Color != null)
+			{
+				foreach (KeyValuePair<int, Color> pair in storedProp_Color)
+				{
+					_material_Instanced.SetColor(pair.Key, pair.Value);
+				}
+			}
+		}
+
+
+        //-----------------------------------------
+        // Extra 옵션에 따른 재질 변경
+        //-----------------------------------------
+        public void SetExtraChangedTexture(Texture2D texture)
+		{
+			//코드를 개선 20.4.21 : 텍스쳐 모드와 extra용 텍스쳐를 별도로 둔다.
+			
+			if(texture == null)
+			{
+				if(_isMaskChild)
+				{
+					//Mask Child에서는 Extra Changed가 발생할 때 Null Texture를 적용할 수 없다.
+					return;
+				}
+				//texture = _sharedMaterial.mainTexture as Texture2D;
+				texture = _material_Shared.mainTexture as Texture2D;
+			}
+
+			_textureMode = TEXTURE_MODE.Extra;//<< 중요
+
+			if (_isMaskChild)
+			{
+				//Mask Child라면 무조건 Instanced 타입이다.
+				_materialType = MATERIAL_TYPE.Instanced;
+				_material_Cur = _material_Instanced;
+				_material_Cur.SetTexture(_shaderID_MainTex, texture);
+				_isAnyTextureRequest = true;
+			}
+			else
+			{
+				//Mask Child가 아니라면, Shared Material과 비교하여 다시 Shared로 바꿀지 결정한다.
+				if(_material_Shared.mainTexture == texture
+					|| _material_Batched.mainTexture == texture)
+				{
+					//Shared나 Batched로 돌아갈 수 있다. (경우에 따라서..)
+					_isAnyTextureRequest = false;
+				}
+				else
+				{
+					//Shared -> Instanced (무조건)
+					_isAnyTextureRequest = true;
+				}
+
+				_material_Instanced.SetTexture(_shaderID_MainTex, texture);
+			}
+
+			AutoSelectMaterial();
+		}
+
+		//추가 20.4.21 : Extra이벤트로부터 텍스쳐를 복구하고자 하는 경우
+		public void RestoreFromExtraTexture()
+		{
+			_textureMode = TEXTURE_MODE.Base;
+			if (_isMaskChild)
+			{
+				//Mask Child라면 무조건 Instanced 타입이다.
+				_materialType = MATERIAL_TYPE.Instanced;
+				_material_Cur = _material_Instanced;
+				_material_Cur.SetTexture(_shaderID_MainTex, _texture_Base);
+				_isAnyTextureRequest = true;
+			}
+			else
+			{
+				//Mask Child가 아니라면, Shared Material과 비교하여 다시 Shared로 바꿀지 결정한다.
+				if(_material_Shared.mainTexture == _texture_Base
+					|| _material_Batched.mainTexture == _texture_Base)
+				{
+					//Shared나 Batched로 돌아갈 수 있다. (경우에 따라서..)
+					_isAnyTextureRequest = false;
+				}
+				else
+				{
+					//Shared -> Instanced (무조건)
+					_isAnyTextureRequest = true;
+				}
+
+				_material_Instanced.SetTexture(_shaderID_MainTex, _texture_Base);
+			}
+
+			AutoSelectMaterial();
+		}
+
+
+		//추가 v1.5.0 : Extra 적용 여부
+		public bool IsExtraAdapted()
+		{
+			return _textureMode == TEXTURE_MODE.Extra;
+		}
+
+
+        //------------------------------------------------
+        // 재질 병합 (Merge)
+        //------------------------------------------------
+        public Material GetMaterialBeforeMerge()
+		{
+			return _material_Instanced;
+		}
+
+		public void SetMergedMaterial(Color[] channelColors, Color[] whiteColors, Material mergedMaterial)
+		{
+			int vertCount = _mesh.vertices.Length;
+			if(vertCount == 0)
+			{
+				return;
+			}
+
+
+			_isMerged = true;
+			_material_Merged = mergedMaterial;
+			_vertColors_NotMerged = new Color[vertCount];
+			_vertColors_Merged = new Color[vertCount];
+
+			if(vertCount > channelColors.Length)
+			{
+				//배열 복사가 불가능하다
+				Debug.LogError("에러 : 버텍스 색상 배열 복사 불가 [" + this.gameObject.name + "]");
+				Color targetColor = channelColors[0];
+				for (int i = 0; i < vertCount; i++)
+				{
+					_vertColors_Merged[i] = targetColor;
+				}
+			}
+			else
+			{
+				//미리 만들어진 배열에서 값을 일부 복사해서 빠르게 완성
+				Array.Copy(channelColors, _vertColors_Merged, vertCount);
+			}
+
+			if(vertCount > whiteColors.Length)
+			{
+				//배열 복사가 불가능하다
+				Debug.LogError("에러 : 버텍스 색상 배열(White) 복사 불가 [" + this.gameObject.name + "]");
+				Color targetColor = whiteColors[0];
+				for (int i = 0; i < vertCount; i++)
+				{
+					_vertColors_NotMerged[i] = targetColor;
+				}
+			}
+			else
+			{
+				//미리 만들어진 배열에서 값을 일부 복사해서 빠르게 완성
+				Array.Copy(whiteColors, _vertColors_NotMerged, vertCount);
+			}
+
+			
+			//재질 변경
+			AutoSelectMaterial(true);
+		}
+
+
+		//병합된 재질(Merged Material)을 해제한다.
+		public void ReleaseMergedMaterial()
+		{
+			if(!_isMerged)
+			{
+				//Merged된 상태가 아니다.
+				AutoSelectMaterial();
+				return;
+			}
+
+			//Merge되었다면, Vertex Color를 초기화한 후 해제 
+			if(_vertColors_NotMerged != null)
+			{
+				_mesh.colors = _vertColors_NotMerged;
+			}
+			
+
+			_isMerged = false;
+			_material_Merged = null;
+			_vertColors_NotMerged = null;
+			_vertColors_Merged = null;
+
+			AutoSelectMaterial(true);
+			
+		}
+
+		//다시 Merged 될 수 있게 재질을 초기화한다.
+		public void SyncMergedMaterial_Reset(Material materialOriginal)
+		{
+			//다시 Merged 될 수 있게 만든다. 이 함수는 ResetMaterialToBatch 함수와 거의 유사하다.
+			if(materialOriginal != null)
+			{
+				_material_Instanced.CopyPropertiesFromMaterial(materialOriginal);
+			}
+			
+
+			//색상 초기화
+			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+
+			//텍스쳐 모드 초기화
+			_textureMode = TEXTURE_MODE.Base;
+			_texture_Base = _texture;
+
+			_isAnyMeshColorRequest = false;
+			_isAnyTextureRequest = false;
+			_isAnyCustomPropertyRequest = false;
+
+			//실제 색상 갱신
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			//지금은 안쓰지만 Batched 설정 초기화
+			_isForceBatch2Shared = true;
+
+			//Material 선택
+			AutoSelectMaterial(true);
+		}
+
+
+		//Merged Material과 값을 동기화한다. Instanced 상태가 아니어도, 애니메이션에 의해서 Instanced로 전환될 때 기존의 색상 값이 적용되기 위함
+		public void SyncMergedMaterial_Color(ref Color color2X)
+		{
+			_multiplyColor = color2X;
+
+			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
+			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
+			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
+			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
+
+			//동기화를 유지해야하므로, 색상 요청은 없는 셈 친다.
+			_isAnyMeshColorRequest = false;
+
+			//Instanced의 색상 값을 동기화 한다.
+			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
+
+			//Material 선택
+			AutoSelectMaterial(true);
+		}
+
+		public void SyncMergedMaterial_CustomImage(Texture2D texture, ref string propertyName)
+		{
+			//Instanced의 값을 동기화한다.
+			//Merged는 유지하도록 한다.
+
+			//Custom Property에 대해서는 원래는 이게 True여야 하지만, 그러면 동기화가 풀려버린다.
+			//Merged Material에서도 동일하게 커스텀 프로퍼티를 수정하므로 Request는 해제하되 값만 할당한다.
+			//_isAnyCustomPropertyRequest = false;//True도 안하고 False도 안한다.
+
+			_material_Instanced.SetTexture(propertyName, texture);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SyncMergedMaterial_CustomImage(Texture2D texture, int propertyNameID)
+		{
+			_material_Instanced.SetTexture(propertyNameID, texture);
+		}
+
+		public void SyncMergedMaterial_CustomImageOffset(ref Vector2 offset, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+
+			_material_Instanced.SetTextureOffset(propertyName, offset);
+		}
+
+		public void SyncMergedMaterial_CustomImageScale(ref Vector2 scale, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+
+			_material_Instanced.SetTextureScale(propertyName, scale);
+		}
+
+		public void SyncMergedMaterial_CustomFloat(float floatValue, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+
+			_material_Instanced.SetFloat(propertyName, floatValue);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SyncMergedMaterial_CustomFloat(float floatValue, int propertyNameID)
+		{
+			_material_Instanced.SetFloat(propertyNameID, floatValue);
+		}
+
+		public void SyncMergedMaterial_CustomInt(int intValue, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyName, intValue);
+#else
+			_material_Instanced.SetInt(propertyName, intValue);
+#endif
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SyncMergedMaterial_CustomInt(int intValue, int propertyNameID)
+		{
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propertyNameID, intValue);
+#else
+			_material_Instanced.SetInt(propertyNameID, intValue);
+#endif
+		}
+
+		public void SyncMergedMaterial_CustomVector4(ref Vector4 vec4Value, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+
+			_material_Instanced.SetVector(propertyName, vec4Value);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SyncMergedMaterial_CustomVector4(ref Vector4 vec4Value, int propertyNameID)
+		{
+			_material_Instanced.SetVector(propertyNameID, vec4Value);
+		}
+
+		public void SyncMergedMaterial_CustomColor(ref Color color, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+
+			_material_Instanced.SetColor(propertyName, color);
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SyncMergedMaterial_CustomColor(ref Color color, int propertyNameID)
+		{
+			_material_Instanced.SetColor(propertyNameID, color);
+		}
+
+		public void SyncMergedMaterial_CustomAlpha(float alpha, ref string propertyName)
+		{
+			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
+			//_isAnyCustomPropertyRequest = false;
+			if(_material_Instanced.HasProperty(propertyName))
+			{
+				Color curColor = _material_Instanced.GetColor(propertyName);
+				curColor.a = alpha;
+				_material_Instanced.SetColor(propertyName, curColor);
+			}
+			
+		}
+
+		//ID를 사용한 버전 [v1.4.3]
+		public void SyncMergedMaterial_CustomAlpha(float alpha, int propertyNameID)
+		{
+			if(_material_Instanced.HasProperty(propertyNameID))
+			{
+				Color curColor = _material_Instanced.GetColor(propertyNameID);
+				curColor.a = alpha;
+				_material_Instanced.SetColor(propertyNameID, curColor);
+			}
+			
+		}
+
+
+        //---------------------------------------------------
+        // Sorting Order
+        //---------------------------------------------------
+        public void SetSortingLayer(string sortingLayerName, int sortingLayerID)
+		{
+			_meshRenderer.sortingLayerName = sortingLayerName;
+			_meshRenderer.sortingLayerID = sortingLayerID;
+		}
+
+		public string GetSortingLayerName()
+		{
+			return _meshRenderer.sortingLayerName;
+		}
+
+		public int GetSortingLayerID()
+		{
+			return _meshRenderer.sortingLayerID;
+		}
+
+		public void SetSortingOrder(int sortingOrder)
+		{
+			_meshRenderer.sortingOrder = sortingOrder;
+		}
+
+		public int GetSortingOrder()
+		{
+			return _meshRenderer.sortingOrder;
+		}
+
+
+		//=====================================================================
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		// Mask 관련
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		//-----------------------------------------
+        // 마스크 관련 Bake 함수
+        //-----------------------------------------
+        /// <summary>
+		/// [Please do not use it]
+		/// Initialize if it is Mask Parent
+		/// </summary>
+		public void SetMaskBasicSetting_Parent()
+		{
+			_isMaskParent = true;
+			_clipParentID = -1;
+			_isMaskChild = false;
+		}
+
+		/// <summary>
+		/// [Please do not use it]
+		/// Initialize if it is Mask Child
+		/// </summary>
+		public void SetMaskBasicSetting_Child(int parentID)
+		{
+			_isMaskParent = false;
+			_clipParentID = parentID;
+			_isMaskChild = true;
+		}
+		
+
+		//Bake시에 Clipping Mask Child나 Send Mask Data (Parent)의 경우엔 
+		/// <summary>
+		/// [Please do not use it]
+		/// Link target objects related to Mask
+		/// </summary>
+		public void LinkOtherMeshesOnBake()
+		{
+			//1. Mask Child라면 Parent Mesh를 찾아서 연결한다. 
+			if(_isMaskChild)
+			{
+				apOptTransform targetTF = _portrait.GetOptTransform(_clipParentID);
+				apOptMesh targetMesh = null;
+				if(targetTF != null)
+				{
+					targetMesh = targetTF._childMesh;
+				}
+
+				_parentOptMesh = targetMesh;
+
+				//이 경우, 미리 Instanced Material로 만든다.
+				if(_meshRenderer.sharedMaterial == null ||
+					_material_Instanced == null)
+				{
+					MakeInstancedMaterial();
+					_meshRenderer.sharedMaterial = _material_Instanced;
+				}
+			}
+
+			//2. Send Mask Data를 가졌다면 Child Mesh를 연결한다.
+			int nSendMasks = _sendMaskDataList != null ? _sendMaskDataList.Length : 0;
+			if(nSendMasks > 0)
+			{
+				apOptSendMaskData sendData = null;				
+				for (int i = 0; i < nSendMasks; i++)
+				{
+					sendData = _sendMaskDataList[i];
+					sendData.LinkTargetMeshOnBake(_portrait);
+				}
+			}
+		}
+
+
+
+        //-----------------------------------------
+        // 초기화
+        //-----------------------------------------
+		[Obsolete]
+        private void Initialize_MaskParent()
 		{
 			if(!_isMaskParent)
 			{
@@ -2549,7 +4538,7 @@ namespace AnyPortrait
 			_renderCamera.SetStatus_RTEvent();
 		}
 
-
+		[Obsolete]
 		private void Initialize_MaskChild()
 		{
 			
@@ -2654,11 +4643,278 @@ namespace AnyPortrait
 			_renderCamera.SetStatus_RTEvent();
 		}
 
-		//---------------------------------------------------------------------------------
-		// Update Command Buffer 함수들 (Basic, MultipleCamera, SingleVR)
-		//---------------------------------------------------------------------------------
 
-		private void UpdateCommandBuffer_Basic()
+		//추가 v1.6.0
+		// 마스크 정보를 Mask Link로 만들어서 연결 및 초기화
+		// Link 후에는 마스크 렌더 카메라에 연결을 한다.
+		// 기존의 InitMaskParent + InitMaskChild를 합친 역할을 한다.
+		public void LinkMaskInfo()
+		{
+			//1. Send Mask를 가졌다면 > 그 상대에게 Link Info를 생성한다.
+			//2. Clipped Child라면 > 본인이 Link Info를 만들고 Parent와 연결한다.
+
+			//1. Send Mask Data 처리 (개수도 갱신)
+			_nSendMaskData = _sendMaskDataList != null ? _sendMaskDataList.Length : 0;
+			if(_nSendMaskData > 0)
+			{
+				apOptSendMaskData curSendData = null;
+				apOptSendMaskData.TargetInfo curTarget = null;
+				apOptMesh targetMesh = null;
+				for (int iSendData = 0; iSendData < _nSendMaskData; iSendData++)
+				{
+					curSendData = _sendMaskDataList[iSendData];
+
+					int nTargetInfos = curSendData._targetInfos != null ? curSendData._targetInfos.Count : 0;
+					if(nTargetInfos == 0)
+					{
+						continue;
+					}
+
+					//각 Send Data에서 데이터를 받을 Target Mesh를 찾아서, 연결을 받으라고 하자
+					for (int iTarget = 0; iTarget < nTargetInfos; iTarget++)
+					{
+						curTarget = curSendData._targetInfos[iTarget];
+						targetMesh = curTarget._linkedMesh;
+
+						if(targetMesh == null)
+						{
+							continue;
+						}
+
+						// 이 Send Mask에 대한 Link Info 생성 요청
+						targetMesh.AddMaskLinkInfo_BySendData(this, curSendData);
+					}
+				}
+			}
+
+			//2. Clipped Child라면 Parent에 대한 Link Info를 스스로 만들어서 추가한다.
+			if(_isMaskChild && _parentOptMesh != null)
+			{
+				AddMaskLinkInfo_ByClipping(_parentOptMesh);
+			}
+		}
+
+		/// <summary>
+		/// 마스크를 생성하는 Send Mask Data를 가진 메시(Mask Parent)가 이 메시로 마스크 연결 정보를 입력하라는 요청을 했다.
+		/// </summary>
+		private void AddMaskLinkInfo_BySendData(apOptMesh sendMesh, apOptSendMaskData sendMaskData)
+		{
+			if(sendMesh == null || sendMaskData == null)
+			{
+				return;
+			}
+
+			if(_receiveMaskInfos == null)
+			{
+				_receiveMaskInfos = new List<apOptMaskLinkInfo>();
+			}
+			apOptMaskLinkInfo newLinkInfo = apOptMaskLinkInfo.MakeLink_SendData(sendMesh, sendMaskData);
+			_receiveMaskInfos.Add(newLinkInfo);
+			
+			//개수 갱신
+			_nReceiveMaskInfo = _receiveMaskInfos.Count;
+		}
+
+		private void AddMaskLinkInfo_ByClipping(apOptMesh parentMaskMesh)
+		{
+			if(parentMaskMesh == null)
+			{
+				return;
+			}
+
+			if(_receiveMaskInfos == null)
+			{
+				_receiveMaskInfos = new List<apOptMaskLinkInfo>();
+			}
+			apOptMaskLinkInfo newLinkInfo = apOptMaskLinkInfo.MakeLink_Clipping(parentMaskMesh);
+			_receiveMaskInfos.Add(newLinkInfo);
+			
+			//개수 갱신
+			_nReceiveMaskInfo = _receiveMaskInfos.Count;
+		}
+
+
+
+
+		/// <summary>
+		/// [Parent Mask]의 경우
+		/// 마스크 연결 정보를 초기화한 이후에는 마스크 렌더 카메라와 연결을 한다.
+		/// </summary>
+		public void LinkSendMaskToRenderCamera(apOptMaskRenderCamera maskRenderCamera)
+		{
+            // Mask Parent인 경우에 종류에 따라서 연결
+			//1. Clipping Parent
+			if(_isMaskParent)
+			{	
+				_linkedClippingMaskParentRenderer = maskRenderCamera.AddRenderer_ClippingParent(this);
+			}
+
+
+			//2. 범용 마스크 (SendData)
+			if (_nSendMaskData > 0)
+			{
+				apOptSendMaskData curSendData = null;
+				for (int iSendData = 0; iSendData < _nSendMaskData; iSendData++)
+				{
+					curSendData = _sendMaskDataList[iSendData];
+
+					curSendData._linkedMaskRenderer = maskRenderCamera.AddRenderer_SendData(this, curSendData);
+					curSendData.Link(_portrait, this);//이참에 링크도 한다.
+				}
+			}
+		}
+
+		public void LinkReceiveMaskInfoToRenderCamera(apOptMaskRenderCamera maskRenderCamera)
+		{
+			// Mask Child인 경우에
+			// ReceiveLinkInfo를 Mask Render Camera에 연결한다.
+			// Renderer도 같이 연결하기 때문에 모든 LinkMaskToRenderCamera 함수가 호출된 후에 호출해야한다.
+			if(_nReceiveMaskInfo == 0)
+			{
+				return;
+			}
+
+			apOptMaskLinkInfo curLinkInfo = null;
+			for (int i = 0; i < _nReceiveMaskInfo; i++)
+			{
+				curLinkInfo = _receiveMaskInfos[i];
+				apOptMaskReceiver receiver = maskRenderCamera.AddReceiver(this, curLinkInfo);
+				curLinkInfo.SetReceiver(receiver);
+			}
+		}
+
+
+
+        //----------------------------------------------------
+        // 렌더링 데이터 삭제 / 리셋
+        //----------------------------------------------------
+		[Obsolete("Mask Render Camera로 코드 이전")]
+        public void ClearCameraData()
+		{	
+			if (_isMaskParent)
+			{
+				if (_renderCamera != null)
+				{
+					_renderCamera.Clear();
+				}
+
+#if UNITY_2019_1_OR_NEWER
+				if(_isUseSRP)//v1.5.1 : SRP 체크 코드 추가
+				{
+					RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskParent;
+				}
+#endif
+				//_isRenderTextureCreated = false;
+			}
+			else if (_isMaskChild)
+			{
+				//여기서도 RenderCamera가 초기화된다.
+				if (_renderCamera != null)
+				{
+					_renderCamera.Clear();
+				}
+
+#if UNITY_2019_1_OR_NEWER
+				if(_isUseSRP)//v1.5.1 : SRP 체크 코드 추가
+				{
+					RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskChild;
+				}
+#endif
+				
+			}
+
+			
+			//_renderCamera = null;
+		}
+
+
+		[Obsolete]
+        public void ReleaseRenderEvents()
+		{
+			//RenderTexture는 그대로 둔 상태로
+			//렌더링 관련 이벤트와 커맨드 버퍼만 삭제한다.
+
+			if (_isMaskParent)
+			{
+				if (_renderCamera != null)
+				{
+					_renderCamera.ReleaseEvents();
+				}
+
+#if UNITY_2019_1_OR_NEWER
+				RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskParent;
+#endif
+				//_isRenderTextureCreated = false;
+			}
+			else if (_isMaskChild)
+			{
+				//여기서도 RenderCamera가 초기화된다.
+				if (_renderCamera != null)
+				{
+					_renderCamera.ReleaseEvents();
+				}
+
+#if UNITY_2019_1_OR_NEWER
+				RenderPipelineManager.beginCameraRendering -= ProcessSRP_MaskChild;
+#endif
+				//_isRenderMaskEventRegistered = false;
+				
+			}
+		}
+
+
+        //Mask Parent의 세팅을 리셋한다.
+		//카메라 설정이나 씬이 변경되었을 때 호출해야한다.
+		[Obsolete]
+		/// <summary>
+		/// If it is Mask Parent, reset Command Buffers to Camera
+		/// </summary>
+		public void ResetMaskParentSetting()
+		{
+			//CleanUpMaskParent();
+			//ClearCameraData();//변경
+
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				return;
+			}
+#endif
+
+			
+			if (_isMaskParent)
+			{
+				Initialize_MaskParent();
+			}
+			else if(_isMaskChild)
+			{
+				Initialize_MaskChild();
+			}
+		}
+
+        //----------------------------------------------
+        // 마스크 업데이트
+        //----------------------------------------------
+        // Mask Parent의 경우
+        // > 마스크를 렌더링하는 영역을 최적화하는 연산
+        // > 커맨드 버퍼를 갱신
+
+        // Mask Child의 경우
+        // > Mask Parent로 부터 RT, RT 최적화 범위 등의 값을 받아서 쉐이더에 입력한다.
+        // > 멀티 카메라라면 현재 "어느 카메라로 렌더링 중인지"를 알아야 적절한 RT를 받아온다.
+        // > 그래서 (1) Parent보다 나중에 연산되어야 하며, 
+        // > (2) 멀티 카메라의 경우 PreRenderEvent에서만 호출되어야 한다.
+
+
+        // <1> Parent 업데이트 : 렌더링 영역 계산과 커맨드 버퍼 갱신
+        //-----------------------------------------------
+        
+		
+        /// <summary>
+        /// 단일+일반 카메라 환경에서 Parent Mask의 커맨드 버퍼 갱신
+        /// </summary>
+		[Obsolete]
+        private void UpdateCommandBuffer_Basic()
 		{
 			//변경 19.9.24 : 
 			if (!_isVisible
@@ -2943,7 +5199,12 @@ namespace AnyPortrait
 			}
 		}
 
-		private void UpdateCommandBuffer_MultipleCameraVR()
+        /// <summary>
+        /// 다중 카메라 환경에서의 Parent Mask의 커맨드 버퍼 갱신.
+        /// VR용으로도 작성했지만, 스테레오 RT는 아니다. (Eye Texture 아님)
+        /// </summary>
+		[Obsolete]
+        private void UpdateCommandBuffer_MultipleCameraVR()
 		{
 			//변경 19.9.24 : 
 			if (!_isVisible
@@ -3213,10 +5474,13 @@ namespace AnyPortrait
 			}
 		}
 
-		
-		
 
-		//유니티 VR용의 커맨드 버퍼 계산 (다수의 계산식이 생략됨)
+        /// <summary>
+        /// 단일 + VR용의 커맨드 버퍼 계산 (다수의 계산식이 생략됨)
+        /// 스테레오 RT로 VR 렌더링 시의 커맨드 버퍼를 연산한다.
+        /// 영역 최적화가 생략된다.
+        /// </summary>
+		[Obsolete]
 		private void UpdateCommandBuffer_SingleCameraVR()
 		{
 			//변경 19.9.24 : 
@@ -3306,13 +5570,170 @@ namespace AnyPortrait
 			}
 		}
 
+        // <2> Child 업데이트 : Parent Mask의 값을 받아서 Shader에 입력
+        //-----------------------------------------------
+		//변경된 마스크 받기
+		public void ReceiveMask_Clipped(	bool isParentVisible, 
+											RenderTexture renderTexture,
+											Vector4 maskScreenSpaceOffset)
+		{
+			if(_curParentRenderTexture != renderTexture)
+			{
+				_curParentRenderTexture = renderTexture;
+				_material_Instanced.SetTexture(_shaderID_MaskTexture, _curParentRenderTexture);
+
+				//if(renderTexture == null)
+				//{
+				//	Debug.LogError("Received RT가 Null이 입력됨 : " + this.gameObject.name);
+				//}
+			}
+
+			_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, maskScreenSpaceOffset);
+			//이거 최적화 해야함
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio))
+			{
+				_material_Instanced.SetFloat(_shaderID_MaskRatio, 1.0f);//클리핑 마스크가 적용되는지 여부 (이건 별도 체크 + 프로퍼티 존재 확인)
+			}
+		}
+
+		public void ReceiveMask_Clipped_VR(	bool isParentVisible, 
+											RenderTexture renderTexture_L,
+											RenderTexture renderTexture_R,
+											Vector4 maskScreenSpaceOffset)
+		{
+			//RT-L만 체크한다.
+			if(_curParentRenderTexture != renderTexture_L)
+			{
+				_curParentRenderTexture = renderTexture_L;
+				_material_Instanced.SetTexture(_shaderID_MaskTexture_L, renderTexture_L);
+				_material_Instanced.SetTexture(_shaderID_MaskTexture_R, renderTexture_R);
+
+				//if(renderTexture_L == null)
+				//{
+				//	Debug.LogError("Received RT (L)가 Null이 입력됨 : " + this.gameObject.name);
+				//}
+				//if(renderTexture_R == null)
+				//{
+				//	Debug.LogError("Received RT (R)가 Null이 입력됨 : " + this.gameObject.name);
+				//}
+			}
+
+			_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, maskScreenSpaceOffset);
+			if(_material_Instanced.HasProperty(_shaderID_MaskRatio))
+			{
+				_material_Instanced.SetFloat(_shaderID_MaskRatio, 1.0f);//클리핑 마스크가 적용되는지 여부 (이건 별도 체크 + 프로퍼티 존재 확인)
+			}
+		}
 
 
-		//---------------------------------------------------------------------------------
-		// Update Mask Child 함수들 (Basic / SingleVR / MultipleVR)
-		//---------------------------------------------------------------------------------
-		//기본 방식이거나 MultipleCamera인 경우 (호출 시점은 다르다)
-		private void UpdateMaskChild_Basic()
+
+
+
+		public void ReceiveMask_SendData_AlphaMaskPreset(	int propID_Ratio, float value_Ratio,
+															int propID_Tex, RenderTexture value_RenderTexture,
+															int propID_SSOffset, Vector4 value_SSOffset,
+															int propID_Op, float value_Op)
+		{
+			//프리셋은 세트로 변경된다.
+			_material_Instanced.SetFloat(propID_Ratio, value_Ratio);
+			_material_Instanced.SetTexture(propID_Tex, value_RenderTexture);
+			_material_Instanced.SetVector(propID_SSOffset, value_SSOffset);
+			_material_Instanced.SetFloat(propID_Op, value_Op);
+		}
+
+		public void ReceiveMask_SendData_AlphaMaskPreset_VR(	int propID_Ratio, float value_Ratio,
+																int propID_Tex_L, RenderTexture value_RenderTexture_L,
+																int propID_Tex_R, RenderTexture value_RenderTexture_R,
+																int propID_SSOffset, Vector4 value_SSOffset,
+																int propID_Op, float value_Op)
+		{
+			//프리셋은 세트로 변경된다.
+			_material_Instanced.SetFloat(propID_Ratio, value_Ratio);
+			_material_Instanced.SetTexture(propID_Tex_L, value_RenderTexture_L);
+			_material_Instanced.SetTexture(propID_Tex_R, value_RenderTexture_R);
+			_material_Instanced.SetVector(propID_SSOffset, value_SSOffset);
+			_material_Instanced.SetFloat(propID_Op, value_Op);
+		}
+
+		public void ReceiveMask_SendData_SeeThroughPreset(	int propID_Ratio, float value_Ratio,
+															int propID_Tex, RenderTexture value_RenderTexture,
+															int propID_SSOffset, Vector4 value_SSOffset,
+															int propID_Alpha, float value_Alpha)
+		{
+			//프리셋은 세트로 변경된다.
+			_material_Instanced.SetFloat(propID_Ratio, value_Ratio);
+			_material_Instanced.SetTexture(propID_Tex, value_RenderTexture);
+			_material_Instanced.SetVector(propID_SSOffset, value_SSOffset);
+			_material_Instanced.SetFloat(propID_Alpha, value_Alpha);
+		}
+
+		public void ReceiveMask_SendData_SeeThroughPreset_VR(	int propID_Ratio, float value_Ratio,
+																int propID_Tex_L, RenderTexture value_RenderTexture_L,
+																int propID_Tex_R, RenderTexture value_RenderTexture_R,
+																int propID_SSOffset, Vector4 value_SSOffset,
+																int propID_Alpha, float value_Alpha)
+		{
+			//프리셋은 세트로 변경된다.
+			_material_Instanced.SetFloat(propID_Ratio, value_Ratio);
+			_material_Instanced.SetTexture(propID_Tex_L, value_RenderTexture_L);
+			_material_Instanced.SetTexture(propID_Tex_R, value_RenderTexture_R);
+			_material_Instanced.SetVector(propID_SSOffset, value_SSOffset);
+			_material_Instanced.SetFloat(propID_Alpha, value_Alpha);
+		}
+
+		//커스텀 프로퍼티를 타입별로 전송
+		public void ReceiveMask_SendData_RenderTexture(int propID, RenderTexture renderTexture)
+		{
+			_material_Instanced.SetTexture(propID, renderTexture);
+		}
+
+		public void ReceiveMask_SendData_Vector4(int propID, Vector4 vectorValue)
+		{
+			_material_Instanced.SetVector(propID, vectorValue);
+		}
+
+		public void ReceiveMask_SendData_Vector2(int propID, Vector2 vector2Value)
+		{
+			Vector4 vec4 = new Vector4(vector2Value.x, vector2Value.y, 0.0f, 0.0f);
+			_material_Instanced.SetVector(propID, vec4);
+		}
+
+		public void ReceiveMask_SendData_Float(int propID, float floatValue)
+		{
+			_material_Instanced.SetFloat(propID, floatValue);
+		}
+
+		public void ReceiveMask_SendData_Int(int propID, int intValue)
+		{
+#if UNITY_2021_1_OR_NEWER
+			_material_Instanced.SetInteger(propID, intValue);
+#else
+			_material_Instanced.SetInt(propID, intValue);
+#endif
+		}
+
+		public void ReceiveMask_SendData_Texture(int propID, Texture textureValue)
+		{
+			_material_Instanced.SetTexture(propID, textureValue);
+		}
+
+		public void ReceiveMask_SendData_Color(int propID, Color colorValue)
+		{
+			_material_Instanced.SetColor(propID, colorValue);
+		}
+
+
+		
+
+
+
+        /// <summary>
+        /// 단일+일반 카메라에서의 Child 렌더링.
+        /// 단일 RT와 영역 최적화 입력을 한다.
+        /// 이 함수는 Update 코드 내에서 호출된다.
+        /// </summary>
+		[Obsolete]
+        private void UpdateMaskChild_Basic()
 		{
 			if(_renderCamera == null || _parentOptMesh == null)
 			{
@@ -3338,8 +5759,13 @@ namespace AnyPortrait
 		}
 
 
-		//Single Camera VR 방식인 경우
-		private void UpdateMaskChild_SingleCameraVR(Camera camera)
+        /// <summary>
+        /// 단일+VR 카메라에서의 Child 렌더링.
+        /// 스테레오 RT에 대해서 입력을 한다.
+        /// 이 연산은 업데이트가 아닌 PreRenderEvent에서 수행한다.
+        /// </summary>
+        [Obsolete]
+        private void UpdateMaskChild_SingleCameraVR(Camera camera)
 		{
 			if (_renderCamera == null || _parentOptMesh == null)
 			{
@@ -3376,7 +5802,16 @@ namespace AnyPortrait
 			_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, parentCamData._maskScreenSpaceOffset);
 		}
 
-		private void UpdateMaskChild_MultipleCameraVR(Camera camera)
+
+
+        /// <summary>
+        /// 다중 카메라에서의 Child 렌더링.
+        /// 현재 렌더링 중인 카메라에 대한 RT를 찾아서 갱신한다.
+        /// 이 연산은 업데이트가 아닌 PreRenderEvent에서 수행한다.
+        /// </summary>
+        /// <param name="camera"></param>
+		[Obsolete]
+        private void UpdateMaskChild_MultipleCameraVR(Camera camera)
 		{
 			if (_renderCamera == null || _parentOptMesh == null)
 			{
@@ -3417,7 +5852,20 @@ namespace AnyPortrait
 		}
 
 
-#if UNITY_2019_1_OR_NEWER
+        //----------------------------------------------------------
+        // 마스크 렌더링/업데이트가 호출되는 이벤트
+        //----------------------------------------------------------
+        // - SRP (카메라 무관) : RenderPipelineManager.beginCameraRendering에서 연산
+        // - BuiltIn - VR/다중 카메라 : MultiCamController를 이용하여 PreRendered 이벤트에서 연산
+        // - BuiltIn - 일반 카메라 : 일반 업데이트에서 연산 가능. Portrait 옵션에 따라서는 Application의 onBeforeRender에서 한번 더 갱신
+        // (Parent/Child 동일하다.)
+
+        // 1. SRP의 경우의 렌더링 이벤트
+        #if UNITY_2019_1_OR_NEWER
+        /// <summary>
+        /// SRP에서의 Mask Parent 업데이트/렌더링 이벤트
+        /// </summary>
+		[Obsolete]
 		private void ProcessSRP_MaskParent(ScriptableRenderContext context, Camera cam)
 		{
 			if (!_isVisible
@@ -3459,6 +5907,10 @@ namespace AnyPortrait
 			context.Submit();
 		}
 
+        /// <summary>
+        /// SRP에서의 Mask Child 업데이트와 Shader 갱신
+        /// </summary>
+		[Obsolete]
 		private void ProcessSRP_MaskChild(ScriptableRenderContext context, Camera cam)
 		{
 			if (!_isVisible
@@ -3477,12 +5929,6 @@ namespace AnyPortrait
 					return;
 			}
 			
-			//if (!_renderCamera.IsVRSupported())
-			//{
-			//	//단일 카메라인 경우 굳이 할 필요는 없다.
-			//	return;
-			//}
-
 			if (context == null || cam == null)
 			{
 				return;
@@ -3493,30 +5939,18 @@ namespace AnyPortrait
 			{
 				_funcUpdateMaskChildVR(cam);
 			}
-			
-			////현재 렌더링되는 카메라에 맞게 렌더링을 하자.
-			//apOptMeshRenderCamera.CameraRenderData parentCamData = _parentOptMesh.GetCameraData(cam);
-			//if(parentCamData == null
-			//	|| parentCamData._renderTexture == null
-			//	|| parentCamData._camera == null
-			//	|| !parentCamData._camera.enabled)
-			//{
-			//	return;
-			//}
-
-			//_curParentRenderTexture = parentCamData._renderTexture;
-
-			//if (_curParentRenderTexture != _prevParentRenderTexture)
-			//{
-			//	_material_Instanced.SetTexture(_shaderID_MaskTexture, _curParentRenderTexture);
-			//	_prevParentRenderTexture = _curParentRenderTexture;
-			//}
-			//_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, parentCamData._maskScreenSpaceOffset);
-			
 		}
 #endif
 
-		private void OnMeshPreRendered_MaskParent(Camera camera)
+
+        // 2. Built-In + Multiple/VR 카메라에서의 마스크 렌더링 이벤트
+
+        /// <summary>
+        /// Built-In에서 다중 카메라/VR에서의 렌더링 이벤트중 Mask Parent용 이벤트
+        /// MultiCamController로 부터 호출받는다.
+        /// </summary>
+		[Obsolete]
+        private void OnMeshPreRendered_MaskParent(Camera camera)
 		{
 			if(!_isMaskParent 
 				|| camera == null 
@@ -3531,6 +5965,11 @@ namespace AnyPortrait
 		}
 
 
+        /// <summary>
+        /// Built-In에서 다중 카메라/VR에서의 렌더링 이벤트중 Mask Child용 이벤트
+        /// MultiCamController로 부터 호출받는다.
+        /// </summary>
+		[Obsolete]
 		private void OnMeshPreRendered_MaskChild(Camera camera)
 		{
 			if(!_isMaskChild
@@ -3544,1611 +5983,112 @@ namespace AnyPortrait
 
 			//Mask Child의 렌더링 텍스쳐를 갱신하자.
 			_funcUpdateMaskChildVR(camera);
-
-#region [미사용 코드]
-			//if (!_renderCamera.IsVRSupported())
-			//{
-			//	//단일 카메라인 경우 굳이 할 필요는 없다.
-			//	return;
-			//}
-			
-			////현재 렌더링되는 카메라에 맞게 렌더링을 하자.
-			//apOptMeshRenderCamera.CameraRenderData parentCamData = _parentOptMesh.GetCameraData(camera);
-			//if(parentCamData == null)
-			//{
-			//	//Debug.LogError("OnMeshPreRendered_MaskChild >> Not Work");
-			//	return;
-			//}
-
-			//if (_renderCamera.VRSupportMode == apPortrait.VR_SUPPORT_MODE.SingleCamera)
-			//{
-			//	//카메라 1개에 듀얼 모드일 것이다.
-			//	if (parentCamData._renderTexture_L == null ||
-			//		parentCamData._renderTexture_R == null)
-			//	{
-			//		//L, R의 두개의 렌더 텍스쳐가 모두 생성되어 있어야 한다.
-			//		return;
-			//	}
-
-			//	_curParentRenderTexture = parentCamData._renderTexture_L;//L을 기준으로 한다.
-
-			//	if (_curParentRenderTexture != _prevParentRenderTexture)
-			//	{
-			//		_material_Instanced.SetTexture("_MaskTex_L", parentCamData._renderTexture_L);
-			//		_material_Instanced.SetTexture("_MaskTex_R", parentCamData._renderTexture_R);
-			//		_prevParentRenderTexture = _curParentRenderTexture;
-			//	}
-			//	_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, parentCamData._maskScreenSpaceOffset);
-			//}
-			//else
-			//{
-			//	//카메라 두개 이상에 1개씩의 RT만 있을 것
-			//	if (parentCamData._renderTexture == null)
-			//	{
-			//		return;
-			//	}
-
-			//	_curParentRenderTexture = parentCamData._renderTexture;
-
-			//	if (_curParentRenderTexture != _prevParentRenderTexture)
-			//	{
-			//		_material_Instanced.SetTexture(_shaderID_MaskTexture, _curParentRenderTexture);
-			//		_prevParentRenderTexture = _curParentRenderTexture;
-			//	}
-			//	_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, parentCamData._maskScreenSpaceOffset);
-			//} 
-			#endregion
-
-
-
 		}
 
-		// Functions
-		//------------------------------------------------
-		/// <summary>
-		/// Show Mesh
-		/// </summary>
-		/// <param name="isResetHideFlag"></param>
-		public void Show(bool isResetHideFlag = false)
-		{	
-			if(isResetHideFlag)
-			{
-				_isHide_External = false;
-			}
-			_meshRenderer.enabled = true;
-			_isVisible = true;
 
-			if (_isMaskParent)
-			{
-				//CleanUpMaskParent();
-				//ClearCameraData();//변경
 
-#if UNITY_EDITOR
-				if (!Application.isPlaying)
-				{
-					return;
-				}
-#endif
-				Initialize_MaskParent();
-			}
-			else if(_isMaskChild)
-			{
-				//추가됨 19.9.24
-				//ClearCameraData();//변경
-#if UNITY_EDITOR
-				if (!Application.isPlaying)
-				{
-					return;
-				}
-#endif
-				Initialize_MaskChild();
-			}
-
-			_isUseRiggingCache = false;
-		}
-
-		/// <summary>
-		/// Hide Mesh
-		/// </summary>
-		public void Hide()
+		//--------------------------------------------------------
+		//마스크 렌더링을 위한 정보를 받아오자
+		public void GetMaskRenderInfo(	out Texture curTexture,
+										out Color curMeshColor,
+										out float vertRange_XMin, out float vertRange_XMax,
+										out float vertRange_YMin, out float vertRange_YMax,
+										out Vector3 vertPosCenter)
 		{
-			_meshRenderer.enabled = false;
-			_isVisible = false;
-
-			if (_isMaskParent 
-				|| _isMaskChild//추가
-				)
-			{
-				//CleanUpMaskParent();
-				//ClearCameraData();//변경
-				ReleaseRenderEvents();//<<다시 변경. RT는 그대로 두고 이벤트만 날린다.
-			}
-
-			_isUseRiggingCache = false;
+			curTexture = _material_Cur.mainTexture;
+			curMeshColor = _material_Cur.color;
+			vertRange_XMin = _vertRange_XMin;
+			vertRange_XMax = _vertRange_XMax;
+			vertRange_YMin = _vertRange_YMin;
+			vertRange_YMax = _vertRange_YMax;
+			vertPosCenter = _vertPosCenter;
 		}
 
-		/// <summary>
-		/// Show or Hide by default
-		/// </summary>
-		public void SetVisibleByDefault()
+		public void GetMaskRenderInfo(	out Texture curTexture,
+										out Color curMeshColor)
 		{
-			if(_isVisibleDefault)
-			{
-				Show(true);
-			}
-			else
-			{
-				Hide();
-			}
+			curTexture = _material_Cur.mainTexture;
+			curMeshColor = _material_Cur.color;
 		}
 
-		/// <summary>
-		/// Hide Mesh ignoring the result
-		/// </summary>
-		/// <param name="isHide"></param>
-		public void SetHideForce(bool isHide)
+		public void CopyMaterialToTarget(Material targetMaterial)
 		{
-			_isHide_External = isHide;
-
-			//실제 Visible 갱신은 다음 프레임의 업데이트때 수행된다.
-		}
-
-
-
-
-
-		//---------------------------------------------------------
-		// Shader 제어 함수들
-		//---------------------------------------------------------
-		//추가 12.14
-		// 각 함수에 isOverlapBatchedProperty 파라미터가 추가
-		// 값이 true라면 -> Instanced 재질 값을 계산할 때 Batch의 색상 속성을 무시한다.
-		//
-		/// <summary>
-		/// Set Main Color (2X)
-		/// </summary>
-		/// <param name="color2X"></param>
-		/// <param name="isOverlapBatchedProperty"></param>
-		public void SetMeshColor(Color color2X)
-		{
-			
-			_multiplyColor = color2X;
-			
-			if(Mathf.Abs(_multiplyColor.r - 0.5f) < 0.004f &&
-				Mathf.Abs(_multiplyColor.g - 0.5f) < 0.004f &&
-				Mathf.Abs(_multiplyColor.b - 0.5f) < 0.004f &&
-				Mathf.Abs(_multiplyColor.a - 1.0f) < 0.004f)
-			{
-				//기본 값이라면
-				_isAnyMeshColorRequest = false;
-				_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-			}
-			else
-			{
-				_isAnyMeshColorRequest = true;
-			}
-
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			//_material_Instanced.SetColor(_shaderID_MainTex, _cal_MeshColor);//버그
-			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);//수정
-
-			AutoSelectMaterial(true);//색상 변경 요청시에는 Gray 체크를 한번 더 해야한다.
-		}
-
-		public void SetMeshAlpha(float alpha)
-		{
-			_multiplyColor.a = alpha;
-			
-			if(Mathf.Abs(_multiplyColor.r - 0.5f) < 0.004f &&
-				Mathf.Abs(_multiplyColor.g - 0.5f) < 0.004f &&
-				Mathf.Abs(_multiplyColor.b - 0.5f) < 0.004f &&
-				Mathf.Abs(_multiplyColor.a - 1.0f) < 0.004f)
-			{
-				//기본 값이라면
-				_isAnyMeshColorRequest = false;
-				_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-			}
-			else
-			{
-				_isAnyMeshColorRequest = true;
-			}
-
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			_material_Instanced.SetColor(_shaderID_MainTex, _cal_MeshColor);
-
-			AutoSelectMaterial(true);//색상 변경 요청시에는 Gray 체크를 한번 더 해야한다.
-		}
-
-		/// <summary>
-		/// Set Main Texture
-		/// </summary>
-		/// <param name="texture"></param>
-		public void SetMeshTexture(Texture2D texture)
-		{
-			//추가 : 20.4.21 : 텍스쳐의 모드에 따라 작동 방식이 다르다.
-			//- Base : 기존과 같다. _texture_Base에 저장을 하여 언제든 다시 복구할 수 있게 만든다.
-			//- Extra : _texture_Base에 저장은 하지만 적용은 하지 않는다.
-
-			//공통적으로 _texture_Base에 저장을 한다.
-			_texture_Base = texture;
-
-			if (_textureMode == TEXTURE_MODE.Base)
-			{
-				//Base 모드일 때
-				//동일하게 적용을 한다.
-
-				if (_isMaskChild)
-				{
-					//Mask Child라면 그냥 Instanced Material에 넣는다.
-					_material_Instanced.SetTexture(_shaderID_MainTex, texture);
-				}
-				else
-				{
-					//그 외에는 Shared Material과 비교한다.
-					if (_material_Shared.mainTexture == texture)
-					{
-						_isAnyTextureRequest = false;
-					}
-					else
-					{
-						_isAnyTextureRequest = true;
-					}
-					_material_Instanced.SetTexture(_shaderID_MainTex, texture);
-				}
-
-				AutoSelectMaterial();
-			}
-		}
-
-		/// <summary>
-		/// Set Color as shader property (not Main Color)
-		/// </summary>
-		/// <param name="color"></param>
-		/// <param name="propertyName"></param>
-		public void SetCustomColor(Color color, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//_instanceMaterial.SetColor(propertyName, color);//이전
-			_material_Instanced.SetColor(propertyName, color);
-
-			AutoSelectMaterial();
-		}
-
-		/// <summary>
-		/// Set Color as shader property (not Main Color)
-		/// </summary>
-		/// <param name="color"></param>
-		public void SetCustomColor(Color color, int propertyNameID)//ID 버전 [v1.4.3]
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			_material_Instanced.SetColor(propertyNameID, color);
-
-			AutoSelectMaterial();
-		}
-
-
-
-		/// <summary>
-		/// Set Alpha as shader property (not Main Color)
-		/// </summary>
-		/// <param name="color"></param>
-		/// <param name="propertyName"></param>
-		public void SetCustomAlpha(float alpha, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//Color color = _instanceMaterial.GetColor(propertyName);
-			//color.a = alpha;
-			//_instanceMaterial.SetColor(propertyName, color);
-
-			//변경 : 현재 Color -> Alpha 변경 -> Instanced에 전달
-			Color color = _material_Cur.GetColor(propertyName);
-			color.a = alpha;
-			_material_Instanced.SetColor(propertyName, color);
-
-			AutoSelectMaterial();
-		}
-
-
-
-		/// <summary>
-		/// Set Alpha as shader property (not Main Color)
-		/// </summary>
-		public void SetCustomAlpha(float alpha, int propertyNameID)//ID 버전 [v1.4.3]
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			Color color = _material_Cur.GetColor(propertyNameID);
-			color.a = alpha;
-			_material_Instanced.SetColor(propertyNameID, color);
-
-			AutoSelectMaterial();
-		}
-
-
-
-		/// <summary>
-		/// Set Texture as shader property (not Main Texture)
-		/// </summary>
-		/// <param name="texture"></param>
-		/// <param name="propertyName"></param>
-		public void SetCustomTexture(Texture2D texture, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//_instanceMaterial.SetTexture(propertyName, texture);//이전
-			_material_Instanced.SetTexture(propertyName, texture);
-
-			AutoSelectMaterial();
-		}
-
-		/// <summary>
-		/// Set Texture as shader property (not Main Texture)
-		/// </summary>
-		public void SetCustomTexture(Texture2D texture, int propertyNameID)//ID 버전 [v1.4.3]
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			_material_Instanced.SetTexture(propertyNameID, texture);
-
-			AutoSelectMaterial();
-		}
-
-
-
-		/// <summary>
-		/// Set Float Value as shader property
-		/// </summary>
-		/// <param name="floatValue"></param>
-		/// <param name="propertyName"></param>
-		public void SetCustomFloat(float floatValue, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//_instanceMaterial.SetFloat(propertyName, floatValue);//이전
-			_material_Instanced.SetFloat(propertyName, floatValue);
-
-			AutoSelectMaterial();
-		}
-
-		/// <summary>
-		/// Set Float Value as shader property
-		/// </summary>
-		/// <param name="floatValue"></param>
-		public void SetCustomFloat(float floatValue, int propertyNameID)//ID 버전 [v1.4.3]
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			_material_Instanced.SetFloat(propertyNameID, floatValue);
-
-			AutoSelectMaterial();
-		}
-
-
-		/// <summary>
-		/// Set Int Value as shader property
-		/// </summary>
-		/// <param name="intValue"></param>
-		/// <param name="propertyName"></param>
-		public void SetCustomInt(int intValue, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyName, intValue);
-#else
-			_material_Instanced.SetInt(propertyName, intValue);
-#endif
-			AutoSelectMaterial();
-		}
-
-
-		/// <summary>
-		/// Set Int Value as shader property
-		/// </summary>
-		/// <param name="intValue"></param>
-		public void SetCustomInt(int intValue, int propertyNameID)//ID 버전 [v1.4.3]
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyNameID, intValue);
-#else
-			_material_Instanced.SetInt(propertyNameID, intValue);
-#endif
-
-			AutoSelectMaterial();
-		}
-
-
-
-		/// <summary>
-		/// Set Vector4 Value as shader property
-		/// </summary>
-		/// <param name="vector4Value"></param>
-		/// <param name="propertyName"></param>
-		public void SetCustomVector4(Vector4 vector4Value, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//_instanceMaterial.SetVector(propertyName, vector4Value);//이전
-			_material_Instanced.SetVector(propertyName, vector4Value);
-
-			AutoSelectMaterial();
-		}
-
-		/// <summary>
-		/// Set Vector4 Value as shader property
-		/// </summary>
-		/// <param name="vector4Value"></param>
-		public void SetCustomVector4(Vector4 vector4Value, int propertyNameID)//ID 버전 [v1.4.3]
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			_material_Instanced.SetVector(propertyNameID, vector4Value);
-
-			AutoSelectMaterial();
-		}
-
-
-
-
-		// 추가 12.02 : UV Offset과 Size 조절
-		/// <summary>
-		/// Set UV Offset Value as shader property
-		/// </summary>
-		/// <param name="propertyName"></param>
-		public void SetCustomTextureOffset(Vector2 uvOffset, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//_instanceMaterial.SetTextureOffset(propertyName, uvOffset);//이전
-			_material_Instanced.SetTextureOffset(propertyName, uvOffset);
-
-			AutoSelectMaterial();
-		}
-
-
-
-		/// <summary>
-		/// Set UV Scale Value as shader property
-		/// </summary>
-		/// <param name="propertyName"></param>
-		public void SetCustomTextureScale(Vector2 uvScale, string propertyName)
-		{
-			//값에 상관없이 이 함수가 호출되면 True
-			_isAnyCustomPropertyRequest = true;
-			//_instanceMaterial.SetTextureScale(propertyName, uvScale);//이전
-			_material_Instanced.SetTextureScale(propertyName, uvScale);
-
-			AutoSelectMaterial();
-		}
-
-
-
-
-
-		private void AutoSelectMaterial(bool isCheckGrayColor = false)
-		{
-#if UNITY_EDITOR
-			if(!Application.isPlaying)
+			if (targetMaterial == null || _material_Cur == null)
 			{
 				return;
 			}
-#endif
-			if(_isMaskChild)
-			{
-				//Mask Child는 무조건 Instanced를 이용한다.
-				if(_materialType != MATERIAL_TYPE.Instanced)
-				{
-					_materialType = MATERIAL_TYPE.Instanced;
-					_material_Cur = _material_Instanced;
-					_meshRenderer.sharedMaterial = _material_Cur;
-				}
-				
-				return;
-			}
-
-			//Batch된 재질이 작동하고 있는가 (Merged가 아닐 때에만 동작)
-			bool isBatched = false;
-			if (!_isMerged)
-			{
-				if (_materialUnit_Batched != null && _materialUnit_Batched.IsAnyChanged)
-				{
-					isBatched = true;
-				}
-
-				if (_isForceBatch2Shared)
-				{
-					//강제로 Shared로 전환해야하는 옵션이 켜질 수 있다.
-					isBatched = false;
-				}
-			}
-			
-
-			bool isColorChanged = _isAnyMeshColorRequest || _parentTransform._isAnyColorCalculated || !_isDefaultColorGray;
-			if(isCheckGrayColor 
-				&& isColorChanged
-				&& !_isAnyTextureRequest
-				&& !_isAnyCustomPropertyRequest
-				)
-			{
-				//만약, 색상 변경 이벤트가 있었는데, (게다가 다른 이벤트는 없었다면)
-				//Gray 체크 요청이 같이 왔다면 Instanced가 아니라 Shared로 바꿀 수 있을 것이다.
-				if(_isMerged)
-				{	
-					//추가 21.12.29 : 병합된 경우엔 Merged Material과 비교해야한다.
-					Color mergedColor = _material_Merged.color;
-
-					bool isMergedColor = Mathf.Abs(_cal_MeshColor.r - mergedColor.r) < 0.004f &&
-											Mathf.Abs(_cal_MeshColor.g - mergedColor.g) < 0.004f &&
-											Mathf.Abs(_cal_MeshColor.b - mergedColor.b) < 0.004f &&
-											Mathf.Abs(_cal_MeshColor.a - mergedColor.a) < 0.004f;
-
-					if (isMergedColor)
-					{
-						//Merged 재질과 같은 색상이다.
-						isColorChanged = false;
-					}
-				}	
-				else if (isBatched)
-				{
-					//만약, Batch 재질이 작동하고 있고, 계산된 MeshColor가 Batch의 색상과 유사하다면, 이건 Batch 쪽으로 전환되어야 한다.
-					//(색상에 한해서)
-
-					Color batchedColor = _material_Batched.color;
-
-					bool isBatchedColor = Mathf.Abs(_cal_MeshColor.r - batchedColor.r) < 0.004f &&
-											Mathf.Abs(_cal_MeshColor.g - batchedColor.g) < 0.004f &&
-											Mathf.Abs(_cal_MeshColor.b - batchedColor.b) < 0.004f &&
-											Mathf.Abs(_cal_MeshColor.a - batchedColor.a) < 0.004f;
-
-					if (isBatchedColor)
-					{
-						//Batch 재질과 같은 색상이다.
-						isColorChanged = false;
-					}
-				}
-				else
-				{
-					//일반적인 경우엔 Gray Color와 같다면 Instanced가 아닌 Shared로 전환한다.
-					bool isGrayColor = Mathf.Abs(_cal_MeshColor.r - 0.5f) < 0.004f &&
-								Mathf.Abs(_cal_MeshColor.g - 0.5f) < 0.004f &&
-								Mathf.Abs(_cal_MeshColor.b - 0.5f) < 0.004f &&
-								Mathf.Abs(_cal_MeshColor.a - 1.0f) < 0.004f;
-
-					if (isGrayColor)
-					{
-						//Gray 색상이라면 색상 이벤트를 무시해도 된다.
-						isColorChanged = false;
-					}
-				}
-			}
-			
-
-			if (_isAnyTextureRequest
-				|| _isAnyCustomPropertyRequest
-				|| isColorChanged)
-			{
-				//Instance Material을 선택해야한다.
-				if (_materialType != MATERIAL_TYPE.Instanced)
-				{
-					_materialType = MATERIAL_TYPE.Instanced;
-					_material_Cur = _material_Instanced;
-					_meshRenderer.sharedMaterial = _material_Cur;
-
-					_isForceBatch2Shared = false;
-
-					//추가 21.12.26
-					//만약 재질이 병합된 상태(Merged)라면, Instanced 되기 전에 버텍스 채널 칼라가 바뀌었을 것
-					//흰색으로 복원해야한다
-					if(_isMerged && _vertColors_NotMerged != null)
-					{
-						_mesh.colors = _vertColors_NotMerged;
-					}
-				}
-			}
-			else
-			{
-				//Batched / Shared / Merged 중에 선택해야한다.
-				//가장 우선 순위는 Merged
-
-				//Shared Material을 선택해야한다.
-				//기본적으론 Shared를 선택해야한다.
-				//Batched Material의 "일괄 적용 요청"이 있었다면, Shared와 Batch 중에서 결정해야한다.
-
-				if (_isMerged)
-				{
-					//병합된 재질로 변환
-					if (_materialType != MATERIAL_TYPE.Merged)
-					{
-						_materialType = MATERIAL_TYPE.Merged;
-						_material_Cur = _material_Merged;
-						_meshRenderer.sharedMaterial = _material_Cur;
-
-						//병합된 재질은 버텍스 색상도 제어해야한다.
-						_mesh.colors = _vertColors_Merged;
-					}
-				}
-				else
-				{
-					if (isBatched)
-					{
-						if (_materialType != MATERIAL_TYPE.Batched)
-						{
-							//-> Batched
-							_materialType = MATERIAL_TYPE.Batched;
-							_material_Cur = _material_Batched;
-							_meshRenderer.sharedMaterial = _material_Cur;
-						}
-					}
-					else
-					{
-						//가장 높은 최적화 단계인 Shared
-						//아무런 변화가 없을때 동작한다.
-						if (_materialType != MATERIAL_TYPE.Shared)
-						{
-							//-> Shared
-							_materialType = MATERIAL_TYPE.Shared;
-							_material_Cur = _material_Shared;
-							_meshRenderer.sharedMaterial = _material_Cur;
-						}
-					}
-				}
-			}
+			targetMaterial.CopyPropertiesFromMaterial(_material_Cur);
 		}
 
-
-		//Material Property 값들을 초기화한다.
-		//이 함수를 호출하면 MaskChild를 제외하면 Batch를 위해 SharedMaterial로 변경된다.
-		/// <summary>
-		/// Return the material value to its initial state. Batch rendering is enabled.
-		/// </summary>
-		public void ResetMaterialToBatch()
+		public void CopyPropertyToTarget_Float(Material targetMat, int propID)
 		{
-			//Debug.LogError("ResetMaterialToBatch");
-			if(_isMaskChild)
+			if (targetMat == null || _material_Cur == null)
 			{
 				return;
 			}
-
-			//Debug.Log("ResetMaterialToBatch : " + this.name);
-			if(_material_Shared != null)
-			{
-				//Shared로 변경
-				_material_Instanced.CopyPropertiesFromMaterial(_material_Shared);
-				_materialType = MATERIAL_TYPE.Shared;
-				_material_Cur = _material_Shared;
-				_meshRenderer.sharedMaterial = _material_Cur;
-
-				//Debug.Log(">> Shared");
-			}
-
-			//텍스쳐 모드 초기화
-			_textureMode = TEXTURE_MODE.Base;
-			_texture_Base = _texture;
-
-			//이전 코드
-			//if(_isUseSharedMaterial)
-			//{
-			//	return;
-			//}
-			//_isUseSharedMaterial = true;
-			//_material = _sharedMaterial;
-
-			////일단 InstanceMat도 복사를 해서 리셋을 해준다.
-			//_instanceMaterial.CopyPropertiesFromMaterial(_sharedMaterial);
-
-			//_meshRenderer.sharedMaterial = _material;
-
-			_isAnyMeshColorRequest = false;
-			_isAnyTextureRequest = false;
-			_isAnyCustomPropertyRequest = false;
-
-			//중요 : Batched에서 강제로 Shared로 전환하게 만들어야 한다.
-			_isForceBatch2Shared = true;
-
-			//색상 값도 초기화
-			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-
-			AutoSelectMaterial(true);
-
-			
+			targetMat.SetFloat(propID, _material_Cur.GetFloat(propID));
 		}
 
-		// Batch 관련 이벤트
-		//-------------------------------------------------------------------------
-		public void SyncMaterialPropertyByBatch_Texture(Texture2D texture)
+		public void CopyPropertyToTarget_Texture(Material targetMat, int propID)
 		{
-			//추가 20.4.21 : Extra 옵션인 경우엔 적용하면 안된다.
-			_texture_Base = texture;
-
-			if (_textureMode == TEXTURE_MODE.Base)
-			{
-				//Debug.Log("SyncMaterialPropertyByBatch_Texture : " + texture.name + " >> " + this.name + " (Clipped : " + _isMaskChild + ")");
-				_material_Instanced.SetTexture(_shaderID_MainTex, texture);
-
-				//동기화 되었으므로, Instanced 자체의 옵션은 해제 - 텍스쳐
-				_isAnyTextureRequest = false;
-
-				_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-				AutoSelectMaterial();
-			}
-		}
-
-		public void SyncMaterialPropertyByBatch_Color(Color color2X)
-		{
-			//일단 Batch의 색상 값을 가져다 쓴다.
-			//이 상태에서 다시 Parent Opt Transform의 색상과 계산을 해서 _cal_MeshColor를 계산해야한다.
-			//Batch와 동기화한 것이므로 isAnyMeshColorRequest 여부는 확인하지 않는다.
-			_multiplyColor = color2X;
-
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			//_material_Instanced.SetColor(_shaderID_Color, _multiplyColor);//<<버그
-			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);//수정 19.10.28
-
-			//동기화 되었으므로, Instanced 자체의 옵션은 해제 - 색상
-			_isAnyMeshColorRequest = false;
-
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial(true);//<<색상 계산을 해야한다.
-		}
-
-		public void SyncMaterialPropertyByBatch_CustomTexture(Texture2D texture, string propertyName)
-		{
-			_material_Instanced.SetTexture(propertyName, texture);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-		public void SyncMaterialPropertyByBatch_CustomTexture(Texture2D texture, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
-		{
-			_material_Instanced.SetTexture(propertyNameID, texture);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-
-
-		public void SyncMaterialPropertyByBatch_CustomTextureOffset(Vector2 offset, string propertyName)
-		{
-			_material_Instanced.SetTextureOffset(propertyName, offset);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-		public void SyncMaterialPropertyByBatch_CustomTextureScale(Vector2 scale, string propertyName)
-		{
-			_material_Instanced.SetTextureScale(propertyName, scale);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-
-
-		public void SyncMaterialPropertyByBatch_CustomColor(Color color, string propertyName)
-		{
-			_material_Instanced.SetColor(propertyName, color);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-		public void SyncMaterialPropertyByBatch_CustomColor(Color color, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
-		{
-			_material_Instanced.SetColor(propertyNameID, color);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-
-
-		public void SyncMaterialPropertyByBatch_CustomFloat(float floatValue, string propertyName)
-		{
-			_material_Instanced.SetFloat(propertyName, floatValue);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-		
-		public void SyncMaterialPropertyByBatch_CustomFloat(float floatValue, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
-		{
-			_material_Instanced.SetFloat(propertyNameID, floatValue);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-
-		public void SyncMaterialPropertyByBatch_CustomInt(int intValue, string propertyName)
-		{
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyName, intValue);
-#else
-			_material_Instanced.SetInt(propertyName, intValue);
-#endif
-
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-		public void SyncMaterialPropertyByBatch_CustomInt(int intValue, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
-		{
-
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyNameID, intValue);
-#else
-			_material_Instanced.SetInt(propertyNameID, intValue);
-#endif
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-
-
-		public void SyncMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, string propertyName)
-		{
-			_material_Instanced.SetVector(propertyName, vecValue);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-		public void SyncMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, int propertyNameID)//ID를 사용한 버전 [v1.4.3]
-		{
-			_material_Instanced.SetVector(propertyNameID, vecValue);
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial();
-		}
-
-
-		
-		public void SyncMaterialPropertyByBatch_Reset(Material syncMaterial)
-		{
-			_material_Instanced.CopyPropertiesFromMaterial(syncMaterial);
-
-
-			//색상은 별도로 초기화
-			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			//Extra Texture 초기화
-			_textureMode = TEXTURE_MODE.Base;
-			_texture_Base = _texture;
-
-
-			//동기화 되었으므로, Instanced 자체의 옵션은 해제 - 전체
-			_isAnyMeshColorRequest = false;
-			_isAnyTextureRequest = false;
-			_isAnyCustomPropertyRequest = false;
-
-			_isForceBatch2Shared = false;//Batch를 막는 플래그를 끄자
-
-			AutoSelectMaterial(true);
-		}
-
-
-		
-
-
-		//클리핑 메시에 관하여 일괄 요청을 하는 경우
-		//일반적인 Sync 함수와 다르다.
-		//Instance 방식을 유지해야한다.
-		//-------------------------------------------------------------------------
-		public void SetClippedMaterialPropertyByBatch_Texture(Texture2D texture)
-		{
-			if(!_isMaskChild)
+			if (targetMat == null || _material_Cur == null)
 			{
 				return;
 			}
-			//Debug.Log("SyncMaterialPropertyByBatch_Clipped_Texture : " + texture.name + " >> " + this.name + " (Clipped : " + _isMaskChild + ")");
-			_material_Instanced.SetTexture(_shaderID_MainTex, texture);
+			targetMat.SetTexture(propID, _material_Cur.GetTexture(propID));
 		}
 
-		public void SetClippedMaterialPropertyByBatch_Color(Color color2X)
+		public void CopyPropertyToTarget_Color(Material targetMat, int propID)
 		{
-			if(!_isMaskChild)
+			if (targetMat == null || _material_Cur == null)
 			{
 				return;
 			}
-			//일단 Batch의 색상 값을 가져다 쓴다.
-			//이 상태에서 다시 Parent Opt Transform의 색상과 계산을 해서 _cal_MeshColor를 계산해야한다.
-			//Batch와 동기화한 것이므로 isAnyMeshColorRequest 여부는 확인하지 않는다.
-			_multiplyColor = color2X;
-
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
+			targetMat.SetColor(propID, _material_Cur.GetColor(propID));
 		}
 
-		public void SetClippedMaterialPropertyByBatch_Alpha(float alpha)
+		public void CopyPropertyToTarget_Vector4(Material targetMat, int propID)
 		{
-			if(!_isMaskChild)
+			if (targetMat == null || _material_Cur == null)
 			{
 				return;
 			}
-			//일단 Batch의 색상 값을 가져다 쓴다.
-			//이 상태에서 다시 Parent Opt Transform의 색상과 계산을 해서 _cal_MeshColor를 계산해야한다.
-			//Batch와 동기화한 것이므로 isAnyMeshColorRequest 여부는 확인하지 않는다.
-			_multiplyColor.a = alpha;
-
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
+			targetMat.SetVector(propID, _material_Cur.GetVector(propID));
 		}
 
-
-		public void SetClippedMaterialPropertyByBatch_CustomTexture(Texture2D texture, string propertyName)
+		public void CopyPropertyToTarget_Int(Material targetMat, int propID)
 		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetTexture(propertyName, texture);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SetClippedMaterialPropertyByBatch_CustomTexture(Texture2D texture, int propertyNameID)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetTexture(propertyNameID, texture);
-		}
-
-		public void SetClippedMaterialPropertyByBatch_CustomTextureOffset(Vector2 offset, string propertyName)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetTextureOffset(propertyName, offset);
-		}
-
-		public void SetClippedMaterialPropertyByBatch_CustomTextureScale(Vector2 scale, string propertyName)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetTextureScale(propertyName, scale);
-		}
-
-		public void SetClippedMaterialPropertyByBatch_CustomColor(Color color, string propertyName)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetColor(propertyName, color);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SetClippedMaterialPropertyByBatch_CustomColor(Color color, int propertyNameID)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetColor(propertyNameID, color);
-		}
-
-		public void SetClippedMaterialPropertyByBatch_CustomAlpha(float alpha, string propertyName)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			if(!_material_Instanced.HasProperty(propertyName))
-			{
-				return;
-			}
-			Color curColor = _material_Instanced.GetColor(propertyName);
-			curColor.a = alpha;
-			_material_Instanced.SetColor(propertyName, curColor);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SetClippedMaterialPropertyByBatch_CustomAlpha(float alpha, int propertyNameID)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			if(!_material_Instanced.HasProperty(propertyNameID))
-			{
-				return;
-			}
-			Color curColor = _material_Instanced.GetColor(propertyNameID);
-			curColor.a = alpha;
-			_material_Instanced.SetColor(propertyNameID, curColor);
-		}
-
-		public void SetClippedMaterialPropertyByBatch_CustomFloat(float floatValue, string propertyName)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetFloat(propertyName, floatValue);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SetClippedMaterialPropertyByBatch_CustomFloat(float floatValue, int propertyNameID)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetFloat(propertyNameID, floatValue);
-		}
-
-		public void SetClippedMaterialPropertyByBatch_CustomInt(int intValue, string propertyName)
-		{
-			if(!_isMaskChild)
+			if (targetMat == null || _material_Cur == null)
 			{
 				return;
 			}
 #if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyName, intValue);
+			targetMat.SetInteger(propID, _material_Cur.GetInteger(propID));
 #else
-			_material_Instanced.SetInt(propertyName, intValue);
+			targetMat.SetInt(propID, _material_Cur.GetInt(propID));
 #endif
 		}
 
-		//ID를 사용한 버전 [v1.4.3]
-		public void SetClippedMaterialPropertyByBatch_CustomInt(int intValue, int propertyNameID)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyNameID, intValue);
-#else
-			_material_Instanced.SetInt(propertyNameID, intValue);
-#endif
-		}
 
-		public void SetClippedMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, string propertyName)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetVector(propertyName, vecValue);
-		}
 
-		//ID를 사용한 버전 [v1.4.3]
-		public void SetClippedMaterialPropertyByBatch_CustomVector4(Vector4 vecValue, int propertyNameID)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-			_material_Instanced.SetVector(propertyNameID, vecValue);
-		}
-		
-		public void SetClippedMaterialPropertyByBatch_Reset(Material syncMaterial)
-		{
-			if(!_isMaskChild)
-			{
-				return;
-			}
-
-			//Clipped인 경우엔 특정 프로퍼티는 복구해서는 안된다.
-			Texture maskTex = null;
-			Texture maskTex_L = null;
-			Texture maskTex_R = null;
-			Vector4 maskScreenSpaceOffset = new Vector4(0, 0, 1, 1);
-			if(_material_Instanced.HasProperty(_shaderID_MaskTexture))
-			{
-				maskTex = _material_Instanced.GetTexture(_shaderID_MaskTexture);
-			}
-			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_L))
-			{
-				maskTex_L = _material_Instanced.GetTexture(_shaderID_MaskTexture_L);
-			}
-			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_R))
-			{
-				maskTex_R = _material_Instanced.GetTexture(_shaderID_MaskTexture_R);
-			}
-			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset))
-			{
-				maskScreenSpaceOffset = _material_Instanced.GetVector(_shaderID_MaskScreenSpaceOffset);
-			}
-
-			//속성 복사
-			_material_Instanced.CopyPropertiesFromMaterial(syncMaterial);
-
-			//색상은 별도로 초기화
-			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
-
-
-
-			//텍스쳐 모드 초기화
-			_textureMode = TEXTURE_MODE.Base;
-			_texture_Base = _texture;
-
-
-			//Mask 속성 복구
-			if(_material_Instanced.HasProperty(_shaderID_MaskTexture) && maskTex != null)
-			{
-				_material_Instanced.SetTexture(_shaderID_MaskTexture, maskTex);
-			}
-			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_L) && maskTex_L != null)
-			{
-				 _material_Instanced.SetTexture(_shaderID_MaskTexture_L, maskTex_L);
-			}
-			if(_material_Instanced.HasProperty(_shaderID_MaskTexture_R) && maskTex_R != null)
-			{
-				 _material_Instanced.SetTexture(_shaderID_MaskTexture_R, maskTex_R);
-			}
-			if(_material_Instanced.HasProperty(_shaderID_MaskScreenSpaceOffset))
-			{
-				_material_Instanced.SetVector(_shaderID_MaskScreenSpaceOffset, maskScreenSpaceOffset);
-			}
-		}
-
-
-
-		//-------------------------------------------------------------------------
-		//// 추가 12.8 : Extra Option에 의해서 Texture가 바뀌었을 경우
-		//public Texture2D GetCurrentMainTextureExceptExtra()
-		//{
-		//	//이전
-		//	//if(_isUseSharedMaterial)
-		//	//{
-		//	//	return _sharedMaterial.mainTexture as Texture2D;
-		//	//}
-		//	//else
-		//	//{
-		//	//	return _instanceMaterial.mainTexture as Texture2D;
-		//	//}
-
-		//	//변경
-		//	return _material_Cur.mainTexture as Texture2D;
-		//}
-
-		public void SetExtraChangedTexture(Texture2D texture)
-		{
-			//코드를 개선 20.4.21 : 텍스쳐 모드와 extra용 텍스쳐를 별도로 둔다.
-			
-			if(texture == null)
-			{
-				if(_isMaskChild)
-				{
-					//Mask Child에서는 Extra Changed가 발생할 때 Null Texture를 적용할 수 없다.
-					return;
-				}
-				//texture = _sharedMaterial.mainTexture as Texture2D;
-				texture = _material_Shared.mainTexture as Texture2D;
-			}
-
-			_textureMode = TEXTURE_MODE.Extra;//<< 중요
-
-			if (_isMaskChild)
-			{
-				//Mask Child라면 무조건 Instanced 타입이다.
-				_materialType = MATERIAL_TYPE.Instanced;
-				_material_Cur = _material_Instanced;
-				_material_Cur.SetTexture(_shaderID_MainTex, texture);
-				_isAnyTextureRequest = true;
-			}
-			else
-			{
-				//Mask Child가 아니라면, Shared Material과 비교하여 다시 Shared로 바꿀지 결정한다.
-				if(_material_Shared.mainTexture == texture
-					|| _material_Batched.mainTexture == texture)
-				{
-					//Shared나 Batched로 돌아갈 수 있다. (경우에 따라서..)
-					_isAnyTextureRequest = false;
-				}
-				else
-				{
-					//Shared -> Instanced (무조건)
-					_isAnyTextureRequest = true;
-				}
-
-				_material_Instanced.SetTexture(_shaderID_MainTex, texture);
-			}
-
-			AutoSelectMaterial();
-		}
-
-		//추가 20.4.21 : Extra이벤트로부터 텍스쳐를 복구하고자 하는 경우
-		public void RestoreFromExtraTexture()
-		{
-			_textureMode = TEXTURE_MODE.Base;
-			if (_isMaskChild)
-			{
-				//Mask Child라면 무조건 Instanced 타입이다.
-				_materialType = MATERIAL_TYPE.Instanced;
-				_material_Cur = _material_Instanced;
-				_material_Cur.SetTexture(_shaderID_MainTex, _texture_Base);
-				_isAnyTextureRequest = true;
-			}
-			else
-			{
-				//Mask Child가 아니라면, Shared Material과 비교하여 다시 Shared로 바꿀지 결정한다.
-				if(_material_Shared.mainTexture == _texture_Base
-					|| _material_Batched.mainTexture == _texture_Base)
-				{
-					//Shared나 Batched로 돌아갈 수 있다. (경우에 따라서..)
-					_isAnyTextureRequest = false;
-				}
-				else
-				{
-					//Shared -> Instanced (무조건)
-					_isAnyTextureRequest = true;
-				}
-
-				_material_Instanced.SetTexture(_shaderID_MainTex, _texture_Base);
-			}
-
-			AutoSelectMaterial();
-		}
-
-
-		//추가 v1.5.0 : Extra 적용 여부
-		public bool IsExtraAdapted()
-		{
-			return _textureMode == TEXTURE_MODE.Extra;
-		}
-
-
-
-		//추가 21.12.25 : Merged 재질
-		//------------------------------------------------
-		public Material GetMaterialBeforeMerge()
-		{
-			return _material_Instanced;
-		}
-
-		public void SetMergedMaterial(Color[] channelColors, Color[] whiteColors, Material mergedMaterial)
-		{
-			int vertCount = _mesh.vertices.Length;
-			if(vertCount == 0)
-			{
-				return;
-			}
-
-
-			_isMerged = true;
-			_material_Merged = mergedMaterial;
-			_vertColors_NotMerged = new Color[vertCount];
-			_vertColors_Merged = new Color[vertCount];
-
-			if(vertCount > channelColors.Length)
-			{
-				//배열 복사가 불가능하다
-				Debug.LogError("에러 : 버텍스 색상 배열 복사 불가 [" + this.gameObject.name + "]");
-				Color targetColor = channelColors[0];
-				for (int i = 0; i < vertCount; i++)
-				{
-					_vertColors_Merged[i] = targetColor;
-				}
-			}
-			else
-			{
-				//미리 만들어진 배열에서 값을 일부 복사해서 빠르게 완성
-				Array.Copy(channelColors, _vertColors_Merged, vertCount);
-			}
-
-			if(vertCount > whiteColors.Length)
-			{
-				//배열 복사가 불가능하다
-				Debug.LogError("에러 : 버텍스 색상 배열(White) 복사 불가 [" + this.gameObject.name + "]");
-				Color targetColor = whiteColors[0];
-				for (int i = 0; i < vertCount; i++)
-				{
-					_vertColors_NotMerged[i] = targetColor;
-				}
-			}
-			else
-			{
-				//미리 만들어진 배열에서 값을 일부 복사해서 빠르게 완성
-				Array.Copy(whiteColors, _vertColors_NotMerged, vertCount);
-			}
-
-			
-			//재질 변경
-			AutoSelectMaterial(true);
-		}
-
-
-		//병합된 재질(Merged Material)을 해제한다.
-		public void ReleaseMergedMaterial()
-		{
-			if(!_isMerged)
-			{
-				//Merged된 상태가 아니다.
-				AutoSelectMaterial();
-				return;
-			}
-
-			//Merge되었다면, Vertex Color를 초기화한 후 해제 
-			if(_vertColors_NotMerged != null)
-			{
-				_mesh.colors = _vertColors_NotMerged;
-			}
-			
-
-			_isMerged = false;
-			_material_Merged = null;
-			_vertColors_NotMerged = null;
-			_vertColors_Merged = null;
-
-			AutoSelectMaterial(true);
-			
-		}
-
-		//다시 Merged 될 수 있게 재질을 초기화한다.
-		public void SyncMergedMaterial_Reset(Material materialOriginal)
-		{
-			//다시 Merged 될 수 있게 만든다. 이 함수는 ResetMaterialToBatch 함수와 거의 유사하다.
-			if(materialOriginal != null)
-			{
-				_material_Instanced.CopyPropertiesFromMaterial(materialOriginal);
-			}
-			
-
-			//색상 초기화
-			_multiplyColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-
-			//텍스쳐 모드 초기화
-			_textureMode = TEXTURE_MODE.Base;
-			_texture_Base = _texture;
-
-			_isAnyMeshColorRequest = false;
-			_isAnyTextureRequest = false;
-			_isAnyCustomPropertyRequest = false;
-
-			//실제 색상 갱신
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			//지금은 안쓰지만 Batched 설정 초기화
-			_isForceBatch2Shared = true;
-
-			//Material 선택
-			AutoSelectMaterial(true);
-		}
-
-
-		//Merged Material과 값을 동기화한다. Instanced 상태가 아니어도, 애니메이션에 의해서 Instanced로 전환될 때 기존의 색상 값이 적용되기 위함
-		public void SyncMergedMaterial_Color(ref Color color2X)
-		{
-			_multiplyColor = color2X;
-
-			_cal_MeshColor.r = _multiplyColor.r * _parentTransform._meshColor2X.r * 2;
-			_cal_MeshColor.g = _multiplyColor.g * _parentTransform._meshColor2X.g * 2;
-			_cal_MeshColor.b = _multiplyColor.b * _parentTransform._meshColor2X.b * 2;
-			_cal_MeshColor.a = _multiplyColor.a * _parentTransform._meshColor2X.a;//Alpha는 2X가 아니다.
-
-			//동기화를 유지해야하므로, 색상 요청은 없는 셈 친다.
-			_isAnyMeshColorRequest = false;
-
-			//Instanced의 색상 값을 동기화 한다.
-			_material_Instanced.SetColor(_shaderID_Color, _cal_MeshColor);
-
-			//Material 선택
-			AutoSelectMaterial(true);
-		}
-
-		public void SyncMergedMaterial_CustomImage(Texture2D texture, ref string propertyName)
-		{
-			//Instanced의 값을 동기화한다.
-			//Merged는 유지하도록 한다.
-
-			//Custom Property에 대해서는 원래는 이게 True여야 하지만, 그러면 동기화가 풀려버린다.
-			//Merged Material에서도 동일하게 커스텀 프로퍼티를 수정하므로 Request는 해제하되 값만 할당한다.
-			//_isAnyCustomPropertyRequest = false;//True도 안하고 False도 안한다.
-
-			_material_Instanced.SetTexture(propertyName, texture);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SyncMergedMaterial_CustomImage(Texture2D texture, int propertyNameID)
-		{
-			_material_Instanced.SetTexture(propertyNameID, texture);
-		}
-
-		public void SyncMergedMaterial_CustomImageOffset(ref Vector2 offset, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-
-			_material_Instanced.SetTextureOffset(propertyName, offset);
-		}
-
-		public void SyncMergedMaterial_CustomImageScale(ref Vector2 scale, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-
-			_material_Instanced.SetTextureScale(propertyName, scale);
-		}
-
-		public void SyncMergedMaterial_CustomFloat(float floatValue, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-
-			_material_Instanced.SetFloat(propertyName, floatValue);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SyncMergedMaterial_CustomFloat(float floatValue, int propertyNameID)
-		{
-			_material_Instanced.SetFloat(propertyNameID, floatValue);
-		}
-
-		public void SyncMergedMaterial_CustomInt(int intValue, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyName, intValue);
-#else
-			_material_Instanced.SetInt(propertyName, intValue);
-#endif
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SyncMergedMaterial_CustomInt(int intValue, int propertyNameID)
-		{
-#if UNITY_2021_1_OR_NEWER
-			_material_Instanced.SetInteger(propertyNameID, intValue);
-#else
-			_material_Instanced.SetInt(propertyNameID, intValue);
-#endif
-		}
-
-		public void SyncMergedMaterial_CustomVector4(ref Vector4 vec4Value, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-
-			_material_Instanced.SetVector(propertyName, vec4Value);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SyncMergedMaterial_CustomVector4(ref Vector4 vec4Value, int propertyNameID)
-		{
-			_material_Instanced.SetVector(propertyNameID, vec4Value);
-		}
-
-		public void SyncMergedMaterial_CustomColor(ref Color color, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-
-			_material_Instanced.SetColor(propertyName, color);
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SyncMergedMaterial_CustomColor(ref Color color, int propertyNameID)
-		{
-			_material_Instanced.SetColor(propertyNameID, color);
-		}
-
-		public void SyncMergedMaterial_CustomAlpha(float alpha, ref string propertyName)
-		{
-			//Instanced의 값을 동기화하며 Merged는 유지하도록 한다. (설명은 위족에)
-			//_isAnyCustomPropertyRequest = false;
-			if(_material_Instanced.HasProperty(propertyName))
-			{
-				Color curColor = _material_Instanced.GetColor(propertyName);
-				curColor.a = alpha;
-				_material_Instanced.SetColor(propertyName, curColor);
-			}
-			
-		}
-
-		//ID를 사용한 버전 [v1.4.3]
-		public void SyncMergedMaterial_CustomAlpha(float alpha, int propertyNameID)
-		{
-			if(_material_Instanced.HasProperty(propertyNameID))
-			{
-				Color curColor = _material_Instanced.GetColor(propertyNameID);
-				curColor.a = alpha;
-				_material_Instanced.SetColor(propertyNameID, curColor);
-			}
-			
-		}
-
-
-		// Get / Set
-		//------------------------------------------------
+		// 클리핑되는 메시인지 여부
+		//--------------------------------------------------------
 		/// <summary>
-		/// Calculated Mesh Color (2X)
+		/// 이 메시가 클리핑 또는 마스크의 값을 받는 메시인가 (기존의 _isMaskChild)
 		/// </summary>
-		public Color MeshColor
+		/// <returns></returns>
+		public bool IsMaskClipped()
 		{
-			get
-			{
-				//return _multiplyColor * 2.0f * _parentTransform._meshColor2X;
-				return _cal_MeshColor;
-			}
+			return _isMaskChild || _nReceiveMaskInfo > 0;
 		}
 
-
-		public MATERIAL_TYPE GetMaterialTypeForDebug()
+		/// <summary>
+		/// 이 메시가 클리핑 또는 마스크를 생성하는 메시인가 (기존의 _isMaskParent)
+		/// </summary>
+		/// <returns></returns>
+		public bool IsMaskParent()
 		{
-			return _materialType;
-		}
-
-		//---------------------------------------------------------
-		// Mesh Renderer 의 Sorting Order 제어
-		//---------------------------------------------------------
-		public void SetSortingLayer(string sortingLayerName, int sortingLayerID)
-		{
-			_meshRenderer.sortingLayerName = sortingLayerName;
-			_meshRenderer.sortingLayerID = sortingLayerID;
-		}
-
-		public string GetSortingLayerName()
-		{
-			return _meshRenderer.sortingLayerName;
-		}
-
-		public int GetSortingLayerID()
-		{
-			return _meshRenderer.sortingLayerID;
-		}
-
-		public void SetSortingOrder(int sortingOrder)
-		{
-			_meshRenderer.sortingOrder = sortingOrder;
-		}
-
-		public int GetSortingOrder()
-		{
-			return _meshRenderer.sortingOrder;
+			return _isMaskParent || _nSendMaskData > 0;
 		}
 	}
 }

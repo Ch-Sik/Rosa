@@ -79,7 +79,10 @@ namespace AnyPortrait
 			UnlitVR = 11,
 			LitVR = 12,
 			UnlitMergeable = 13,
-			LitMergeable = 14
+			LitMergeable = 14,
+			UnlitMask = 15,
+			LitMask = 16,
+
 		}
 
 		[SerializeField]
@@ -360,6 +363,9 @@ namespace AnyPortrait
 		[SerializeField] public string _referenceMaterialPath = "";
 
 
+		//v1.6.0 : 이 프리셋을 설명하는 키워드들
+		[SerializeField] public string _descTags = "";
+
 
 		// Init
 		//-----------------------------------------------
@@ -426,6 +432,8 @@ namespace AnyPortrait
 
 			_referenceMat = null;
 			_referenceMaterialPath = "";
+
+			_descTags = "";
 		}
 
 		// Link
@@ -438,6 +446,7 @@ namespace AnyPortrait
 		public apMaterialSet MakeReserved(	int uniqueID, 
 											string name, 
 											ICON icon,
+											string descTags,
 											string shaderPath_Normal_AlphaBlend,
 											string shaderPath_Normal_Additive,
 											string shaderPath_Normal_SoftAdditive,
@@ -504,6 +513,8 @@ namespace AnyPortrait
 
 			_referenceMat = null;
 			_referenceMaterialPath = "";
+
+			_descTags = descTags;
 
 #if UNITY_EDITOR
 
@@ -839,6 +850,209 @@ namespace AnyPortrait
 
 		
 		/// <summary>
+		/// Reserved 프로퍼티들을 자동으로 추가한다.
+		/// Shader가 갱신되거나 프리셋/세트 초기화시 호출한다.
+		/// 업데이트에 따라 Reserved 프로퍼티가 추가된다면 이 함수에 더 작성하자
+		/// 만약 Shader 변경에 따라 기존의 Reserved 프로퍼티가 없어져야 한다면 이 함수가 자동으로 삭제한다.
+		/// </summary>
+		public void CheckAndAddReservedProperties()
+		{
+			//기본 프로퍼티들
+			CheckAndAddReservedProperty("_Color", SHADER_PROP_TYPE.Color, true);//true : Shader가 프로퍼티를 가졌는지 여부는 상관하지 않고 무조건 추가한다. 또한 삭제되지도 않는다.
+			CheckAndAddReservedProperty("_MainTex", SHADER_PROP_TYPE.Texture, true);
+
+			//Clipped
+			CheckAndAddReservedProperty("_MaskTex", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskScreenSpaceOffset", SHADER_PROP_TYPE.Vector);
+
+			//(VR의 경우)
+			CheckAndAddReservedProperty("_MaskTex_L", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_R", SHADER_PROP_TYPE.Texture);
+
+			//v1.6.0 (Shader v3)에서 추가된 프로퍼티들
+			CheckAndAddReservedProperty("_MaskRatio", SHADER_PROP_TYPE.Float);
+			
+			CheckAndAddReservedProperty("_MaskRatio_1", SHADER_PROP_TYPE.Float);
+			CheckAndAddReservedProperty("_MaskTex_1", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskScreenSpaceOffset_1", SHADER_PROP_TYPE.Vector);
+			CheckAndAddReservedProperty("_MaskOp_1", SHADER_PROP_TYPE.Float);
+
+			CheckAndAddReservedProperty("_MaskRatio_2", SHADER_PROP_TYPE.Float);
+			CheckAndAddReservedProperty("_MaskTex_2", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskScreenSpaceOffset_2", SHADER_PROP_TYPE.Vector);
+			CheckAndAddReservedProperty("_MaskOp_2", SHADER_PROP_TYPE.Float);
+
+			CheckAndAddReservedProperty("_MaskRatio_3", SHADER_PROP_TYPE.Float);
+			CheckAndAddReservedProperty("_MaskTex_3", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskScreenSpaceOffset_3", SHADER_PROP_TYPE.Vector);
+			CheckAndAddReservedProperty("_MaskOp_3", SHADER_PROP_TYPE.Float);
+
+			CheckAndAddReservedProperty("_MaskRatio_4", SHADER_PROP_TYPE.Float);
+			CheckAndAddReservedProperty("_MaskTex_4", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskScreenSpaceOffset_4", SHADER_PROP_TYPE.Vector);
+			CheckAndAddReservedProperty("_MaskOp_4", SHADER_PROP_TYPE.Float);
+
+			CheckAndAddReservedProperty("_SeeThroughRatio", SHADER_PROP_TYPE.Float);
+			CheckAndAddReservedProperty("_SeeThroughTex", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_SeeThroughScreenSpaceOffset", SHADER_PROP_TYPE.Vector);
+			CheckAndAddReservedProperty("_SeeThroughAlpha", SHADER_PROP_TYPE.Float);
+
+			//(VR의 경우)
+			CheckAndAddReservedProperty("_MaskTex_1_L", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_1_R", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_2_L", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_2_R", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_3_L", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_3_R", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_4_L", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MaskTex_4_R", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_SeeThroughTex_L", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_SeeThroughTex_R", SHADER_PROP_TYPE.Texture);
+
+			//Mergeable 프리셋의 경우
+			CheckAndAddReservedProperty("_MergedTex1", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex2", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex3", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex4", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex5", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex6", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex7", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex8", SHADER_PROP_TYPE.Texture);
+			CheckAndAddReservedProperty("_MergedTex9", SHADER_PROP_TYPE.Texture);
+		}
+
+
+
+		/// <summary>
+		/// Reserved 프로퍼티를 추가할 수 있는지 확인한 후 추가를 한다.
+		/// Shader 중 하나라도 해당 프로퍼티를 가지고 있다면 추가한다.
+		/// 이미 Reserved가 추가된 상태에서 Shader에 존재하지 않는다면 삭제도 한다.
+		/// 단, 커스텀 프로퍼티로라도 이미 추가되어 있다면 추가/삭제하지 않는다.
+		/// </summary>
+		private void CheckAndAddReservedProperty(string propName, SHADER_PROP_TYPE propType, bool isAddForce = false)
+		{
+			if(string.IsNullOrEmpty(propName))
+			{
+				return;
+			}
+
+			//(1) 무조건 추가(isAddForce)인 경우
+			// - 이미 추가된 상태(Reserved 관계없이)가 아니라면 Shader에 관계없이 추가한다.
+
+			//(2) 무조건 추가가 아닌 경우
+			// - 해당 프로퍼티를 Shader가 가진 경우 > 이미 추가된 상태가 아니라면 추가한다.
+			// - 해당 프로퍼티를 Shader가 가지지 않은 경우 > 이미 Reserved 프로퍼티가 추가된 상태라면 삭제한다.
+
+			//기존의 프로퍼티
+			PropertySet existPropSet = GetPropertySet(propName);
+
+			bool isAddable = false;
+
+			if(isAddForce)
+			{
+				//(1) 무조건 추가(isAddForce)인 경우
+				// - 이미 추가된 상태(Reserved 관계없이)가 아니라면 Shader에 관계없이 추가한다.
+				if(existPropSet == null)
+				{
+					//기존에 프로퍼티가 없다면 추가한다.
+					isAddable = true;
+				}
+			}
+			else
+			{
+				//(2) 무조건 추가가 아닌 경우
+				// - 해당 프로퍼티를 Shader가 가진 경우 > 이미 추가된 상태가 아니라면 추가한다.
+				// - 해당 프로퍼티를 Shader가 가지지 않은 경우 > 이미 Reserved 프로퍼티가 추가된 상태라면 삭제한다.
+
+				//Shader에 있는 프로퍼티만 추가한다.
+				//요청된 프로퍼티가 Shader에 있는가
+				bool isShaderHasProp = false;
+				ShaderHasProperty(propName, _shader_AlphaMask, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Normal_AlphaBlend, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Normal_Additive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Normal_SoftAdditive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Normal_Multiplicative, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Clipped_AlphaBlend, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Clipped_Additive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Clipped_SoftAdditive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_Clipped_Multiplicative, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Normal_AlphaBlend, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Normal_Additive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Normal_SoftAdditive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Normal_Multiplicative, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Clipped_AlphaBlend, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Clipped_Additive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Clipped_SoftAdditive, ref isShaderHasProp);
+				ShaderHasProperty(propName, _shader_L_Clipped_Multiplicative, ref isShaderHasProp);
+
+				if(isShaderHasProp)
+				{
+					//- 해당 프로퍼티를 Shader가 가진 경우 > 이미 추가된 상태가 아니라면 추가한다.
+					isAddable = true;
+				}
+				else
+				{
+					//- 해당 프로퍼티를 Shader가 가지지 않은 경우 > 이미 Reserved 프로퍼티가 추가된 상태라면 삭제한다.
+					if(existPropSet != null && existPropSet._isReserved)
+					{
+						//Reserved 프로퍼티가 추가된 상태라면 삭제한다.
+						if(_propertySets != null)
+						{
+							_propertySets.Remove(existPropSet);
+						}
+					}
+				}
+			}
+
+
+			if(isAddable)
+			{
+				if(propType != SHADER_PROP_TYPE.Texture)
+				{
+					//일반 타입의 경우
+					AddProperty(propName, true, propType);
+				}
+				else
+				{
+					//Texture 타입의 경우
+					AddProperty_Texture(propName, true, true);//Common 타입으로 추가한다.
+				}
+				
+			}
+		}
+
+		private void ShaderHasProperty(string propName, Shader shader, ref bool isHasProp)
+		{
+			if(shader == null || isHasProp)
+			{
+				//Shader가 없거나 이미 결과가 true라면 리턴
+				return;
+			}
+
+			#if UNITY_2019_3_OR_NEWER
+			//2019.3 이상에서는 Shader.FindPropertyIndex()를 사용한다.
+			if(shader.FindPropertyIndex(propName) >= 0)
+			{
+				//True일 때만 결과값 갱신
+				isHasProp = true;
+			}
+			
+			#else
+
+			//이전 버전에서는 Shader.FindPropertyIndex() 함수가 없다.
+			Material testMaterial = new Material(shader);
+			if(testMaterial.HasProperty(propName))
+			{
+				isHasProp = true;
+			}
+			UnityEngine.Object.DestroyImmediate(testMaterial);
+			#endif
+		}
+
+
+
+
+		/// <summary>
 		/// MaterialSet으로 부터 생성한다.
 		/// </summary>
 		/// <param name="srcMat"></param>
@@ -960,6 +1174,9 @@ namespace AnyPortrait
 			_referenceMat = srcMat._referenceMat;
 			_referenceMaterialPath = srcMat._referenceMaterialPath;
 
+			//v1.6.0
+			_descTags = srcMat._descTags;
+
 #if UNITY_EDITOR
 			LoadShaderAssets();
 			LoadRefMaterial();
@@ -1025,6 +1242,9 @@ namespace AnyPortrait
 				//v1.5.1 : 참조 재질 경로
 				sw.WriteLine("REFM" + _referenceMaterialPath);
 
+				//v1.6.0
+				sw.WriteLine("DESC" + _descTags);
+
 				//Prop은.. 구분자로 개수 확인
 				sw.WriteLine("PROP" + _propertySets.Count);
 
@@ -1064,6 +1284,7 @@ namespace AnyPortrait
 
 			_name = "";
 			_uniqueID = -1;
+			_descTags = "";
 
 			string strKey = "";
 			string strValue = "";
@@ -1137,6 +1358,9 @@ namespace AnyPortrait
 
 					//v1.5.1 : 참조 재질 경로
 					else if(strKey == "REFM") { _referenceMaterialPath = strValue; }
+
+					//v1.6.0
+					else if(strKey == "DESC") { _descTags = strValue; }
 
 					else if(strKey == "PROP")
 					{

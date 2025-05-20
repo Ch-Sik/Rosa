@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -148,201 +148,6 @@ namespace AnyPortrait
 			//변경 방식 : 미리 클리핑 영역으로 화면 포커스를 이동한 후, Dst만큼 확대한다 -> 그대로 Texture2D에 적용한다.
 			//apGL의 Window Size를 바꾸어준다.
 
-			//-------------------->> 기존 방식
-
-			#region [미사용 코드]
-			//int rtSizeWidth = ((int)_editor.position.width);
-			//int rtSizeHeight = ((int)_editor.position.height);
-
-			////winPosY -= 10;
-			//int guiOffsetX = apGL._posX_NotCalculated;
-			//int guiOffsetY = apGL._posY_NotCalculated;
-
-			//int clipPosX = winPosX - (srcSizeWidth / 2);
-			//int clipPosY = winPosY - (srcSizeHeight / 2);
-
-			//clipPosX += guiOffsetX;
-			//clipPosY += guiOffsetY + 15;
-
-			//int clipPosX_Right = clipPosX + srcSizeWidth;
-			//int clipPosY_Bottom = clipPosY + srcSizeHeight;
-
-			//if (clipPosX < 0)		{ clipPosX = 0; }
-			//if (clipPosY < 0)		{ clipPosY = 0; }
-			//if (clipPosX_Right > rtSizeWidth)	{ clipPosX_Right = rtSizeWidth; }
-			//if (clipPosY_Bottom > rtSizeHeight)	{ clipPosY_Bottom = rtSizeHeight; }
-
-			//int clipWidth = (clipPosX_Right - clipPosX);
-			//int clipHeight = (clipPosY_Bottom - clipPosY);
-			//if (clipWidth <= 0 || clipHeight <= 0)
-			//{
-			//	Debug.LogError("RenderToTexture Failed : Clip Area is over Screen");
-			//	return null;
-			//}
-
-			//meshGroup.RefreshForce();
-			//meshGroup.UpdateRenderUnits(0.0f, true);
-
-
-
-			////Pass-1. 일반 + MaskParent를 Alpha2White 렌더링. 이걸로 나중에 알파 채널용 텍스쳐를 만든다.
-			////--------------------------------------------------------------------------------------------------------
-			//_renderTexture_GrayscaleAlpha = RenderTexture.GetTemporary(rtSizeWidth, rtSizeHeight, 8, RenderTextureFormat.ARGB32);
-			//_renderTexture_GrayscaleAlpha.antiAliasing = 1;
-			//_renderTexture_GrayscaleAlpha.wrapMode = TextureWrapMode.Clamp;
-
-			//RenderTexture.active = null;
-			//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-
-			////기본 
-			//Color maskClearColor = new Color(clearColor.a, clearColor.a, clearColor.a, 1.0f);
-			//GL.Clear(false, true, maskClearColor, 0.0f);//변경 : Mac에서도 작동 하려면..
-			//apGL.DrawBoxGL(Vector2.zero, 50000, 50000, maskClearColor, false, true);//<<이걸로 배경을 깔자
-			//GL.Flush();
-
-			////System.Threading.Thread.Sleep(50);
-
-			//for (int iUnit = 0; iUnit < meshGroup._renderUnits_All.Count; iUnit++)
-			//{
-			//	apRenderUnit renderUnit = meshGroup._renderUnits_All[iUnit];
-			//	if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
-			//	{
-			//		if (renderUnit._meshTransform != null)
-			//		{
-			//			if (renderUnit._meshTransform._isClipping_Parent)
-			//			{
-			//				if (renderUnit._isVisible)
-			//				{
-			//					//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-			//					apGL.DrawRenderUnit_Basic_Alpha2White(renderUnit);
-			//				}
-			//			}
-			//			else if (renderUnit._meshTransform._isClipping_Child)
-			//			{
-			//				//Pass
-			//				//Alpha 렌더링에서 Clipping Child는 제외한다. 어차피 Parent의 Alpha보다 많을 수 없으니..
-			//			}
-			//			else
-			//			{
-			//				if (renderUnit._isVisible)
-			//				{
-			//					//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-			//					apGL.DrawRenderUnit_Basic_Alpha2White(renderUnit);
-			//				}
-			//			}
-			//		}
-			//	}
-			//}
-
-			//System.Threading.Thread.Sleep(5);
-
-			//Texture2D resultTex_SrcSize_Alpha = new Texture2D(srcSizeWidth, srcSizeHeight, TextureFormat.ARGB32, false);
-			//resultTex_SrcSize_Alpha.ReadPixels(new Rect(clipPosX, clipPosY, clipWidth, clipHeight), 0, 0);
-			//resultTex_SrcSize_Alpha.Apply();
-
-
-			////Pass-2. 기본 렌더링
-			////--------------------------------------------------------------------------------------------------------
-			////1. Clip Parent의 MaskTexture를 미리 구워서 Dictionary에 넣는다.
-			//Dictionary<apRenderUnit, Texture2D> bakedClipMaskTextures = new Dictionary<apRenderUnit, Texture2D>();
-
-
-			//for (int iUnit = 0; iUnit < meshGroup._renderUnits_All.Count; iUnit++)
-			//{
-			//	apRenderUnit renderUnit = meshGroup._renderUnits_All[iUnit];
-			//	if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
-			//	{
-			//		if (renderUnit._meshTransform != null)
-			//		{
-			//			if (renderUnit._meshTransform._isClipping_Parent)
-			//			{
-			//				if (renderUnit._isVisible)
-			//				{
-			//					Texture2D clipMaskTex = apGL.GetMaskTexture_ClippingParent(renderUnit);
-			//					if (clipMaskTex != null)
-			//					{
-			//						bakedClipMaskTextures.Add(renderUnit, clipMaskTex);
-			//					}
-			//					else
-			//					{
-			//						Debug.LogError("Clip Testure Bake Failed");
-			//					}
-
-			//				}
-			//			}
-			//		}
-			//	}
-			//}
-
-			//System.Threading.Thread.Sleep(5);
-
-
-			//_renderTexture = RenderTexture.GetTemporary(rtSizeWidth, rtSizeHeight, 8, RenderTextureFormat.ARGB32);
-			//_renderTexture.antiAliasing = 1;
-			//_renderTexture.wrapMode = TextureWrapMode.Clamp;
-
-			//RenderTexture.active = null;
-			//RenderTexture.active = _renderTexture;
-
-			//Color opaqueClearColor = new Color(clearColor.r * clearColor.a, clearColor.g * clearColor.a, clearColor.b * clearColor.a, 1.0f);
-
-			////GL.Clear(true, true, clearColor, -100.0f);//이전
-			//GL.Clear(false, true, opaqueClearColor, 0.0f);//변경 : Mac에서도 작동 하려면..
-			//apGL.DrawBoxGL(Vector2.zero, 50000, 50000, opaqueClearColor, false, true);//<<이걸로 배경을 깔자
-			//GL.Flush();
-
-			////System.Threading.Thread.Sleep(50);
-
-			//for (int iUnit = 0; iUnit < meshGroup._renderUnits_All.Count; iUnit++)
-			//{
-			//	apRenderUnit renderUnit = meshGroup._renderUnits_All[iUnit];
-			//	if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
-			//	{
-			//		if (renderUnit._meshTransform != null)
-			//		{
-			//			if (renderUnit._meshTransform._isClipping_Parent)
-			//			{
-			//				if (renderUnit._isVisible)
-			//				{
-			//					if (bakedClipMaskTextures.ContainsKey(renderUnit))
-			//					{
-			//						apGL.DrawRenderUnit_ClippingParent_Renew_WithoutRTT(renderUnit,
-			//									renderUnit._meshTransform._clipChildMeshes,
-			//									bakedClipMaskTextures[renderUnit]);
-			//					}
-
-
-			//					////RenderTexture.active = _renderTexture;//<<클리핑 뒤에는 다시 연결해줘야한다.
-			//				}
-			//			}
-			//			else if (renderUnit._meshTransform._isClipping_Child)
-			//			{
-			//				//Pass
-			//			}
-			//			else
-			//			{
-			//				if (renderUnit._isVisible)
-			//				{
-			//					RenderTexture.active = _renderTexture;
-			//					apGL.DrawRenderUnit_Basic(renderUnit);
-			//				}
-			//			}
-			//		}
-			//	}
-			//}
-
-			//System.Threading.Thread.Sleep(5);
-
-
-			//Texture2D resultTex_SrcSize = new Texture2D(srcSizeWidth, srcSizeHeight, TextureFormat.ARGB32, false);
-			//resultTex_SrcSize.ReadPixels(new Rect(clipPosX, clipPosY, clipWidth, clipHeight), 0, 0);
-
-			//resultTex_SrcSize.Apply(); 
-			#endregion
-
-			//--------------------<< 기존 방식
-			
-
 			//-------------------->> 새로운 방식2
 
 			apGL.GetWindowParameters(_glWindowParam);
@@ -486,16 +291,221 @@ namespace AnyPortrait
 			meshGroup.RefreshForce();
 			meshGroup.UpdateRenderUnits(0.0f, true);
 
-			//int newRtSizeWidth = GetProperRenderTextureSize(rtSizeWidth);
-			//int newRtSizeHeight = GetProperRenderTextureSize(rtSizeHeight);
-			//clipPosX += (newRtSizeWidth - rtSizeWidth) / 2;
-			//clipPosY += (newRtSizeHeight - rtSizeHeight) / 2;
-			//rtSizeWidth = newRtSizeWidth;
-			//rtSizeHeight = newRtSizeHeight;
+			
+			//v1.6.0 : 코드 순서 재조정
+			//캡쳐 렌더링은 다음의 단계를 거쳐서 진행된다.
+			//- 1. 클리핑을 위한 RT를 생성하고 거기에 렌더링을 한다.
+			//- 2. 캡쳐된 이미지의 투명도를 알기 위해 Alpha2White로 렌더링을 한다. (이후에 합성하여 캡쳐 이미지의 Alpha 값으로 삼는다)
+			//- 3. 실제 Color 렌더링 > RGB 값으로 삼는다.
+
+			// [ 1. 클리핑을 위한 RT 생성 ]
+			//Clipping / Send Mask Data별 RT를 생성하고 렌더링한다. (타입은 Texture2D)
+			
+			//Clipping 방식의 RT
+			Dictionary<apTransform_Mesh, RenderTexture> clippingRTs = new Dictionary<apTransform_Mesh, RenderTexture>();
+
+			//Per-Mesh 방식의 RT
+			Dictionary<apTransform_Mesh, Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>> perMeshRTs = new Dictionary<apTransform_Mesh, Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>>();
+
+			//Shared 방식의 RT
+			Dictionary<int, RenderTexture> sharedRTs = new Dictionary<int, RenderTexture>();
+
+			//위 RT를 모두 모은 전체 RT 리스트
+			List<RenderTexture> tmpRTs = new List<RenderTexture>();//생성된 모든 RT들을 일괄 해제하기 위한 리스트
+
+
+			apRenderUnit renderUnit = null;
+			apTransform_Mesh meshTF = null;
+
+			//변경
+			List<apRenderUnit> renderUnits = meshGroup.SortedBuffer.SortedRenderUnits;
+			int nRenderUnits = renderUnits.Count;
+
+			//[ 1. RT에 렌더링을 한다. ]
+
+			//임시로 RenderTexture들을 생성한다.
+			//- Clipping / Per Mesh / Shared
+
+			//페이즈 순서대로 렌더링을 한다.
+			//클리핑은 페이즈 1에서 수행한다.
+			for (int iPhase = 0; iPhase < 3; iPhase++)
+			{
+				for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
+				{
+					renderUnit = renderUnits[iUnit];
+					//메시가 아니라면 패스
+					if(renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+						|| renderUnit._meshTransform == null)
+					{
+						continue;
+					}
+
+					meshTF = renderUnit._meshTransform;
+
+					//1. 클리핑 마스크라면 개별 마스크에 저장을 한다.
+					//클리핑 마스크는 페이즈 1(0)일 때만 
+					if(meshTF._isClipping_Parent && iPhase == 0)
+					{	
+						if(!clippingRTs.ContainsKey(meshTF))
+						{
+							RenderTexture renderTex = apGL.GetTempRenderTexture(FilterMode.Bilinear);
+							clippingRTs.Add(meshTF, renderTex);
+							tmpRTs.Add(renderTex);
+
+							//여기에 Mask 렌더링을 해야한다.
+							apGL.DrawRenderUnitForExport_MaskParent(renderUnit,
+																	apSendMaskData.RT_SHADER_TYPE.AlphaMask,
+																	renderTex,
+																	true,//매번 Clear 하도록
+
+																	//클리핑-체인 비활성
+																	false,
+																	null,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, 0.0f
+																	);
+						}
+					}
+
+
+					//마스크를 받는 경우 값 할당
+					bool isAnyClipReceived = false;
+					RenderTexture clippingMask = null;
+					RenderTexture receiveMaskRT_1 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+
+					RenderTexture receiveMaskRT_2 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+
+					RenderTexture receiveMaskRT_3 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+
+					RenderTexture receiveMaskRT_4 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+
+					//텍스쳐 투과
+					RenderTexture receiveSeeThroughRT = null;
+					float receiveSeeThroughAlpha = 0.0f;
+
+					GetReceivedMaskInfo(meshTF, 
+										clippingRTs, perMeshRTs, sharedRTs,
+										//결과값
+										out isAnyClipReceived,
+										out clippingMask,
+										out receiveMaskRT_1, out receiveMaskOp_1,
+										out receiveMaskRT_2, out receiveMaskOp_2,
+										out receiveMaskRT_3, out receiveMaskOp_3,
+										out receiveMaskRT_4, out receiveMaskOp_4,
+										out receiveSeeThroughRT, out receiveSeeThroughAlpha);
+
+
+					int nSendMask = meshTF._sendMaskDataList != null ? meshTF._sendMaskDataList.Count : 0;
+					if(nSendMask > 0)
+					{
+						apSendMaskData sendMaskData = null;
+						for (int iSend = 0; iSend < nSendMask; iSend++)
+						{
+							sendMaskData = meshTF._sendMaskDataList[iSend];
+
+							//렌더 페이즈가 동일할 때만 렌더링
+							int iRenderPhase = (int)sendMaskData._rtRenderOrder;
+							if(iRenderPhase != iPhase)
+							{
+								continue;
+							}
+
+							if(sendMaskData._rtShaderType == apSendMaskData.RT_SHADER_TYPE.CustomShader)
+							{
+								//커스텀 쉐이더는 에디터에서 지원하지 않는다.
+								continue;
+							}
+
+							RenderTexture renderTex = null;
+							bool isNewRT = false;
+							bool isNeedToRender = false;
+
+							if (sendMaskData._isRTShared)
+							{
+								//공유 Mask를 사용하는 경우
+								sharedRTs.TryGetValue(sendMaskData._sharedRTID, out renderTex);
+
+								if(renderTex == null)
+								{
+									isNewRT = true;
+									renderTex = apGL.GetTempRenderTexture(FilterMode.Bilinear);
+
+									sharedRTs.Add(sendMaskData._sharedRTID, renderTex);
+									tmpRTs.Add(renderTex);
+								}
+
+								isNeedToRender = true;//공유된 RT는 무조건 렌더링을 해야한다.
+							}
+							else
+							{
+								//Per-Mesh 방식의 RT를 사용한다.
+								if (!perMeshRTs.ContainsKey(meshTF))
+								{
+									perMeshRTs.Add(meshTF, new Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>());
+								}
+
+								Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture> rtList = perMeshRTs[meshTF];
+
+								rtList.TryGetValue(sendMaskData._rtShaderType, out renderTex);
+
+								if(renderTex == null)
+								{
+									isNewRT = true;
+									renderTex = apGL.GetTempRenderTexture(FilterMode.Bilinear);
+									rtList.Add(sendMaskData._rtShaderType, renderTex);
+									tmpRTs.Add(renderTex);
+
+									//Per-Mesh는 Shader Type당 한번만 렌더링한다.
+									isNeedToRender = true;
+								}
+							}
+
+							
+
+
+							if(isNeedToRender)
+							{
+								//여기에 Mask 렌더링을 해야한다.
+								apGL.DrawRenderUnitForExport_MaskParent(renderUnit,
+																		sendMaskData._rtShaderType,
+																		renderTex,
+																		isNewRT,//새로운 RT를 생성할 때만 Clear하도록
+
+																		//클리핑-체인
+																		isAnyClipReceived,
+																		clippingMask,
+																		receiveMaskRT_1, receiveMaskOp_1,
+																		receiveMaskRT_2, receiveMaskOp_2,
+																		receiveMaskRT_3, receiveMaskOp_3,
+																		receiveMaskRT_4, receiveMaskOp_4,
+																		receiveSeeThroughRT, receiveSeeThroughAlpha
+																		);
+							}
+						}
+					}
+				}
+			}
+			
+
+
+
+
+			// [ 2. 투명도를 알기 위해 Alpha2White로 렌더링을 한다. ]
+
 
 			//Pass-1. 일반 + MaskParent를 Alpha2White 렌더링. 이걸로 나중에 알파 채널용 텍스쳐를 만든다.
 			//--------------------------------------------------------------------------------------------------------
-			_renderTexture_GrayscaleAlpha = RenderTexture.GetTemporary(rtSizeWidth, rtSizeHeight, 8, RenderTextureFormat.ARGB32);
+			_renderTexture_GrayscaleAlpha = RenderTexture.GetTemporary(	rtSizeWidth,
+																		rtSizeHeight,
+																		8,
+																		RenderTextureFormat.ARGB32);
 			//_renderTexture_GrayscaleAlpha.antiAliasing = 1;
 			_renderTexture_GrayscaleAlpha.isPowerOfTwo = false;
 			_renderTexture_GrayscaleAlpha.wrapMode = TextureWrapMode.Clamp;
@@ -504,49 +514,69 @@ namespace AnyPortrait
 			RenderTexture.active = _renderTexture_GrayscaleAlpha;
 
 			//기본 
-			Color maskClearColor = new Color(clearColor.a, clearColor.a, clearColor.a, 1.0f);
-			GL.Clear(false, true, maskClearColor, 0.0f);//변경 : Mac에서도 작동 하려면..
+			Color maskClearColor = new Color(clearColor.a, clearColor.a, clearColor.a, 1.0f);//Alpha가 GrayScale로 적용된 색상
+			GL.Clear(false, true, maskClearColor, 1.0f);//변경 : Mac에서도 작동 하려면..
 			apGL.DrawBoxGL(Vector2.zero, 50000, 50000, maskClearColor, false, true);//<<이걸로 배경을 깔자
 			GL.Flush();
 
 			//System.Threading.Thread.Sleep(50);
 
-			//변경
-			List<apRenderUnit> renderUnits = meshGroup.SortedBuffer.SortedRenderUnits;
-			int nRenderUnits = renderUnits.Count;
-
 			//변경 19.11.23 : ExtraOption-Depth에 의한 순서 변경도 적용
 			for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
 			{
-				apRenderUnit renderUnit = renderUnits[iUnit];
+				renderUnit = renderUnits[iUnit];
 
-				if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
+				if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+					|| renderUnit._meshTransform == null)
 				{
-					if (renderUnit._meshTransform != null)
-					{
-						if (renderUnit._meshTransform._isClipping_Parent)
-						{
-							if (renderUnit._isVisible)
-							{
-								//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-								apGL.DrawRenderUnit_Basic_Alpha2White_ForExport(renderUnit);
-							}
-						}
-						else if (renderUnit._meshTransform._isClipping_Child)
-						{
-							//Pass
-							//Alpha 렌더링에서 Clipping Child는 제외한다. 어차피 Parent의 Alpha보다 많을 수 없으니..
-						}
-						else
-						{
-							if (renderUnit._isVisible)
-							{
-								//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-								apGL.DrawRenderUnit_Basic_Alpha2White_ForExport(renderUnit);
-							}
-						}
-					}
+					continue;
 				}
+
+				if (!renderUnit._isVisible)
+				{
+					continue;
+				}
+
+				meshTF = renderUnit._meshTransform;
+
+				//마스크를 받는 경우 값 할당
+				bool isAnyClipReceived = false;
+				RenderTexture clippingMask = null;
+				RenderTexture receiveMaskRT_1 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_2 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_3 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_4 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveSeeThroughRT = null;
+				float receiveSeeThroughAlpha = 0.0f;
+
+				GetReceivedMaskInfo(meshTF, 
+									clippingRTs, perMeshRTs, sharedRTs,
+									//결과값
+									out isAnyClipReceived,
+									out clippingMask,
+									out receiveMaskRT_1, out receiveMaskOp_1,
+									out receiveMaskRT_2, out receiveMaskOp_2,
+									out receiveMaskRT_3, out receiveMaskOp_3,
+									out receiveMaskRT_4, out receiveMaskOp_4,
+									out receiveSeeThroughRT, out receiveSeeThroughAlpha);
+
+				//이제 렌더링을 하자
+				//마스크를 받은 메시는 마스크 데이터를 같이 넣자
+				apGL.DrawRenderUnit_Basic_Alpha2White_ForExport(renderUnit,
+																clippingMask,
+																receiveMaskRT_1, receiveMaskOp_1,
+																receiveMaskRT_2, receiveMaskOp_2,
+																receiveMaskRT_3, receiveMaskOp_3,
+																receiveMaskRT_4, receiveMaskOp_4
+																);
 			}
 
 			System.Threading.Thread.Sleep(5);
@@ -556,40 +586,10 @@ namespace AnyPortrait
 			resultTex_SrcSize_Alpha.Apply();
 
 
+			// [ 3. 전체 렌더링을 한다. ]
+
 			//Pass-2. 기본 렌더링
 			//--------------------------------------------------------------------------------------------------------
-			//1. Clip Parent의 MaskTexture를 미리 구워서 Dictionary에 넣는다.
-			Dictionary<apRenderUnit, Texture2D> bakedClipMaskTextures = new Dictionary<apRenderUnit, Texture2D>();
-
-
-			//변경 19.11.23 : ExtraOption-Depth인 경우 렌더링 순서가 바뀌어야한다.
-			for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
-			{
-				apRenderUnit renderUnit = renderUnits[iUnit];
-
-				if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
-				{
-					if (renderUnit._meshTransform != null)
-					{
-						if (renderUnit._meshTransform._isClipping_Parent)
-						{
-							if (renderUnit._isVisible)
-							{
-								Texture2D clipMaskTex = apGL.GetMaskTexture_ClippingParent(renderUnit);
-								if (clipMaskTex != null)
-								{
-									bakedClipMaskTextures.Add(renderUnit, clipMaskTex);
-								}
-								else
-								{
-									Debug.LogError("Clip Testure Bake Failed");
-								}
-
-							}
-						}
-					}
-				}
-			}
 
 			System.Threading.Thread.Sleep(5);
 
@@ -602,9 +602,13 @@ namespace AnyPortrait
 			RenderTexture.active = null;
 			RenderTexture.active = _renderTexture;
 
-			Color opaqueClearColor = new Color(clearColor.r * clearColor.a, clearColor.g * clearColor.a, clearColor.b * clearColor.a, 1.0f);
+			//이거 확인해볼것
+			//Color opaqueClearColor = new Color(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 
-			GL.Clear(false, true, opaqueClearColor, 0.0f);//변경 : Mac에서도 작동 하려면..
+			//v1.6.0 변경 : RGB는 Alpha의 영향을 받으면 안된다.
+			Color opaqueClearColor = new Color(clearColor.r, clearColor.g, clearColor.b, 1.0f);
+
+			GL.Clear(false, true, opaqueClearColor, 1.0f);//변경 : Mac에서도 작동 하려면..
 			apGL.DrawBoxGL(Vector2.zero, 50000, 50000, opaqueClearColor, false, true);//<<이걸로 배경을 깔자
 			GL.Flush();
 
@@ -612,43 +616,59 @@ namespace AnyPortrait
 			//변경 19.11.23 : ExtraOption-Depth인 경우 렌더링 순서가 바뀌어야한다.
 			for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
 			{
-				apRenderUnit renderUnit = renderUnits[iUnit];
+				renderUnit = renderUnits[iUnit];
 
-				if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
+				if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+					|| renderUnit._meshTransform == null)
 				{
-					if (renderUnit._meshTransform != null)
-					{
-						if (renderUnit._meshTransform._isClipping_Parent)
-						{
-							if (renderUnit._isVisible)
-							{
-								if (bakedClipMaskTextures.ContainsKey(renderUnit))
-								{
-									apGL.DrawRenderUnit_ClippingParent_ForExport_WithoutRTT(
-																			renderUnit,
-																			renderUnit._meshTransform._clipChildMeshes,
-																			bakedClipMaskTextures[renderUnit]
-																			);
-								}
-
-
-								////RenderTexture.active = _renderTexture;//<<클리핑 뒤에는 다시 연결해줘야한다.
-							}
-						}
-						else if (renderUnit._meshTransform._isClipping_Child)
-						{
-							//Pass
-						}
-						else
-						{
-							if (renderUnit._isVisible)
-							{
-								RenderTexture.active = _renderTexture;
-								apGL.DrawRenderUnit_Basic_ForExport(renderUnit);
-							}
-						}
-					}
+					continue;
 				}
+
+				if(!renderUnit._isVisible)
+				{
+					continue;
+				}
+
+				meshTF = renderUnit._meshTransform;
+
+				//마스크를 받는 경우 값 할당
+				bool isAnyClipReceived = false;
+				RenderTexture clippingMask = null;
+				RenderTexture receiveMaskRT_1 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_2 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_3 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_4 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+
+				//텍스쳐 투과
+				RenderTexture receiveSeeThroughRT = null;
+				float receiveSeeThroughAlpha = 0.0f;
+
+				GetReceivedMaskInfo(meshTF, 
+									clippingRTs, perMeshRTs, sharedRTs,
+									//결과값
+									out isAnyClipReceived,
+									out clippingMask,
+									out receiveMaskRT_1, out receiveMaskOp_1,
+									out receiveMaskRT_2, out receiveMaskOp_2,
+									out receiveMaskRT_3, out receiveMaskOp_3,
+									out receiveMaskRT_4, out receiveMaskOp_4,
+									out receiveSeeThroughRT, out receiveSeeThroughAlpha);
+				
+
+				apGL.DrawRenderUnit_Basic_ForExport(	renderUnit,
+														clippingMask,
+														receiveMaskRT_1, receiveMaskOp_1,
+														receiveMaskRT_2, receiveMaskOp_2,
+														receiveMaskRT_3, receiveMaskOp_3,
+														receiveMaskRT_4, receiveMaskOp_4,
+														receiveSeeThroughRT, receiveSeeThroughAlpha);
 			}
 
 			System.Threading.Thread.Sleep(5);
@@ -762,7 +782,6 @@ namespace AnyPortrait
 			//보정 계산 결과 변수들
 			int rtSizeWidth = 0;
 			int rtSizeHeight = 0;
-
 			
 
 			//에디터 크기는 기본적으로 1920 x 1080을 기본으로 하므로, 여기서는 2000을 기본으로 잡자
@@ -1431,10 +1450,225 @@ namespace AnyPortrait
 			// [ 5. 마스크, 일반 렌더링 ]
 			// : RT 생성 > 렌더링 > 전체 복사 > 클리핑 복사 순서로 처리한다.
 
+			//v1.6.0 : 코드 순서 재조정
+			//캡쳐 렌더링은 다음의 단계를 거쳐서 진행된다.
+			//- 1. 클리핑을 위한 RT를 생성하고 거기에 렌더링을 한다.
+			//- 2. 캡쳐된 이미지의 투명도를 알기 위해 Alpha2White로 렌더링을 한다. (이후에 합성하여 캡쳐 이미지의 Alpha 값으로 삼는다)
+			//- 3. 실제 Color 렌더링 > RGB 값으로 삼는다.
+
+			// [ 1. 클리핑을 위한 RT 생성 ]
+			//Clipping / Send Mask Data별 RT를 생성하고 렌더링한다. (타입은 Texture2D)
 			
+			//Clipping 방식의 RT
+			Dictionary<apTransform_Mesh, RenderTexture> clippingRTs = new Dictionary<apTransform_Mesh, RenderTexture>();
+
+			//Per-Mesh 방식의 RT
+			Dictionary<apTransform_Mesh, Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>> perMeshRTs = new Dictionary<apTransform_Mesh, Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>>();
+
+			//Shared 방식의 RT
+			Dictionary<int, RenderTexture> sharedRTs = new Dictionary<int, RenderTexture>();
+
+			//위 RT를 모두 모은 전체 RT 리스트
+			List<RenderTexture> tmpRTs = new List<RenderTexture>();//생성된 모든 RT들을 일괄 해제하기 위한 리스트
+
+			//변경 v1.6.0
+			//클리핑 마스크 로직의 변경으로,
+			//RT 렌더링을 1차적으로 한 후, 각각 렌더링을 한다.
+			//- 기존에는 MaskParent를 렌더링하고, 동시에 Parent가 Child를 렌더링 했다.
+			//- 여기서는 Clipping Parent/MaskParent를 RT에 렌더링하고, 이후에 일괄 렌더링을 한다.
+
+			//(참고 코드 : apEditor_Functions의 "RenderMeshGroup")
+
+			apRenderUnit renderUnit = null;
+			apTransform_Mesh meshTF = null;
+
+			//변경
+			List<apRenderUnit> renderUnits = meshGroup.SortedBuffer.SortedRenderUnits;
+			int nRenderUnits = renderUnits.Count;
+
+
+			//[ 1. RT에 렌더링을 한다. ]
+
+			//임시로 RenderTexture들을 생성한다.
+			//- Clipping / Per Mesh / Shared
+
+			//페이즈 순서대로 한다.
+			for (int iPhase = 0; iPhase < 3; iPhase++)
+			{
+				for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
+				{
+					renderUnit = renderUnits[iUnit];
+					//메시가 아니라면 패스
+					if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+						|| renderUnit._meshTransform == null)
+					{
+						continue;
+					}
+
+					meshTF = renderUnit._meshTransform;
+
+					//1. 클리핑 마스크라면 개별 마스크에 저장을 한다.
+					//- 클리핑은 페이즈 1(0)일 때만 수행한다.
+					if (meshTF._isClipping_Parent && iPhase == 0)
+					{
+						if (!clippingRTs.ContainsKey(meshTF))
+						{
+							RenderTexture renderTex = apGL.GetTempRenderTexture(FilterMode.Bilinear);
+							clippingRTs.Add(meshTF, renderTex);
+							tmpRTs.Add(renderTex);
+
+							//여기에 Mask 렌더링을 해야한다.
+							apGL.DrawRenderUnitForExport_MaskParent(renderUnit,
+																	apSendMaskData.RT_SHADER_TYPE.AlphaMask,
+																	renderTex,
+																	true,////Clipping Parent는 매번 RT 생성후 Clear를 해야한다.
+
+																	//클리핑-체인 비활성
+																	false,
+																	null,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, apSendMaskData.MASK_OPERATION.And,
+																	null, 0.0f
+																	);
+						}
+					}
+
+					//마스크를 받는 경우 값 할당
+					bool isAnyClipReceived = false;
+					RenderTexture clippingMask = null;
+					RenderTexture receiveMaskRT_1 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+
+					RenderTexture receiveMaskRT_2 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+
+					RenderTexture receiveMaskRT_3 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+
+					RenderTexture receiveMaskRT_4 = null;
+					apSendMaskData.MASK_OPERATION receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+
+					//텍스쳐 투과
+					RenderTexture receiveSeeThroughRT = null;
+					float receiveSeeThroughAlpha = 0.0f;
+
+					GetReceivedMaskInfo(meshTF, 
+										clippingRTs, perMeshRTs, sharedRTs,
+										//결과값
+										out isAnyClipReceived,
+										out clippingMask,
+										out receiveMaskRT_1, out receiveMaskOp_1,
+										out receiveMaskRT_2, out receiveMaskOp_2,
+										out receiveMaskRT_3, out receiveMaskOp_3,
+										out receiveMaskRT_4, out receiveMaskOp_4,
+										out receiveSeeThroughRT, out receiveSeeThroughAlpha);
+
+
+					int nSendMask = meshTF._sendMaskDataList != null ? meshTF._sendMaskDataList.Count : 0;
+					if (nSendMask > 0)
+					{
+						apSendMaskData sendMaskData = null;
+						for (int iSend = 0; iSend < nSendMask; iSend++)
+						{
+							sendMaskData = meshTF._sendMaskDataList[iSend];
+
+							int iRenderPhase = (int)sendMaskData._rtRenderOrder;
+							if(iRenderPhase != iPhase)
+							{
+								//페이즈가 맞지 않다.
+								continue;
+							}
+
+							if (sendMaskData._rtShaderType == apSendMaskData.RT_SHADER_TYPE.CustomShader)
+							{
+								//커스텀 쉐이더는 에디터에서 지원하지 않는다.
+								continue;
+							}
+
+							RenderTexture renderTex = null;
+							bool isNewRT = false;
+							bool isNeedToRender = false;
+
+							if (sendMaskData._isRTShared)
+							{
+								//공유 Mask를 사용하는 경우
+								sharedRTs.TryGetValue(sendMaskData._sharedRTID, out renderTex);
+
+								if (renderTex == null)
+								{
+									isNewRT = true;
+									renderTex = apGL.GetTempRenderTexture(FilterMode.Bilinear);
+
+									sharedRTs.Add(sendMaskData._sharedRTID, renderTex);
+									tmpRTs.Add(renderTex);
+								}
+
+								isNeedToRender = true;//공유된 RT는 무조건 렌더링을 해야한다.
+							}
+							else
+							{
+								//Per-Mesh 방식의 RT를 사용한다.
+								if (!perMeshRTs.ContainsKey(meshTF))
+								{
+									perMeshRTs.Add(meshTF, new Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>());
+								}
+
+								Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture> rtList = perMeshRTs[meshTF];
+
+								rtList.TryGetValue(sendMaskData._rtShaderType, out renderTex);
+
+								if (renderTex == null)
+								{
+									isNewRT = true;
+									renderTex = apGL.GetTempRenderTexture(FilterMode.Bilinear);
+									rtList.Add(sendMaskData._rtShaderType, renderTex);
+									tmpRTs.Add(renderTex);
+
+									//Per-Mesh는 Shader Type당 한번만 렌더링한다.
+									isNeedToRender = true;
+								}
+							}
+
+							if (isNeedToRender)
+							{
+								//Mask 렌더링을 해야한다.
+								apGL.DrawRenderUnitForExport_MaskParent(renderUnit,
+																		sendMaskData._rtShaderType,
+																		renderTex,
+																		isNewRT,//SendData 방식은 RT 재사용을 할 수도 있으므로 RT가 생성되는 순간에만 Clear를 한다.
+
+																		//클리핑-체인
+																		isAnyClipReceived,
+																		clippingMask,
+																		receiveMaskRT_1, receiveMaskOp_1,
+																		receiveMaskRT_2, receiveMaskOp_2,
+																		receiveMaskRT_3, receiveMaskOp_3,
+																		receiveMaskRT_4, receiveMaskOp_4,
+																		receiveSeeThroughRT, receiveSeeThroughAlpha
+
+																		);
+							}
+						}
+					}
+
+				}
+			}
+
+			
+
+
+			// [ 2. 투명도를 알기 위해 Alpha2White로 렌더링을 한다. ]
+
+
+
 			//Pass-1. 일반 + MaskParent를 Alpha2White 렌더링. 이걸로 나중에 알파 채널용 텍스쳐를 만든다.
 			//--------------------------------------------------------------------------------------------------------
-			_renderTexture_GrayscaleAlpha = RenderTexture.GetTemporary(rtSizeWidth, rtSizeHeight, 8, RenderTextureFormat.ARGB32);
+			_renderTexture_GrayscaleAlpha = RenderTexture.GetTemporary(	rtSizeWidth,
+																		rtSizeHeight,
+																		8,
+																		RenderTextureFormat.ARGB32);
 			//_renderTexture_GrayscaleAlpha.antiAliasing = 1;
 			_renderTexture_GrayscaleAlpha.isPowerOfTwo = false;
 			_renderTexture_GrayscaleAlpha.wrapMode = TextureWrapMode.Clamp;
@@ -1447,63 +1681,64 @@ namespace AnyPortrait
 
 			//기본 
 			Color maskClearColor = new Color(clearColor.a, clearColor.a, clearColor.a, 1.0f);//Alpha가 GrayScale로 적용된 색상
-			GL.Clear(false, true, maskClearColor, 0.0f);//변경 : Mac에서도 작동 하려면..
+			GL.Clear(false, true, maskClearColor, 1.0f);//변경 : Mac에서도 작동 하려면..
 			apGL.DrawBoxGL(Vector2.zero, 50000, 50000, maskClearColor, false, true);//<<이걸로 배경을 깔자
 			GL.Flush();
-
-			//System.Threading.Thread.Sleep(50);
-
-
-			
-
-			//변경
-			List<apRenderUnit> renderUnits = meshGroup.SortedBuffer.SortedRenderUnits;
-			int nRenderUnits = renderUnits.Count;
 
 			//ExtraOption-Depth에 의한 순서 변경도 적용
 			for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
 			{
-				apRenderUnit renderUnit = renderUnits[iUnit];
+				renderUnit = renderUnits[iUnit];
 
-				if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
+				if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+					|| renderUnit._meshTransform == null)
 				{
-					if (renderUnit._meshTransform != null)
-					{
-						if (renderUnit._meshTransform._isClipping_Parent)
-						{
-							if (renderUnit._isVisible)
-							{
-								//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-								apGL.DrawRenderUnit_Basic_Alpha2White_ForExport(	renderUnit
-																					
-																					////[ Pixel Perfect ]
-																					//isPixelPerfect,
-																					//clipAreaPosGL_LB,
-																					//posSizeGLPerPixel
-																					);
-							}
-						}
-						else if (renderUnit._meshTransform._isClipping_Child)
-						{
-							//Pass
-							//Alpha 렌더링에서 Clipping Child는 제외한다. 어차피 Parent의 Alpha보다 많을 수 없으니..
-						}
-						else
-						{
-							if (renderUnit._isVisible)
-							{
-								//RenderTexture.active = _renderTexture_GrayscaleAlpha;
-								apGL.DrawRenderUnit_Basic_Alpha2White_ForExport(	renderUnit
-																					
-																					////[ Pixel Perfect ]
-																					//isPixelPerfect,
-																					//clipAreaPosGL_LB,
-																					//posSizeGLPerPixel
-																					);
-							}
-						}
-					}
+					continue;
 				}
+
+				if(!renderUnit._isVisible)
+				{
+					continue;
+				}
+
+				meshTF = renderUnit._meshTransform;
+
+				//마스크를 받는 경우 값 할당
+				bool isAnyClipReceived = false;
+				RenderTexture clippingMask = null;
+				RenderTexture receiveMaskRT_1 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+				RenderTexture receiveMaskRT_2 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+				RenderTexture receiveMaskRT_3 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+				RenderTexture receiveMaskRT_4 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveSeeThroughRT = null;
+				float receiveSeeThroughAlpha = 0.0f;
+
+				GetReceivedMaskInfo(meshTF, 
+									clippingRTs, perMeshRTs, sharedRTs,
+									//결과값
+									out isAnyClipReceived,
+									out clippingMask,
+									out receiveMaskRT_1, out receiveMaskOp_1,
+									out receiveMaskRT_2, out receiveMaskOp_2,
+									out receiveMaskRT_3, out receiveMaskOp_3,
+									out receiveMaskRT_4, out receiveMaskOp_4,
+									out receiveSeeThroughRT, out receiveSeeThroughAlpha);
+
+
+				//이제 렌더링을 하자
+				//마스크를 받은 메시는 마스크 데이터를 같이 넣자
+				apGL.DrawRenderUnit_Basic_Alpha2White_ForExport(renderUnit,
+																clippingMask,
+																receiveMaskRT_1, receiveMaskOp_1,
+																receiveMaskRT_2, receiveMaskOp_2,
+																receiveMaskRT_3, receiveMaskOp_3,
+																receiveMaskRT_4, receiveMaskOp_4
+																);
 			}
 
 			System.Threading.Thread.Sleep(5);
@@ -1511,6 +1746,7 @@ namespace AnyPortrait
 			//RT > 텍스쳐 복사시 : RT > 전체 복사 > 부분 복사
 
 			//<전체 복사>
+			//Texture2D copiedTexture_Alpha = new Texture2D(rtSizeWidth, rtSizeHeight, TextureFormat.ARGB32, false);
 			Texture2D copiedTexture_Alpha = new Texture2D(rtSizeWidth, rtSizeHeight, TextureFormat.ARGB32, false);
 			copiedTexture_Alpha.wrapMode = TextureWrapMode.Clamp;
 			copiedTexture_Alpha.filterMode = FilterMode.Point;//V2에선 항상 Point
@@ -1524,7 +1760,6 @@ namespace AnyPortrait
 			Texture2D resultTex_GrayscaleAlpha = new Texture2D(clipAreaWidth_InRT, clipAreaHeight_InRT, TextureFormat.ARGB32, false);
 			resultTex_GrayscaleAlpha.wrapMode = TextureWrapMode.Clamp;
 			resultTex_GrayscaleAlpha.filterMode = FilterMode.Point; //V2에선 항상 Point
-
 			
 			//resultTex_SrcSize_Alpha.ReadPixels(new Rect(clipPosX_InRT, clipPosY_InRT, clipSrcWidth_InRT, clipSrcHeight_InRT), 0, 0);
 			//resultTex_SrcSize_Alpha.Apply();
@@ -1563,109 +1798,89 @@ namespace AnyPortrait
 			//전체 복사된 텍스쳐는 삭제
 			UnityEngine.Object.DestroyImmediate(copiedTexture_Alpha);
 
-
 			RenderTexture.active = null;
 
+			
+			// [ 3. 전체 렌더링을 한다. ]
 
 			//Pass-2. 기본 렌더링
 			//--------------------------------------------------------------------------------------------------------
-			//1. Clip Parent의 MaskTexture를 미리 구워서 Dictionary에 넣는다.
-			Dictionary<apRenderUnit, Texture2D> bakedClipMaskTextures = new Dictionary<apRenderUnit, Texture2D>();
-
-			
-
-			//ExtraOption-Depth인 경우 렌더링 순서가 바뀌어야한다.
-			for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
-			{
-				apRenderUnit renderUnit = renderUnits[iUnit];
-
-				if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
-				{
-					if (renderUnit._meshTransform != null)
-					{
-						if (renderUnit._meshTransform._isClipping_Parent)
-						{
-							if (renderUnit._isVisible)
-							{
-								Texture2D clipMaskTex = apGL.GetMaskTexture_ClippingParent(renderUnit);
-								if (clipMaskTex != null)
-								{
-									bakedClipMaskTextures.Add(renderUnit, clipMaskTex);
-								}
-								else
-								{
-									Debug.LogError("Clip Testure Bake Failed");
-								}
-
-							}
-						}
-					}
-				}
-			}
-
 			System.Threading.Thread.Sleep(5);
-
 			
 			_renderTexture = RenderTexture.GetTemporary(rtSizeWidth, rtSizeHeight, 8, RenderTextureFormat.ARGB32);
 			_renderTexture.isPowerOfTwo = false;
 			_renderTexture.wrapMode = TextureWrapMode.Clamp;
 			_renderTexture.filterMode = FilterMode.Point;//V2에선 항상 Point
-
 			
 			RenderTexture.active = _renderTexture;
 
-			Color opaqueClearColor = new Color(clearColor.r * clearColor.a, clearColor.g * clearColor.a, clearColor.b * clearColor.a, 1.0f);
+			//이거 확인해볼것
+			//이전
+			//Color opaqueClearColor = new Color(clearColor.r * clearColor.a, clearColor.g * clearColor.a, clearColor.b * clearColor.a, 1.0f);
 
-			GL.Clear(false, true, opaqueClearColor, 0.0f);//변경 : Mac에서도 작동 하려면..
+			//v1.6.0 변경 : RGB는 Alpha의 영향을 받으면 안된다.
+			Color opaqueClearColor = new Color(clearColor.r, clearColor.g, clearColor.b, 1.0f);
+
+			GL.Clear(false, true, opaqueClearColor, 1.0f);//변경 : Mac에서도 작동 하려면..
 			apGL.DrawBoxGL(Vector2.zero, 50000, 50000, opaqueClearColor, false, true);//<<이걸로 배경을 깔자
 			GL.Flush();
 
 			//ExtraOption-Depth인 경우 렌더링 순서가 바뀌어야한다.
 			for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
 			{
-				apRenderUnit renderUnit = renderUnits[iUnit];
+				renderUnit = renderUnits[iUnit];
 
-				if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
+				if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+					|| renderUnit._meshTransform == null)
 				{
-					if (renderUnit._meshTransform != null)
-					{
-						if (renderUnit._meshTransform._isClipping_Parent)
-						{
-							if (renderUnit._isVisible)
-							{
-								if (bakedClipMaskTextures.ContainsKey(renderUnit))
-								{
-									apGL.DrawRenderUnit_ClippingParent_ForExport_WithoutRTT(	renderUnit,
-																								renderUnit._meshTransform._clipChildMeshes,
-																								bakedClipMaskTextures[renderUnit]
-																								
-																								////[ Pixel Perfect ]
-																								//isPixelPerfect,
-																								//clipAreaPosGL_LB,
-																								//posSizeGLPerPixel
-																								);
-								}
-							}
-						}
-						else if (renderUnit._meshTransform._isClipping_Child)
-						{
-							//Pass
-						}
-						else
-						{
-							if (renderUnit._isVisible)
-							{
-								RenderTexture.active = _renderTexture;
-								apGL.DrawRenderUnit_Basic_ForExport(	renderUnit
-																		////[ Pixel Perfect ]
-																		//isPixelPerfect,
-																		//clipAreaPosGL_LB,
-																		//posSizeGLPerPixel
-																		);
-							}
-						}
-					}
+					continue;
 				}
+
+				if(!renderUnit._isVisible)
+				{
+					continue;
+				}
+
+				meshTF = renderUnit._meshTransform;
+
+				//마스크를 받는 경우 값 할당
+				bool isAnyClipReceived = false;
+				RenderTexture clippingMask = null;
+				RenderTexture receiveMaskRT_1 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_2 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_3 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+
+				RenderTexture receiveMaskRT_4 = null;
+				apSendMaskData.MASK_OPERATION receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+
+				//텍스쳐 투과
+				RenderTexture receiveSeeThroughRT = null;
+				float receiveSeeThroughAlpha = 0.0f;
+
+				GetReceivedMaskInfo(meshTF, 
+									clippingRTs, perMeshRTs, sharedRTs,
+									//결과값
+									out isAnyClipReceived,
+									out clippingMask,
+									out receiveMaskRT_1, out receiveMaskOp_1,
+									out receiveMaskRT_2, out receiveMaskOp_2,
+									out receiveMaskRT_3, out receiveMaskOp_3,
+									out receiveMaskRT_4, out receiveMaskOp_4,
+									out receiveSeeThroughRT, out receiveSeeThroughAlpha);
+
+
+				apGL.DrawRenderUnit_Basic_ForExport(	renderUnit,
+														clippingMask,
+														receiveMaskRT_1, receiveMaskOp_1,
+														receiveMaskRT_2, receiveMaskOp_2,
+														receiveMaskRT_3, receiveMaskOp_3,
+														receiveMaskRT_4, receiveMaskOp_4,
+														receiveSeeThroughRT, receiveSeeThroughAlpha);
 			}
 
 			System.Threading.Thread.Sleep(5);
@@ -1702,14 +1917,9 @@ namespace AnyPortrait
 			Texture2D copiedTexture_Color = new Texture2D(rtSizeWidth, rtSizeHeight, TextureFormat.ARGB32, false);
 			copiedTexture_Color.wrapMode = TextureWrapMode.Clamp;
 			copiedTexture_Color.filterMode = FilterMode.Point;//V2에선 항상 Point
-			
 
 			copiedTexture_Color.ReadPixels(new Rect(0, 0, rtSizeWidth, rtSizeHeight), 0, 0);
 			copiedTexture_Color.Apply();
-
-			//SaveDebugTexture(copiedTexture_Color, "리사이즈 후 전체 캡쳐");
-			//Debug.LogError("클리핑 : " + clipPosX_InRT + ", " + clipPosY_InRT + " (" + clipSrcWidth_InRT + "x" + clipSrcHeight_InRT + ")");
-
 
 			//<부분 복사>
 			Texture2D resultTex_Color = new Texture2D(clipAreaWidth_InRT, clipAreaHeight_InRT, TextureFormat.ARGB32, false);
@@ -1738,8 +1948,6 @@ namespace AnyPortrait
 				Graphics.CopyTexture(copiedTexture_Color, 0, 0, copiedFocusX, copiedFocusY, copiedWidth, copiedHeight, resultTex_Color, 0, 0, 0, 0);
 			}
 			resultTex_Color.Apply();
-
-			
 
 			//전체 복사된 텍스쳐는 삭제
 			//UnityEngine.Object.DestroyImmediate(testFullTex);
@@ -1781,6 +1989,17 @@ namespace AnyPortrait
 			RenderTexture.ReleaseTemporary(_renderTexture);
 
 
+			//마스크 이미지를 모두 해제한다.
+			int nTmpRTs = tmpRTs.Count;
+			if(nTmpRTs > 0)
+			{
+				for (int i = 0; i < nTmpRTs; i++)
+				{
+					RenderTexture.ReleaseTemporary(tmpRTs[i]);
+				}
+			}
+
+
 			
 			// 2. 렌더링된 이미지를 가공한다.
 			//--------------------------------------------------------------------
@@ -1788,6 +2007,7 @@ namespace AnyPortrait
 
 			_renderTexture = null;
 			_renderTexture_GrayscaleAlpha = null;
+
 			Texture2D resultTex_Merged = null;
 
 			//추가 : 가장자리 알파 문제를 수정하자
@@ -1796,7 +2016,6 @@ namespace AnyPortrait
 			//Debug.LogWarning("Resize 여부 체크");
 			//Debug.Log("Src Size : " + srcSizeWidth + "x" + srcSizeHeight);
 			//Debug.Log("Dst Size : " + dstSizeWidth + "x" + dstSizeHeight);
-
 
 			//기존 버전과 다르게 
 			//이미 리사이징을 했으므로
@@ -1814,9 +2033,14 @@ namespace AnyPortrait
 			System.Threading.Thread.Sleep(5);
 			//기존 크기의 이미지는 삭제
 			UnityEngine.Object.DestroyImmediate(resultTex_Color);
-			UnityEngine.Object.DestroyImmediate(resultTex_GrayscaleAlpha);
 
+			//이게 진짜
+			UnityEngine.Object.DestroyImmediate(resultTex_GrayscaleAlpha);
 			return resultTex_Merged;
+
+			//테스트
+			//UnityEngine.Object.DestroyImmediate(resultTex_Merged);
+			//return resultTex_GrayscaleAlpha;
 
 		}
 
@@ -2579,6 +2803,165 @@ namespace AnyPortrait
 		{	
 			return Mathf.Min(16384, SystemInfo.maxTextureSize);
 		}
+
+
+
+		// 렌더링 코드 도중 클리핑 마스크 관련
+		private void GetReceivedMaskInfo(	apTransform_Mesh meshTF, 
+											//참조할 텍스쳐 리스트
+											Dictionary<apTransform_Mesh, RenderTexture> clippingRTs,
+											Dictionary<apTransform_Mesh, Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture>> perMeshRTs,
+											Dictionary<int, RenderTexture> sharedRTs,
+											//결과값
+											out bool isAnyReceived,
+											out RenderTexture clippingMask,
+											out RenderTexture receiveMaskRT_1, out apSendMaskData.MASK_OPERATION receiveMaskOp_1,
+											out RenderTexture receiveMaskRT_2, out apSendMaskData.MASK_OPERATION receiveMaskOp_2,
+											out RenderTexture receiveMaskRT_3, out apSendMaskData.MASK_OPERATION receiveMaskOp_3,
+											out RenderTexture receiveMaskRT_4, out apSendMaskData.MASK_OPERATION receiveMaskOp_4,
+											out RenderTexture receiveSeeThroughRT, out float receiveSeeThroughAlpha)
+		{
+			isAnyReceived = false;
+			clippingMask = null;
+			receiveMaskRT_1 = null; receiveMaskOp_1 = apSendMaskData.MASK_OPERATION.And;
+			receiveMaskRT_2 = null; receiveMaskOp_2 = apSendMaskData.MASK_OPERATION.And;
+			receiveMaskRT_3 = null; receiveMaskOp_3 = apSendMaskData.MASK_OPERATION.And;
+			receiveMaskRT_4 = null; receiveMaskOp_4 = apSendMaskData.MASK_OPERATION.And;
+			receiveSeeThroughRT = null;
+			receiveSeeThroughAlpha = 0.0f;
+
+			if(meshTF == null
+				|| clippingRTs == null
+				|| perMeshRTs == null
+				|| sharedRTs == null)
+			{
+				return;
+			}
+
+			//클리핑 마스크를 받는 경우
+			if(meshTF._isClipping_Child && meshTF._clipParentMeshTransform != null)
+			{
+				//클리핑 마스크를 받는 경우
+				clippingRTs.TryGetValue(meshTF._clipParentMeshTransform, out clippingMask);
+			}
+
+			int nLinkedReceivedMasks = meshTF._linkedReceivedMasks != null ? meshTF._linkedReceivedMasks.Count : 0;
+
+			if(nLinkedReceivedMasks > 0)
+			{
+				//Send Mask Data에 의해 마스크를 받는 경우
+				apMaskLinkInfo info = null;
+				for (int iMaskInfo = 0; iMaskInfo < nLinkedReceivedMasks; iMaskInfo++)
+				{
+					info = meshTF._linkedReceivedMasks[iMaskInfo];
+
+					apTransform_Mesh parentMesh = info._parentMaskMeshTF;
+					apSendMaskData parentData = info._parentMaskData;
+					if(parentMesh == null || parentData == null)
+					{
+						continue;
+					}
+
+					RenderTexture receivedRT = null;
+					if(parentData._isRTShared)
+					{
+						// 공유 텍스쳐
+						sharedRTs.TryGetValue(parentData._sharedRTID, out receivedRT);
+					}
+					else
+					{
+						//메시별 텍스쳐
+						Dictionary<apSendMaskData.RT_SHADER_TYPE, RenderTexture> rtList = null;
+						perMeshRTs.TryGetValue(parentMesh, out rtList);
+						if(rtList != null)
+						{
+							rtList.TryGetValue(parentData._rtShaderType, out receivedRT);
+						}
+					}
+
+					if(receivedRT == null)
+					{
+						//생성된 RT가 없다.
+						continue;
+					}
+
+					//이제 프로퍼티에 따라서 가져오자
+					int nPropSets = parentData._propertySets != null ? parentData._propertySets.Count : 0;
+					if(nPropSets == 0)
+					{
+						continue;
+					}
+
+					for (int iPropSet = 0; iPropSet < nPropSets; iPropSet++)
+					{
+						apSendMaskData.ReceivePropertySet propSet = parentData._propertySets[iPropSet];
+
+						if(propSet._preset == apSendMaskData.SHADER_PROP_PRESET.AlphaMaskPreset)
+						{
+							// [ Alpha Mask 프리셋인 경우 ]
+							//생성된 RT가 해당되는 채널 변수로 할당
+							switch(propSet._reservedChannel)
+							{
+								case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_1:
+									receiveMaskRT_1 = receivedRT;
+									receiveMaskOp_1 = propSet._value_MaskOp;
+									break;
+
+								case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_2:
+									receiveMaskRT_2 = receivedRT;
+									receiveMaskOp_2 = propSet._value_MaskOp;
+									break;
+
+								case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_3:
+									receiveMaskRT_3 = receivedRT;
+									receiveMaskOp_3 = propSet._value_MaskOp;
+									break;
+
+								case apSendMaskData.SHADER_PROP_RESERVED_CHANNEL.Channel_4:
+									receiveMaskRT_4 = receivedRT;
+									receiveMaskOp_4 = propSet._value_MaskOp;
+									break;
+							}
+						}
+						else if(propSet._preset == apSendMaskData.SHADER_PROP_PRESET.SeeThroughPreset)
+						{
+							// [ See-Through 프리셋인 경우 ]
+							receiveSeeThroughRT = receivedRT;
+
+							//Alpha (Float)값은 고정값 또는 컨트롤 파라미터의 값으로 입력한다.
+							//일단 고정값 할당
+							receiveSeeThroughAlpha = propSet._value_Float;
+
+							if (propSet._value_IsUseControlParam && propSet._value_LinkedControlParam != null)
+							{
+								apControlParam cp = propSet._value_LinkedControlParam;
+								if(cp._valueType == apControlParam.TYPE.Float)
+								{
+									//조건이 맞다면 컨트롤 파라미터 값을 적용
+									receiveSeeThroughAlpha = cp._float_Cur;
+								}
+							}
+
+							
+						}
+					}
+				}
+			}
+
+			if(clippingMask != null
+				|| receiveMaskRT_1 != null
+				|| receiveMaskRT_2 != null
+				|| receiveMaskRT_3 != null
+				|| receiveMaskRT_4 != null
+				|| receiveSeeThroughRT != null)
+			{
+				isAnyReceived = true;
+			}
+		}
+
+
+
+
 
 		//------------------------------------------------------------------------------------------
 		public bool MakeGIFHeader(	string filePath,

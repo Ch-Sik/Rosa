@@ -1145,6 +1145,188 @@ namespace AnyPortrait
 			}
 		}
 
+		/// <summary>
+		/// 추가 v1.6.0 : 마스크 데이터의 대상 MeshTF로의 링크를 갱신한다.
+		/// 재귀적으로만 동작하며, Root Mesh Group만 호출한다.
+		/// </summary>
+		public void LinkSendMaskData()
+		{	
+			//Step1 : 초기화 (재귀적으로 호출됨)
+			LinkSendMaskData_Step1_Init();
+
+			//Step2 : 연결 (재귀적으로 호출됨 + Root Mesh Group 찾아야 한다.)
+			apMeshGroup rootMeshGroup = FindRootMeshGroup();
+			
+			LinkSendMaskData_Step2_Link(rootMeshGroup);
+		}
+
+		/// <summary>
+		/// Send Mask Data의 연결 함수 중 첫 연산.
+		/// 연결 정보를 모두 초기화한다.
+		/// </summary>
+		private void LinkSendMaskData_Step1_Init()
+		{
+			//마스크를 사용하는 자식 메시로서의 마스크 연결 정보를 일단 모두 초기화한다.
+			int nMeshTFs = _childMeshTransforms != null ? _childMeshTransforms.Count : 0;
+			if (nMeshTFs > 0)
+			{
+				apTransform_Mesh meshTF = null;
+				for (int iMeshTF = 0; iMeshTF < nMeshTFs; iMeshTF++)
+				{
+					meshTF = _childMeshTransforms[iMeshTF];
+					meshTF._linkedReceivedMasks = null;//링크 정보 초기화
+				}
+			}
+
+			//자식 객체에도 초기화 전달
+			int nChildMeshGroupTFs = _childMeshGroupTransforms != null ? _childMeshGroupTransforms.Count : 0;
+			if (nChildMeshGroupTFs > 0)
+			{
+				apTransform_MeshGroup meshGroupTF = null;
+				apMeshGroup childMeshGroup = null;
+				for (int iChildMGs = 0; iChildMGs < nChildMeshGroupTFs; iChildMGs++)
+				{
+					meshGroupTF = _childMeshGroupTransforms[iChildMGs];
+					if(meshGroupTF == null) { continue; }
+
+					childMeshGroup = meshGroupTF._meshGroup;
+					if(childMeshGroup == this) { continue; }
+
+					childMeshGroup.LinkSendMaskData_Step1_Init();
+				}
+			}
+		}
+
+		private void LinkSendMaskData_Step2_Link(apMeshGroup rootMeshGroup)
+		{
+			int nMeshTFs = _childMeshTransforms != null ? _childMeshTransforms.Count : 0;
+			if(nMeshTFs > 0)
+			{
+				apTransform_Mesh meshTF = null;
+				apTransform_Mesh targetMeshTF = null;
+
+				//마스크 생성 정보를 바탕으로 MeshTF간의 연결을 하자
+				for (int iMeshTF = 0; iMeshTF < nMeshTFs; iMeshTF++)
+				{
+					meshTF = _childMeshTransforms[iMeshTF];
+
+					int nSendMaskData = meshTF._sendMaskDataList != null ? meshTF._sendMaskDataList.Count : 0;
+					if(nSendMaskData == 0)
+					{
+						continue;
+					}
+
+					apSendMaskData sendMask = null;
+					for (int iSend = 0; iSend < nSendMaskData; iSend++)
+					{
+						sendMask = meshTF._sendMaskDataList[iSend];
+
+						int nTargetTFs = sendMask._targetInfos != null ? sendMask._targetInfos.Count : 0;
+
+						bool isAnyInvalidTarget = false;
+						
+						//타겟들을 하나씩 연결하자						
+						for (int iTarget = 0; iTarget < nTargetTFs; iTarget++)
+						{
+							apSendMaskData.TargetInfo curTarget = sendMask._targetInfos[iTarget];
+
+							//이미 있다면 패스
+							bool isNeedFind = true;
+							if(curTarget._linkedMeshTF != null
+								&& curTarget._linkedMeshTF._transformUniqueID == curTarget._meshTFID)
+							{
+								//이미 연결이 완료되어 다시 연결할 필요가 없다.
+								isNeedFind = false;
+							}
+
+							if(isNeedFind)
+							{
+								//다시 연결하자
+								curTarget._linkedMeshTF = rootMeshGroup.GetMeshTransformRecursive(curTarget._meshTFID);
+
+								if(curTarget._linkedMeshTF == null)
+								{
+									//못찾았다면 > 삭제해야한다.
+									curTarget._meshTFID = -1;
+									isAnyInvalidTarget = true;
+								}
+							}
+
+							if(curTarget._linkedMeshTF != null)
+							{
+								//메시 연결이 완료되었다면,
+								targetMeshTF = curTarget._linkedMeshTF;
+
+								//Parent 메시와 Mask Data 정보를 포함한 Mask Link 정보를 입력하자
+								if(targetMeshTF._linkedReceivedMasks == null)
+								{
+									targetMeshTF._linkedReceivedMasks = new List<apMaskLinkInfo>();
+								}
+								apMaskLinkInfo newLinkInfo = new apMaskLinkInfo();
+								newLinkInfo.Link(meshTF, sendMask);
+								targetMeshTF._linkedReceivedMasks.Add(newLinkInfo);//링크 정보를 리스트에 추가
+							}
+						}
+
+						if(isAnyInvalidTarget)
+						{
+							//삭제할게 있다면
+							if(sendMask._targetInfos != null)
+							{
+								//ID가 유효하지 않은 경우를 삭제
+								sendMask._targetInfos.RemoveAll(delegate(apSendMaskData.TargetInfo a)
+								{
+									return a._meshTFID < 0;
+								});
+							}
+						}
+
+						//프로퍼티 리스트에서 컨트롤 파라미터등을 연결하자
+						
+						int nPropSets = sendMask._propertySets != null ? sendMask._propertySets.Count : 0;
+						if(nPropSets > 0)
+						{
+							apSendMaskData.ReceivePropertySet propSet = null;
+							for (int iProp = 0; iProp < nPropSets; iProp++)
+							{
+								propSet = sendMask._propertySets[iProp];
+								if (propSet == null) { continue; }
+
+								//Control Param을 찾자
+								if (propSet._value_ControlParamID >= 0)
+								{
+									//Control Param ID가 있다면, 이 메시 그룹에서 찾는다.
+									propSet._value_LinkedControlParam = _parentPortrait.GetControlParam(propSet._value_ControlParamID);
+									//Debug.Log("Control Param 연결 : " + (propSet._value_LinkedControlParam != null ? propSet._value_LinkedControlParam._keyName : "null"));
+								}
+								else
+								{
+									propSet._value_LinkedControlParam = null;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			int nChildMeshGroupTFs = _childMeshGroupTransforms != null ? _childMeshGroupTransforms.Count : 0;
+			if (nChildMeshGroupTFs > 0)
+			{
+				apTransform_MeshGroup meshGroupTF = null;
+				apMeshGroup childMeshGroup = null;
+				for (int iChildMGs = 0; iChildMGs < nChildMeshGroupTFs; iChildMGs++)
+				{
+					meshGroupTF = _childMeshGroupTransforms[iChildMGs];
+					if(meshGroupTF == null) { continue; }
+
+					childMeshGroup = meshGroupTF._meshGroup;
+					if(childMeshGroup == this) { continue; }
+
+					childMeshGroup.LinkSendMaskData_Step2_Link(rootMeshGroup);
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// 현재 메시 그룹을 포함하여 자식 > 부모 (루트)까지 필요한만큼 렌더 유닛을 생성한다.

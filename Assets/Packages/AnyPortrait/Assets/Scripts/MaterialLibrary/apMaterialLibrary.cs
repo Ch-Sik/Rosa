@@ -16,6 +16,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.IO;
+using System.Text;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -44,25 +46,46 @@ namespace AnyPortrait
 
 		//예약된 재질 설정
 		public const int RESERVED_MAT_ID__Unlit = 0;
-		public const int RESERVED_MAT_ID__Unlit_V2 = 2;//추가 v1.4.7 : 이게 기본이다
+		public const int RESERVED_MAT_ID__Unlit_V2 = 2;//추가 v1.4.7
+		public const int RESERVED_MAT_ID__Unlit_V16 = 3;//추가 v1.6.0 : 변경. 이건 마스크를 포함한다.
+
 		public const int RESERVED_MAT_ID__Lit = 11;
 		public const int RESERVED_MAT_ID__Bumped = 12;
 		public const int RESERVED_MAT_ID__Bumped_Specular = 13;
 		public const int RESERVED_MAT_ID__Bumped_Specular_Emissive = 14;
 		public const int RESERVED_MAT_ID__Bumped_Rimlight = 15;
 		public const int RESERVED_MAT_ID__Bumped_Ramp = 16;
+
+		public const int RESERVED_MAT_ID__Lit_V16_SimpleLit = 20;
+		public const int RESERVED_MAT_ID__Lit_V16_Bumped = 21;
+		public const int RESERVED_MAT_ID__Lit_V16_Bumped_Specular = 22;
+		public const int RESERVED_MAT_ID__Lit_V16_Bumped_Specular_Emissive = 23;
+		public const int RESERVED_MAT_ID__Lit_V16_Bumped_Rimlight = 24;
+		public const int RESERVED_MAT_ID__Lit_V16_Bumped_Ramp = 25;
+
+
+
 		public const int RESERVED_MAT_ID__LWRP_Unlit = 51;
 		public const int RESERVED_MAT_ID__LWRP_2D_Lit = 52;
 		public const int RESERVED_MAT_ID__KeepAlpha_Unlit = 61;
 		public const int RESERVED_MAT_ID__KeepAlpha_Lit = 62;
+
+		//추가 22.1.5
+		public const int RESERVED_MAT_ID__Mergeable_Unlit = 63;
+		public const int RESERVED_MAT_ID__Mergeable_Lit = 64;
+
+		//추가 v1.6.0
+		public const int RESERVED_MAT_ID__KeepAlpha_V16_Unlit = 65;
+		public const int RESERVED_MAT_ID__KeepAlpha_V16_Lit = 66;
+
 		public const int RESERVED_MAT_ID__VR_Unlit = 71;
 		public const int RESERVED_MAT_ID__VR_Lit = 72;
 		public const int RESERVED_MAT_ID__VR_Unlit_ScaleOffset = 73;
 		public const int RESERVED_MAT_ID__VR_Lit_ScaleOffset = 74;
 
-		//추가 22.1.5
-		public const int RESERVED_MAT_ID__Mergeable_Unlit = 63;
-		public const int RESERVED_MAT_ID__Mergeable_Lit = 64;
+		//추가 v1.6.0
+		public const int RESERVED_MAT_ID__VR_V16_Unlit = 75;
+		public const int RESERVED_MAT_ID__VR_V16_Lit = 76;
 
 		public const int RESERVED_MAT_ID__URP_Unlit = 81;
 		public const int RESERVED_MAT_ID__URP_Lit = 82;
@@ -87,6 +110,19 @@ namespace AnyPortrait
 		public const int RESERVED_MAT_ID__URP23_MergeableUnlit = 97;
 		public const int RESERVED_MAT_ID__URP23_Mergeable2DLit = 98;
 
+		//v1.6.0
+		public const int RESERVED_MAT_ID__URP_V16_21_Unlit = 100;
+		public const int RESERVED_MAT_ID__URP_V16_21_Lit = 101;
+		public const int RESERVED_MAT_ID__URP_V16_21_2DLit = 102;
+		public const int RESERVED_MAT_ID__URP_V16_21_2DBumpedLit = 103;
+
+		//v1.6.0
+		public const int RESERVED_MAT_ID__URP_V16_23_Unlit = 105;
+		public const int RESERVED_MAT_ID__URP_V16_23_Lit = 106;
+		public const int RESERVED_MAT_ID__URP_V16_23_2DLit = 107;
+		public const int RESERVED_MAT_ID__URP_V16_23_2DBumpedLit = 108;
+
+
 		//Reserved는 200 이내이면 된다.
 
 
@@ -101,6 +137,28 @@ namespace AnyPortrait
 			NoneOrCustom
 
 		}
+
+		//주요 태그 v1.6.0
+		//- 태그 조합은 ","로 구분한다.
+		private const string TAG_Unlit = "Unlit";
+		private const string TAG_Lit = "Lit";		
+		private const string TAG_Legacy = "Legacy";
+		private const string TAG_Bumped = "Bumped";
+		private const string TAG_Specular = "Specular";
+		private const string TAG_Emissive = "Emissive";
+		private const string TAG_Rimlight = "Rimlight";
+		private const string TAG_Ramp = "Ramp";
+		private const string TAG_LWRP = "LWRP";
+		private const string TAG_URP = "URP ~20";
+		private const string TAG_URP21 = "URP 21~22";
+		private const string TAG_URP23 = "URP 23~6";
+		private const string TAG_2D = "2D";
+		private const string TAG_VR = "VR";
+		private const string TAG_KeepAlpha = "KeepAlpha";
+		private const string TAG_Mergeable = "Mergeable";
+		private const string TAG_MultiMask = "Multi-Masks";
+		
+
 
 		// Init
 		//------------------------------------------------------
@@ -133,59 +191,90 @@ namespace AnyPortrait
 			//ClearPresets();
 
 			//1. 기본 Unlit 타입의 MaterialSet
-			apMaterialSet mat_UnlitLegacy = MakeReservedPreset(RESERVED_MAT_ID__Unlit, "Unlit (Legacy)", apMaterialSet.ICON.Unlit,
-												"apShader_Transparent",
-												"apShader_Transparent_Additive",
-												"apShader_Transparent_SoftAdditive",
-												"apShader_Transparent_Multiplicative",
-												"apShader_ClippedWithMask",
-												"apShader_ClippedWithMask_Additive",
-												"apShader_ClippedWithMask_SoftAdditive",
-												"apShader_ClippedWithMask_Multiplicative",
-												"Linear/apShader_L_Transparent",
-												"Linear/apShader_L_Transparent_Additive",
-												"Linear/apShader_L_Transparent_SoftAdditive",
-												"Linear/apShader_L_Transparent_Multiplicative",
-												"Linear/apShader_L_ClippedWithMask",
-												"Linear/apShader_L_ClippedWithMask_Additive",
-												"Linear/apShader_L_ClippedWithMask_SoftAdditive",
-												"Linear/apShader_L_ClippedWithMask_Multiplicative",
-												"apShader_AlphaMask",
-												true);
+			MakeReservedPreset(	RESERVED_MAT_ID__Unlit, "Legacy/Unlit", apMaterialSet.ICON.Unlit,
+								MakeTagText(TAG_Unlit, TAG_Legacy),
+								"apShader_Transparent",
+								"apShader_Transparent_Additive",
+								"apShader_Transparent_SoftAdditive",
+								"apShader_Transparent_Multiplicative",
+								"apShader_ClippedWithMask",
+								"apShader_ClippedWithMask_Additive",
+								"apShader_ClippedWithMask_SoftAdditive",
+								"apShader_ClippedWithMask_Multiplicative",
+								"Linear/apShader_L_Transparent",
+								"Linear/apShader_L_Transparent_Additive",
+								"Linear/apShader_L_Transparent_SoftAdditive",
+								"Linear/apShader_L_Transparent_Multiplicative",
+								"Linear/apShader_L_ClippedWithMask",
+								"Linear/apShader_L_ClippedWithMask_Additive",
+								"Linear/apShader_L_ClippedWithMask_SoftAdditive",
+								"Linear/apShader_L_ClippedWithMask_Multiplicative",
+								"apShader_AlphaMask",
+								true);
 
 			
-			if(mat_UnlitLegacy != null)
-			{
-				mat_UnlitLegacy.CheckAndRemoveDuplicatedProperties();//중복 프로퍼티 제거
-			}
+			//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+			// if(mat_UnlitLegacy != null)
+			// {
+			// 	mat_UnlitLegacy.CheckAndRemoveDuplicatedProperties();//중복 프로퍼티 제거
+			// }
 
 			//v1.4.7 : 새로운 Unlit. 완전히 라이팅을 받지 않는다.
-			apMaterialSet mat_UnlitV2 = MakeReservedPreset(RESERVED_MAT_ID__Unlit_V2, "Unlit (v2)", apMaterialSet.ICON.Unlit,
-												"Unlit 2/apShader_Unlit2_T_Alpha",
-												"Unlit 2/apShader_Unlit2_T_Add",
-												"Unlit 2/apShader_Unlit2_T_Soft",
-												"Unlit 2/apShader_Unlit2_T_Mul",
-												"Unlit 2/apShader_Unlit2_C_Alpha",
-												"Unlit 2/apShader_Unlit2_C_Add",
-												"Unlit 2/apShader_Unlit2_C_Soft",
-												"Unlit 2/apShader_Unlit2_C_Mul",
-												"Unlit 2/Linear/apShader_L_Unlit2_T_Alpha",
-												"Unlit 2/Linear/apShader_L_Unlit2_T_Add",
-												"Unlit 2/Linear/apShader_L_Unlit2_T_Soft",
-												"Unlit 2/Linear/apShader_L_Unlit2_T_Mul",
-												"Unlit 2/Linear/apShader_L_Unlit2_C_Alpha",
-												"Unlit 2/Linear/apShader_L_Unlit2_C_Add",
-												"Unlit 2/Linear/apShader_L_Unlit2_C_Soft",
-												"Unlit 2/Linear/apShader_L_Unlit2_C_Mul",
-												"Unlit 2/apShader_Unlit2_AlphaMask",
-												false);//이건 Black Ambient가 필요없다.
+			MakeReservedPreset(	RESERVED_MAT_ID__Unlit_V2, "Legacy/Unlit (v2)", apMaterialSet.ICON.Unlit,
+								MakeTagText(TAG_Unlit),
+								"Unlit 2/apShader_Unlit2_T_Alpha",
+								"Unlit 2/apShader_Unlit2_T_Add",
+								"Unlit 2/apShader_Unlit2_T_Soft",
+								"Unlit 2/apShader_Unlit2_T_Mul",
+								"Unlit 2/apShader_Unlit2_C_Alpha",
+								"Unlit 2/apShader_Unlit2_C_Add",
+								"Unlit 2/apShader_Unlit2_C_Soft",
+								"Unlit 2/apShader_Unlit2_C_Mul",
+								"Unlit 2/Linear/apShader_L_Unlit2_T_Alpha",
+								"Unlit 2/Linear/apShader_L_Unlit2_T_Add",
+								"Unlit 2/Linear/apShader_L_Unlit2_T_Soft",
+								"Unlit 2/Linear/apShader_L_Unlit2_T_Mul",
+								"Unlit 2/Linear/apShader_L_Unlit2_C_Alpha",
+								"Unlit 2/Linear/apShader_L_Unlit2_C_Add",
+								"Unlit 2/Linear/apShader_L_Unlit2_C_Soft",
+								"Unlit 2/Linear/apShader_L_Unlit2_C_Mul",
+								"Unlit 2/apShader_Unlit2_AlphaMask",
+								false);//이건 Black Ambient가 필요없다.
+			
+			//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+			// if(mat_UnlitV2 != null)
+			// {
+			// 	mat_UnlitV2.CheckAndRemoveDuplicatedProperties();//중복 프로퍼티 제거
+			// }
 
-			if(mat_UnlitV2 != null)
-			{
-				mat_UnlitV2.CheckAndRemoveDuplicatedProperties();//중복 프로퍼티 제거
-			}
-			
-			
+			//v1.6.0 : Unlit v3. 마스크를 포함한다.
+			MakeReservedPreset(	RESERVED_MAT_ID__Unlit_V16, "Unlit (v16)", apMaterialSet.ICON.UnlitMask,
+								MakeTagText(TAG_Unlit, TAG_MultiMask),
+								"Unlit (v16)/apShader_Unlit16_T_Alpha",
+								"Unlit (v16)/apShader_Unlit16_T_Add",
+								"Unlit (v16)/apShader_Unlit16_T_Soft",
+								"Unlit (v16)/apShader_Unlit16_T_Mul",
+								"Unlit (v16)/apShader_Unlit16_C_Alpha",
+								"Unlit (v16)/apShader_Unlit16_C_Add",
+								"Unlit (v16)/apShader_Unlit16_C_Soft",
+								"Unlit (v16)/apShader_Unlit16_C_Mul",
+								"Unlit (v16)/apShader_Unlit16_T_Alpha",
+								"Unlit (v16)/apShader_Unlit16_T_Add",
+								"Unlit (v16)/apShader_Unlit16_T_Soft",
+								"Unlit (v16)/apShader_Unlit16_T_Mul",
+								"Unlit (v16)/apShader_Unlit16_C_Alpha",
+								"Unlit (v16)/apShader_Unlit16_C_Add",
+								"Unlit (v16)/apShader_Unlit16_C_Soft",
+								"Unlit (v16)/apShader_Unlit16_C_Mul",
+								"Unlit (v16)/apShader_Unlit16_AlphaMask",
+								false);//이건 Black Ambient가 필요없다.
+
+			//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+			// if(mat_UnlitV3 != null)
+			// {
+			// 	//마스크 전용 프로퍼티 추가
+			// 	mat_UnlitV3.CheckAndRemoveDuplicatedProperties();//중복 프로퍼티 제거
+			// }
 
 
 			//Advanced 패키지가 로드되었다는 가정하에
@@ -199,8 +288,20 @@ namespace AnyPortrait
 				MakeReserved_Advanced(true);
 			}
 
+			//v1.6.0
+			//Lit v16 패키지가 로드되었다는 가정하에
+			if (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_SimpleLit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Specular) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Specular_Emissive) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Rimlight) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Ramp) != null)
+			{
+				MakeReserved_Lit_V16(true);
+			}
+
 			//LWRP 패키지가 로드되었다는 가정하에
-			if(GetPresetUnit(RESERVED_MAT_ID__LWRP_Unlit) != null)
+			if (GetPresetUnit(RESERVED_MAT_ID__LWRP_Unlit) != null)
 			{	
 				MakeReserved_LWRPUnlit(true);
 			}
@@ -220,11 +321,25 @@ namespace AnyPortrait
 				MakeReserved_VR(true);
 			}
 
+			//추가 v1.6.0 : VR (v16) 패키지 로드 체크
+			if(GetPresetUnit(RESERVED_MAT_ID__VR_V16_Unlit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__VR_V16_Lit) != null)
+			{	
+				MakeReserved_VR_V16(true);
+			}
+
 			//추가 19.10.27 : KeepAlpha 패키지 확인 후 초기화
 			if(GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_Unlit) != null ||
 				GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_Lit) != null)
 			{	
 				MakeReserved_KeepAlpha(true);
+			}
+
+			//v1.6.0 : KeepAlpha의 v16 버전
+			if(GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_V16_Unlit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_V16_Lit) != null)
+			{	
+				MakeReserved_KeepAlpha_V16(true);
 			}
 
 			//추가 22.1.5 : Mergeable 패키지 확인
@@ -266,35 +381,50 @@ namespace AnyPortrait
 			{
 				MakeReserved_URP23(true);
 			}
+
+			//v1.6.0 : URP(21) V16 패키지 확인 후 초기화
+			if(GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_Unlit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_Lit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_2DLit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_2DBumpedLit) != null)
+			{
+				MakeReserved_URP_V16_21(true);
+			}
+
+			//v1.6.0 : URP(23) V16 패키지 확인 후 초기화
+			if(GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_Unlit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_Lit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_2DLit) != null ||
+				GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_2DBumpedLit) != null)
+			{
+				MakeReserved_URP_V16_23(true);
+			}
 		}
 
-
-		
-
-
-		private apMaterialSet MakeReservedPreset(int uniqueID, 
-											string name, 
-											apMaterialSet.ICON icon,
-											string shaderPath_Normal_AlphaBlend,
-											string shaderPath_Normal_Additive,
-											string shaderPath_Normal_SoftAdditive,
-											string shaderPath_Normal_Multiplicative,
-											string shaderPath_Clipped_AlphaBlend,
-											string shaderPath_Clipped_Additive,
-											string shaderPath_Clipped_SoftAdditive,
-											string shaderPath_Clipped_Multiplicative,
-											string shaderPath_L_Normal_AlphaBlend,
-											string shaderPath_L_Normal_Additive,
-											string shaderPath_L_Normal_SoftAdditive,
-											string shaderPath_L_Normal_Multiplicative,
-											string shaderPath_L_Clipped_AlphaBlend,
-											string shaderPath_L_Clipped_Additive,
-											string shaderPath_L_Clipped_SoftAdditive,
-											string shaderPath_L_Clipped_Multiplicative,
-											string shaderPath_AlphaMask,
-											bool isNeedToSetBlackColoredAmbient,
-											bool isVRSupported = false,
-											bool isUseShaderGraph = false)
+		private apMaterialSet MakeReservedPreset(	int uniqueID, 
+													string name, 
+													apMaterialSet.ICON icon,
+													string descTags,
+													string shaderPath_Normal_AlphaBlend,
+													string shaderPath_Normal_Additive,
+													string shaderPath_Normal_SoftAdditive,
+													string shaderPath_Normal_Multiplicative,
+													string shaderPath_Clipped_AlphaBlend,
+													string shaderPath_Clipped_Additive,
+													string shaderPath_Clipped_SoftAdditive,
+													string shaderPath_Clipped_Multiplicative,
+													string shaderPath_L_Normal_AlphaBlend,
+													string shaderPath_L_Normal_Additive,
+													string shaderPath_L_Normal_SoftAdditive,
+													string shaderPath_L_Normal_Multiplicative,
+													string shaderPath_L_Clipped_AlphaBlend,
+													string shaderPath_L_Clipped_Additive,
+													string shaderPath_L_Clipped_SoftAdditive,
+													string shaderPath_L_Clipped_Multiplicative,
+													string shaderPath_AlphaMask,
+													bool isNeedToSetBlackColoredAmbient,
+													bool isVRSupported = false,
+													bool isUseShaderGraph = false)
 		{
 
 			//[v1.5.0] 변경
@@ -342,8 +472,19 @@ namespace AnyPortrait
 			if(!isMakeNewReserved)
 			{
 				//에셋 로드까지 완료된 재질 프리셋은 강제로 다시 로드하지 않는다
+				//기본값이 업데이트에 의해 바뀌었을 수 있으니, 기본값 몇개는 갱신한다.
+				materialSet._name = name;
+				materialSet._icon = icon;				
+				materialSet._descTags = descTags;
+
+				//프로퍼티 갱신 [v1.6.0]
+				//Reserved 프로퍼티 자동 갱신 및 추가 후
+				materialSet.CheckAndAddReservedProperties();
+				materialSet.CheckAndRemoveDuplicatedProperties();//혹시 모를 중복 제거
+
 				return materialSet;
 			}
+
 
 			//새로운 재질 프리셋이라면
 			if(isNewPreset)
@@ -352,6 +493,7 @@ namespace AnyPortrait
 				materialSet.MakeReserved(	uniqueID, 
 										name, 
 										icon,
+										descTags,
 										_basePath + "Assets/Shaders/" + shaderPath_Normal_AlphaBlend + strExp,
 										_basePath + "Assets/Shaders/" + shaderPath_Normal_Additive + strExp,
 										_basePath + "Assets/Shaders/" + shaderPath_Normal_SoftAdditive + strExp,
@@ -371,20 +513,20 @@ namespace AnyPortrait
 										_basePath + "Assets/Shaders/" + shaderPath_AlphaMask + strExp,
 										isNeedToSetBlackColoredAmbient);
 
-				//공통된 기본 프로퍼티 추가
-				materialSet.AddProperty("_Color", true, apMaterialSet.SHADER_PROP_TYPE.Color);
-				materialSet.AddProperty("_MainTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
-				if(!isVRSupported)
-				{
-					materialSet.AddProperty("_MaskTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
-				}
-				else
-				{
-					materialSet.AddProperty("_MaskTex_L", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
-					materialSet.AddProperty("_MaskTex_R", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
-				}
+				//공통된 기본 프로퍼티 추가 > 삭제 v1.6.0. 아래의 materialSet.CheckAndAddReservedProperties() 함수에서 자동 수행
+				// materialSet.AddProperty("_Color", true, apMaterialSet.SHADER_PROP_TYPE.Color);
+				// materialSet.AddProperty("_MainTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
+				// if(!isVRSupported)
+				// {
+				// 	materialSet.AddProperty("_MaskTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
+				// }
+				// else
+				// {
+				// 	materialSet.AddProperty("_MaskTex_L", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
+				// 	materialSet.AddProperty("_MaskTex_R", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
+				// }
 			
-				materialSet.AddProperty("_MaskScreenSpaceOffset", true, apMaterialSet.SHADER_PROP_TYPE.Vector);
+				// materialSet.AddProperty("_MaskScreenSpaceOffset", true, apMaterialSet.SHADER_PROP_TYPE.Vector);
 
 			}
 			else
@@ -396,12 +538,15 @@ namespace AnyPortrait
 				materialSet.LoadRefMaterial();
 #endif
 			}
+
+			//프로퍼티 갱신 [v1.6.0]
+			//Reserved 프로퍼티 자동 갱신 및 추가 후
+			materialSet.CheckAndAddReservedProperties();
+			materialSet.CheckAndRemoveDuplicatedProperties();//혹시 모를 중복 제거
 			
 			return materialSet;
 		}
 		
-
-
 
 
 
@@ -454,6 +599,27 @@ namespace AnyPortrait
 									"Unlit 2/Linear/apShader_L_Unlit2_C_Mul",
 									"Unlit 2/apShader_Unlit2_AlphaMask");
 					break;
+
+				case RESERVED_MAT_ID__Unlit_V16://Unlit v3
+					ReinputPaths(	targetSet,
+									"Unlit 3/apShader_Unlit3_T_Alpha",
+									"Unlit 3/apShader_Unlit3_T_Add",
+									"Unlit 3/apShader_Unlit3_T_Soft",
+									"Unlit 3/apShader_Unlit3_T_Mul",
+									"Unlit 3/apShader_Unlit3_C_Alpha",
+									"Unlit 3/apShader_Unlit3_C_Add",
+									"Unlit 3/apShader_Unlit3_C_Soft",
+									"Unlit 3/apShader_Unlit3_C_Mul",
+									"Unlit 3/apShader_Unlit3_T_Alpha",
+									"Unlit 3/apShader_Unlit3_T_Add",
+									"Unlit 3/apShader_Unlit3_T_Soft",
+									"Unlit 3/apShader_Unlit3_T_Mul",
+									"Unlit 3/apShader_Unlit3_C_Alpha",
+									"Unlit 3/apShader_Unlit3_C_Add",
+									"Unlit 3/apShader_Unlit3_C_Soft",
+									"Unlit 3/apShader_Unlit3_C_Mul",
+									"Unlit 3/apShader_Unlit3_AlphaMask");
+						break;
 
 					//[ Advanced ]
 				case RESERVED_MAT_ID__Lit:
@@ -582,7 +748,136 @@ namespace AnyPortrait
 									"apShader_AlphaMask");
 					break;
 
-					//[LWRP]
+					//[v1.6.0] Lit v16의 Simple Lit
+				case RESERVED_MAT_ID__Lit_V16_SimpleLit:
+					ReinputPaths(	targetSet,
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_T_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_C_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_T_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_C_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",												
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__Lit_V16_Bumped:
+					ReinputPaths(	targetSet,
+									"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_T_Alpha",//Bumped
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_C_Alpha",//Bumped
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_T_Alpha",//Bumped
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_C_Alpha",//Bumped
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Specular:
+					ReinputPaths(	targetSet,
+									"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_T_Alpha",//Bumped+Specular
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_C_Alpha",//Bumped+Specular
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_T_Alpha",//Bumped+Specular
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_C_Alpha",//Bumped+Specular
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",												
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Specular_Emissive:
+					ReinputPaths(	targetSet,
+									"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_T_Alpha",//Bumped+Specular+Emissive
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_C_Alpha",//Bumped+Specular+Emissive
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_T_Alpha",//Bumped+Specular+Emissive
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_C_Alpha",//Bumped+Specular+Emissive
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Rimlight:
+					ReinputPaths(	targetSet,
+									"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_T_Alpha",//Bumped+Rimlight
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_C_Alpha",//Bumped+Rimlight
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_T_Alpha",//Bumped+Rimlight
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_C_Alpha",//Bumped+Rimlight
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Ramp:
+					ReinputPaths(	targetSet,
+									"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_T_Alpha",//Bumped+Ramp
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_C_Alpha",//Bumped+Ramp
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_T_Alpha",//Bumped+Ramp
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+									"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_C_Alpha",//Bumped+Ramp
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask");
+					break;
+
+
+
+				//[LWRP]
 				case RESERVED_MAT_ID__LWRP_Unlit:
 					ReinputPaths(	targetSet,
 									"Advanced/LWRP Unlit/apShader_LWRPUnlit_T_Alpha",
@@ -669,6 +964,55 @@ namespace AnyPortrait
 									"apShader_AlphaMask");
 					break;
 
+					//[v1.6.0] KeepAlpha
+				case RESERVED_MAT_ID__KeepAlpha_V16_Unlit:
+					ReinputPaths(	targetSet,
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Common/apShader_KA16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__KeepAlpha_V16_Lit:
+					ReinputPaths(	targetSet,
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_T_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_C_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_T_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_C_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Common/apShader_KA16_AlphaMask");
+					break;
+
 					//[VR]
 				case RESERVED_MAT_ID__VR_Unlit:
 					ReinputPaths(	targetSet,
@@ -753,6 +1097,54 @@ namespace AnyPortrait
 									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Mul",
 									"apShader_AlphaMask");
 					break;
+
+					//[VR v16]
+				case RESERVED_MAT_ID__VR_V16_Unlit:
+					ReinputPaths(	targetSet,
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Mul",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Mul",
+
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Mul",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Mul",
+
+									"Advanced/VR (v16)/Common/apShader_VR16_AlphaMask");
+					break;
+
+				case RESERVED_MAT_ID__VR_V16_Lit:
+					ReinputPaths(	targetSet,
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Mul",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Mul",
+
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Mul",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Mul",
+
+									"Advanced/VR (v16)/Common/apShader_VR16_AlphaMask");
+					break;
+
 
 					//[Mergeable]
 				case RESERVED_MAT_ID__Mergeable_Unlit:
@@ -1211,6 +1603,216 @@ namespace AnyPortrait
 								"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask",
 								true);
 					break;
+
+				//v1.6.0 : V16의 URP (2021)
+				case RESERVED_MAT_ID__URP_V16_21_Unlit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_21_Lit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_21_2DLit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_21_2DBumpedLit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_T_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_C_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_T_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_C_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_23_Unlit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_23_Lit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_23_2DLit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
+				case RESERVED_MAT_ID__URP_V16_23_2DBumpedLit:
+					ReinputPaths(	targetSet,
+									"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_T_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_C_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_T_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_C_Alpha",//2D Bumped Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									true);//True : Shader Graph
+					break;
+
 			}
 		}
 
@@ -1320,10 +1922,15 @@ namespace AnyPortrait
 				matSet._uniqueID = newID;
 				matSet._name = name;
 
-				matSet.AddProperty("_Color", true, apMaterialSet.SHADER_PROP_TYPE.Color);
-				matSet.AddProperty("_MainTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
-				matSet.AddProperty("_MaskTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
-				matSet.AddProperty("_MaskScreenSpaceOffset", true, apMaterialSet.SHADER_PROP_TYPE.Vector);
+				//이전
+				// matSet.AddProperty("_Color", true, apMaterialSet.SHADER_PROP_TYPE.Color);
+				// matSet.AddProperty("_MainTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
+				// matSet.AddProperty("_MaskTex", true, apMaterialSet.SHADER_PROP_TYPE.Texture);
+				// matSet.AddProperty("_MaskScreenSpaceOffset", true, apMaterialSet.SHADER_PROP_TYPE.Vector);
+
+				//변경 v1.6.0
+				matSet.CheckAndAddReservedProperties();//기본 Reserved Property를 추가한다.
+				matSet.CheckAndRemoveDuplicatedProperties();//중복된 프로퍼티가 있다면 삭제한다.
 			}
 			
 			_presets.Add(matSet);
@@ -1354,7 +1961,7 @@ namespace AnyPortrait
 
 		private int GetNewCustomID()
 		{
-			//사용자 ID는 100부터 시작
+			//사용자 ID는 200부터 시작
 			//랜덤값으로 만듭시다.
 			//랜덤은 1000부터 99999
 			//에러시 ID는 200부터 999
@@ -1390,6 +1997,30 @@ namespace AnyPortrait
 		}
 
 
+		private string MakeTagText(params string[] tagTexts)
+		{
+			int nTagCount = tagTexts != null ? tagTexts.Length : 0;
+			if(nTagCount == 0)
+			{
+				return "";
+			}
+
+			StringBuilder sb = new StringBuilder(200);
+
+			for (int i = 0; i < nTagCount; i++)
+			{
+				sb.Append(tagTexts[i]);
+				if(i < nTagCount - 1)
+				{
+					sb.Append(", ");
+				}
+			}
+
+			return sb.ToString();
+			
+
+		}
+
 
 		// 외부에서 추가된 Shader로 Reserved Preset 만들기
 		//------------------------------------------------------------------------------------------
@@ -1404,37 +2035,41 @@ namespace AnyPortrait
 			if ((!makeWhenAlreadyAdded) || (GetPresetUnit(RESERVED_MAT_ID__Lit) != null))
 			{
 				//Lit를 추가하거나 갱신할 수 있을 때
-				apMaterialSet matSet_Lit = MakeReservedPreset(RESERVED_MAT_ID__Lit, "Lit", apMaterialSet.ICON.Lit,
-												"Advanced/Lit/apShader_Lit_T_Alpha",
-												"Advanced/Lit/apShader_Lit_T_Add",
-												"Advanced/Lit/apShader_Lit_T_Soft",
-												"Advanced/Lit/apShader_Lit_T_Mul",
-												"Advanced/Lit/apShader_Lit_C_Alpha",
-												"Advanced/Lit/apShader_Lit_C_Add",
-												"Advanced/Lit/apShader_Lit_C_Soft",
-												"Advanced/Lit/apShader_Lit_C_Mul",
-												"Advanced/Lit/Linear/apShader_L_Lit_T_Alpha",
-												"Advanced/Lit/Linear/apShader_L_Lit_T_Add",
-												"Advanced/Lit/Linear/apShader_L_Lit_T_Soft",
-												"Advanced/Lit/Linear/apShader_L_Lit_T_Mul",
-												"Advanced/Lit/Linear/apShader_L_Lit_C_Alpha",
-												"Advanced/Lit/Linear/apShader_L_Lit_C_Add",
-												"Advanced/Lit/Linear/apShader_L_Lit_C_Soft",
-												"Advanced/Lit/Linear/apShader_L_Lit_C_Mul",
-												"apShader_AlphaMask",
-												false);
+				MakeReservedPreset(	RESERVED_MAT_ID__Lit, "Legacy/Lit", apMaterialSet.ICON.Lit,
+									MakeTagText(TAG_Lit),
+									"Advanced/Lit/apShader_Lit_T_Alpha",
+									"Advanced/Lit/apShader_Lit_T_Add",
+									"Advanced/Lit/apShader_Lit_T_Soft",
+									"Advanced/Lit/apShader_Lit_T_Mul",
+									"Advanced/Lit/apShader_Lit_C_Alpha",
+									"Advanced/Lit/apShader_Lit_C_Add",
+									"Advanced/Lit/apShader_Lit_C_Soft",
+									"Advanced/Lit/apShader_Lit_C_Mul",
+									"Advanced/Lit/Linear/apShader_L_Lit_T_Alpha",
+									"Advanced/Lit/Linear/apShader_L_Lit_T_Add",
+									"Advanced/Lit/Linear/apShader_L_Lit_T_Soft",
+									"Advanced/Lit/Linear/apShader_L_Lit_T_Mul",
+									"Advanced/Lit/Linear/apShader_L_Lit_C_Alpha",
+									"Advanced/Lit/Linear/apShader_L_Lit_C_Add",
+									"Advanced/Lit/Linear/apShader_L_Lit_C_Soft",
+									"Advanced/Lit/Linear/apShader_L_Lit_C_Mul",
+									"apShader_AlphaMask",
+									false);
 
-				if(matSet_Lit != null)
-				{
-					matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Lit != null)
+				// {
+				// 	matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			// 3. Bumped
 			if ((!makeWhenAlreadyAdded) || (GetPresetUnit(RESERVED_MAT_ID__Bumped) != null))
 			{
 				//Bumped를 추가하거나 갱신할 수 있을 때
-				apMaterialSet matSet_Bumped = MakeReservedPreset(RESERVED_MAT_ID__Bumped, "Bumped", apMaterialSet.ICON.Lit,
+				apMaterialSet matSet_Bumped = MakeReservedPreset(
+													RESERVED_MAT_ID__Bumped, "Legacy/Bumped", apMaterialSet.ICON.Lit,
+													MakeTagText(TAG_Lit, TAG_Bumped),
 													"Advanced/Bumped/apShader_Bumped_T_Alpha",
 													"Advanced/Bumped/apShader_Bumped_T_Add",
 													"Advanced/Bumped/apShader_Bumped_T_Soft",
@@ -1456,6 +2091,7 @@ namespace AnyPortrait
 
 				if(matSet_Bumped != null)
 				{
+					//프로퍼티 추가
 					matSet_Bumped.AddProperty_Texture("_BumpMap", false, false);
 					matSet_Bumped.CheckAndRemoveDuplicatedProperties();//중복 제거
 				}
@@ -1467,7 +2103,9 @@ namespace AnyPortrait
 			if ((!makeWhenAlreadyAdded) || (GetPresetUnit(RESERVED_MAT_ID__Bumped_Specular) != null))
 			{
 				//Bumped Specular를 추가하거나 갱신할 수 있을 때
-				apMaterialSet matSet_BumpedSpecular = MakeReservedPreset(RESERVED_MAT_ID__Bumped_Specular, "Bumped Specular", apMaterialSet.ICON.LitSpecular,
+				apMaterialSet matSet_BumpedSpecular = MakeReservedPreset(
+												RESERVED_MAT_ID__Bumped_Specular, "Legacy/Bumped Specular", apMaterialSet.ICON.LitSpecular,
+												MakeTagText(TAG_Lit, TAG_Bumped, TAG_Specular),
 												"Advanced/BumpedSpecular/apShader_BumpSpec_T_Alpha",
 												"Advanced/BumpedSpecular/apShader_BumpSpec_T_Add",
 												"Advanced/BumpedSpecular/apShader_BumpSpec_T_Soft",
@@ -1489,6 +2127,7 @@ namespace AnyPortrait
 
 				if(matSet_BumpedSpecular != null)
 				{
+					//프로퍼티 추가
 					matSet_BumpedSpecular.AddProperty_Texture("_BumpMap", false, false);
 					matSet_BumpedSpecular.AddProperty("_SpecularPower", false, apMaterialSet.SHADER_PROP_TYPE.Float).SetFloat(5.0f);
 					matSet_BumpedSpecular.AddProperty_Texture("_SpecularMap", false, false);
@@ -1503,7 +2142,9 @@ namespace AnyPortrait
 			{
 				//Bumped Specular Emission를 추가하거나 갱신할 수 있을 때
 
-				apMaterialSet matSet_BSE = MakeReservedPreset(RESERVED_MAT_ID__Bumped_Specular_Emissive, "Bumped Specular Emissison", apMaterialSet.ICON.LitSpecularEmission,
+				apMaterialSet matSet_BSE = MakeReservedPreset(
+													RESERVED_MAT_ID__Bumped_Specular_Emissive, "Legacy/Bumped Specular Emissison", apMaterialSet.ICON.LitSpecularEmission,
+													MakeTagText(TAG_Lit, TAG_Bumped, TAG_Specular, TAG_Emissive),
 													"Advanced/BumpedSpecularEmission/apShader_BSE_T_Alpha",
 													"Advanced/BumpedSpecularEmission/apShader_BSE_T_Add",
 													"Advanced/BumpedSpecularEmission/apShader_BSE_T_Soft",
@@ -1525,6 +2166,7 @@ namespace AnyPortrait
 
 				if(matSet_BSE != null)
 				{
+					//프로퍼티 추가
 					matSet_BSE.AddProperty_Texture("_BumpMap", false, false);
 					matSet_BSE.AddProperty("_SpecularPower", false, apMaterialSet.SHADER_PROP_TYPE.Float).SetFloat(5.0f);
 					matSet_BSE.AddProperty_Texture("_SpecularMap", false, false);
@@ -1541,7 +2183,9 @@ namespace AnyPortrait
 			if ((!makeWhenAlreadyAdded) || (GetPresetUnit(RESERVED_MAT_ID__Bumped_Rimlight) != null))
 			{
 				//Bumped Rimlight를 추가하거나 갱신할 수 있을 때
-				apMaterialSet matSet_BRimlight = MakeReservedPreset(RESERVED_MAT_ID__Bumped_Rimlight, "Bumped Rimlight", apMaterialSet.ICON.LitRimlight,
+				apMaterialSet matSet_BRimlight = MakeReservedPreset(
+													RESERVED_MAT_ID__Bumped_Rimlight, "Legacy/Bumped Rimlight", apMaterialSet.ICON.LitRimlight,
+													MakeTagText(TAG_Lit, TAG_Bumped, TAG_Rimlight),
 													"Advanced/BumpedRimlight/apShader_BumpRim_T_Alpha",
 													"Advanced/BumpedRimlight/apShader_BumpRim_T_Add",
 													"Advanced/BumpedRimlight/apShader_BumpRim_T_Soft",
@@ -1563,6 +2207,7 @@ namespace AnyPortrait
 
 				if(matSet_BRimlight != null)
 				{
+					//프로퍼티 추가
 					matSet_BRimlight.AddProperty_Texture("_BumpMap", false, false);
 					matSet_BRimlight.AddProperty("_RimPower", false, apMaterialSet.SHADER_PROP_TYPE.Float).SetFloat(2.0f);
 					matSet_BRimlight.AddProperty("_RimColor", false, apMaterialSet.SHADER_PROP_TYPE.Color).SetColor(Color.white);
@@ -1576,7 +2221,9 @@ namespace AnyPortrait
 			if ((!makeWhenAlreadyAdded) || (GetPresetUnit(RESERVED_MAT_ID__Bumped_Ramp) != null))
 			{
 				//Bumped Ramp를 추가하거나 갱신할 수 있을 때
-				apMaterialSet matSet_BumpRamp = MakeReservedPreset(RESERVED_MAT_ID__Bumped_Ramp, "Bumped Ramp", apMaterialSet.ICON.LitRamp,
+				apMaterialSet matSet_BumpRamp = MakeReservedPreset(
+													RESERVED_MAT_ID__Bumped_Ramp, "Legacy/Bumped Ramp", apMaterialSet.ICON.LitRamp,
+													MakeTagText(TAG_Lit, TAG_Bumped, TAG_Ramp),
 													"Advanced/BumpedRamp/apShader_BumpRamp_T_Alpha",
 													"Advanced/BumpedRamp/apShader_BumpRamp_T_Add",
 													"Advanced/BumpedRamp/apShader_BumpRamp_T_Soft",
@@ -1598,6 +2245,7 @@ namespace AnyPortrait
 
 				if(matSet_BumpRamp != null)
 				{
+					//프로퍼티 추가
 					matSet_BumpRamp.AddProperty_Texture("_BumpMap", false, false);
 					matSet_BumpRamp.AddProperty_Texture("_RampMap", false, true);
 					matSet_BumpRamp.CheckAndRemoveDuplicatedProperties();//중복 제거
@@ -1605,6 +2253,253 @@ namespace AnyPortrait
 				
 			}
 		}
+
+
+
+		public void MakeReserved_Lit_V16(bool isCheckShader)
+		{
+			// [v16] Simple Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_SimpleLit) != null))
+			{
+				//Lit를 추가하거나 갱신할 수 있을 때
+				MakeReservedPreset(	RESERVED_MAT_ID__Lit_V16_SimpleLit, "Simple Lit", apMaterialSet.ICON.LitMask,
+									MakeTagText(TAG_Lit, TAG_MultiMask),
+
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_T_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_C_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_T_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+									"Advanced/Lit (v16)/Simple Lit/apShader_Lit16_SimpleLit_C_Alpha",//Simple Lit
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+									"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+												
+									"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask",//Alpha Mask
+									false);
+			}
+
+			// [v16] Bumped
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped) != null))
+			{
+				//Lit를 추가하거나 갱신할 수 있을 때
+				apMaterialSet matSet_v16_Bumped = MakeReservedPreset(
+												RESERVED_MAT_ID__Lit_V16_Bumped, "Bumped", apMaterialSet.ICON.LitMask,
+												MakeTagText(TAG_Lit, TAG_Bumped, TAG_MultiMask),
+
+												"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_T_Alpha",//Bumped
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_C_Alpha",//Bumped
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+
+												"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_T_Alpha",//Bumped
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped/apShader_Lit16_Bumped_C_Alpha",//Bumped
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+												
+												"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask",//Alpha Mask
+												false);
+
+				if(matSet_v16_Bumped != null)
+				{
+					//프로퍼티 추가
+					matSet_v16_Bumped.AddProperty_Texture("_BumpMap", false, false);
+					matSet_v16_Bumped.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+
+			// [v16] Bumped Specular
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Specular) != null))
+			{
+				//Lit를 추가하거나 갱신할 수 있을 때
+				apMaterialSet matSet_v16_BumpedSpecular = MakeReservedPreset(
+												RESERVED_MAT_ID__Lit_V16_Bumped_Specular, "Bumped Specular", apMaterialSet.ICON.LitSpecular,
+												MakeTagText(TAG_Lit, TAG_Bumped, TAG_Specular, TAG_MultiMask),
+
+												"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_T_Alpha",//Bumped+Specular
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_C_Alpha",//Bumped+Specular
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+
+												"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_T_Alpha",//Bumped+Specular
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Specular/apShader_Lit16_BumpSpec_C_Alpha",//Bumped+Specular
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+												
+												"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask",//Alpha Mask
+												false);
+
+				if(matSet_v16_BumpedSpecular != null)
+				{
+					//프로퍼티 추가
+					matSet_v16_BumpedSpecular.AddProperty_Texture("_BumpMap", false, false);
+					matSet_v16_BumpedSpecular.AddProperty("_SpecularPower", false, apMaterialSet.SHADER_PROP_TYPE.Float).SetFloat(5.0f);
+					matSet_v16_BumpedSpecular.AddProperty_Texture("_SpecularMap", false, false);
+					matSet_v16_BumpedSpecular.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+
+			// [v16] Bumped Specular Emissive
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Specular_Emissive) != null))
+			{
+				//Lit를 추가하거나 갱신할 수 있을 때
+				apMaterialSet matSet_v16_BSE = MakeReservedPreset(
+												RESERVED_MAT_ID__Lit_V16_Bumped_Specular_Emissive,
+												"Bumped Specular Emissive",
+												apMaterialSet.ICON.LitSpecularEmission,
+												MakeTagText(TAG_Lit, TAG_Bumped, TAG_Specular, TAG_Emissive, TAG_MultiMask),
+
+												"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_T_Alpha",//Bumped+Specular+Emissive
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_C_Alpha",//Bumped+Specular+Emissive
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+
+												"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_T_Alpha",//Bumped+Specular+Emissive
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Specular Emission/apShader_Lit16_BumpSpecEm_C_Alpha",//Bumped+Specular+Emissive
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+												
+												"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask",//Alpha Mask
+												false);
+
+				if(matSet_v16_BSE != null)
+				{
+					//프로퍼티 추가
+					matSet_v16_BSE.AddProperty_Texture("_BumpMap", false, false);
+					matSet_v16_BSE.AddProperty("_SpecularPower", false, apMaterialSet.SHADER_PROP_TYPE.Float).SetFloat(5.0f);
+					matSet_v16_BSE.AddProperty_Texture("_SpecularMap", false, false);
+					matSet_v16_BSE.AddProperty("_EmissionColor", false, apMaterialSet.SHADER_PROP_TYPE.Color).SetColor(Color.white);
+					matSet_v16_BSE.AddProperty_Texture("_EmissionMap", false, false);
+					matSet_v16_BSE.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+
+			// [v16] Bumped Rimlight
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Rimlight) != null))
+			{
+				//Lit를 추가하거나 갱신할 수 있을 때
+				apMaterialSet matSet_v16_BumpedRimlight = MakeReservedPreset(
+												RESERVED_MAT_ID__Lit_V16_Bumped_Rimlight,
+												"Bumped Rimlight",
+												apMaterialSet.ICON.LitRimlight,
+												MakeTagText(TAG_Lit, TAG_Bumped, TAG_Rimlight, TAG_MultiMask),
+
+												"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_T_Alpha",//Bumped+Rimlight
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_C_Alpha",//Bumped+Rimlight
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+
+												"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_T_Alpha",//Bumped+Rimlight
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Rimlight/apShader_Lit16_BumpRim_C_Alpha",//Bumped+Rimlight
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+												
+												"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask",//Alpha Mask
+												false);
+
+				if(matSet_v16_BumpedRimlight != null)
+				{
+					//프로퍼티 추가
+					matSet_v16_BumpedRimlight.AddProperty_Texture("_BumpMap", false, false);
+					matSet_v16_BumpedRimlight.AddProperty("_RimPower", false, apMaterialSet.SHADER_PROP_TYPE.Float).SetFloat(2.0f);
+					matSet_v16_BumpedRimlight.AddProperty("_RimColor", false, apMaterialSet.SHADER_PROP_TYPE.Color).SetColor(Color.white);
+					matSet_v16_BumpedRimlight.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+
+			// [v16] Bumped Ramp
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Lit_V16_Bumped_Ramp) != null))
+			{
+				//Lit를 추가하거나 갱신할 수 있을 때
+				apMaterialSet matSet_v16_BumpedRamp = MakeReservedPreset(
+												RESERVED_MAT_ID__Lit_V16_Bumped_Ramp,
+												"Bumped Ramp",
+												apMaterialSet.ICON.LitRamp,
+												MakeTagText(TAG_Lit, TAG_Bumped, TAG_Ramp, TAG_MultiMask),
+
+												"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_T_Alpha",//Bumped+Ramp
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_C_Alpha",//Bumped+Ramp
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+
+												"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_T_Alpha",//Bumped+Ramp
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_T_Mul",
+
+												"Advanced/Lit (v16)/Bumped Ramp/apShader_Lit16_BumpRamp_C_Alpha",//Bumped+Ramp
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Add",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Soft",
+												"Advanced/Lit (v16)/Common/apShader_Lit16_C_Mul",
+												
+												"Advanced/Lit (v16)/Common/apShader_Lit16_AlphaMask",//Alpha Mask
+												false);
+
+				if(matSet_v16_BumpedRamp != null)
+				{
+					//프로퍼티 추가
+					matSet_v16_BumpedRamp.AddProperty_Texture("_BumpMap", false, false);
+					matSet_v16_BumpedRamp.AddProperty_Texture("_RampMap", false, true);
+					matSet_v16_BumpedRamp.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+		}
+
 
 		public bool MakeReserved_LWRPUnlit(bool isCheckShader)
 		{
@@ -1637,7 +2532,8 @@ namespace AnyPortrait
 				}
 			}
 
-			apMaterialSet matSet_LWRP_Unlit = MakeReservedPreset(RESERVED_MAT_ID__LWRP_Unlit, "LWRP Unlit", apMaterialSet.ICON.Unlit, 
+			MakeReservedPreset(	RESERVED_MAT_ID__LWRP_Unlit, "Legacy/LWRP Unlit", apMaterialSet.ICON.Unlit, 
+								MakeTagText(TAG_Unlit, TAG_LWRP),
 								"Advanced/LWRP Unlit/apShader_LWRPUnlit_T_Alpha",
 								"Advanced/LWRP Unlit/apShader_LWRPUnlit_T_Additive",
 								"Advanced/LWRP Unlit/apShader_LWRPUnlit_T_SoftAdditive",
@@ -1658,10 +2554,11 @@ namespace AnyPortrait
 								"Advanced/LWRP Unlit/apShader_LWRPUnlit_AlphaMask",
 								true);
 
-			if(matSet_LWRP_Unlit != null)
-			{
-				matSet_LWRP_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-			}
+			//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+			// if(matSet_LWRP_Unlit != null)
+			// {
+			// 	matSet_LWRP_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+			// }
 
 			return true;
 		}
@@ -1688,7 +2585,8 @@ namespace AnyPortrait
 				}
 			}
 
-			apMaterialSet matSet_LWRP_2DLit = MakeReservedPreset(RESERVED_MAT_ID__LWRP_2D_Lit, "LWRP 2D Lit", apMaterialSet.ICON.Lit, 
+			MakeReservedPreset(	RESERVED_MAT_ID__LWRP_2D_Lit, "Legacy/LWRP 2D Lit", apMaterialSet.ICON.Lit, 
+								MakeTagText(TAG_Lit, TAG_LWRP, TAG_2D),
 								"Advanced/LWRP 2D Lit (Experimental)/apShader_LWRP2D_Lit_T_AlphaBlend",
 								"Advanced/LWRP 2D Lit (Experimental)/apShader_LWRP2D_Lit_T_Additive",
 								"Advanced/LWRP 2D Lit (Experimental)/apShader_LWRP2D_Lit_T_SoftAdditive",
@@ -1710,10 +2608,11 @@ namespace AnyPortrait
 								"Advanced/LWRP 2D Lit (Experimental)/apShader_LWRP2D_AlphaMask",
 								false);
 
-			if(matSet_LWRP_2DLit != null)
-			{
-				matSet_LWRP_2DLit.CheckAndRemoveDuplicatedProperties();//중복 제거
-			}
+			//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+			// if(matSet_LWRP_2DLit != null)
+			// {
+			// 	matSet_LWRP_2DLit.CheckAndRemoveDuplicatedProperties();//중복 제거
+			// }
 
 			return true;
 		}
@@ -1724,129 +2623,204 @@ namespace AnyPortrait
 			//Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__VR_Unlit) != null))
 			{
-				apMaterialSet matSet_VR_Unlit = MakeReservedPreset(RESERVED_MAT_ID__VR_Unlit, "VR Unlit", apMaterialSet.ICON.UnlitVR, 
-								"Advanced/UnlitVR/apShader_UnlitVR_T_Alpha",
-								"Advanced/UnlitVR/apShader_UnlitVR_T_Add",
-								"Advanced/UnlitVR/apShader_UnlitVR_T_Soft",
-								"Advanced/UnlitVR/apShader_UnlitVR_T_Mul",
-								"Advanced/UnlitVR/apShader_UnlitVR_C_Alpha",
-								"Advanced/UnlitVR/apShader_UnlitVR_C_Add",
-								"Advanced/UnlitVR/apShader_UnlitVR_C_Soft",
-								"Advanced/UnlitVR/apShader_UnlitVR_C_Mul",
+				MakeReservedPreset(	RESERVED_MAT_ID__VR_Unlit, "Legacy/VR Unlit", apMaterialSet.ICON.UnlitVR, 
+									MakeTagText(TAG_Unlit, TAG_VR),
+									"Advanced/UnlitVR/apShader_UnlitVR_T_Alpha",
+									"Advanced/UnlitVR/apShader_UnlitVR_T_Add",
+									"Advanced/UnlitVR/apShader_UnlitVR_T_Soft",
+									"Advanced/UnlitVR/apShader_UnlitVR_T_Mul",
+									"Advanced/UnlitVR/apShader_UnlitVR_C_Alpha",
+									"Advanced/UnlitVR/apShader_UnlitVR_C_Add",
+									"Advanced/UnlitVR/apShader_UnlitVR_C_Soft",
+									"Advanced/UnlitVR/apShader_UnlitVR_C_Mul",
 
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Alpha",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Add",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Soft",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Mul",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Alpha",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Add",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Soft",
-								"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Mul",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Alpha",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Add",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Soft",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_T_Mul",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Alpha",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Add",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Soft",
+									"Advanced/UnlitVR/Linear/apShader_L_UnlitVR_C_Mul",
 
-								"apShader_AlphaMask", 
-								true,
-								true);
+									"apShader_AlphaMask", 
+									true,
+									true);
 
-				if(matSet_VR_Unlit != null)
-				{
-					matSet_VR_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_VR_Unlit != null)
+				// {
+				// 	matSet_VR_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 			
 			//Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__VR_Lit) != null))
 			{
-				apMaterialSet matSet_VR_Lit = MakeReservedPreset(RESERVED_MAT_ID__VR_Lit, "VR Lit", apMaterialSet.ICON.LitVR, 
-								"Advanced/LitVR/apShader_LitVR_T_Alpha",
-								"Advanced/LitVR/apShader_LitVR_T_Add",
-								"Advanced/LitVR/apShader_LitVR_T_Soft",
-								"Advanced/LitVR/apShader_LitVR_T_Mul",
-								"Advanced/LitVR/apShader_LitVR_C_Alpha",
-								"Advanced/LitVR/apShader_LitVR_C_Add",
-								"Advanced/LitVR/apShader_LitVR_C_Soft",
-								"Advanced/LitVR/apShader_LitVR_C_Mul",
+				MakeReservedPreset(	RESERVED_MAT_ID__VR_Lit, "Legacy/VR Lit", apMaterialSet.ICON.LitVR,
+									MakeTagText(TAG_Lit, TAG_VR),
+									"Advanced/LitVR/apShader_LitVR_T_Alpha",
+									"Advanced/LitVR/apShader_LitVR_T_Add",
+									"Advanced/LitVR/apShader_LitVR_T_Soft",
+									"Advanced/LitVR/apShader_LitVR_T_Mul",
+									"Advanced/LitVR/apShader_LitVR_C_Alpha",
+									"Advanced/LitVR/apShader_LitVR_C_Add",
+									"Advanced/LitVR/apShader_LitVR_C_Soft",
+									"Advanced/LitVR/apShader_LitVR_C_Mul",
 
-								"Advanced/LitVR/Linear/apShader_L_LitVR_T_Alpha",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_T_Add",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_T_Soft",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_T_Mul",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_C_Alpha",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_C_Add",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_C_Soft",
-								"Advanced/LitVR/Linear/apShader_L_LitVR_C_Mul",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_T_Alpha",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_T_Add",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_T_Soft",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_T_Mul",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_C_Alpha",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_C_Add",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_C_Soft",
+									"Advanced/LitVR/Linear/apShader_L_LitVR_C_Mul",
 
-								"apShader_AlphaMask", 
-								false,
-								true);
+									"apShader_AlphaMask", 
+									false,
+									true);
 
-				if(matSet_VR_Lit != null)
-				{
-					matSet_VR_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_VR_Lit != null)
+				// {
+				// 	matSet_VR_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//Unlit (with ScaleOffset)
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__VR_Unlit_ScaleOffset) != null))
 			{
-				apMaterialSet matSet_VR_UnlitScaleOffset = MakeReservedPreset(RESERVED_MAT_ID__VR_Unlit_ScaleOffset, "VR Unlit (with ScaleOffset)", apMaterialSet.ICON.UnlitVR, 
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Alpha",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Add",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Soft",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Mul",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Alpha",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Add",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Soft",
-								"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Mul",
+				MakeReservedPreset(	RESERVED_MAT_ID__VR_Unlit_ScaleOffset, "Legacy/VR Unlit (ScaleOffset)", apMaterialSet.ICON.UnlitVR, 
+									MakeTagText(TAG_Unlit, TAG_VR),
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Alpha",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Add",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Soft",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_T_Mul",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Alpha",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Add",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Soft",
+									"Advanced/UnlitVRWithScaleOffset/apShader_UnlitVRSO_C_Mul",
 
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Alpha",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Add",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Soft",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Mul",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Alpha",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Add",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Soft",
-								"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Mul",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Alpha",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Add",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Soft",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_T_Mul",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Alpha",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Add",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Soft",
+									"Advanced/UnlitVRWithScaleOffset/Linear/apShader_L_UnlitVRSO_C_Mul",
 
-								"apShader_AlphaMask", 
-								true,
-								true);
+									"apShader_AlphaMask", 
+									true,
+									true);
 
-				if(matSet_VR_UnlitScaleOffset != null)
-				{
-					matSet_VR_UnlitScaleOffset.CheckAndRemoveDuplicatedProperties();
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_VR_UnlitScaleOffset != null)
+				// {
+				// 	matSet_VR_UnlitScaleOffset.CheckAndRemoveDuplicatedProperties();
+				// }
 			}
 			
 			//Lit (with ScaleOffset)
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__VR_Lit_ScaleOffset) != null))
 			{
-				apMaterialSet matSet_VR_LitScaleOffset = MakeReservedPreset(RESERVED_MAT_ID__VR_Lit_ScaleOffset, "VR Lit (with ScaleOffset)", apMaterialSet.ICON.LitVR, 
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Alpha",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Add",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Soft",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Mul",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Alpha",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Add",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Soft",
-								"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Mul",
+				MakeReservedPreset(	RESERVED_MAT_ID__VR_Lit_ScaleOffset, "Legacy/VR Lit (ScaleOffset)", apMaterialSet.ICON.LitVR, 
+									MakeTagText(TAG_Lit, TAG_VR),
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Alpha",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Add",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Soft",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_T_Mul",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Alpha",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Add",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Soft",
+									"Advanced/LitVRWithScaleOffset/apShader_LitVRSO_C_Mul",
 
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Alpha",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Add",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Soft",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Mul",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Alpha",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Add",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Soft",
-								"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Mul",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Alpha",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Add",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Soft",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_T_Mul",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Alpha",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Add",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Soft",
+									"Advanced/LitVRWithScaleOffset/Linear/apShader_L_LitVRSO_C_Mul",
 
-								"apShader_AlphaMask", 
-								false,
-								true);
+									"apShader_AlphaMask", 
+									false,
+									true);
 
-				if(matSet_VR_LitScaleOffset != null)
-				{
-					matSet_VR_LitScaleOffset.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_VR_LitScaleOffset != null)
+				// {
+				// 	matSet_VR_LitScaleOffset.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
+			}
+		}
+
+		/// <summary>
+		/// v1.6.0 : 개선된 VR 재질 프리셋을 확인하여 추가한다.
+		/// </summary>
+		/// <param name="isCheckShader"></param>
+		public void MakeReserved_VR_V16(bool isCheckShader)
+		{
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__VR_V16_Unlit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__VR_V16_Unlit,
+									"VR Unlit",
+									apMaterialSet.ICON.UnlitVR, 
+									MakeTagText(TAG_Unlit, TAG_VR, TAG_MultiMask),
+
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Mul",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Mul",
+
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_T_Mul",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Alpha",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Add",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Soft",
+									"Advanced/VR (v16)/Unlit/apShader_VR16_Unlit_C_Mul",
+
+									"Advanced/VR (v16)/Common/apShader_VR16_AlphaMask",
+									false,//검은색 Ambient Color 강제 아님
+									true);
+			}
+
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__VR_V16_Lit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__VR_V16_Lit,
+									"VR Lit",
+									apMaterialSet.ICON.LitVR, 
+									MakeTagText(TAG_Lit, TAG_VR, TAG_MultiMask),
+								
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Mul",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Mul",
+
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_T_Mul",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Alpha",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Add",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Soft",
+									"Advanced/VR (v16)/Lit/apShader_VR16_Lit_C_Mul",
+
+									"Advanced/VR (v16)/Common/apShader_VR16_AlphaMask",
+									false,//검은색 Ambient Color 강제 아님
+									true);
 			}
 		}
 
@@ -1857,65 +2831,136 @@ namespace AnyPortrait
 			//Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_Unlit) != null))
 			{
-				apMaterialSet matSet_KeepAlpha_Unlit = MakeReservedPreset(RESERVED_MAT_ID__KeepAlpha_Unlit, "KeepAlpha Unlit", apMaterialSet.ICON.Unlit, 
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Alpha",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Add",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Soft",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Mul",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Alpha",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Add",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Soft",
-								"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Mul",
+				MakeReservedPreset(	RESERVED_MAT_ID__KeepAlpha_Unlit, "Legacy/KeepAlpha Unlit", apMaterialSet.ICON.Unlit, 
+									MakeTagText(TAG_Unlit, TAG_KeepAlpha),
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Alpha",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Add",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Soft",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_T_Mul",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Alpha",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Add",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Soft",
+									"Advanced/KeepAlphaUnlit/apShader_KAUnlit_C_Mul",
 
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Alpha",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Add",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Soft",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Mul",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Alpha",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Add",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Soft",
-								"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Mul",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Alpha",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Add",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Soft",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_T_Mul",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Alpha",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Add",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Soft",
+									"Advanced/KeepAlphaUnlit/Linear/apShader_L_KAUnlit_C_Mul",
 
-								"apShader_AlphaMask", 
-								true);
+									"apShader_AlphaMask", 
+									true);
 
-				if(matSet_KeepAlpha_Unlit != null)
-				{
-					matSet_KeepAlpha_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_KeepAlpha_Unlit != null)
+				// {
+				// 	matSet_KeepAlpha_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 			
 			//Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_Lit) != null))
 			{
-				apMaterialSet matSet_KeepAlpha_Lit = MakeReservedPreset(RESERVED_MAT_ID__KeepAlpha_Lit, "KeepAlpha Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/KeepAlphaLit/apShader_KALit_T_Alpha",
-								"Advanced/KeepAlphaLit/apShader_KALit_T_Add",
-								"Advanced/KeepAlphaLit/apShader_KALit_T_Soft",
-								"Advanced/KeepAlphaLit/apShader_KALit_T_Mul",
-								"Advanced/KeepAlphaLit/apShader_KALit_C_Alpha",
-								"Advanced/KeepAlphaLit/apShader_KALit_C_Add",
-								"Advanced/KeepAlphaLit/apShader_KALit_C_Soft",
-								"Advanced/KeepAlphaLit/apShader_KALit_C_Mul",
+				MakeReservedPreset(	RESERVED_MAT_ID__KeepAlpha_Lit, "Legacy/KeepAlpha Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_KeepAlpha),
+									"Advanced/KeepAlphaLit/apShader_KALit_T_Alpha",
+									"Advanced/KeepAlphaLit/apShader_KALit_T_Add",
+									"Advanced/KeepAlphaLit/apShader_KALit_T_Soft",
+									"Advanced/KeepAlphaLit/apShader_KALit_T_Mul",
+									"Advanced/KeepAlphaLit/apShader_KALit_C_Alpha",
+									"Advanced/KeepAlphaLit/apShader_KALit_C_Add",
+									"Advanced/KeepAlphaLit/apShader_KALit_C_Soft",
+									"Advanced/KeepAlphaLit/apShader_KALit_C_Mul",
 
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Alpha",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Add",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Soft",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Mul",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Alpha",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Add",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Soft",
-								"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Mul",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Alpha",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Add",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Soft",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_T_Mul",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Alpha",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Add",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Soft",
+									"Advanced/KeepAlphaLit/Linear/apShader_L_KALit_C_Mul",
 
-								"apShader_AlphaMask", 
-								false);
+									"apShader_AlphaMask", 
+									false);
 
-				if(matSet_KeepAlpha_Lit != null)
-				{
-					matSet_KeepAlpha_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_KeepAlpha_Lit != null)
+				// {
+				// 	matSet_KeepAlpha_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 			
+		}
+
+		/// <summary>
+		/// KeepAlpha의 v16 버전
+		/// </summary>
+		/// <param name="isCheckShader"></param>
+		public void MakeReserved_KeepAlpha_V16(bool isCheckShader)
+		{
+			//Unlit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_V16_Unlit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__KeepAlpha_V16_Unlit,
+									"KeepAlpha Unlit", apMaterialSet.ICON.UnlitMask, 
+									MakeTagText(TAG_Unlit, TAG_KeepAlpha, TAG_MultiMask),
+
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Alpha",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Common/apShader_KA16_AlphaMask",
+									false);
+			}
+			
+			//Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__KeepAlpha_V16_Lit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__KeepAlpha_V16_Lit,
+									"KeepAlpha Lit", apMaterialSet.ICON.LitMask, 
+									MakeTagText(TAG_Lit, TAG_KeepAlpha, TAG_MultiMask),
+								
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_T_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_C_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_T_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_T_Mul",
+
+									"Advanced/KeepAlpha (v16)/Lit/apShader_KA16_Lit_C_Alpha",//Lit
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Add",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Soft",
+									"Advanced/KeepAlpha (v16)/Unlit/apShader_KA16_Unlit_C_Mul",
+
+									"Advanced/KeepAlpha (v16)/Common/apShader_KA16_AlphaMask",
+									false);
+			}
 		}
 
 
@@ -1925,86 +2970,90 @@ namespace AnyPortrait
 			//Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Mergeable_Unlit) != null))
 			{
-				apMaterialSet matSet_Unlit = MakeReservedPreset(RESERVED_MAT_ID__Mergeable_Unlit, "Mergeable Unlit", apMaterialSet.ICON.UnlitMergeable,
-								"Advanced/Mergeable/Unlit/apShader_Mergeable_Unlit_T_Alpha",//Merged
+				MakeReservedPreset(	RESERVED_MAT_ID__Mergeable_Unlit, "Legacy/Mergeable Unlit", apMaterialSet.ICON.UnlitMergeable,
+									MakeTagText(TAG_Unlit, TAG_Mergeable),
+									"Advanced/Mergeable/Unlit/apShader_Mergeable_Unlit_T_Alpha",//Merged
 								
-								"apShader_Transparent_Additive",
-								"apShader_Transparent_SoftAdditive",
-								"apShader_Transparent_Multiplicative",
-								"apShader_ClippedWithMask",
-								"apShader_ClippedWithMask_Additive",
-								"apShader_ClippedWithMask_SoftAdditive",
-								"apShader_ClippedWithMask_Multiplicative",
+									"apShader_Transparent_Additive",
+									"apShader_Transparent_SoftAdditive",
+									"apShader_Transparent_Multiplicative",
+									"apShader_ClippedWithMask",
+									"apShader_ClippedWithMask_Additive",
+									"apShader_ClippedWithMask_SoftAdditive",
+									"apShader_ClippedWithMask_Multiplicative",
 								
-								"Advanced/Mergeable/Unlit/Linear/apShader_L_Mergeable_Unlit_T_Alpha",////Merged
+									"Advanced/Mergeable/Unlit/Linear/apShader_L_Mergeable_Unlit_T_Alpha",////Merged
 
-								"Linear/apShader_L_Transparent_Additive",
-								"Linear/apShader_L_Transparent_SoftAdditive",
-								"Linear/apShader_L_Transparent_Multiplicative",
-								"Linear/apShader_L_ClippedWithMask",
-								"Linear/apShader_L_ClippedWithMask_Additive",
-								"Linear/apShader_L_ClippedWithMask_SoftAdditive",
-								"Linear/apShader_L_ClippedWithMask_Multiplicative",
-								"apShader_AlphaMask",
-								true);
+									"Linear/apShader_L_Transparent_Additive",
+									"Linear/apShader_L_Transparent_SoftAdditive",
+									"Linear/apShader_L_Transparent_Multiplicative",
+									"Linear/apShader_L_ClippedWithMask",
+									"Linear/apShader_L_ClippedWithMask_Additive",
+									"Linear/apShader_L_ClippedWithMask_SoftAdditive",
+									"Linear/apShader_L_ClippedWithMask_Multiplicative",
+									"apShader_AlphaMask",
+									true);
 
 				//프로퍼티 추가
-				if(matSet_Unlit != null)
-				{
-					matSet_Unlit.AddProperty_Texture("_MergedTex1", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex2", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex3", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex4", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex5", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex6", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex7", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex8", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex9", true, true);
-
-					matSet_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Unlit != null)
+				// {
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex1", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex2", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex3", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex4", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex5", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex6", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex7", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex8", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex9", true, true);
+					
+				// 	matSet_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__Mergeable_Lit) != null))
 			{
-				apMaterialSet matSet_Lit = MakeReservedPreset(RESERVED_MAT_ID__Mergeable_Lit, "Mergeable Lit", apMaterialSet.ICON.LitMergeable,
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Alpha",
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Add",//Add
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Soft",//SoftAdd
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Mul",//Mul
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Alpha",
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Add",//C-Add
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Soft",//C-SoftAdd
-								"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Mul",//C-Mul
+				MakeReservedPreset(	RESERVED_MAT_ID__Mergeable_Lit, "Legacy/Mergeable Lit", apMaterialSet.ICON.LitMergeable,
+									MakeTagText(TAG_Lit, TAG_Mergeable),
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Alpha",
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Add",//Add
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Soft",//SoftAdd
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_T_Mul",//Mul
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Alpha",
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Add",//C-Add
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Soft",//C-SoftAdd
+									"Advanced/Mergeable/Lit/apShader_Mergeable_Lit_C_Mul",//C-Mul
 								
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Alpha",
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Alpha",
 
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Add",//Add
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Soft",//SoftAdd
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Mul",//Mul
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Alpha",
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Add",//C-Add
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Soft",//C-SoftAdd
-								"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Mul",//C-Mul
-								"apShader_AlphaMask",
-								false);
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Add",//Add
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Soft",//SoftAdd
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_T_Mul",//Mul
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Alpha",
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Add",//C-Add
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Soft",//C-SoftAdd
+									"Advanced/Mergeable/Lit/Linear/apShader_L_Mergeable_Lit_C_Mul",//C-Mul
+									"apShader_AlphaMask",
+									false);
 
-				if(matSet_Lit != null)
-				{
-					//프로퍼티 추가
-					matSet_Lit.AddProperty_Texture("_MergedTex1", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex2", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex3", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex4", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex5", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex6", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex7", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex8", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex9", true, true);
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Lit != null)
+				// {
+				// 	//프로퍼티 추가
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex1", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex2", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex3", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex4", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex5", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex6", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex7", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex8", true, true);
+				// 	// matSet_Lit.AddProperty_Texture("_MergedTex9", true, true);
 
-					matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				// 	matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 				
 			}
 		}
@@ -2017,100 +3066,106 @@ namespace AnyPortrait
 			//Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_Unlit) != null))
 			{
-				apMaterialSet matSet_URP_Unlit = MakeReservedPreset(RESERVED_MAT_ID__URP_Unlit, "URP Unlit", apMaterialSet.ICON.Unlit, 
-								"Advanced/URP Unlit/apShaderGraph_URP_Unlit_T_Alpha",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Multiplicative",
-								"Advanced/URP Unlit/apShaderGraph_URP_Unlit_C_Alpha",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_Unlit, "Legacy/URP Unlit", apMaterialSet.ICON.Unlit, 
+									MakeTagText(TAG_Unlit, TAG_URP),
+									"Advanced/URP Unlit/apShaderGraph_URP_Unlit_T_Alpha",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Multiplicative",
+									"Advanced/URP Unlit/apShaderGraph_URP_Unlit_C_Alpha",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Multiplicative",
 
-								"Advanced/URP Unlit/Linear/apShaderGraph_L_URP_Unlit_T_Alpha",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Multiplicative",
-								"Advanced/URP Unlit/Linear/apShaderGraph_L_URP_Unlit_C_Alpha",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Multiplicative",
+									"Advanced/URP Unlit/Linear/apShaderGraph_L_URP_Unlit_T_Alpha",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Multiplicative",
+									"Advanced/URP Unlit/Linear/apShaderGraph_L_URP_Unlit_C_Alpha",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Multiplicative",
 
-								"Advanced/URP Common/apShaderGraph_URP_Common_AlphaMask", 
-								true, 
-								false, 
-								true);//<<Shader Graph를 이용한다.
+									"Advanced/URP Common/apShaderGraph_URP_Common_AlphaMask", 
+									true, 
+									false, 
+									true);//<<Shader Graph를 이용한다.
 
-				if(matSet_URP_Unlit != null)
-				{
-					matSet_URP_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP_Unlit != null)
+				// {
+				// 	matSet_URP_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 			
 			//Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_Lit) != null))
 			{
-				apMaterialSet matSet_URP_Lit = MakeReservedPreset(RESERVED_MAT_ID__URP_Lit, "URP Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/URP Lit/apShaderGraph_URP_Lit_T_Alpha",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Lit_T_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Lit_T_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Multiplicative",
-								"Advanced/URP Lit/apShaderGraph_URP_Lit_C_Alpha",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Lit_C_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Lit_C_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_Lit, "Legacy/URP Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_URP),
+									"Advanced/URP Lit/apShaderGraph_URP_Lit_T_Alpha",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Lit_T_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Lit_T_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Multiplicative",
+									"Advanced/URP Lit/apShaderGraph_URP_Lit_C_Alpha",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Lit_C_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Lit_C_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Multiplicative",
 
-								"Advanced/URP Lit/Linear/apShaderGraph_L_URP_Lit_T_Alpha",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_T_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_T_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Multiplicative",
-								"Advanced/URP Lit/Linear/apShaderGraph_L_URP_Lit_C_Alpha",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_C_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_C_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Multiplicative",
+									"Advanced/URP Lit/Linear/apShaderGraph_L_URP_Lit_T_Alpha",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_T_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_T_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Multiplicative",
+									"Advanced/URP Lit/Linear/apShaderGraph_L_URP_Lit_C_Alpha",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_C_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Lit_C_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Multiplicative",
 
-								"Advanced/URP Common/apShaderGraph_URP_Common_AlphaMask", 
-								false,
-								false, 
-								true);//<<Shader Graph를 이용한다.
+									"Advanced/URP Common/apShaderGraph_URP_Common_AlphaMask", 
+									false,
+									false, 
+									true);//<<Shader Graph를 이용한다.
 
-				if(matSet_URP_Lit != null)
-				{
-					matSet_URP_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP_Lit != null)
+				// {
+				// 	matSet_URP_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//2D Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_2DLit) != null))
 			{
-				apMaterialSet matSet_URP_2DLit = MakeReservedPreset(RESERVED_MAT_ID__URP_2DLit, "URP 2D Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/URP 2D Lit (Experimental)/apShaderGraph_URP_2DLit_T_Alpha",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Multiplicative",
-								"Advanced/URP 2D Lit (Experimental)/apShaderGraph_URP_2DLit_C_Alpha",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_2DLit, "Legacy/URP 2D Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_URP, TAG_2D),
+									"Advanced/URP 2D Lit (Experimental)/apShaderGraph_URP_2DLit_T_Alpha",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_T_Multiplicative",
+									"Advanced/URP 2D Lit (Experimental)/apShaderGraph_URP_2DLit_C_Alpha",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/apShaderGraph_URP_Common_Unlit_C_Multiplicative",
 
-								"Advanced/URP 2D Lit (Experimental)/Linear/apShaderGraph_L_URP_2DLit_T_Alpha",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Multiplicative",
-								"Advanced/URP 2D Lit (Experimental)/Linear/apShaderGraph_L_URP_2DLit_C_Alpha",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
-								"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Multiplicative",
+									"Advanced/URP 2D Lit (Experimental)/Linear/apShaderGraph_L_URP_2DLit_T_Alpha",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_T_Multiplicative",
+									"Advanced/URP 2D Lit (Experimental)/Linear/apShaderGraph_L_URP_2DLit_C_Alpha",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Additive",
+									"Advanced/URP Common/Linear/apShaderGraph_L_URP_Common_Unlit_C_Multiplicative",
 
-								"Advanced/URP Common/apShaderGraph_URP_Common_AlphaMask", 
-								false,
-								false, 
-								true);//<<Shader Graph를 이용한다.
+									"Advanced/URP Common/apShaderGraph_URP_Common_AlphaMask", 
+									false,
+									false, 
+									true);//<<Shader Graph를 이용한다.
 
-				if(matSet_URP_2DLit != null)
-				{
-					matSet_URP_2DLit.CheckAndRemoveDuplicatedProperties();//중복 체크
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP_2DLit != null)
+				// {
+				// 	matSet_URP_2DLit.CheckAndRemoveDuplicatedProperties();//중복 체크
+				// }
 			}
 			
 		}
@@ -2126,77 +3181,83 @@ namespace AnyPortrait
 			//Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_Unlit) != null))
 			{
-				apMaterialSet matSet_URP21_Unlit = MakeReservedPreset(RESERVED_MAT_ID__URP21_Unlit, "URP (2021) Unlit", apMaterialSet.ICON.Unlit, 
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Alpha",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP21_Unlit, "Legacy/URP (2021) Unlit", apMaterialSet.ICON.Unlit, 
+									MakeTagText(TAG_Unlit, TAG_URP21),
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Alpha",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Alpha",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Alpha",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Alpha",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Alpha",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Alpha",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Alpha",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
-								true, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
+									true, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_URP21_Unlit != null)
-				{
-					matSet_URP21_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP21_Unlit != null)
+				// {
+				// 	matSet_URP21_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_Lit) != null))
 			{
-				apMaterialSet matSet_URP21_Lit = MakeReservedPreset(RESERVED_MAT_ID__URP21_Lit, "URP (2021) Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/URP (2021)/Lit/apShaderGraph_URP21_Lit_T_Alpha",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP21_Lit, "Legacy/URP (2021) Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_URP21),
+									"Advanced/URP (2021)/Lit/apShaderGraph_URP21_Lit_T_Alpha",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2021)/Lit/apShaderGraph_URP21_Lit_C_Alpha",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/Lit/apShaderGraph_URP21_Lit_C_Alpha",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Lit/Linear/apShaderGraph_URP21_L_Lit_T_Alpha",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2021)/Lit/Linear/apShaderGraph_URP21_L_Lit_T_Alpha",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2021)/Lit/Linear/apShaderGraph_URP21_L_Lit_C_Alpha",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/Lit/Linear/apShaderGraph_URP21_L_Lit_C_Alpha",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
-								false, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
+									false, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_URP21_Lit != null)
-				{
-					matSet_URP21_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP21_Lit != null)
+				// {
+				// 	matSet_URP21_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//Bumped Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_BumpedLit) != null))
 			{
-				apMaterialSet matSet_Bumped = MakeReservedPreset(RESERVED_MAT_ID__URP21_BumpedLit, "URP (2021) Bumped Lit", apMaterialSet.ICON.Lit, 
+				apMaterialSet matSet_Bumped = MakeReservedPreset(
+								RESERVED_MAT_ID__URP21_BumpedLit, "Legacy/URP (2021) Bumped Lit", apMaterialSet.ICON.Lit, 
+								MakeTagText(TAG_Lit, TAG_URP21, TAG_Bumped),
 								"Advanced/URP (2021)/Bumped Lit/apShaderGraph_URP21_BumpedLit_T_Alpha",
 								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
 								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
@@ -2224,6 +3285,7 @@ namespace AnyPortrait
 
 				if(matSet_Bumped != null)
 				{
+					//프로퍼티 추가
 					//노멀맵 텍스쳐 추가
 					matSet_Bumped.AddProperty_Texture("_BumpMap", false, false);
 					matSet_Bumped.CheckAndRemoveDuplicatedProperties();//중복 제거
@@ -2234,42 +3296,46 @@ namespace AnyPortrait
 			//2D Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_2DLit) != null))
 			{
-				apMaterialSet matSet_URP21_2DLit = MakeReservedPreset(RESERVED_MAT_ID__URP21_2DLit, "URP (2021) 2D Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Alpha",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP21_2DLit, "Legacy/URP (2021) 2D Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_URP21, TAG_2D),
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Alpha",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Alpha",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Alpha",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Alpha",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Alpha",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Alpha",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Alpha",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
-								false, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
+									false, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_URP21_2DLit != null)
-				{
-					matSet_URP21_2DLit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP21_2DLit != null)
+				// {
+				// 	matSet_URP21_2DLit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//2D Bumped Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_2DBumpedLit) != null))
 			{
-				apMaterialSet matSet_Bumped = MakeReservedPreset(RESERVED_MAT_ID__URP21_2DBumpedLit, "URP (2021) 2D Bumped Lit", apMaterialSet.ICON.Lit, 
+				apMaterialSet matSet_Bumped = MakeReservedPreset(
+								RESERVED_MAT_ID__URP21_2DBumpedLit, "Legacy/URP (2021) 2D Bumped Lit", apMaterialSet.ICON.Lit, 
+								MakeTagText(TAG_Lit, TAG_URP21, TAG_Bumped, TAG_2D),
 								"Advanced/URP (2021)/2D Bumped Lit/apShaderGraph_URP21_2DBumpedLit_T_Alpha",
 								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
 								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
@@ -2297,6 +3363,7 @@ namespace AnyPortrait
 
 				if(matSet_Bumped != null)
 				{
+					//프로퍼티 추가
 					//노멀맵 텍스쳐 추가
 					matSet_Bumped.AddProperty_Texture("_BumpMap", false, false);
 					matSet_Bumped.CheckAndRemoveDuplicatedProperties();//중복 제거
@@ -2308,94 +3375,98 @@ namespace AnyPortrait
 			//Mergeable Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_MergeableUnlit) != null))
 			{
-				apMaterialSet matSet_Unlit = MakeReservedPreset(RESERVED_MAT_ID__URP21_MergeableUnlit, "URP (2021) Mergeable Unlit", apMaterialSet.ICON.UnlitMergeable, 
-								"Advanced/URP (2021)/Mergeable Unlit/apShaderGraph_URP21_MergeableUnlit_T_Alpha",//Merged
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP21_MergeableUnlit, "Legacy/URP (2021) Mergeable Unlit", apMaterialSet.ICON.UnlitMergeable, 
+									MakeTagText(TAG_Unlit, TAG_URP21, TAG_Mergeable),
+									"Advanced/URP (2021)/Mergeable Unlit/apShaderGraph_URP21_MergeableUnlit_T_Alpha",//Merged
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Alpha",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Alpha",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Mergeable Unlit/Linear/apShaderGraph_URP21_L_MergeableUnlit_T_Alpha",//Merged
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2021)/Mergeable Unlit/Linear/apShaderGraph_URP21_L_MergeableUnlit_T_Alpha",//Merged
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Alpha",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Alpha",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
-								true, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
+									true, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_Unlit != null)
-				{
-					//프로퍼티 추가
-					matSet_Unlit.AddProperty_Texture("_MergedTex1", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex2", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex3", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex4", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex5", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex6", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex7", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex8", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex9", true, true);
-
-					matSet_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Unlit != null)
+				// {
+				// 	//프로퍼티 추가
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex1", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex2", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex3", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex4", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex5", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex6", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex7", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex8", true, true);
+				// 	// matSet_Unlit.AddProperty_Texture("_MergedTex9", true, true);
+					
+				// 	matSet_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 				
 			}
 
 			//Mergeable Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP21_Mergeable2DLit) != null))
 			{
-				apMaterialSet matSet_Lit = MakeReservedPreset(RESERVED_MAT_ID__URP21_Mergeable2DLit, "URP (2021) Mergeable 2D Lit", apMaterialSet.ICON.LitMergeable, 
-								"Advanced/URP (2021)/Mergeable 2D Lit/apShaderGraph_URP21_Mergeable2DLit_T_Alpha",//Merged
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP21_Mergeable2DLit, "Legacy/URP (2021) Mergeable 2D Lit", apMaterialSet.ICON.LitMergeable, 
+									MakeTagText(TAG_Lit, TAG_URP21, TAG_Mergeable, TAG_2D),
+									"Advanced/URP (2021)/Mergeable 2D Lit/apShaderGraph_URP21_Mergeable2DLit_T_Alpha",//Merged
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_T_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Alpha",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
-								"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
-								"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Alpha",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
+									"Advanced/URP (2021)/2D Lit/apShaderGraph_URP21_2DLit_C_Additive",
+									"Advanced/URP (2021)/Unlit/apShaderGraph_URP21_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Mergeable 2D Lit/Linear/apShaderGraph_URP21_L_Mergeable2DLit_T_Alpha",//Merged
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2021)/Mergeable 2D Lit/Linear/apShaderGraph_URP21_L_Mergeable2DLit_T_Alpha",//Merged
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_T_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Alpha",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
-								"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
-								"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Alpha",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
+									"Advanced/URP (2021)/2D Lit/Linear/apShaderGraph_URP21_L_2DLit_C_Additive",
+									"Advanced/URP (2021)/Unlit/Linear/apShaderGraph_URP21_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
-								false, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2021)/Common/apShaderGraph_URP21_Common_AlphaMask", 
+									false, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_Lit != null)
-				{
-					//프로퍼티 추가
-					matSet_Lit.AddProperty_Texture("_MergedTex1", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex2", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex3", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex4", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex5", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex6", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex7", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex8", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex9", true, true);
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Lit != null)
+				// {
+				// 	//프로퍼티 추가
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex1", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex2", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex3", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex4", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex5", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex6", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex7", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex8", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex9", true, true);
 
-					matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				// 	matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 				
 			}
 		}
@@ -2407,77 +3478,83 @@ namespace AnyPortrait
 			//Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_Unlit) != null))
 			{
-				apMaterialSet matSet_URP23_Unlit = MakeReservedPreset(RESERVED_MAT_ID__URP23_Unlit, "URP (2023) Unlit", apMaterialSet.ICON.Unlit, 
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Alpha",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP23_Unlit, "Legacy/URP (2023) Unlit", apMaterialSet.ICON.Unlit, 
+									MakeTagText(TAG_Unlit, TAG_URP23),
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Alpha",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Alpha",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Alpha",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Alpha",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Alpha",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Alpha",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Alpha",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
-								true, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
+									true, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_URP23_Unlit != null)
-				{
-					matSet_URP23_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP23_Unlit != null)
+				// {
+				// 	matSet_URP23_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_Lit) != null))
 			{
-				apMaterialSet matSet_URP23_Lit = MakeReservedPreset(RESERVED_MAT_ID__URP23_Lit, "URP (2023) Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/URP (2023)/Lit/apShaderGraph_URP23_Lit_T_Alpha",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP23_Lit, "Legacy/URP (2023) Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_URP23),
+									"Advanced/URP (2023)/Lit/apShaderGraph_URP23_Lit_T_Alpha",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2023)/Lit/apShaderGraph_URP23_Lit_C_Alpha",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/Lit/apShaderGraph_URP23_Lit_C_Alpha",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Lit/Linear/apShaderGraph_URP23_L_Lit_T_Alpha",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2023)/Lit/Linear/apShaderGraph_URP23_L_Lit_T_Alpha",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2023)/Lit/Linear/apShaderGraph_URP23_L_Lit_C_Alpha",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/Lit/Linear/apShaderGraph_URP23_L_Lit_C_Alpha",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
-								false, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
+									false, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_URP23_Lit != null)
-				{
-					matSet_URP23_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_URP23_Lit != null)
+				// {
+				// 	matSet_URP23_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//Bumped Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_BumpedLit) != null))
 			{
-				apMaterialSet matSet_Bumped = MakeReservedPreset(RESERVED_MAT_ID__URP23_BumpedLit, "URP (2023) Bumped Lit", apMaterialSet.ICON.Lit, 
+				apMaterialSet matSet_Bumped = MakeReservedPreset(
+								RESERVED_MAT_ID__URP23_BumpedLit, "Legacy/URP (2023) Bumped Lit", apMaterialSet.ICON.Lit, 
+								MakeTagText(TAG_Lit, TAG_URP23, TAG_Bumped),
 								"Advanced/URP (2023)/Bumped Lit/apShaderGraph_URP23_BumpedLit_T_Alpha",
 								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
 								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
@@ -2505,9 +3582,9 @@ namespace AnyPortrait
 
 				if(matSet_Bumped != null)
 				{
+					//프로퍼티 추가
 					//노멀맵 텍스쳐 추가
 					matSet_Bumped.AddProperty_Texture("_BumpMap", false, false);
-
 					matSet_Bumped.CheckAndRemoveDuplicatedProperties();//중복 제거
 				}
 			}
@@ -2515,42 +3592,46 @@ namespace AnyPortrait
 			//2D Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_2DLit) != null))
 			{
-				apMaterialSet matSet_2DLit = MakeReservedPreset(RESERVED_MAT_ID__URP23_2DLit, "URP (2023) 2D Lit", apMaterialSet.ICON.Lit, 
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Alpha",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP23_2DLit, "Legacy/URP (2023) 2D Lit", apMaterialSet.ICON.Lit, 
+									MakeTagText(TAG_Lit, TAG_URP23, TAG_2D),
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Alpha",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Alpha",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Alpha",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Alpha",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Alpha",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Alpha",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Alpha",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
-								false, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
+									false, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_2DLit != null)
-				{
-					matSet_2DLit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_2DLit != null)
+				// {
+				// 	matSet_2DLit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 			}
 
 			//2D Bumped Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_2DBumpedLit) != null))
 			{
-				apMaterialSet matSet_Bumped = MakeReservedPreset(RESERVED_MAT_ID__URP23_2DBumpedLit, "URP (2023) 2D Bumped Lit", apMaterialSet.ICON.Lit, 
+				apMaterialSet matSet_Bumped = MakeReservedPreset(
+								RESERVED_MAT_ID__URP23_2DBumpedLit, "Legacy/URP (2023) 2D Bumped Lit", apMaterialSet.ICON.Lit, 
+								MakeTagText(TAG_Lit, TAG_URP23, TAG_Bumped, TAG_2D),
 								"Advanced/URP (2023)/2D Bumped Lit/apShaderGraph_URP23_2DBumpedLit_T_Alpha",
 								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
 								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
@@ -2578,6 +3659,7 @@ namespace AnyPortrait
 
 				if(matSet_Bumped != null)
 				{
+					//프로퍼티 추가
 					//노멀맵 텍스쳐 추가
 					matSet_Bumped.AddProperty_Texture("_BumpMap", false, false);
 
@@ -2590,97 +3672,381 @@ namespace AnyPortrait
 			//Mergeable Unlit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_MergeableUnlit) != null))
 			{
-				apMaterialSet matSet_Unlit = MakeReservedPreset(RESERVED_MAT_ID__URP23_MergeableUnlit, "URP (2023) Mergeable Unlit", apMaterialSet.ICON.UnlitMergeable, 
-								"Advanced/URP (2023)/Mergeable Unlit/apShaderGraph_URP23_MergeableUnlit_T_Alpha",//Merged
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP23_MergeableUnlit, "Legacy/URP (2023) Mergeable Unlit", apMaterialSet.ICON.UnlitMergeable, 
+									MakeTagText(TAG_Unlit, TAG_URP23, TAG_Mergeable),
+									"Advanced/URP (2023)/Mergeable Unlit/apShaderGraph_URP23_MergeableUnlit_T_Alpha",//Merged
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Alpha",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Alpha",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Mergeable Unlit/Linear/apShaderGraph_URP23_L_MergeableUnlit_T_Alpha",//Merged
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2023)/Mergeable Unlit/Linear/apShaderGraph_URP23_L_MergeableUnlit_T_Alpha",//Merged
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Alpha",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Alpha",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
-								true, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
+									true, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_Unlit != null)
-				{
-					//프로퍼티 추가
-					matSet_Unlit.AddProperty_Texture("_MergedTex1", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex2", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex3", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex4", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex5", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex6", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex7", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex8", true, true);
-					matSet_Unlit.AddProperty_Texture("_MergedTex9", true, true);
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Unlit != null)
+				// {
+				// 	//프로퍼티 추가
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex1", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex2", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex3", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex4", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex5", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex6", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex7", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex8", true, true);
+				// 	matSet_Unlit.AddProperty_Texture("_MergedTex9", true, true);
 
-					matSet_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				// 	matSet_Unlit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 				
 			}
 
 			//Mergeable Lit
 			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP23_Mergeable2DLit) != null))
 			{
-				apMaterialSet matSet_Lit = MakeReservedPreset(RESERVED_MAT_ID__URP23_Mergeable2DLit, "URP (2023) Mergeable 2D Lit", apMaterialSet.ICON.LitMergeable, 
-								"Advanced/URP (2023)/Mergeable 2D Lit/apShaderGraph_URP23_Mergeable2DLit_T_Alpha",//Merged
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
+				MakeReservedPreset(	RESERVED_MAT_ID__URP23_Mergeable2DLit, "Legacy/URP (2023) Mergeable 2D Lit", apMaterialSet.ICON.LitMergeable, 
+									MakeTagText(TAG_Lit, TAG_URP23, TAG_Mergeable, TAG_2D),
+									"Advanced/URP (2023)/Mergeable 2D Lit/apShaderGraph_URP23_Mergeable2DLit_T_Alpha",//Merged
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_T_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_T_Multiplicative",
 								
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Alpha",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
-								"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
-								"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Alpha",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
+									"Advanced/URP (2023)/2D Lit/apShaderGraph_URP23_2DLit_C_Additive",
+									"Advanced/URP (2023)/Unlit/apShaderGraph_URP23_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Mergeable 2D Lit/Linear/apShaderGraph_URP23_L_Mergeable2DLit_T_Alpha",//Merged
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
+									"Advanced/URP (2023)/Mergeable 2D Lit/Linear/apShaderGraph_URP23_L_Mergeable2DLit_T_Alpha",//Merged
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_T_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_T_Multiplicative",
 
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Alpha",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
-								"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
-								"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Alpha",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
+									"Advanced/URP (2023)/2D Lit/Linear/apShaderGraph_URP23_L_2DLit_C_Additive",
+									"Advanced/URP (2023)/Unlit/Linear/apShaderGraph_URP23_L_Unlit_C_Multiplicative",
 
-								"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
-								false, //빛 제거 필요(Unlit인 경우 True)
-								false, //VR
-								true);//Shader Graph 유무
+									"Advanced/URP (2023)/Common/apShaderGraph_URP23_Common_AlphaMask", 
+									false, //빛 제거 필요(Unlit인 경우 True)
+									false, //VR
+									true);//Shader Graph 유무
 
-				if(matSet_Lit != null)
-				{
-					//프로퍼티 추가
-					matSet_Lit.AddProperty_Texture("_MergedTex1", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex2", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex3", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex4", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex5", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex6", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex7", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex8", true, true);
-					matSet_Lit.AddProperty_Texture("_MergedTex9", true, true);
+				//삭제 v1.6.0 : MakeReservedPreset()에서 프로퍼티 초기화 및 중복 처리를 수행했다.
+				// if(matSet_Lit != null)
+				// {
+				// 	//프로퍼티 추가
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex1", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex2", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex3", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex4", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex5", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex6", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex7", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex8", true, true);
+				// 	matSet_Lit.AddProperty_Texture("_MergedTex9", true, true);
 
-					matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
-				}
+				// 	matSet_Lit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				// }
 				
 			}
 		}
+
+
+
+		//v1.6.0 : URP v16의 2021용 버전
+		public void MakeReserved_URP_V16_21(bool isCheckShader)
+		{
+			//Unlit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_Unlit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_V16_21_Unlit, "URP (2021) Unlit", apMaterialSet.ICON.UnlitMask, 
+									MakeTagText(TAG_Unlit, TAG_URP21, TAG_MultiMask),
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+									false, //VR
+									true);//Shader Graph 유무
+			}
+
+			//Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_Lit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_V16_21_Lit, "URP (2021) Lit", apMaterialSet.ICON.LitMask, 
+									MakeTagText(TAG_Lit, TAG_URP21, TAG_MultiMask),
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/Lit/apSG_URP16_2021_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+									false, //VR
+									true);//Shader Graph 유무
+			}
+
+			//2D Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_2DLit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_V16_21_2DLit, "URP (2021) 2D Lit", apMaterialSet.ICON.LitMask, 
+									MakeTagText(TAG_Lit, TAG_2D, TAG_URP21, TAG_MultiMask),
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2021/2D Lit/apSG_URP16_2021_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+									"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+									false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+									false, //VR
+									true);//Shader Graph 유무
+			}
+
+			//2D Bumped Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_21_2DBumpedLit) != null))
+			{
+				apMaterialSet matSet_URPv16_21_2DBumpedLit = MakeReservedPreset(
+								RESERVED_MAT_ID__URP_V16_21_2DBumpedLit, "URP (2021) 2D Bumped Lit", apMaterialSet.ICON.LitMask, 
+								MakeTagText(TAG_Lit, TAG_2D, TAG_Bumped, TAG_URP21, TAG_MultiMask),
+								"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_T_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+								"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_C_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+								"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_T_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_T_Mul",
+
+								"Advanced/URP (v16)/2021/2D Bumped Lit/apSG_URP16_2021_2DBumpedLit_C_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Add",
+								"Advanced/URP (v16)/2021/Unlit/apSG_URP16_2021_Unlit_C_Mul",
+
+								"Advanced/URP (v16)/2021/Common/apSG_URP16_2021_AlphaMask",
+								false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+								false, //VR
+								true);//Shader Graph 유무
+
+				if(matSet_URPv16_21_2DBumpedLit != null)
+				{
+					//Bump Map 프로퍼티를 추가한다.
+					matSet_URPv16_21_2DBumpedLit.AddProperty_Texture("_BumpMap", false, false);
+					matSet_URPv16_21_2DBumpedLit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+		}
+
+
+		//URP (v16)의 유니티 2023/6용 버전
+		public void MakeReserved_URP_V16_23(bool isCheckShader)
+		{
+			//Unlit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_Unlit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_V16_23_Unlit,
+									"URP (2023) Unlit", apMaterialSet.ICON.UnlitMask, 
+									MakeTagText(TAG_Unlit, TAG_URP23, TAG_MultiMask),
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Alpha",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+									false, //VR
+									true);//Shader Graph 유무
+			}
+
+			//Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_Lit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_V16_23_Lit,
+									"URP (2023) Lit", apMaterialSet.ICON.LitMask, 
+									MakeTagText(TAG_Lit, TAG_URP23, TAG_MultiMask),
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_T_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/Lit/apSG_URP16_2023_Lit_C_Alpha",//Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+									false, //VR
+									true);//Shader Graph 유무
+			}
+
+			//2D Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_2DLit) != null))
+			{
+				MakeReservedPreset(	RESERVED_MAT_ID__URP_V16_23_2DLit,
+									"URP (2023) 2D Lit", apMaterialSet.ICON.LitMask, 
+									MakeTagText(TAG_Lit, TAG_2D, TAG_URP23, TAG_MultiMask),
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_T_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+									"Advanced/URP (v16)/2023/2D Lit/apSG_URP16_2023_2DLit_C_Alpha",//2D Lit
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+									"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+									"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+									false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+									false, //VR
+									true);//Shader Graph 유무
+			}
+
+			//2D Bumped Lit
+			if ((!isCheckShader) || (GetPresetUnit(RESERVED_MAT_ID__URP_V16_23_2DBumpedLit) != null))
+			{
+				apMaterialSet matSet_URPv16_23_2DBumpedLit = MakeReservedPreset(
+								RESERVED_MAT_ID__URP_V16_23_2DBumpedLit,
+								"URP (2023) 2D Bumped Lit", apMaterialSet.ICON.LitMask, 
+								MakeTagText(TAG_Lit, TAG_2D, TAG_Bumped, TAG_URP23, TAG_MultiMask),
+								"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_T_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+								"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_C_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+								"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_T_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_T_Mul",
+
+								"Advanced/URP (v16)/2023/2D Bumped Lit/apSG_URP16_2023_2DBumpedLit_C_Alpha",//2D Bumped Lit
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Add",
+								"Advanced/URP (v16)/2023/Unlit/apSG_URP16_2023_Unlit_C_Mul",
+
+								"Advanced/URP (v16)/2023/Common/apSG_URP16_2023_AlphaMask",
+								false, //빛 제거 필요 > Lit이거나 Ambient Color 무관한 쉐이더는 False
+								false, //VR
+								true);//Shader Graph 유무
+
+				if(matSet_URPv16_23_2DBumpedLit != null)
+				{
+					//Bump Map 프로퍼티를 추가한다.
+					matSet_URPv16_23_2DBumpedLit.AddProperty_Texture("_BumpMap", false, false);
+					matSet_URPv16_23_2DBumpedLit.CheckAndRemoveDuplicatedProperties();//중복 제거
+				}
+			}
+		}
+
 
 
 
@@ -2949,7 +4315,8 @@ namespace AnyPortrait
 		{
 			if(_presets != null)
 			{
-				return GetPresetUnit(RESERVED_MAT_ID__Unlit_V2);
+				//return GetPresetUnit(RESERVED_MAT_ID__Unlit_V2);
+				return GetPresetUnit(RESERVED_MAT_ID__Unlit_V16);
 			}
 			return null;
 		}
@@ -2966,6 +4333,7 @@ namespace AnyPortrait
 				//삭제 불가능한 프리셋 타입
 				case RESERVED_MAT_ID__Unlit:
 				case RESERVED_MAT_ID__Unlit_V2:
+				case RESERVED_MAT_ID__Unlit_V16:
 					return PRESET_TYPE.Reserved_NotRemovable;
 
 				//삭제는 가능한 프리셋 타입
@@ -2975,16 +4343,33 @@ namespace AnyPortrait
 				case RESERVED_MAT_ID__Bumped_Specular_Emissive:
 				case RESERVED_MAT_ID__Bumped_Rimlight:
 				case RESERVED_MAT_ID__Bumped_Ramp:
+
+				case RESERVED_MAT_ID__Lit_V16_SimpleLit:
+				case RESERVED_MAT_ID__Lit_V16_Bumped:
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Specular:
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Specular_Emissive:
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Rimlight:
+				case RESERVED_MAT_ID__Lit_V16_Bumped_Ramp:
+
 				case RESERVED_MAT_ID__LWRP_Unlit:
 				case RESERVED_MAT_ID__LWRP_2D_Lit:
 				case RESERVED_MAT_ID__KeepAlpha_Unlit:
 				case RESERVED_MAT_ID__KeepAlpha_Lit:
+				case RESERVED_MAT_ID__KeepAlpha_V16_Unlit://v1.6.0
+				case RESERVED_MAT_ID__KeepAlpha_V16_Lit://v1.6.0
+
 				case RESERVED_MAT_ID__VR_Unlit:
 				case RESERVED_MAT_ID__VR_Lit:
 				case RESERVED_MAT_ID__VR_Unlit_ScaleOffset:
 				case RESERVED_MAT_ID__VR_Lit_ScaleOffset:
+
+				case RESERVED_MAT_ID__VR_V16_Unlit://v1.6.0
+				case RESERVED_MAT_ID__VR_V16_Lit://v1.6.0
+
 				case RESERVED_MAT_ID__Mergeable_Unlit:
 				case RESERVED_MAT_ID__Mergeable_Lit:
+
+
 				case RESERVED_MAT_ID__URP_Unlit:
 				case RESERVED_MAT_ID__URP_Lit:
 				case RESERVED_MAT_ID__URP_2DLit:
@@ -3002,6 +4387,16 @@ namespace AnyPortrait
 				case RESERVED_MAT_ID__URP23_2DBumpedLit:
 				case RESERVED_MAT_ID__URP23_MergeableUnlit:
 				case RESERVED_MAT_ID__URP23_Mergeable2DLit:
+
+				case RESERVED_MAT_ID__URP_V16_21_Unlit:
+				case RESERVED_MAT_ID__URP_V16_21_Lit:
+				case RESERVED_MAT_ID__URP_V16_21_2DLit:
+				case RESERVED_MAT_ID__URP_V16_21_2DBumpedLit:
+
+				case RESERVED_MAT_ID__URP_V16_23_Unlit:
+				case RESERVED_MAT_ID__URP_V16_23_Lit:
+				case RESERVED_MAT_ID__URP_V16_23_2DLit:
+				case RESERVED_MAT_ID__URP_V16_23_2DBumpedLit:
 					return PRESET_TYPE.Reserved_Removable;
 			}
 

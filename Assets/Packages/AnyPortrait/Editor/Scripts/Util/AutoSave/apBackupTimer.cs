@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -104,11 +104,8 @@ namespace AnyPortrait
 
 			if(_refreshTimerSec > 60.0f)
 			{
-				
-
 				_refreshTimerSec -= 60.0f;
 				isUpdatable = true;
-
 
 				PortraitUnit workUnit = _units.Find(delegate (PortraitUnit a)
 				{

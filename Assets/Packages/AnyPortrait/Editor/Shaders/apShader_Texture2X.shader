@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) 2017-2018. RainyRizzle. All rights reserved
 *	contact to : https://www.rainyrizzle.com/ , contactrainyrizzle@gmail.com
 *

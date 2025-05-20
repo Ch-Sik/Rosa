@@ -1,4 +1,4 @@
-﻿/*
+/*
 *	Copyright (c) RainyRizzle Inc. All rights reserved
 *	Contact to : www.rainyrizzle.com , contactrainyrizzle@gmail.com
 *
@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System;
 
 using AnyPortrait;
+//using UnityEditor.PackageManager;
+//using System.Linq;
 
 namespace AnyPortrait
 {
@@ -35,7 +37,28 @@ namespace AnyPortrait
 		private Camera _camera = null;
 
 		public delegate void FUNC_MESH_PRE_RENDERED(Camera camera);
-		private Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED> _meshPreRenderedEvents = new Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED>();
+		
+		// 이전에는 OptMesh를 키값으로 삼아서 생성/삭제를 했다.
+		
+		// 빠른 업데이트를 위해서 배열로 만들고, 래퍼 클래스를 만들자
+		//private Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED> _meshPreRenderedEvents = new Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED>();
+
+		//LoadKey + 이벤트 래퍼
+		public class EventSet
+		{
+			public object _loadKey = null;
+			public FUNC_MESH_PRE_RENDERED _funcEvent = null;
+
+			public EventSet(object loadKey, FUNC_MESH_PRE_RENDERED funcEvent)
+			{
+				_loadKey = loadKey;
+				_funcEvent = funcEvent;
+			}
+
+		}
+
+		private Dictionary<object, EventSet> _key2Event = null;
+		private EventSet[] _renderEvents = null;
 		private int _nEvent = 0;
 		
 		private bool _isInit = false;
@@ -53,65 +76,152 @@ namespace AnyPortrait
 
 		public void Init()
 		{
+			if(_isInit)
+			{
+				return;
+			}
+
 			if(_camera == null)
 			{
 				_camera = gameObject.GetComponent<Camera>();
 			}
+
+			//추가 v1.6.0 : MultiCameraController는 인게임 중에 생성되며 저장되지 않아야 한다.
+			hideFlags = HideFlags.DontSave;
+
+			_key2Event = null;
+			_renderEvents = null;
 
 			_nEvent = 0;
 			_isDestroyed = false;
 			_isInit = true;
 		}
 
+		public bool IsInit()
+		{
+			return _isInit;
+		}
+
 
 		// Functions
 		//------------------------------------------------
-		/// <summary>
-		/// OptMesh -> PreRender 이벤트 등록
-		/// </summary>
-		/// <param name="optMesh"></param>
-		/// <param name="preRenderEvent"></param>
-		public void AddPreRenderEvent(apOptMesh optMesh, FUNC_MESH_PRE_RENDERED preRenderEvent)
+		//변경 : OptMesh가 아니라 범용적으로 이벤트를 등록한다.
+		public object AddPreRenderEvent(object prevLoadKey, FUNC_MESH_PRE_RENDERED preRenderEvent)
 		{
-			if(_meshPreRenderedEvents == null)
+			if(preRenderEvent == null)
 			{
-				_meshPreRenderedEvents = new Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED>();
+				//유효하지 않은 이벤트
+				return null;
 			}
 
-			if(!_meshPreRenderedEvents.ContainsKey(optMesh))
+			if(_camera == null)
 			{
-				_meshPreRenderedEvents.Add(optMesh, preRenderEvent);
+				Debug.LogError("[" + name + "] Camera is null. Please check the camera.", gameObject);
 			}
-			else
+			
+			//이미 등록되었는지 확인하자
+			if(prevLoadKey != null && _key2Event != null)
 			{
-				_meshPreRenderedEvents[optMesh] = preRenderEvent;
+				EventSet existSet = null;
+				_key2Event.TryGetValue(prevLoadKey, out existSet);
+				if(existSet != null)
+				{
+					//이미 등록이 되었다면 리턴
+					return existSet._loadKey;
+				}
 			}
 
-			//Debug.Log("PreRenderEvent Added [" + optMesh.name + " > " + name + "]");
+			//새로 데이터를 입력하자
+			object newKey = prevLoadKey;
+			if(newKey == null)
+			{
+				newKey = new object();
+			}
 
-			_nEvent = _meshPreRenderedEvents.Count;
+			if(_key2Event == null)
+			{
+				_key2Event = new Dictionary<object, EventSet>();
+			}
+
+			EventSet newSet = new EventSet(newKey, preRenderEvent);
+			_key2Event.Add(newKey, newSet);
+
+			//배열 갱신
+			//_renderEvents = _key2Event.Values.ToArray();
+			_nEvent = _key2Event.Count;
+			if(_nEvent == 0)
+			{
+				_renderEvents = null;
+			}
+			else if(_nEvent > 0)
+			{
+				_renderEvents = new EventSet[_nEvent];
+				int iEvent = 0;
+				foreach (KeyValuePair<object, EventSet> eventPair in _key2Event)
+				{
+					//Debug.Log("> Add Render Event : " + _camera.gameObject.name);
+					_renderEvents[iEvent] = eventPair.Value;
+					iEvent++;
+				}
+			}
+				
+			
+
+			return newKey;
 		}
 
+
+		//변경 : LoadKey를 기준으로 삭제 요청
 		/// <summary>
-		/// OptMesh -> PreRender 이벤트 삭제
+		/// 저장된 PreRender 이벤트 삭제
 		/// </summary>
-		/// <param name="optMesh"></param>
-		public void RemovePreRenderEvent(apOptMesh optMesh)
+		public void RemovePreRenderEvent(object loadKey)
 		{
-			if (_meshPreRenderedEvents == null)
+			if(loadKey == null
+				|| _nEvent == 0)
 			{
 				return;
 			}
-
-			//Debug.LogWarning("RemovePreRenderEvent [" + optMesh.name + "]");
-			if (_meshPreRenderedEvents.ContainsKey(optMesh))
+			
+			if(_key2Event == null)
 			{
-				_meshPreRenderedEvents.Remove(optMesh);
+				_key2Event = new Dictionary<object, EventSet>();
 			}
 
-			_nEvent = _meshPreRenderedEvents.Count;
+			EventSet targetEventSet = null;
+			if(_key2Event != null)
+			{
+				_key2Event.TryGetValue(loadKey, out targetEventSet);
+			}
+
+			if(targetEventSet != null)
+			{
+				//등록되었다면 삭제하자
+				_key2Event.Remove(loadKey);
+			}
+
+			_nEvent = _key2Event.Count;
+			
+
+			//배열 갱신
+			if (_nEvent == 0)
+			{
+				_renderEvents = null;
+			}
+			else if(_nEvent > 0)
+			{
+				_renderEvents = new EventSet[_nEvent];
+				int iEvent = 0;
+				foreach (KeyValuePair<object, EventSet> eventPair in _key2Event)
+				{
+					_renderEvents[iEvent] = eventPair.Value;
+					iEvent++;
+				}
+			}
+			
 			if(_nEvent == 0)
 			{
+				//모든 이벤트가 삭제되었다면
 				//Debug.LogError("[" + name + "] Event is 0");
 				_isDestroyed = true;
 				Destroy(this);
@@ -126,21 +236,36 @@ namespace AnyPortrait
 				return;
 			}
 
-			apOptMesh optMesh = null;
-			FUNC_MESH_PRE_RENDERED funcMeshPreRendered = null;
+			//이전
+			// apOptMesh optMesh = null;
+			// FUNC_MESH_PRE_RENDERED funcMeshPreRendered = null;
 
-			foreach (KeyValuePair<apOptMesh, FUNC_MESH_PRE_RENDERED> pair in _meshPreRenderedEvents)
+			// foreach (KeyValuePair<apOptMesh, FUNC_MESH_PRE_RENDERED> pair in _meshPreRenderedEvents)
+			// {
+			// 	optMesh = pair.Key;
+			// 	funcMeshPreRendered = pair.Value;
+
+			// 	if(optMesh == null || funcMeshPreRendered == null)
+			// 	{
+			// 		//메시가 없다면 리스트를 다시 봐야 한다.
+			// 		continue;
+			// 	}
+
+			// 	funcMeshPreRendered(_camera);
+			// }
+
+			//변경 v1.6.0
+			EventSet curEventSet = null;
+			for (int i = 0; i < _nEvent; i++)
 			{
-				optMesh = pair.Key;
-				funcMeshPreRendered = pair.Value;
-
-				if(optMesh == null || funcMeshPreRendered == null)
+				curEventSet = _renderEvents[i];
+				
+				if(curEventSet._loadKey == null || curEventSet._funcEvent == null)
 				{
-					//메시가 없다면 리스트를 다시 봐야 한다.
 					continue;
 				}
 
-				funcMeshPreRendered(_camera);
+				curEventSet._funcEvent(_camera);
 			}
 		}
 
@@ -160,10 +285,17 @@ namespace AnyPortrait
 
 		// Get / Set
 		//-------------------------------------------------
-		public Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED> GetPreRenderedEvents()
+		// public Dictionary<apOptMesh, FUNC_MESH_PRE_RENDERED> GetPreRenderedEvents()
+		// {
+		// 	return _meshPreRenderedEvents;
+		// }
+
+		public bool IsDestroying()
 		{
-			return _meshPreRenderedEvents;
+			return _isDestroyed;
 		}
+
+		
 
 	}
 }

@@ -205,6 +205,10 @@ namespace AnyPortrait
 		public apGUIRenderSettings GUIRenderSettings { get { return _guiRenderSettings; } }
 
 
+		//추가 v1.6.0 : 클리핑을 포함한 마스크를 렌더링하기 위한 렌더 텍스쳐를 관리하는 객체
+		private apEditorRT _renderTex = new apEditorRT();
+		public apEditorRT RenderTex { get { return _renderTex; } }
+
 		//--------------------------------------------------------------------------------
 		// GUI Repaint / 업데이트 관련 멤버
 		//--------------------------------------------------------------------------------
@@ -533,7 +537,8 @@ namespace AnyPortrait
 		public bool _isShowURPWarningMsg = true;
 
 		//추가 22.1.7 : Bake시 URP에 의한 렌더 파이프라인 옵션 체크
-		public bool _option_CheckSRPWhenBake = true;
+		//public bool _option_CheckSRPWhenBake = true;//옵션명 변경
+		public bool _option_ValidateEnvironmentWhenBake = true;//Bake시 환경 체크 (SRP, Color Space 등)
 
 
 		//추가 22.4.17 : 핀 설정시, 가중치가 자동으로 갱신되게 만드는 옵션.
@@ -574,6 +579,9 @@ namespace AnyPortrait
 
 		//추가 v1.5.0 : 컨트롤 파라미터에 키 추가하는 경우 블렌딩 값이 설정될지 여부
 		public bool _option_NewControlParamModMeshBoneBlended = true;
+
+		//추가 v1.6.0
+		//Bake시 환경 체크
 
 
 		//----------------------------------------------------------------------------------
@@ -697,8 +705,8 @@ namespace AnyPortrait
 		/// <summary>Bone을 렌더링 하는가</summary>
 		public BONE_RENDER_MODE _boneGUIRenderMode = BONE_RENDER_MODE.Render;
 
-		public enum MESH_RENDER_MODE { None, Render, }
-		public MESH_RENDER_MODE _meshGUIRenderMode = MESH_RENDER_MODE.Render;
+		public enum MESH_RENDER_MODE { None, RenderAll, RenderWithOutMask, }
+		public MESH_RENDER_MODE _meshGUIRenderMode = MESH_RENDER_MODE.RenderAll;
 
 		[Flags]
 		public enum BONE_RENDER_TARGET
@@ -1174,6 +1182,13 @@ namespace AnyPortrait
 		
 		//첫 렌더링 감지 후 초기화
 		public bool _isFirstOnGUI = false;
+		private bool _isInit = false;
+
+		//중복에 의한 기존 에디터 삭제 요청시 Enable이 호출되는 문제가 있다.
+		//이때는 유효하지 않은 에디터로 인식되어야 한다.
+		private bool _isClosedEditor = false;//이 값은 False > True로만 동작한다.
+		public void SetClosedEditor() { _isClosedEditor = true; }
+		public bool IsClosedEditor() { return _isClosedEditor; }
 
 
 		/// <summary>

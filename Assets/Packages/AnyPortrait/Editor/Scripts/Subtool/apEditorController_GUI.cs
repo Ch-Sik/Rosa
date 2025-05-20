@@ -3008,7 +3008,8 @@ namespace AnyPortrait
 			if (image != null)
 			{
 				float sqrt2 = 1.0f / 1.414f;
-				apGL.DrawTextureGL(image, mousePos + new Vector2(radius * sqrt2 + 16, radius * sqrt2 + 16), 32, 32, Color.grey, 0.0f);
+				float size = 32.0f / apGL.Zoom;
+				apGL.DrawTextureGL(image, mousePos + new Vector2(radius * sqrt2 + 16, radius * sqrt2 + 16), size, size, Color.grey, 0.0f);
 			}
 
 			//Editor.Repaint();

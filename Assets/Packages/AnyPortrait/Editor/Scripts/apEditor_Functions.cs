@@ -655,26 +655,17 @@ namespace AnyPortrait
 			{
 				_guiLOFactory.Init();
 			}
+			
 
 
-			//GUIStyleWrapper가 이미 로드되었는지 확인
-			if (_guiStyleWrapper != null && _guiStyleWrapper.IsInitialized())
-			{
-				return true;
-			}
+			////GUIStyleWrapper가 이미 로드되었는지 확인
+			//if (_guiStyleWrapper != null && _guiStyleWrapper.IsInitialized())
+			//{
+			//	return true;
+			//}
 
-			//로드가 안되었다면 > Event의 타입을 봐야한다.
-			if (Event.current == null)
-			{
-				//Debug.LogError("AnyPortrait : CheckEditorResources : No Event");
-				return false;
-			}
+			bool isGUIStyleLoaded = false;
 
-			if (Event.current.type != EventType.Layout)
-			{
-				//Debug.LogError("AnyPortrait : CheckEditorResources : No Layout Event [" + Event.current.type + "]");
-				return false;
-			}
 
 			//추가 19.11.21 : GUIStyle 최적화를 위한 코드
 			if (_guiStyleWrapper == null)
@@ -682,15 +673,28 @@ namespace AnyPortrait
 				_guiStyleWrapper = new apGUIStyleWrapper();
 			}
 			if (!_guiStyleWrapper.IsInitialized())
+			{	
+				if(Event.current != null
+					&& Event.current.type == EventType.Layout)
+				{
+					//GUI Style은 초기화되는 상황이 한정되어 있다.
+					_guiStyleWrapper.Init();
+					
+				}
+			}
+
+			if(_guiStyleWrapper.IsInitialized())
 			{
-				_guiStyleWrapper.Init();
+				//GUI Style이 로드된게 최종적인 처리 성공이다.
+				//(나머지는 조건 상관없이 초기화가 된다)
+				isGUIStyleLoaded = true;
 			}
 
 			//추가 21.1.19 : GUI Workspace에 추가되는 버튼들
-			if(_guiButton_Menu == null)
+			if (_guiButton_Menu == null)
 			{
-				_guiButton_Menu = new apGUIButton(	ImageSet.Get(apImageSet.PRESET.GUI_Button_Menu), 
-													ImageSet.Get(apImageSet.PRESET.GUI_Button_Menu_Roll), 
+				_guiButton_Menu = new apGUIButton(ImageSet.Get(apImageSet.PRESET.GUI_Button_Menu),
+													ImageSet.Get(apImageSet.PRESET.GUI_Button_Menu_Roll),
 													GUI_STAT_MENUBTN_SIZE, GUI_STAT_MENUBTN_SIZE);
 			}
 			if(_guiButton_RecordOnion == null)
@@ -778,7 +782,8 @@ namespace AnyPortrait
 			//추가 v1.4.6 : GUI의 일부 데이터가 초기화 되지 않는 문제
 			apEditorUtil.ResetWhiteTexture();
 
-			return true;
+			
+			return isGUIStyleLoaded;//GUI Style 로드 여부가 중요
 		}
 
 
@@ -957,9 +962,14 @@ namespace AnyPortrait
 					_isInvertBackgroundColor = !_isInvertBackgroundColor;
 					break;
 
-				case apGUIMenu.MENU_ITEM__GUIVIEW.Mesh:
-					if(_meshGUIRenderMode == MESH_RENDER_MODE.Render)	{ _meshGUIRenderMode = MESH_RENDER_MODE.None; }
-					else												{ _meshGUIRenderMode = MESH_RENDER_MODE.Render; }
+				case apGUIMenu.MENU_ITEM__GUIVIEW.Mesh_Show:
+					if(_meshGUIRenderMode == MESH_RENDER_MODE.RenderAll)	{ _meshGUIRenderMode = MESH_RENDER_MODE.None; }
+					else													{ _meshGUIRenderMode = MESH_RENDER_MODE.RenderAll; }
+					break;
+
+				case apGUIMenu.MENU_ITEM__GUIVIEW.MeshMask_Show:
+					if(_meshGUIRenderMode == MESH_RENDER_MODE.RenderWithOutMask)	{ _meshGUIRenderMode = MESH_RENDER_MODE.None; }
+					else															{ _meshGUIRenderMode = MESH_RENDER_MODE.RenderWithOutMask; }
 					break;
 
 				case apGUIMenu.MENU_ITEM__GUIVIEW.Bone_Show:
@@ -1462,13 +1472,11 @@ namespace AnyPortrait
 			bool isTargetTimelineLayer_Multiple = targetTimelineLayers != null && targetTimelineLayers.Count > 0;
 			bool isTargetTimelineLayer_Single = !isTargetTimelineLayer_Multiple && targetTimelineLayer != null;//다중 선택이 입력된 경우 단일 선택은 무시한다.
 			
-
 			if (isRequest_RefreshTimelines) //<조건문 추가 19.5.21
 			{
 				//타임라인값도 리프레시 (Sorting 등)
 				curAnimClip.RefreshTimelines(targetTimelineLayer, targetTimelineLayers);
 			}
-
 			
 			//조건문 변경 19.5.21
 			if (isRequest_ResetTimelineInfo || _timelineInfoList.Count == 0)
@@ -1482,6 +1490,7 @@ namespace AnyPortrait
 				{
 					apAnimTimeline timeline = null;
 					apTimelineLayerInfo timelineInfo = null;
+
 					for (int iTimeline = 0; iTimeline < nTimelines; iTimeline++)
 					{
 						timeline = timelines[iTimeline];
@@ -1507,7 +1516,6 @@ namespace AnyPortrait
 								{
 									//Modifier가 Transform을 지원하는 경우
 									//Bone이 위쪽에 속한다.
-
 									if (curAnimClip._targetMeshGroup == null)
 									{
 										//기존 방식
@@ -1656,6 +1664,8 @@ namespace AnyPortrait
 
 				//이제 대상인 Timeline들을 돌면서 체크를 한다.
 				int nTimelines = timelines != null ? timelines.Count : 0;
+				//Debug.LogWarning("> RefreshTimeline Layer에서 Mod Bone/Mesh 다시 연결 시도 [" + nTimelines + "]");
+
 				if(nTimelines > 0)
 				{
 					apAnimTimeline timeline = null;
@@ -1664,24 +1674,29 @@ namespace AnyPortrait
 
 					for (int iTimeline = 0; iTimeline < nTimelines; iTimeline++)
 					{
-						timeline = timelines[iTimeline];
-
+						timeline = timelines[iTimeline];						
 						if (timeline == null)
 						{
 							continue;
 						}
 
+						//Debug.Log("[" + iTimeline + "] 타임라인 : " + timeline.DisplayName);
+
 						if (timeline._linkType != apAnimClip.LINK_TYPE.AnimatedModifier
 							|| timeline._linkedModifier == null)
 						{
+							//Debug.LogError("> 타임라인이 AnimatedModifier가 아니거나 Modifier가 없다.");
 							continue;
 						}
 
 						int nLayers = timeline._layers != null ? timeline._layers.Count : 0;
 						if (nLayers == 0)
 						{
+							//Debug.LogError("> 타임라인 레이어가 없다.");
 							continue;
 						}
+
+						//Debug.Log(">> 타임라인 레이어 갱신 [" + nLayers + "]");
 
 						for (int iLayer = 0; iLayer < nLayers; iLayer++)
 						{
@@ -1689,18 +1704,23 @@ namespace AnyPortrait
 
 							if (layer == null)
 							{
+								//Debug.LogError(">> 레이어가 없다.");
 								continue;
 							}
+
+							//Debug.Log("- [" + iLayer + "] 레이어 : " + layer.DisplayName);
 
 							int nKeys = layer._keyframes != null ? layer._keyframes.Count : 0;
 							if (nKeys == 0)
 							{
+								//Debug.LogError(">> 키프레임이 없다.");
 								continue;
 							}
 
 							int nPSGs = timeline._linkedModifier._paramSetGroup_controller != null ? timeline._linkedModifier._paramSetGroup_controller.Count : 0;
 							if (nPSGs == 0)
 							{
+								//Debug.LogError(">> ParamSetGroup이 없다.");
 								continue;
 							}
 
@@ -1716,6 +1736,7 @@ namespace AnyPortrait
 
 							if (paramSetGroup == null)
 							{
+								// Debug.LogError(">> ParamSetGroup이 없다. 2 - " + layer.DisplayName);
 								continue;
 							}
 							
@@ -1756,8 +1777,18 @@ namespace AnyPortrait
 										//Bone Data 연결
 										keyframe.LinkModBone_Editor(paramSet, paramSet._boneData[0]);
 										isDataLinked = true;
+
+										//Debug.Log(">> Bone Data 연결 [" + paramSet._boneData[0]._bone._name + "]");
 									}
+									// else
+									// {
+									// 	Debug.LogError(">> Mod Data가 없다.");
+									// }
 								}
+								// else
+								// {
+								// 	Debug.LogError(">> ParamSet이 없다.");
+								// }
 
 								if (!isDataLinked)
 								{
@@ -1767,263 +1798,6 @@ namespace AnyPortrait
 						}
 					}
 				}
-
-
-
-				#region [미사용 코드] 위 코드에 통합됨
-				////if (targetTimelineLayer == null)
-				//if(!isTargetTimelineLayer_Single && !isTargetTimelineLayer_Multiple)//변경 20.6.19 : 타겟 레이어가 없는 경우
-				//{
-				//	//전체 링크
-				//	for (int iTimeline = 0; iTimeline < curAnimClip._timelines.Count; iTimeline++)
-				//	{
-				//		apAnimTimeline timeline = curAnimClip._timelines[iTimeline];
-
-				//		if (timeline == null)
-				//		{
-				//			continue;
-				//		}
-
-				//		if (timeline._linkType != apAnimClip.LINK_TYPE.AnimatedModifier
-				//			|| timeline._linkedModifier == null)
-				//		{
-				//			continue;
-				//		}
-
-				//		int nLayers = timeline._layers != null ? timeline._layers.Count : 0;
-				//		if (nLayers == 0)
-				//		{
-				//			continue;
-				//		}
-
-				//		for (int iLayer = 0; iLayer < nLayers; iLayer++)
-				//		{
-				//			apAnimTimelineLayer layer = timeline._layers[iLayer];
-
-				//			if (layer == null)
-				//			{
-				//				continue;
-				//			}
-
-				//			int nKeys = layer._keyframes != null ? layer._keyframes.Count : 0;
-				//			if(nKeys == 0)
-				//			{
-				//				continue;
-				//			}
-
-				//			int nPSGs = timeline._linkedModifier._paramSetGroup_controller != null ? timeline._linkedModifier._paramSetGroup_controller.Count : 0;
-				//			if(nPSGs == 0)
-				//			{
-				//				continue;
-				//			}
-
-				//			//이전 (GC 발생)
-				//			//apModifierParamSetGroup paramSetGroup = timeline._linkedModifier._paramSetGroup_controller.Find(delegate (apModifierParamSetGroup a)
-				//			//{
-				//			//	return a._keyAnimTimelineLayer == layer;
-				//			//});
-
-				//			//변경 v1.5.0
-				//			s_FindModPSG_TimelineLayer = layer;
-				//			apModifierParamSetGroup paramSetGroup = timeline._linkedModifier._paramSetGroup_controller.Find(s_FindModPSGByTimelineLayer_Func);
-
-				//			if (paramSetGroup != null)
-				//			{
-				//				apAnimKeyframe keyframe = null;
-				//				int nParamSets = paramSetGroup._paramSetList != null ? paramSetGroup._paramSetList.Count : 0;
-
-				//				for (int iKey = 0; iKey < nKeys; iKey++)
-				//				{
-				//					keyframe = layer._keyframes[iKey];
-
-				//					apModifierParamSet paramSet = null;
-				//					if(nParamSets > 0)
-				//					{
-				//						//이전 (GC 발생)
-				//						//paramSet = paramSetGroup._paramSetList.Find(delegate (apModifierParamSet a)
-				//						//{
-				//						//	return a.SyncKeyframe == keyframe;
-				//						//});
-
-				//						//변경 v1.5.0
-				//						s_FindParamSet_Keyframe = keyframe;
-				//						paramSet = paramSetGroup._paramSetList.Find(s_FindParamSetByKeyframe_Func);
-				//					}
-
-				//					bool isDataLinked = false;
-				//					if (paramSet != null)
-				//					{
-				//						int nMeshData = paramSet._meshData != null ? paramSet._meshData.Count : 0;
-				//						int nBoneData = paramSet._boneData != null ? paramSet._boneData.Count : 0;
-
-				//						if(nMeshData > 0)
-				//						{
-				//							//Mesh Data 연결
-				//							keyframe.LinkModMesh_Editor(paramSet, paramSet._meshData[0]);
-				//							isDataLinked = true;
-				//						}
-				//						else if(nBoneData > 0)
-				//						{
-				//							//Bone Data 연결
-				//							keyframe.LinkModBone_Editor(paramSet, paramSet._boneData[0]);
-				//							isDataLinked = true;
-				//						}
-				//					}
-
-				//					if(!isDataLinked)
-				//					{
-				//						keyframe.LinkModMesh_Editor(null, null);//<<null, null을 넣으면 ModBone도 Null이 된다.
-				//					}
-				//				}
-				//			}
-				//		}
-				//	}
-				//}
-				//else if(isTargetTimelineLayer_Single)
-				//{
-				//	//[단일]
-				//	//특정 TimelineLayer만 링크
-				//	apAnimTimeline parentTimeline = targetTimelineLayer._parentTimeline;
-
-				//	bool isValidTimeline = true;//조건 중 하나라도 실패하면 안됨
-
-				//	if (parentTimeline != null &&
-				//		parentTimeline._linkType == apAnimClip.LINK_TYPE.AnimatedModifier &&
-				//			parentTimeline._linkedModifier != null)
-				//	{
-				//		apModifierParamSetGroup paramSetGroup = parentTimeline._linkedModifier._paramSetGroup_controller.Find(delegate (apModifierParamSetGroup a)
-				//		{
-				//			return a._keyAnimTimelineLayer == targetTimelineLayer;
-				//		});
-
-				//		if (paramSetGroup != null)
-				//		{
-				//			for (int iKey = 0; iKey < targetTimelineLayer._keyframes.Count; iKey++)
-				//			{
-				//				apAnimKeyframe keyframe = targetTimelineLayer._keyframes[iKey];
-
-				//				//이전 (GC 발생)
-				//				//apModifierParamSet paramSet = paramSetGroup._paramSetList.Find(delegate (apModifierParamSet a)
-				//				//{
-				//				//	return a.SyncKeyframe == keyframe;
-				//				//});
-
-				//				//변경 v1.5.0
-				//				s_FindParamSet_Keyframe = keyframe;
-				//				apModifierParamSet paramSet = paramSetGroup._paramSetList.Find(s_FindParamSetByKeyframe_Func);
-
-
-				//				bool isDataLinked = false;
-				//				if (paramSet != null)
-				//				{
-				//					int nMeshData = paramSet._meshData != null ? paramSet._meshData.Count : 0;
-				//					int nBoneData = paramSet._boneData != null ? paramSet._boneData.Count : 0;
-
-				//					if(nMeshData > 0)
-				//					{
-				//						//Mesh Data 연결
-				//						keyframe.LinkModMesh_Editor(paramSet, paramSet._meshData[0]);
-				//						isDataLinked = true;
-				//					}
-				//					else if(nBoneData > 0)
-				//					{
-				//						//Bone Data 연결
-				//						keyframe.LinkModBone_Editor(paramSet, paramSet._boneData[0]);
-				//						isDataLinked = true;
-				//					}
-				//				}
-
-				//				if(!isDataLinked)
-				//				{
-				//					keyframe.LinkModMesh_Editor(null, null);//<<null, null을 넣으면 ModBone도 Null이 된다.
-				//				}
-				//			}
-				//		}
-				//	}
-				//}
-				//else if(isTargetTimelineLayer_Multiple)
-				//{
-				//	//[다중] 20.6.19
-				//	//리스트의 타임라인 레이어만 링크
-				//	apAnimTimelineLayer curLayer = null;
-				//	apAnimTimeline curParentTimeline = null;
-
-				//	int nTargetLayers = targetTimelineLayers != null ? targetTimelineLayers.Count : 0;
-
-				//	if (nTargetLayers > 0)
-				//	{
-				//		for (int iLayer = 0; iLayer < nTargetLayers; iLayer++)
-				//		{
-				//			curLayer = targetTimelineLayers[iLayer];
-				//			if (curLayer == null)
-				//			{
-				//				continue;
-				//			}
-				//			curParentTimeline = curLayer._parentTimeline;
-
-				//			if(curParentTimeline == null)
-				//			{
-				//				continue;
-				//			}
-
-				//			if(curParentTimeline._linkType != apAnimClip.LINK_TYPE.AnimatedModifier
-				//				|| curParentTimeline._linkedModifier == null)
-				//			{
-				//				continue;
-				//			}
-
-				//			int nPSGs = curParentTimeline._linkedModifier._paramSetGroup_controller != null ? curParentTimeline._linkedModifier._paramSetGroup_controller.Count : 0;
-				//			if(nPSGs == 0)
-				//			{
-				//				continue;
-				//			}
-
-				//			//이전 (GC 발생)
-				//			//apModifierParamSetGroup paramSetGroup = curParentTimeline._linkedModifier._paramSetGroup_controller.Find(delegate (apModifierParamSetGroup a)
-				//			//{
-				//			//	return a._keyAnimTimelineLayer == curLayer;
-				//			//});
-
-				//			//변경 v1.5.0
-				//			s_FindModPSG_TimelineLayer = curLayer;
-				//			apModifierParamSetGroup paramSetGroup = curParentTimeline._linkedModifier._paramSetGroup_controller.Find(s_FindModPSGByTimelineLayer_Func);
-
-
-				//			if (paramSetGroup != null)
-				//			{
-				//				int nKeys = curLayer._keyframes != null ? curLayer._keyframes.Count : 0;
-				//				if(nKeys > 0)
-				//				{
-
-				//				}
-				//				for (int iKey = 0; iKey < curLayer._keyframes.Count; iKey++)
-				//				{
-				//					apAnimKeyframe keyframe = curLayer._keyframes[iKey];
-				//					apModifierParamSet paramSet = paramSetGroup._paramSetList.Find(delegate (apModifierParamSet a)
-				//					{
-				//						return a.SyncKeyframe == keyframe;
-				//					});
-
-				//					if (paramSet != null && paramSet._meshData.Count > 0)
-				//					{
-				//						keyframe.LinkModMesh_Editor(paramSet, paramSet._meshData[0]);
-				//					}
-				//					else if (paramSet != null && paramSet._boneData.Count > 0)//<<추가 : boneData => ModBone
-				//					{
-				//						keyframe.LinkModBone_Editor(paramSet, paramSet._boneData[0]);
-				//					}
-				//					else
-				//					{
-				//						keyframe.LinkModMesh_Editor(null, null);//<<null, null을 넣으면 ModBone도 Null이 된다.
-				//					}
-				//				}
-				//			}
-				//		}
-				//	}
-
-				//} 
-				#endregion
-
 			}
 
 
@@ -2207,7 +1981,8 @@ namespace AnyPortrait
 		{
 			//Profiler.BeginSample("MeshGroup Render");
 
-			if (meshRenderMode == MESH_RENDER_MODE.Render)
+			//Normal 상태의 메시들을 렌더링하자 (선택 여부 무관하게 렌더링)
+			if (meshRenderMode != MESH_RENDER_MODE.None)
 			{
 				//이전
 				//_tmpSelectedRenderUnits.Clear();
@@ -2219,18 +1994,20 @@ namespace AnyPortrait
 				bool isMeshTF_Main_Checkable = (selectedMeshTF_Main != null);
 				bool isMeshTF_Sub_Checkable = (selectedMeshTF_Sub != null && selectedMeshTF_Sub.Count > 0);//Sub 리스트엔 Main도 포함되어 있으므로 2 이상이어야 한다.
 				
-
 				List<apRenderUnit> renderUnits = meshGroup.SortedBuffer.SortedRenderUnits;
 				int nRenderUnits = renderUnits.Count;
 
 
+				apRenderUnit renderUnit = null;
+				apTransform_Mesh meshTF = null;
+
+				bool isRenderMaskOnlyMesh = meshRenderMode == MESH_RENDER_MODE.RenderAll;//Mask Only 메시를 출력할지 여부
 
 				//선택된 렌더유닛을 먼저 선정. 그 후에 다시 렌더링하자
 				//for (int iUnit = 0; iUnit < meshGroup._renderUnits_All.Count; iUnit++)//>>이전 코드
 				if (isMeshTF_Main_Checkable || isMeshTF_Sub_Checkable)
 				{
-					//선택된게 있다면
-					apRenderUnit renderUnit = null;
+					//선택된게 있다면					
 					for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)//<<변경
 					{
 						renderUnit = renderUnits[iUnit];//<<변경
@@ -2265,8 +2042,6 @@ namespace AnyPortrait
 				if(renderRequest_Normal.BoneRigWeightColor)//변경 22.3.3
 				{
 					//Rig Weight를 집어넣자.
-					//bool isBoneColor = Select._rigEdit_isBoneColorView;
-					//apSelection.RIGGING_EDIT_VIEW_MODE rigViewMode = Select._rigEdit_viewMode;
 					apRenderVertex renderVert = null;
 					apModifiedMesh modMesh = Select.ModMesh_Main;
 					apModifiedVertexRig vertRig = null;
@@ -2281,72 +2056,94 @@ namespace AnyPortrait
 						if (modifier._paramSetGroup_controller.Count > 0 &&
 							modifier._paramSetGroup_controller[0]._paramSetList.Count > 0)
 						{
-							List<apModifiedMesh> modMeshes = Select.Modifier._paramSetGroup_controller[0]._paramSetList[0]._meshData;
+							List<apModifiedMesh> modMeshes = modifier._paramSetGroup_controller[0]._paramSetList[0]._meshData;
 
-							for (int iMM = 0; iMM < modMeshes.Count; iMM++)
+							int nModMeshes = modMeshes != null ? modMeshes.Count : 0;
+							for (int iMM = 0; iMM < nModMeshes; iMM++)
 							{
 								modMesh = modMeshes[iMM];
-								if (modMesh != null)
+
+								//v1.6.0 버그 : modMesh._renderUnit가 null인 경우가 있다.
+								if (modMesh == null)
 								{
-									//modMesh.RefreshVertexRigs(_portrait);//삭제 : 20.3.30 > 별달리 Refresh할 것은 없다.
+									continue;
+								}
 
-									//이 렌더 유닛이 선택된 경우에만 RigWeightParam을 계산하자.
-									//bool isSelectedRenderUnit = _tmpSelectedRenderUnits.Contains(modMesh._renderUnit);//이전
-									bool isSelectedRenderUnit = (_tmpSelected_MainRenderUnit == modMesh._renderUnit);//변경 20.5.28
+								if(modMesh._renderUnit == null)
+								{
+									//Debug.LogError("V1.6.0 버그");
+									continue;
+								}
 
+
+								//이 렌더 유닛이 선택된 경우에만 RigWeightParam을 계산하자.
+								bool isSelectedRenderUnit = (_tmpSelected_MainRenderUnit == modMesh._renderUnit);//변경 20.5.28
 									
-									//for (int iRU = 0; iRU < modMesh._renderUnit._renderVerts.Count; iRU++)//이전
+								//for (int iRU = 0; iRU < modMesh._renderUnit._renderVerts.Count; iRU++)//이전
 
-									//변경 22.3.23 [v1.4.0] : RenderVertex가 배열로 변경됨
-									int nRenderVerts = modMesh._renderUnit._renderVerts != null ? modMesh._renderUnit._renderVerts.Length : 0;
-									if (nRenderVerts > 0)
+								//변경 22.3.23 [v1.4.0] : RenderVertex가 배열로 변경됨
+								int nRenderVerts = modMesh._renderUnit._renderVerts != null ? modMesh._renderUnit._renderVerts.Length : 0;
+								if (nRenderVerts > 0)
+								{
+									for (int iRU = 0; iRU < nRenderVerts; iRU++)
 									{
-										for (int iRU = 0; iRU < nRenderVerts; iRU++)
-										{
-											renderVert = modMesh._renderUnit._renderVerts[iRU];
-											renderVert._renderColorByTool = colorBlack;
-											renderVert._renderWeightByTool = 0.0f;
-											renderVert._renderParam = 0;
-											renderVert._renderRigWeightParam.Clear();//<<추가 19.7.30
-										}
+										renderVert = modMesh._renderUnit._renderVerts[iRU];
+										renderVert._renderColorByTool = colorBlack;
+										renderVert._renderWeightByTool = 0.0f;
+										renderVert._renderParam = 0;
+										renderVert._renderRigWeightParam.Clear();//<<추가 19.7.30
 									}
+								}
 
-									for (int iVR = 0; iVR < modMesh._vertRigs.Count; iVR++)
+								int nVertRigs = modMesh._vertRigs != null ? modMesh._vertRigs.Count : 0;
+								if(nVertRigs > 0)
+								{
+									for (int iVR = 0; iVR < nVertRigs; iVR++)
 									{
 										vertRig = modMesh._vertRigs[iVR];
-										if (vertRig._renderVertex != null)
+
+										if (vertRig._renderVertex == null)
 										{
-											for (int iWP = 0; iWP < vertRig._weightPairs.Count; iWP++)
+											continue;
+										}
+
+										int nWeightPairs = vertRig._weightPairs != null ? vertRig._weightPairs.Count : 0;
+										if(nWeightPairs == 0)
+										{
+											continue;
+										}
+
+										for (int iWP = 0; iWP < nWeightPairs; iWP++)
+										{
+											weightPair = vertRig._weightPairs[iWP];
+											vertRig._renderVertex._renderColorByTool += weightPair._bone._color * weightPair._weight;
+
+											if (weightPair._bone == selelcedBone)
 											{
-												weightPair = vertRig._weightPairs[iWP];
-												vertRig._renderVertex._renderColorByTool += weightPair._bone._color * weightPair._weight;
+												vertRig._renderVertex._renderWeightByTool += weightPair._weight;
+											}
 
-												if (weightPair._bone == selelcedBone)
-												{
-													vertRig._renderVertex._renderWeightByTool += weightPair._weight;
-												}
-
-												//선택된 렌더 유닛인 경우 WeightParam에 Rig값을 입력하자.
-												if(isSelectedRenderUnit)
-												{
-													vertRig._renderVertex._renderRigWeightParam.AddRigWeight(weightPair._bone._color, weightPair._bone == selelcedBone, weightPair._weight);
-												}
+											//선택된 렌더 유닛인 경우 WeightParam에 Rig값을 입력하자.
+											if(isSelectedRenderUnit)
+											{
+												vertRig._renderVertex._renderRigWeightParam.AddRigWeight(weightPair._bone._color, weightPair._bone == selelcedBone, weightPair._weight);
 											}
 										}
 									}
+								}
+								
 
-									//선택된 렌더 유닛에 한해서 RigWeight를 계산하자. (19.7.30)
+								//선택된 렌더 유닛에 한해서 RigWeight를 계산하자. (19.7.30)
 
-									if (isSelectedRenderUnit
-										&& nRenderVerts > 0//추가 22.3.23
-										)
+								if (isSelectedRenderUnit
+									&& nRenderVerts > 0//추가 22.3.23
+									)
+								{
+									//for (int iRU = 0; iRU < modMesh._renderUnit._renderVerts.Count; iRU++)//이전
+									for (int iRU = 0; iRU < nRenderVerts; iRU++)//변경 22.3.23
 									{
-										//for (int iRU = 0; iRU < modMesh._renderUnit._renderVerts.Count; iRU++)//이전
-										for (int iRU = 0; iRU < nRenderVerts; iRU++)//변경 22.3.23
-										{
-											renderVert = modMesh._renderUnit._renderVerts[iRU];
-											renderVert._renderRigWeightParam.Normalize();
-										}
+										renderVert = modMesh._renderUnit._renderVerts[iRU];
+										renderVert._renderRigWeightParam.Normalize();
 									}
 								}
 							}
@@ -2376,52 +2173,61 @@ namespace AnyPortrait
 						if (modifier._paramSetGroup_controller.Count > 0 &&
 							modifier._paramSetGroup_controller[0]._paramSetList.Count > 0)
 						{
-							List<apModifiedMesh> modMeshes = Select.Modifier._paramSetGroup_controller[0]._paramSetList[0]._meshData;
-							for (int iMM = 0; iMM < modMeshes.Count; iMM++)
+							List<apModifiedMesh> modMeshes = modifier._paramSetGroup_controller[0]._paramSetList[0]._meshData;
+
+							int nModMeshes = modMeshes != null ? modMeshes.Count : 0;
+							for (int iMM = 0; iMM < nModMeshes; iMM++)
 							{
 								modMesh = modMeshes[iMM];
-								if (modMesh != null)
+
+								//v1.6.0 : modMesh._renderUnit == null인 버그가 있다.
+								if (modMesh == null)
 								{
-									//Refresh를 여기서 하진 말자
-									//modMesh.RefreshVertexWeights(_portrait, isPhysic, isVolume);
+									continue;
+								}
 
-									//이전
-									//for (int iRU = 0; iRU < modMesh._renderUnit._renderVerts.Count; iRU++)
+								if(modMesh._renderUnit == null)
+								{
+									//Debug.LogError("V1.6.0 버그");
+									continue;
+								}
 
-									//변경 22.3.23 [v1.4.0] : 배열로 변경
-									int nRenderVerts = modMesh._renderUnit._renderVerts != null ? modMesh._renderUnit._renderVerts.Length : 0;
-									for (int iRU = 0; iRU < nRenderVerts; iRU++)
+								//Refresh를 여기서 하진 말자
+								//modMesh.RefreshVertexWeights(_portrait, isPhysic, isVolume);
+
+								//변경 22.3.23 [v1.4.0] : 배열로 변경
+								int nRenderVerts = modMesh._renderUnit._renderVerts != null ? modMesh._renderUnit._renderVerts.Length : 0;
+								for (int iRU = 0; iRU < nRenderVerts; iRU++)
+								{
+									renderVert = modMesh._renderUnit._renderVerts[iRU];
+									renderVert._renderColorByTool = colorBlack;
+									renderVert._renderWeightByTool = 0.0f;
+									renderVert._renderParam = 0;
+								}
+
+								int nVertWeights = modMesh._vertWeights != null ? modMesh._vertWeights.Count : 0;
+
+								for (int iVR = 0; iVR < nVertWeights; iVR++)
+								{
+									vertWeight = modMesh._vertWeights[iVR];
+
+									if (vertWeight._renderVertex == null)
 									{
-										renderVert = modMesh._renderUnit._renderVerts[iRU];
-										renderVert._renderColorByTool = colorBlack;
-										renderVert._renderWeightByTool = 0.0f;
-										renderVert._renderParam = 0;
+										continue;
 									}
 
-									int nVertWeights = modMesh._vertWeights != null ? modMesh._vertWeights.Count : 0;
+									//그라데이션을 위한 Weight 값을 넣어주자
+									vertWeight._renderVertex._renderWeightByTool = vertWeight._weight;
 
-									for (int iVR = 0; iVR < nVertWeights; iVR++)
+									if (isPhysic)
 									{
-										vertWeight = modMesh._vertWeights[iVR];
-
-										if (vertWeight._renderVertex == null)
+										if (vertWeight._isEnabled && vertWeight._physicParam._isMain)
 										{
-											continue;
+											vertWeight._renderVertex._renderParam = 1;//1 : Main
 										}
-
-										//그라데이션을 위한 Weight 값을 넣어주자
-										vertWeight._renderVertex._renderWeightByTool = vertWeight._weight;
-
-										if (isPhysic)
+										else if (!vertWeight._isEnabled && vertWeight._physicParam._isConstraint)
 										{
-											if (vertWeight._isEnabled && vertWeight._physicParam._isMain)
-											{
-												vertWeight._renderVertex._renderParam = 1;//1 : Main
-											}
-											else if (!vertWeight._isEnabled && vertWeight._physicParam._isConstraint)
-											{
-												vertWeight._renderVertex._renderParam = 2;//2 : Constraint
-											}
+											vertWeight._renderVertex._renderParam = 2;//2 : Constraint
 										}
 									}
 								}
@@ -2433,71 +2239,203 @@ namespace AnyPortrait
 
 				//----------------------------------
 
-				if (!isSelectedMeshOnly)
+				//v1.6.0 마스크 렌더링 수정
+				// [ 이전 ]
+				//- 하나씩 렌더링 하는 중에 Clipping Parent를 만나면 임시 RT에 마스크를 생성한다.
+				//- Clipping Child가 뒤이어서 나오기 때문에 임시 RT에서 마스크를 가져오면 된다.
+
+				// [ 변경 ]
+				//- 메시 렌더링 전에 Clipping Parent나 SendMaskData를 보유한 메시들의 마스크를 생성하고 에디터 RT에 저장해둔다.
+
+
+				// [ 변경 ]
+				//- 메시 렌더링 전에 Clipping Parent나 SendMaskData를 보유한 메시들의 마스크를 생성하고 에디터 RT에 저장해둔다.
+				//- 3개의 페이즈 순서대로 마스크를 렌더링한다. 클리핑-체인을 고려
+				//- 일반 Clipping 렌더링은 페이즈 1 (0)에서 수행한다.
+				for (int iPhase = 0; iPhase < 3; iPhase++)
 				{
-					apRenderUnit renderUnit = null;
 					for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
 					{
 						renderUnit = renderUnits[iUnit];
 
-
-						if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
+						if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh
+							|| renderUnit._meshTransform == null)
 						{
-							if (renderUnit._meshTransform != null)
+							continue;
+						}
+
+						meshTF = renderUnit._meshTransform;
+
+						//주의 : Else 연산이 아니라, 옵션이 있다면 모든 경우에 대해 마스크를 렌더링해야한다.
+
+						//1. 클리핑 마스크라면 개별 마스크에 저장을 한다.
+						//클리핑 렌더링은 "페이즈 1"에서만 수행한다.
+						if(meshTF._isClipping_Parent && iPhase == 0)
+						{
+							apMaskRT maskRT = RenderTex.GetRT_ClippingParent(meshTF);
+
+							//클리핑 마스크는 "AlphaMask" 타입으로 렌더링을 한다.
+							apGL.DrawRenderUnit_ToMaskRT(renderUnit, maskRT, apSendMaskData.RT_SHADER_TYPE.AlphaMask, this);
+						}
+
+
+						//2. Send Mask Data의 RT를 렌더한다.
+						int nSendMaskData = meshTF._sendMaskDataList != null ? meshTF._sendMaskDataList.Count : 0;
+						if(nSendMaskData > 0)
+						{
+							apSendMaskData sendMaskData = null;
+							for (int iSMD = 0; iSMD < nSendMaskData; iSMD++)
 							{
-								if (renderUnit._meshTransform._isClipping_Parent)
+								sendMaskData = meshTF._sendMaskDataList[iSMD];
+								
+								int iRenderPhase = (int)sendMaskData._rtRenderOrder;
+
+								if(iRenderPhase != iPhase)
 								{
-									//Profiler.BeginSample("Render - Mask Unit");
-
-									//테스트
-									//int nClipMeshes = renderUnit._meshTransform._clipChildMeshes != null ? renderUnit._meshTransform._clipChildMeshes.Count : 0;
-									//if(nClipMeshes == 0)
-									//{
-									//	Debug.Log("Clip Mesh = 0 [" + renderUnit.Name + "]");
-									//}
-
-
-									if (!isRenderOnlyVisible || renderUnit._isVisible)
-									{
-										apGL.DrawRenderUnit_ClippingParent_Renew(	renderUnit,
-																					
-																					//meshRenderType,		//이전
-																					renderRequest_Normal,	//변경 22.3.3
-																					
-																					renderUnit._meshTransform._clipChildMeshes,
-																					VertController,
-																					this,
-																					Select);
-									}
-
-									//Profiler.EndSample();
+									//렌더 순서가 맞지 않다.
+									continue;
 								}
-								else if (renderUnit._meshTransform._isClipping_Child)
+
+								if(sendMaskData._rtShaderType == apSendMaskData.RT_SHADER_TYPE.CustomShader)
 								{
-									//렌더링은 생략한다.
+									//커스텀 쉐이더는 에디터에서 지원하지 않는다.
+									continue;
+								}
+
+								apMaskRT maskRT = null;
+								if(sendMaskData._isRTShared)
+								{
+									//공유 Mask를 사용하는 경우
+									maskRT = RenderTex.GetRT_Shared(sendMaskData._rtShaderType, sendMaskData._sharedRTID);
 								}
 								else
 								{
-									//Profiler.BeginSample("Render - Normal Unit");
-
-									if (!isRenderOnlyVisible || renderUnit._isVisible)
-									{
-										apGL.DrawRenderUnit(	renderUnit,
-
-																//meshRenderType,		//이전
-																renderRequest_Normal,	//변경 22.3.3
-
-																VertController,
-																Select,
-																this,
-																_mouseSet.Pos);
-									}
-
-									//Profiler.EndSample();
+									//개별 Mask를 사용하는 경우
+									maskRT = RenderTex.GetRT_PerMeshTF(meshTF, sendMaskData._rtShaderType);
 								}
 
+								//Shader Type에 맞게 마스크를 렌더링한다.
+								apGL.DrawRenderUnit_ToMaskRT(renderUnit, maskRT, sendMaskData._rtShaderType, this);
 							}
 						}
+					}
+				}
+				
+
+				//메시를 렌더링하자
+				if (!isSelectedMeshOnly)
+				{
+					for (int iUnit = 0; iUnit < nRenderUnits; iUnit++)
+					{
+						renderUnit = renderUnits[iUnit];
+
+						if (renderUnit._unitType != apRenderUnit.UNIT_TYPE.Mesh)
+						{
+							continue;
+						}
+
+						meshTF = renderUnit._meshTransform;
+						if(meshTF == null)
+						{
+							continue;
+						}
+
+						if (isRenderOnlyVisible && !renderUnit._isVisible)
+						{
+							//이 렌더 유닛은 숨겨진 상태다.
+							continue;
+						}
+
+						if(meshTF._isMaskOnlyMesh && !isRenderMaskOnlyMesh)
+						{
+							//MaskOnly 메시인데 렌더링이 제한된 경우
+							continue;
+						}
+
+						//기존과 다르게, Clipping Child도 렌더링에 참여한다.
+						//- 클리핑 자식이나 마스크를 필요로 하는 경우, 다른 함수를 호출할 뿐, 동일하다.
+						//연결된 마스크 Info 개수를 체크하자
+						int nLinkedReceivedMasks = meshTF._linkedReceivedMasks != null ? meshTF._linkedReceivedMasks.Count : 0;
+
+						if(meshTF._isClipping_Child || nLinkedReceivedMasks > 0)
+						{
+							// [ 클리핑 자식 메시이거나 수신받는 마스크가 있는 경우 ]
+							apGL.DrawRenderUnit_MaskReceived(renderUnit,
+															renderRequest_Normal,
+															VertController,
+															this,
+															Select);
+						}
+						else
+						{
+							// [ 일반 메시인 경우 ]
+							apGL.DrawRenderUnit(	renderUnit,
+													renderRequest_Normal,	//변경 22.3.3
+													VertController,
+													Select,
+													this,
+													_mouseSet.Pos);
+						}
+
+						#region [미사용 코드] Clipping Parent가 Child들을 렌더링하는 이전 방식
+						//if (renderUnit._unitType == apRenderUnit.UNIT_TYPE.Mesh)
+						//{
+						//	if (renderUnit._meshTransform != null)
+						//	{
+						//		if (renderUnit._meshTransform._isClipping_Parent)
+						//		{
+						//			//Profiler.BeginSample("Render - Mask Unit");
+
+						//			//테스트
+						//			//int nClipMeshes = renderUnit._meshTransform._clipChildMeshes != null ? renderUnit._meshTransform._clipChildMeshes.Count : 0;
+						//			//if(nClipMeshes == 0)
+						//			//{
+						//			//	Debug.Log("Clip Mesh = 0 [" + renderUnit.Name + "]");
+						//			//}
+
+						//			//여기 수정해야함
+						//			if (!isRenderOnlyVisible || renderUnit._isVisible)
+						//			{
+						//				apGL.DrawRenderUnit_ClippingParent_Renew(	renderUnit,
+
+						//															//meshRenderType,		//이전
+						//															renderRequest_Normal,	//변경 22.3.3
+
+						//															renderUnit._meshTransform._clipChildMeshes,
+						//															VertController,
+						//															this,
+						//															Select);
+						//			}
+
+						//			//Profiler.EndSample();
+						//		}
+						//		else if (renderUnit._meshTransform._isClipping_Child)
+						//		{
+						//			//렌더링은 생략한다.
+						//		}
+						//		else
+						//		{
+						//			//Profiler.BeginSample("Render - Normal Unit");
+
+						//			if (!isRenderOnlyVisible || renderUnit._isVisible)
+						//			{
+						//				apGL.DrawRenderUnit(	renderUnit,
+
+						//										//meshRenderType,		//이전
+						//										renderRequest_Normal,	//변경 22.3.3
+
+						//										VertController,
+						//										Select,
+						//										this,
+						//										_mouseSet.Pos);
+						//			}
+
+						//			//Profiler.EndSample();
+						//		}
+
+						//	}
+						//} 
+						#endregion
 					}
 
 					//렌더유닛 렌더링 후 Pass 1차 종료
@@ -2761,7 +2699,10 @@ namespace AnyPortrait
 
 			}
 
-			if (meshRenderMode == MESH_RENDER_MODE.Render)
+
+
+			//선택된 Render Unit의 세부 요소들 (버텍스 등)을 렌더링하자
+			if (meshRenderMode != MESH_RENDER_MODE.None)
 			{
 				//선택된 Render Unit을 그려준다. (Vertex 등)
 				
@@ -4650,14 +4591,24 @@ namespace AnyPortrait
 												GetText(TEXT.Okay));
 				return;
 			}
+			
+			
 
+			GameObject newPortraitObj = new GameObject(_requestedNewPortraitName);//<Undo
 
-			GameObject newPortraitObj = new GameObject(_requestedNewPortraitName);
+			Undo.RegisterCreatedObjectUndo(newPortraitObj, "New Portrait");
+			int undoID = Undo.GetCurrentGroup();
+
+			Undo.RegisterCompleteObjectUndo(newPortraitObj, "New Portrait");
+			Undo.RegisterCompleteObjectUndo(newPortraitObj.transform, "New Portrait");
+
 			newPortraitObj.transform.position = Vector3.zero;
 			newPortraitObj.transform.rotation = Quaternion.identity;
 			newPortraitObj.transform.localScale = Vector3.one;
 
-			_portrait = newPortraitObj.AddComponent<apPortrait>();
+			//_portrait = newPortraitObj.AddComponent<apPortrait>();//이전
+			_portrait = Undo.AddComponent<apPortrait>(newPortraitObj);//변경 v1.6.0
+			Undo.RegisterCompleteObjectUndo(_portrait, "New Portrait");
 
 			//Selection.activeGameObject = newPortraitObj;
 			Selection.activeGameObject = null;//<<선택을 해제해준다. 프로파일러를 도와줘야져
@@ -4692,11 +4643,6 @@ namespace AnyPortrait
 				ProjectSettingData.AdaptCommonSettingsToPortrait(_portrait);
 			}
 
-
-
-
-
-
 			//Selection.activeGameObject = _portrait.gameObject;
 			Selection.activeGameObject = null;//<<선택을 해제해준다. 프로파일러를 도와줘야져
 
@@ -4712,6 +4658,11 @@ namespace AnyPortrait
 			_hierarchy.ResetAllUnits();
 			_hierarchy_MeshGroup.ResetSubUnits();
 			_hierarchy_AnimClip.ResetSubUnits();
+
+			//v1.6.0 : 렌더 텍스쳐 초기화
+			RenderTex.ReleaseAll();
+
+			Undo.CollapseUndoOperations(undoID);
 		}
 
 		private void MakePortraitFromBackupFile()
@@ -4764,6 +4715,9 @@ namespace AnyPortrait
 				_hierarchy.ResetAllUnits();
 				_hierarchy_MeshGroup.ResetSubUnits();
 				_hierarchy_AnimClip.ResetSubUnits();
+
+				//v1.6.0 : 렌더 텍스쳐 초기화
+				RenderTex.ReleaseAll();
 
 				Notification("Backup File [" + _requestedLoadedBackupPortraitFilePath + "] is loaded", false, false);
 			}
@@ -5012,7 +4966,8 @@ namespace AnyPortrait
 
 
 			SavePref_Bool("AnyPortrait_IsShowURPWarningMsg", _isShowURPWarningMsg, true);
-			SavePref_Bool("AnyPortrait_IsCheckSRPWhenBake", _option_CheckSRPWhenBake, true);
+			//SavePref_Bool("AnyPortrait_IsCheckSRPWhenBake", _option_CheckSRPWhenBake, true);
+			SavePref_Bool("AnyPortrait_ValidateEnvironmentWhenBake", _option_ValidateEnvironmentWhenBake, true);
 
 
 			SavePref_Bool("AnyPortrait_PinOption_AutoWeightRefresh", _pinOption_AutoWeightRefresh, true);
@@ -5279,7 +5234,8 @@ namespace AnyPortrait
 			_cppPluginOption_UsePlugin = EditorPrefs.GetBool("AnyPortrait_UseCPPPlugin", false);
 
 			_isShowURPWarningMsg = EditorPrefs.GetBool("AnyPortrait_IsShowURPWarningMsg", true);
-			_option_CheckSRPWhenBake = EditorPrefs.GetBool("AnyPortrait_IsCheckSRPWhenBake", true);
+			//_option_CheckSRPWhenBake = EditorPrefs.GetBool("AnyPortrait_IsCheckSRPWhenBake", true);
+			_option_ValidateEnvironmentWhenBake = EditorPrefs.GetBool("AnyPortrait_ValidateEnvironmentWhenBake", true);
 
 			_pinOption_AutoWeightRefresh = EditorPrefs.GetBool("AnyPortrait_PinOption_AutoWeightRefresh", true);
 
@@ -5449,7 +5405,8 @@ namespace AnyPortrait
 
 
 			_isShowURPWarningMsg = DefaultShowURPWarningMsg;
-			_option_CheckSRPWhenBake = DefaultCheckSRPWhenBake;
+			//_option_CheckSRPWhenBake = DefaultCheckSRPWhenBake;
+			_option_ValidateEnvironmentWhenBake = DefaultValidateEnvWhenBake;
 
 			_pinOption_AutoWeightRefresh = DefaultPinOptionAutoWeightRefresh;
 
@@ -5569,7 +5526,8 @@ namespace AnyPortrait
 		public static bool DefaultExModObjOption_NotSelectable { get { return false; } }
 
 		public static bool DefaultShowURPWarningMsg { get { return true; } }
-		public static bool DefaultCheckSRPWhenBake { get { return true; } }
+		// public static bool DefaultCheckSRPWhenBake { get { return true; } }
+		public static bool DefaultValidateEnvWhenBake { get { return true; } }
 		public static bool DefaultPinOptionAutoWeightRefresh { get { return true; } }
 
 		public static CONTROL_PARAM_UI_SIZE_OPTION DefaultControlParamUISizeOption { get { return CONTROL_PARAM_UI_SIZE_OPTION.Default; } }
@@ -6369,6 +6327,9 @@ namespace AnyPortrait
 			_hierarchy.ResetAllUnits();
 			_hierarchy_MeshGroup.ResetSubUnits();
 			_hierarchy_AnimClip.ResetSubUnits();
+
+			//v1.6.0 : 렌더 텍스쳐도 다시 초기화
+			RenderTex.ReleaseAll();
 
 			yield return false;
 

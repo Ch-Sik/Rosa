@@ -6431,9 +6431,14 @@ namespace AnyPortrait
 
 			//위치 : 상하좌우, + Area 중심으로 이동
 			//버튼을 Left, Right, Up, Down, Move To Center로 설정
+			//변경 > 첫줄엔 LRUD 버튼을 배치하고 두번째 줄에 Move To Center / Move To Pivot 버튼을 넣는다.
 
-			int width_MoveAxisBtn = 26;
-			int width_CenterAxisBtn = width - (10 + width_MoveAxisBtn * 4 + 8);
+			//int width_MoveAxisBtn = 26;
+			//int width_CenterAxisBtn = width - (10 + width_MoveAxisBtn * 4 + 8);
+
+			int width_MoveAxisBtn = ((width - 5) / 4 - 2);
+			int width_CenterAxisBtn = ((width - 5) / 2) - 2;
+
 			int height_MoveAxisBtn = 20;
 			GUILayout.Space(2);
 			EditorGUILayout.BeginHorizontal(apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(height_MoveAxisBtn));
@@ -6501,6 +6506,10 @@ namespace AnyPortrait
 					apEditorUtil.ReleaseGUIFocus();
 				}
 			}
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal(apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(height_MoveAxisBtn));
+			GUILayout.Space(5);
 			if (apEditorUtil.ToggledButton(Editor.GetUIWord(UIWORD.MoveToCenter), false, isMirrorEnabled, width_CenterAxisBtn, height_MoveAxisBtn))//"Move to Center"
 			{
 				if (isMirrorEnabled)
@@ -6538,6 +6547,23 @@ namespace AnyPortrait
 					apEditorUtil.ReleaseGUIFocus();
 				}
 			}
+
+			//추가 v1.6.0 : Pivot으로 이동
+			if (apEditorUtil.ToggledButton(Editor.GetUIWord(UIWORD.MoveToPivot), false, isMirrorEnabled, width_CenterAxisBtn, height_MoveAxisBtn))//"Move to Center"
+			{
+				if (isMirrorEnabled)
+				{
+					apEditorUtil.SetRecord_Mesh(	apUndoGroupData.ACTION.MeshEdit_SettingChanged,
+													Editor,
+													Mesh,
+													//Mesh, 
+													false,
+													apEditorUtil.UNDO_STRUCT.ValueOnly);
+
+					Mesh._mirrorAxis = Mesh._offsetPos;
+					apEditorUtil.ReleaseGUIFocus();
+				}
+			}
 			//GUILayout.Space(5 + (width - (10 + width_MoveAxisBtn)) / 2);
 
 			EditorGUILayout.EndHorizontal();
@@ -6564,7 +6590,6 @@ namespace AnyPortrait
 				if (apEditorUtil.ToggledButton(Editor.ImageSet.Get(isMirrorX ? apImageSet.PRESET.MeshEdit_MirrorCopy_X : apImageSet.PRESET.MeshEdit_MirrorCopy_Y), 1, Editor.GetUIWord(UIWORD.CopySymmetry), false, nVertices > 0 && isMirrorEnabled, width, 25))
 				{
 					//미러 복사하기
-
 					//v1.4.2 탭 전환 전에 모달 상태를 확인하자
 					bool isExecutable = Editor.CheckModalAndExecutable();
 
@@ -6573,6 +6598,23 @@ namespace AnyPortrait
 						if (nVertices > 0)
 						{
 							Editor.Controller.DuplicateMirrorVertices();
+						}
+						apEditorUtil.ReleaseGUIFocus();
+					}
+				}
+
+				//추가 v1.6.0 : 복사가 아니라 이동도 할 수 있다.
+				if (apEditorUtil.ToggledButton(Editor.ImageSet.Get(isMirrorX ? apImageSet.PRESET.MeshEdit_MirrorMove_X : apImageSet.PRESET.MeshEdit_MirrorMove_Y), 1, Editor.GetUIWord(UIWORD.MoveSymmetry), false, nVertices > 0 && isMirrorEnabled, width, 25))
+				{
+					//미러 복사하기
+					//v1.4.2 탭 전환 전에 모달 상태를 확인하자
+					bool isExecutable = Editor.CheckModalAndExecutable();
+
+					if (isExecutable)
+					{
+						if (nVertices > 0)
+						{
+							Editor.Controller.MoveMirrorVertices();
 						}
 						apEditorUtil.ReleaseGUIFocus();
 					}
@@ -8589,13 +8631,6 @@ namespace AnyPortrait
 				}
 			}
 
-			//int uiType = 0;//이전
-			//0 : NotSelected
-			//1 : SingleMesh
-			//2 : SingleMeshGroup
-			//3 : MultiMesh (메인이 Mesh)
-			//4 : MultiMeshGroup (메인이 MeshGroup)
-
 			MESHGROUP_RIGHT_SETTING_PROPERTY_UI propUIType = MESHGROUP_RIGHT_SETTING_PROPERTY_UI.NoSelected;
 
 			if(isValidSelect)
@@ -9138,6 +9173,14 @@ namespace AnyPortrait
 										case apMaterialSet.ICON.LitMergeable:
 											matSetImg = Editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_MergeableLit);
 											break;
+
+										case apMaterialSet.ICON.UnlitMask:
+											matSetImg = Editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_UnlitMask);
+											break;
+
+										case apMaterialSet.ICON.LitMask:
+											matSetImg = Editor.ImageSet.Get(apImageSet.PRESET.MaterialSetIcon_LitMask);
+											break;
 									}
 
 									//이전
@@ -9534,13 +9577,67 @@ namespace AnyPortrait
 						apEditorUtil.GUI_DelimeterBoxH(width - 10);
 						GUILayout.Space(10);
 
-						//GUIStyle guiStyle_ClipStatus = new GUIStyle(GUI.skin.box);
-						//guiStyle_ClipStatus.alignment = TextAnchor.MiddleCenter;
-						//guiStyle_ClipStatus.normal.textColor = apEditorUtil.BoxTextColor;
 
-						Editor.SetGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_Child, MeshTF_Main._isClipping_Child);//"Mesh Transform Detail Status - Clipping Child"
+						//메시의 마스크/메타 맵 전달 정보
+						//- 전달 정보 다이얼로그 열기 버튼
+						//- 현재 연결 정보 (부모인 경우 : 도착 아이콘 + 대상 메시 / 자식인 경우 : 부모 메시 + 출발 아이콘)
+						//- "아래로 클리핑" 버튼 (조건에 따라)
+						//- (추가) 마스크로서만 동작하기 토글 버튼
+
+						//"마스크 설정 열기"
+						if(_guiContent_Right_MeshGroup_OpenMaskDialog == null)
+						{
+							_guiContent_Right_MeshGroup_OpenMaskDialog = apGUIContentWrapper.Make(1, Editor.GetUIWord(UIWORD.OpenMaskSettings), Editor.ImageSet.Get(apImageSet.PRESET.MGSetting_OpenMask));
+						}
+						if (GUILayout.Button(_guiContent_Right_MeshGroup_OpenMaskDialog.Content, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(28)))
+						{
+							apDialog_SendMaskData.ShowDialog(_editor, Portrait, MeshGroup, MeshTF_Main);
+						}
+
+						GUILayout.Space(5);
+
+						//추가 v1.6.0 : Render As Mask
+						if(_guiContent_Right_MeshGroup_WorkAsMaskOnly == null)
+						{
+							_guiContent_Right_MeshGroup_WorkAsMaskOnly = apGUIContentWrapper.Make(1, Editor.GetUIWord(UIWORD.AsMaskOnly), Editor.ImageSet.Get(apImageSet.PRESET.MGSetting_RenderAsMask));
+						}
+						if(apEditorUtil.ToggledButton_2Side(_guiContent_Right_MeshGroup_WorkAsMaskOnly, MeshTF_Main._isMaskOnlyMesh, true, width, 28))
+						{
+							apEditorUtil.SetRecord_MeshGroup(apUndoGroupData.ACTION.MeshGroup_DefaultSettingChanged,
+																Editor,
+																_meshGroup,
+																//MeshTF_Main, 
+																false, true,
+																apEditorUtil.UNDO_STRUCT.ValueOnly);
+							MeshTF_Main._isMaskOnlyMesh = !MeshTF_Main._isMaskOnlyMesh;
+						}
+
+
+						GUILayout.Space(5);
+
+						//클리핑 여부 (Parent 여부 상관 없음)
+						if(_guiContent_Right_MeshGroup_Clipping == null)
+						{
+							_guiContent_Right_MeshGroup_Clipping = apGUIContentWrapper.Make(1, Editor.GetUIWord(UIWORD.ClipToBelowMesh), Editor.ImageSet.Get(apImageSet.PRESET.MGSetting_Clipping));
+						}
+						if(apEditorUtil.ToggledButton_2Side(_guiContent_Right_MeshGroup_Clipping, MeshTF_Main._isClipping_Child, true, width, 28))
+						{	
+							if(MeshTF_Main._isClipping_Child)
+							{
+								//Clipping된 상태라면 해제
+								Editor.Controller.ReleaseClippingMeshTransform(MeshGroup, MeshTF_Main);
+							}
+							else
+							{
+								//새로 Clipping 하기
+								Editor.Controller.AddClippingMeshTransform(MeshGroup, MeshTF_Main, true, true, true);
+							}
+						}
+						
+						
 						Editor.SetGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_Parent, MeshTF_Main._isClipping_Parent);//"Mesh Transform Detail Status - Clipping Parent"
-						Editor.SetGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_None, (!MeshTF_Main._isClipping_Parent && !MeshTF_Main._isClipping_Child));//"Mesh Transform Detail Status - Clipping None"
+						//Editor.SetGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_Child, MeshTF_Main._isClipping_Child);//"Mesh Transform Detail Status - Clipping Child"
+						//Editor.SetGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_None, (!MeshTF_Main._isClipping_Parent && !MeshTF_Main._isClipping_Child));//"Mesh Transform Detail Status - Clipping None"
 
 						if (MeshTF_Main._isClipping_Parent)
 						{
@@ -9548,12 +9645,12 @@ namespace AnyPortrait
 							{
 								//1. 자식 메시를 가지는 Clipping의 Base Parent이다.
 								//- Mask 사이즈를 보여준다.
-								//- 자식 메시 리스트들을 보여준다.
+								//- 자식 메시 리스트들을 보여준다. > 삭제 [v1.6.0]
 								//-> 레이어 순서를 바꾼다. / Clip을 해제한다..
 
 								//"Parent Mask Mesh"
-								GUILayout.Box(Editor.GetUIWord(UIWORD.ParentMaskMesh), apGUIStyleWrapper.I.Box_MiddleCenter_BoxTextColor, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25));
-								GUILayout.Space(5);
+								//GUILayout.Box(Editor.GetUIWord(UIWORD.ParentMaskMesh), apGUIStyleWrapper.I.Box_MiddleCenter_BoxTextColor, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25));
+								//GUILayout.Space(5);
 
 								EditorGUILayout.LabelField(Editor.GetUIWord(UIWORD.MaskTextureSize), apGUILOFactory.I.Width(width));//"Mask Texture Size"
 								int prevRTTIndex = (int)MeshTF_Main._renderTexSize;
@@ -9575,112 +9672,116 @@ namespace AnyPortrait
 								}
 
 
-								GUILayout.Space(5);
+								#region [미사용 코드] Clip-Child 메시 보여주는 UI 삭제
+								//GUILayout.Space(5);
 
 
-								//Texture2D btnImg_Down = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_LayerDown);
-								//Texture2D btnImg_Up = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_LayerUp);
-								Texture2D btnImg_Delete = Editor.ImageSet.Get(apImageSet.PRESET.Controller_RemoveRecordKey);
+								////Texture2D btnImg_Down = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_LayerDown);
+								////Texture2D btnImg_Up = Editor.ImageSet.Get(apImageSet.PRESET.Modifier_LayerUp);
+								//Texture2D btnImg_Delete = Editor.ImageSet.Get(apImageSet.PRESET.Controller_RemoveRecordKey);
 
-								int iBtn = -1;
-								//int btnRequestType = -1;
-
-
-								for (int iChild = 0; iChild < MeshTF_Main._clipChildMeshes.Count; iChild++)
-								{
-									apTransform_Mesh childMesh = MeshTF_Main._clipChildMeshes[iChild]._meshTransform;
-									EditorGUILayout.BeginHorizontal(apGUILOFactory.I.Width(width));
-									if (childMesh != null)
-									{
-										EditorGUILayout.LabelField(childMesh._nickName, apGUILOFactory.I.Width(width - (20 + 5)), apGUILOFactory.I.Height(20));
-										if (GUILayout.Button(btnImg_Delete, apGUILOFactory.I.Width(20), apGUILOFactory.I.Height(20)))
-										{
-											iBtn = iChild;
-											//btnRequestType = 2;//2 : Delete
-
-										}
-									}
-									else
-									{
-										EditorGUILayout.LabelField(apStringFactory.I.Dot3, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(20));
-									}
-									EditorGUILayout.EndHorizontal();
-								}
+								//int iBtn = -1;
+								////int btnRequestType = -1;
 
 
-								if (iBtn >= 0)
-								{
-									//Debug.LogError("TODO : Mesh 삭제");
-									apTransform_Mesh targetChildTransform = MeshTF_Main._clipChildMeshes[iBtn]._meshTransform;
-									if (targetChildTransform != null)
-									{
-										//해당 ChildMesh를 Release하자
-										Editor.Controller.ReleaseClippingMeshTransform(MeshGroup, targetChildTransform);
-									}
-								}
+								//for (int iChild = 0; iChild < MeshTF_Main._clipChildMeshes.Count; iChild++)
+								//{
+								//	apTransform_Mesh childMesh = MeshTF_Main._clipChildMeshes[iChild]._meshTransform;
+								//	EditorGUILayout.BeginHorizontal(apGUILOFactory.I.Width(width));
+								//	if (childMesh != null)
+								//	{
+								//		EditorGUILayout.LabelField(childMesh._nickName, apGUILOFactory.I.Width(width - (20 + 5)), apGUILOFactory.I.Height(20));
+								//		if (GUILayout.Button(btnImg_Delete, apGUILOFactory.I.Width(20), apGUILOFactory.I.Height(20)))
+								//		{
+								//			iBtn = iChild;
+								//			//btnRequestType = 2;//2 : Delete
+
+								//		}
+								//	}
+								//	else
+								//	{
+								//		EditorGUILayout.LabelField(apStringFactory.I.Dot3, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(20));
+								//	}
+								//	EditorGUILayout.EndHorizontal();
+								//}
+
+
+								//if (iBtn >= 0)
+								//{
+								//	//Debug.LogError("TODO : Mesh 삭제");
+								//	apTransform_Mesh targetChildTransform = MeshTF_Main._clipChildMeshes[iBtn]._meshTransform;
+								//	if (targetChildTransform != null)
+								//	{
+								//		//해당 ChildMesh를 Release하자
+								//		Editor.Controller.ReleaseClippingMeshTransform(MeshGroup, targetChildTransform);
+								//	}
+								//} 
+								#endregion
 							}
 						}
-						else if (MeshTF_Main._isClipping_Child)
-						{
-							if (Editor.IsDelayedGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_Child))//"Mesh Transform Detail Status - Clipping Child"
-							{
-								//2. Parent를 Mask로 삼는 자식 Mesh이다.
-								//- 부모 메시를 보여준다.
-								//-> 순서 바꾸기를 요청한다
-								//-> Clip을 해제한다.
-								//"Child Clipped Mesh" ->"Clipped Child Mesh"
-								GUILayout.Box(Editor.GetUIWord(UIWORD.ClippedChildMesh), apGUIStyleWrapper.I.Box_MiddleCenter_BoxTextColor, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25));
-								GUILayout.Space(5);
+						#region [미사용 코드]
+						//else if (MeshTF_Main._isClipping_Child)
+						//{
+						//	if (Editor.IsDelayedGUIVisible(apEditor.DELAYED_UI_TYPE.Mesh_Transform_Detail_Status__Clipping_Child))//"Mesh Transform Detail Status - Clipping Child"
+						//	{
+						//		//2. Parent를 Mask로 삼는 자식 Mesh이다.
+						//		//- 부모 메시를 보여준다.
+						//		//-> 순서 바꾸기를 요청한다
+						//		//-> Clip을 해제한다.
+						//		//"Child Clipped Mesh" ->"Clipped Child Mesh"
+						//		GUILayout.Box(Editor.GetUIWord(UIWORD.ClippedChildMesh), apGUIStyleWrapper.I.Box_MiddleCenter_BoxTextColor, apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25));
+						//		GUILayout.Space(5);
 
-								if (_guiContent_Right2MeshGroup_MaskParentName == null)
-								{
-									_guiContent_Right2MeshGroup_MaskParentName = new apGUIContentWrapper();
-								}
+						//		if (_guiContent_Right2MeshGroup_MaskParentName == null)
+						//		{
+						//			_guiContent_Right2MeshGroup_MaskParentName = new apGUIContentWrapper();
+						//		}
 
-								//string strParentName = "<No Mask Parent>";
-								if (MeshTF_Main._clipParentMeshTransform != null)
-								{
-									//strParentName = SubMeshInGroup._clipParentMeshTransform._nickName;
-									_guiContent_Right2MeshGroup_MaskParentName.ClearText(false);
-									_guiContent_Right2MeshGroup_MaskParentName.AppendText(Editor.GetUIWord(UIWORD.MaskMesh), false);
-									_guiContent_Right2MeshGroup_MaskParentName.AppendText(apStringFactory.I.Colon_Space, false);
-									_guiContent_Right2MeshGroup_MaskParentName.AppendText(MeshTF_Main._clipParentMeshTransform._nickName, true);
-								}
-								else
-								{
-									_guiContent_Right2MeshGroup_MaskParentName.ClearText(false);
-									_guiContent_Right2MeshGroup_MaskParentName.AppendText(Editor.GetUIWord(UIWORD.MaskMesh), false);
-									_guiContent_Right2MeshGroup_MaskParentName.AppendText(apStringFactory.I.Colon_Space, false);
-									_guiContent_Right2MeshGroup_MaskParentName.AppendText(apStringFactory.I.NoMaskParent, true);
-								}
+						//		//string strParentName = "<No Mask Parent>";
+						//		if (MeshTF_Main._clipParentMeshTransform != null)
+						//		{
+						//			//strParentName = SubMeshInGroup._clipParentMeshTransform._nickName;
+						//			_guiContent_Right2MeshGroup_MaskParentName.ClearText(false);
+						//			_guiContent_Right2MeshGroup_MaskParentName.AppendText(Editor.GetUIWord(UIWORD.MaskMesh), false);
+						//			_guiContent_Right2MeshGroup_MaskParentName.AppendText(apStringFactory.I.Colon_Space, false);
+						//			_guiContent_Right2MeshGroup_MaskParentName.AppendText(MeshTF_Main._clipParentMeshTransform._nickName, true);
+						//		}
+						//		else
+						//		{
+						//			_guiContent_Right2MeshGroup_MaskParentName.ClearText(false);
+						//			_guiContent_Right2MeshGroup_MaskParentName.AppendText(Editor.GetUIWord(UIWORD.MaskMesh), false);
+						//			_guiContent_Right2MeshGroup_MaskParentName.AppendText(apStringFactory.I.Colon_Space, false);
+						//			_guiContent_Right2MeshGroup_MaskParentName.AppendText(apStringFactory.I.NoMaskParent, true);
+						//		}
 
-								//"Mask Parent" -> "Mask Mesh"
-								EditorGUILayout.LabelField(_guiContent_Right2MeshGroup_MaskParentName.Content, apGUILOFactory.I.Width(width));
-								//EditorGUILayout.LabelField(Editor.GetUIWord(UIWORD.ClippedIndex) + " : " + SubMeshInGroup._clipIndexFromParent, GUILayout.Width(width));//"Clipped Index : "//<<필요없으니 삭제 19.12.6
-								EditorGUILayout.BeginHorizontal(apGUILOFactory.I.Width(width));
+						//		//"Mask Parent" -> "Mask Mesh"
+						//		EditorGUILayout.LabelField(_guiContent_Right2MeshGroup_MaskParentName.Content, apGUILOFactory.I.Width(width));
+						//		//EditorGUILayout.LabelField(Editor.GetUIWord(UIWORD.ClippedIndex) + " : " + SubMeshInGroup._clipIndexFromParent, GUILayout.Width(width));//"Clipped Index : "//<<필요없으니 삭제 19.12.6
+						//		EditorGUILayout.BeginHorizontal(apGUILOFactory.I.Width(width));
 
-								//int btnRequestType = -1;
-								//"Release"
-								if (GUILayout.Button(Editor.GetUIWord(UIWORD.Release), apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25)))
-								{
-									//btnRequestType = 2;//2 : Delete
-									Editor.Controller.ReleaseClippingMeshTransform(MeshGroup, MeshTF_Main);
-								}
-								EditorGUILayout.EndHorizontal();
+						//		//int btnRequestType = -1;
+						//		//"Release"
+						//		if (GUILayout.Button(Editor.GetUIWord(UIWORD.Release), apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25)))
+						//		{
+						//			//btnRequestType = 2;//2 : Delete
+						//			Editor.Controller.ReleaseClippingMeshTransform(MeshGroup, MeshTF_Main);
+						//		}
+						//		EditorGUILayout.EndHorizontal();
 
 
-							}
-						}
-						else
-						{
-							//3. 기본 상태의 Mesh이다.
-							//Clip을 요청한다.
-							//"Clipping To Below Mesh" -> "Clip to Below Mesh"
-							if (GUILayout.Button(Editor.GetUIWord(UIWORD.ClipToBelowMesh), apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25)))
-							{
-								Editor.Controller.AddClippingMeshTransform(MeshGroup, MeshTF_Main, true, true, true);
-							}
-						}
+						//	}
+						//}
+						//else
+						//{
+						//	//3. 기본 상태의 Mesh이다.
+						//	//Clip을 요청한다.
+						//	//"Clipping To Below Mesh" -> "Clip to Below Mesh"
+						//	if (GUILayout.Button(Editor.GetUIWord(UIWORD.ClipToBelowMesh), apGUILOFactory.I.Width(width), apGUILOFactory.I.Height(25)))
+						//	{
+						//		Editor.Controller.AddClippingMeshTransform(MeshGroup, MeshTF_Main, true, true, true);
+						//	}
+						//} 
+						#endregion
 					}
 
 

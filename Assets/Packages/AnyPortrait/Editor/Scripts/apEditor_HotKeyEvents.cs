@@ -389,10 +389,22 @@ namespace AnyPortrait
 		/// <summary>추가 21.1.21 : 메시의 보이기 여부 단축키</summary>
 		private apHotKey.HotKeyResult OnHotKeyEvent_MeshVisibleToggle(object paramObject)
 		{
-			if(_meshGUIRenderMode == MESH_RENDER_MODE.Render)	{ _meshGUIRenderMode = MESH_RENDER_MODE.None; }
-			else												{ _meshGUIRenderMode = MESH_RENDER_MODE.Render; }
+			switch (_meshGUIRenderMode)
+			{
+				case MESH_RENDER_MODE.None: _meshGUIRenderMode = MESH_RENDER_MODE.RenderAll; break;
+				case MESH_RENDER_MODE.RenderAll: _meshGUIRenderMode = MESH_RENDER_MODE.RenderWithOutMask; break;
+				case MESH_RENDER_MODE.RenderWithOutMask: _meshGUIRenderMode = MESH_RENDER_MODE.None; break;
+			}
 
-			return apHotKey.HotKeyResult.MakeResult(_meshGUIRenderMode == MESH_RENDER_MODE.None ? apStringFactory.I.Hide : apStringFactory.I.Show);
+			SaveEditorPref();
+
+			switch (_meshGUIRenderMode)
+			{
+				case MESH_RENDER_MODE.None:					return apHotKey.HotKeyResult.MakeResult(apStringFactory.I.Hide);
+				case MESH_RENDER_MODE.RenderAll:			return apHotKey.HotKeyResult.MakeResult(apStringFactory.I.Show);
+				case MESH_RENDER_MODE.RenderWithOutMask:	return apHotKey.HotKeyResult.MakeResult(apStringFactory.I.ShowWithoutMasks);
+			}
+			return null;
 		}
 
 

@@ -1345,25 +1345,47 @@ namespace AnyPortrait
 
 				//rootUnit.PrintDebugRecursive();//<<Debug
 
+				string strUndoName = "LoadBackup";
+				HashSet<UnityEngine.Object> undoList = new HashSet<UnityEngine.Object>();//중복 방지용
+
+
 				//이제 하나씩 만들어봅시다.
 				//일단 Portrait부터
-				GameObject newPortraitObj = new GameObject("Backup_" + portraitName + "__" + strDateTime);
+				GameObject newPortraitObj = new GameObject("Backup_" + portraitName + "__" + strDateTime);//<Undo
+				Undo.RegisterCreatedObjectUndo(newPortraitObj, strUndoName);
+				int undoID = Undo.GetCurrentGroup();
+
+				UndoGameObject(newPortraitObj, undoList);//Undo에 GameObject를 등록한다.
+
 				newPortraitObj.transform.position = Vector3.zero;
 				newPortraitObj.transform.rotation = Quaternion.identity;
 				newPortraitObj.transform.localScale = Vector3.one;
 
-				apPortrait portrait = newPortraitObj.AddComponent<apPortrait>();
+				//apPortrait portrait = newPortraitObj.AddComponent<apPortrait>();//이전
+				apPortrait portrait = Undo.AddComponent<apPortrait>(newPortraitObj);//v1.6.0 : Undo.AddComponent로 변경
+				Undo.RegisterCreatedObjectUndo(portrait, strUndoName);
+				if(!undoList.Contains(portrait))
+				{
+					undoList.Add(portrait);
+				}
 
 				// Monobehaviour 타입의 멤버가 저장될 Group을 만들자.
-				MakeObjectGroup(portrait);
+				MakeObjectGroup(portrait, undoList);
 
 				//Debug.LogError("----------- Parsed Data 2 Portrait -----------------");
-				bool isResult = RecursiveMakePortrait(rootUnit, portrait, null, null, null, 0);
+				bool isResult = RecursiveMakePortrait(rootUnit, portrait, null, null, null, 0, undoList);
 				if(!isResult)
 				{
-					UnityEngine.MonoBehaviour.DestroyImmediate(newPortraitObj);
+					//UnityEngine.MonoBehaviour.DestroyImmediate(newPortraitObj);
+					Undo.DestroyObjectImmediate(newPortraitObj);
+
+					//Undo 병합
+					Undo.CollapseUndoOperations(undoID);
 					return null;
 				}
+
+				//Undo 병합
+				Undo.CollapseUndoOperations(undoID);
 
 				return portrait;
 			}
@@ -1636,12 +1658,19 @@ namespace AnyPortrait
 
 
 
-		public void MakeObjectGroup(apPortrait portrait)
+		public void MakeObjectGroup(apPortrait portrait, HashSet<UnityEngine.Object> undoList)
 		{
+			string strUndoName = "Backup MakeObjectGroup";
 			if (portrait._subObjectGroup == null)
 			{
-				portrait._subObjectGroup = new GameObject("EditorObjects");
-				portrait._subObjectGroup.transform.parent = portrait.transform;
+				portrait._subObjectGroup = new GameObject("EditorObjects");//<Undo
+				Undo.RegisterCreatedObjectUndo(portrait._subObjectGroup, strUndoName);
+
+				UndoGameObject(portrait._subObjectGroup, undoList);//Undo에 GameObject를 등록한다.
+
+				//portrait._subObjectGroup.transform.parent = portrait.transform;//이전
+				Undo.SetTransformParent(portrait._subObjectGroup.transform, portrait.transform, strUndoName);
+
 				portrait._subObjectGroup.transform.localPosition = Vector3.zero;
 				portrait._subObjectGroup.transform.localRotation = Quaternion.identity;
 				portrait._subObjectGroup.transform.localScale = Vector3.one;
@@ -1650,8 +1679,14 @@ namespace AnyPortrait
 
 			if (portrait._subObjectGroup_Mesh == null)
 			{
-				portrait._subObjectGroup_Mesh = new GameObject("Meshes");
-				portrait._subObjectGroup_Mesh.transform.parent = portrait._subObjectGroup.transform;
+				portrait._subObjectGroup_Mesh = new GameObject("Meshes");//<Undo
+				Undo.RegisterCreatedObjectUndo(portrait._subObjectGroup_Mesh, strUndoName);
+
+				UndoGameObject(portrait._subObjectGroup_Mesh, undoList);//Undo에 GameObject를 등록한다.
+
+				//portrait._subObjectGroup_Mesh.transform.parent = portrait._subObjectGroup.transform;//이전
+				Undo.SetTransformParent(portrait._subObjectGroup_Mesh.transform, portrait._subObjectGroup.transform, strUndoName);
+
 				portrait._subObjectGroup_Mesh.transform.localPosition = Vector3.zero;
 				portrait._subObjectGroup_Mesh.transform.localRotation = Quaternion.identity;
 				portrait._subObjectGroup_Mesh.transform.localScale = Vector3.one;
@@ -1660,8 +1695,14 @@ namespace AnyPortrait
 
 			if (portrait._subObjectGroup_MeshGroup == null)
 			{
-				portrait._subObjectGroup_MeshGroup = new GameObject("MeshGroups");
-				portrait._subObjectGroup_MeshGroup.transform.parent = portrait._subObjectGroup.transform;
+				portrait._subObjectGroup_MeshGroup = new GameObject("MeshGroups");//<Undo
+				Undo.RegisterCreatedObjectUndo(portrait._subObjectGroup_MeshGroup, strUndoName);
+
+				UndoGameObject(portrait._subObjectGroup_MeshGroup, undoList);//Undo에 GameObject를 등록한다.
+
+				//portrait._subObjectGroup_MeshGroup.transform.parent = portrait._subObjectGroup.transform;//이전
+				Undo.SetTransformParent(portrait._subObjectGroup_MeshGroup.transform, portrait._subObjectGroup.transform, strUndoName);
+
 				portrait._subObjectGroup_MeshGroup.transform.localPosition = Vector3.zero;
 				portrait._subObjectGroup_MeshGroup.transform.localRotation = Quaternion.identity;
 				portrait._subObjectGroup_MeshGroup.transform.localScale = Vector3.one;
@@ -1670,8 +1711,14 @@ namespace AnyPortrait
 
 			if(portrait._subObjectGroup_Modifier == null)
 			{
-				portrait._subObjectGroup_Modifier = new GameObject("Modifiers");
-				portrait._subObjectGroup_Modifier.transform.parent = portrait._subObjectGroup.transform;
+				portrait._subObjectGroup_Modifier = new GameObject("Modifiers");//<Undo
+				Undo.RegisterCreatedObjectUndo(portrait._subObjectGroup_Modifier, strUndoName);
+
+				UndoGameObject(portrait._subObjectGroup_Modifier, undoList);//Undo에 GameObject를 등록한다.
+
+				//portrait._subObjectGroup_Modifier.transform.parent = portrait._subObjectGroup.transform;//이전
+				Undo.SetTransformParent(portrait._subObjectGroup_Modifier.transform, portrait._subObjectGroup.transform, strUndoName);
+
 				portrait._subObjectGroup_Modifier.transform.localPosition = Vector3.zero;
 				portrait._subObjectGroup_Modifier.transform.localRotation = Quaternion.identity;
 				portrait._subObjectGroup_Modifier.transform.localScale = Vector3.one;
@@ -1681,7 +1728,13 @@ namespace AnyPortrait
 
 
 
-		private bool RecursiveMakePortrait(apBackupUnit curUnit, apPortrait targetPortrait, apBackupUnit parentUnit, object parentInstance, object parentList, int indexOfListArray)
+		private bool RecursiveMakePortrait(	apBackupUnit curUnit,
+											apPortrait targetPortrait,
+											apBackupUnit parentUnit,
+											object parentInstance,
+											object parentList,
+											int indexOfListArray,
+											HashSet<UnityEngine.Object> undoList)
 		{
 			try
 			{
@@ -1817,12 +1870,28 @@ namespace AnyPortrait
 									}
 
 									GameObject newGameObject = new GameObject(curUnit._monoName);
-									newGameObject.transform.parent = groupGameObject.transform;
+									Undo.RegisterCreatedObjectUndo(newGameObject, "Backup");
+
+									UndoGameObject(newGameObject, undoList);//Undo에 GameObject를 등록한다.
+
+									//newGameObject.transform.parent = groupGameObject.transform;
+									Undo.SetTransformParent(newGameObject.transform, groupGameObject.transform, "Backup");
+
 									newGameObject.transform.localPosition = curUnit._monoPosition;
 									newGameObject.transform.localRotation = curUnit._monoQuat;
 									newGameObject.transform.localScale = curUnit._monoScale;
 
-									object monoObject = newGameObject.AddComponent(monoType);
+									//object monoObject = newGameObject.AddComponent(monoType);//이전
+									object monoObject = Undo.AddComponent(newGameObject, monoType);//변경 v1.6.0 : Undo.AddComponent로 변경
+									
+									//Undo
+									UnityEngine.Object uObj = monoObject as UnityEngine.Object;
+									if(uObj != null)
+									{
+										Undo.RegisterCompleteObjectUndo(uObj, "Backup");
+									}
+									
+
 									curInstance = monoObject;
 
 									if (curUnit._isListArrayItem)
@@ -1845,7 +1914,12 @@ namespace AnyPortrait
 									//Debug.LogError("GameObject?? 이건 어디다 파싱하져..");
 
 									GameObject newGameObject = new GameObject(curUnit._monoName);
-									newGameObject.transform.parent = targetPortrait._subObjectGroup.transform;
+									Undo.RegisterCreatedObjectUndo(newGameObject, "Backup");
+									UndoGameObject(newGameObject, undoList);//Undo에 GameObject를 등록한다.
+
+									//newGameObject.transform.parent = targetPortrait._subObjectGroup.transform;
+									Undo.SetTransformParent(newGameObject.transform, targetPortrait._subObjectGroup.transform, "Backup");
+
 									newGameObject.transform.localPosition = curUnit._monoPosition;
 									newGameObject.transform.localRotation = curUnit._monoQuat;
 									newGameObject.transform.localScale = curUnit._monoScale;
@@ -1867,8 +1941,6 @@ namespace AnyPortrait
 							case apBackupUnit.FIELD_CATEGORY.UnityObject:
 								{
 									//Debug.LogError("UnityObject?? 이건 어디다 파싱하져.. [" + curUnit._typeName_Partial + " / " + curUnit._fieldName + "]");
-
-
 									object instanceObj = System.Activator.CreateInstance(System.Type.GetType(curUnit._typeName_Partial));
 									if (fi != null)
 									{
@@ -1934,7 +2006,7 @@ namespace AnyPortrait
 									System.Type unitType = System.Type.GetType(curUnit._typeName_Partial);
 									if (unitType == null)
 									{
-										Debug.LogError("Type is Wrong");
+										Debug.LogError("Type is Wrong : " + curUnit._typeName_Partial);
 									}
 									else
 									{
@@ -2024,7 +2096,7 @@ namespace AnyPortrait
 					{
 						for (int i = 0; i < curUnit._childFields.Count; i++)
 						{
-							if(!RecursiveMakePortrait(curUnit._childFields[i], targetPortrait, curUnit, curInstance, null, i))
+							if(!RecursiveMakePortrait(curUnit._childFields[i], targetPortrait, curUnit, curInstance, null, i, undoList))
 							{
 								//에러 발생
 								return false;
@@ -2044,7 +2116,7 @@ namespace AnyPortrait
 					{
 						for (int i = 0; i < curUnit._childItems.Count; i++)
 						{
-							if(!RecursiveMakePortrait(curUnit._childItems[i], targetPortrait, curUnit, null, curListArray, i))
+							if(!RecursiveMakePortrait(curUnit._childItems[i], targetPortrait, curUnit, null, curListArray, i, undoList))
 							{
 								//에러 발생
 								return false;
@@ -2112,6 +2184,55 @@ namespace AnyPortrait
 			}
 
 			return sb.ToString();
+		}
+
+
+		//백업용 Undo 함수들
+		//---------------------------------------------------------------------------------
+		/// <summary>
+		/// GameObject를 Undo에 등록하는 함수.
+		/// 컴포넌트들을 일괄 저장한다.
+		/// 중복을 막기 위해 HashSet을 사용한다.
+		/// </summary>
+		private void UndoGameObject(GameObject targetObj, HashSet<UnityEngine.Object> undoList)
+		{
+			if(targetObj == null)
+			{
+				return;
+			}
+
+			string undoName = "Backup GameObject : " + targetObj.name;
+
+			//일단 GameObject를 Undo에 등록한다.
+			if(!undoList.Contains(targetObj))
+			{
+				Undo.RegisterCompleteObjectUndo(targetObj, undoName);
+				undoList.Add(targetObj);
+			}
+
+			//GameObject들의 컴포넌트들도 저장한다.
+			UnityEngine.Component[] components = targetObj.GetComponents<UnityEngine.Component>();
+			int nComponents = components.Length;
+			if(nComponents == 0)
+			{
+				return;
+			}
+
+			UnityEngine.Component curComponent = null;
+			for (int i = 0; i < nComponents; i++)
+			{
+				curComponent = components[i];
+				if(curComponent == null)
+				{
+					continue;
+				}
+				if(!undoList.Contains(curComponent))
+				{
+					Undo.RegisterCompleteObjectUndo(curComponent, undoName);
+					undoList.Add(curComponent);
+				}
+			}
+			
 		}
 	}
 }
