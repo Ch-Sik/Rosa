@@ -13,7 +13,8 @@ public class PlayerStateUI : MonoBehaviour
     private static PlayerStateUI _instance = null;
     public static PlayerStateUI Instance { get { return _instance; } }
 
-    [SerializeField] TMP_Text text_selectedMagic;
+    // 25.05.16) 선택된 마법 관련 UI 삭제
+    // [SerializeField] TMP_Text text_selectedMagic;
     [SerializeField] GameObject heart;
     [SerializeField] GameObject heartContainer;
     [SerializeField] Sprite filled;
@@ -56,9 +57,9 @@ public class PlayerStateUI : MonoBehaviour
         }
     }
 
-    // TODO: 아이콘과 스프라이트 기반으로 기능 재구현
-    public void UpdateSelectedMagic(SO_Magic selectedMagic)
-    {
-        text_selectedMagic.text = selectedMagic.skillName;
-    }
+    //// TODO: 아이콘과 스프라이트 기반으로 기능 재구현
+    //public void UpdateSelectedMagic(SO_Magic selectedMagic)
+    //{
+    //    text_selectedMagic.text = selectedMagic.skillName;
+    //}
 }
