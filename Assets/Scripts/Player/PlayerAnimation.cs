@@ -83,6 +83,8 @@ public class PlayerAnimation : MonoBehaviour
         anim.SetBool("isHoldingCube", playerRef.grabCube.isHoldingCube);
         anim.SetBool("isGliding", playerMove.isGliding);
         anim.SetBool("isSuperDashing", playerMove.isDoingSuperDash);
+        // 25.05.20) 대시 애니메이션 추가
+        anim.SetBool("isDashing", playerMove.isDashing);
     }
 
     public void SetAttackAnimTrigger()

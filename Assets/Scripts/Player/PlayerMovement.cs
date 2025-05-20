@@ -287,9 +287,9 @@ public class PlayerMovement : MonoBehaviour
 
     void LoadFlags()
     {
-        dashEnabled = FlagManager.Instance.GetFlag("dashEnabled") == 1 ? true : false;
-        mushJumpEnabled = FlagManager.Instance.GetFlag("mushJumpEnabled") == 1 ? true : false;
-        glidingEnabled = FlagManager.Instance.GetFlag("glidingEnabled") == 1 ? true : false;
+        dashEnabled = FlagManager.Instance?.GetFlag("dashEnabled") == 1 ? true : false;
+        mushJumpEnabled = FlagManager.Instance?.GetFlag("mushJumpEnabled") == 1 ? true : false;
+        glidingEnabled = FlagManager.Instance?.GetFlag("glidingEnabled") == 1 ? true : false;
     }
     #endregion
 
@@ -811,7 +811,7 @@ public class PlayerMovement : MonoBehaviour
     public void EnableMushJump()
     {
         Debug.Log("버섯 점프 습득!");
-        FlagManager.Instance.SetFlag("mushJumpEnabled", 1);
+        FlagManager.Instance?.SetFlag("mushJumpEnabled", 1);
         mushJumpEnabled = true;
     }
     #endregion
@@ -900,7 +900,7 @@ public class PlayerMovement : MonoBehaviour
     public void EnableGliding()
     {
         Debug.Log("활강 습득!");
-        FlagManager.Instance.SetFlag("glidingEnabled", 1);
+        FlagManager.Instance?.SetFlag("glidingEnabled", 1);
         glidingEnabled = true;
     }
     #endregion
@@ -949,7 +949,7 @@ public class PlayerMovement : MonoBehaviour
     public void EnableDash()
     {
         Debug.Log("대시 습득!");
-        FlagManager.Instance.SetFlag("dashEnabled", 1);
+        FlagManager.Instance?.SetFlag("dashEnabled", 1);
         dashEnabled = true;
     }
 
