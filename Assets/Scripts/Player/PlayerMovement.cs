@@ -106,6 +106,9 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("디버그용: 대시 쿨타임 남은 시간")]
     [SerializeField, ReadOnly] float dashLeftCooldown;
 
+    [FoldoutGroup("대시 관련")]
+    [SerializeField] VfxPlayer dashVfx;
+
     // 버섯점프 관련
     [FoldoutGroup("버섯 점프 관련")]
     [Tooltip("버섯 점프 활성화 여부")]
@@ -132,6 +135,9 @@ public class PlayerMovement : MonoBehaviour
     [FoldoutGroup("버섯 점프 관련")]
     [Tooltip("플레이어 버섯 점프 파워")]
     [SerializeField] float mushJumpPower = 20f;
+
+    [FoldoutGroup("버섯 점프 관련")]
+    [SerializeField] VfxPlayer mushJumpVfx;
 
 
     // 슈퍼대시 관련
@@ -805,6 +811,8 @@ public class PlayerMovement : MonoBehaviour
         moveSpeed = mushJumpMoveSpeed;
         rb.velocity = new Vector2(rb.velocity.x, mushJumpPower);
         playerRef.animation.SetJumpTrigger();
+        // 25.05.23) 강조선이펙트 추가
+        mushJumpVfx.PlayVFX();
     }
 
     [Button, FoldoutGroup("버섯 점프 관련")]
@@ -930,6 +938,9 @@ public class PlayerMovement : MonoBehaviour
 
             rb.gravityScale = 0;
             rb.velocity = Vector2.right * (facingDirection.isLEFT() ? -1 : 1) * dashSpeed;
+
+            // 25.05.23) 강조선이펙트 추가
+            dashVfx.PlayVFX();
         }).AppendInterval(dashDuration)
         .AppendCallback(() =>
         {
