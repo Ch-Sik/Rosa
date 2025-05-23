@@ -213,6 +213,8 @@ public class MapManager : MonoBehaviour
             Vector2Int position = nextRoom.GetRoomPort(direction, ports[0].index).ports[0];
             Vector3 destination = new Vector3(position.x, position.y) + GetMargin(direction);
 
+            Debug.Log($"destination: {destination}");
+
             OpenScene(nextRoom, destination);
             currentRoom = nextRoom;
         })
@@ -274,6 +276,8 @@ public class MapManager : MonoBehaviour
         transportPosition += GetMargin(GetOppositeDirection(direction));
         transportPosition += GetTransportPostion(exitPort, direction);
 
+        Debug.Log($"transportPosition: {transportPosition}");
+
         player.position = transportPosition;
     }
 
@@ -286,9 +290,9 @@ public class MapManager : MonoBehaviour
             case PortDirection.Bot:
                 return new Vector3(0, 2);
             case PortDirection.Rig:
-                return new Vector3(-2, 0.5f);
+                return new Vector3(-2, 2f);
             case PortDirection.Lef:
-                return new Vector3(2, 0.5f);
+                return new Vector3(2, 2f);
 
             default: return Vector3.zero;
         }
@@ -424,6 +428,9 @@ public class MapManager : MonoBehaviour
 
     public void SaveSceneState()
     {
+        // TODO: 방 내부의 기믹 상태 저장
+        return;     // 기능 정상 작동하지 않으므로 일단 비활성화
+
         //현재 룸에 대한 저장
         List<int> senders = new List<int>();
 
