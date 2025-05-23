@@ -425,7 +425,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -451,6 +450,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -743,7 +744,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -769,6 +769,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -1701,7 +1703,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -1727,6 +1728,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -2219,7 +2222,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -2245,6 +2247,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -2469,6 +2473,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 2506026
     _transformUniqueID: 59567764
     _nickName: rUpperLeg
@@ -2495,6 +2501,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 42162171
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -3416,7 +3424,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -3442,6 +3449,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -7562,7 +7571,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -7588,6 +7596,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -10839,13 +10849,13 @@ MonoBehaviour:
   _subObjectGroup_Mesh: {fileID: 2197314496533616995}
   _subObjectGroup_MeshGroup: {fileID: 652271886857738103}
   _subObjectGroup_Modifier: {fileID: 9078051424385390905}
+  _isImportant: 1
   _FPS: 30
   _bakeScale: 0.01
   _bakeZSize: 1
   _imageFilePath_Thumbnail: 
   _isPhysicsPlay_Editor: 1
   _bakeUnlinkedGroup: {fileID: 0}
-  _isImportant: 1
   _autoPlayAnimClipID: -1
   _isOptimizedPortrait: 0
   _bakeTargetOptPortrait: {fileID: 0}
@@ -11771,12 +11781,13 @@ MonoBehaviour:
     _bakeOption_BlurOption: 1
     _bakeScale100: 100
   _bakedPsdSecondarySet: []
-  _billboardType: 0
-  _billboardParentRotation: 0
+  _billboardType: 1
+  _billboardParentRotation: 2
+  _isForceCamSortModeToOrthographic: 1
   _vrSupportMode: 0
   _vrRenderTextureSize: 0
   _cameraCheckMode: 0
-  _isForceCamSortModeToOrthographic: 1
+  _renderPipelineOption: 0
   _meshShadowCastingMode: 0
   _meshReceiveShadow: 0
   _meshLightProbeUsage: 0
@@ -12070,6 +12081,7 @@ MonoBehaviour:
     _isNeedToSetBlackColoredAmbient: 0
     _referenceMat: {fileID: 0}
     _referenceMaterialPath: 
+    _descTags: 
   _flippedMeshOption: 0
   _rootBoneScaleMethod: 0
   _unspecifiedAnimControlParamOption: 0
@@ -19768,7 +19780,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -19794,6 +19805,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -20147,6 +20160,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 23656966
     _transformUniqueID: 81539656
     _nickName: head
@@ -20173,6 +20188,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 41431624
     _transformUniqueID: 51479679
     _nickName: ear
@@ -20199,6 +20216,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 5786986
     _transformUniqueID: 11132020
     _nickName: mouth
@@ -20225,6 +20244,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 27090320
     _transformUniqueID: 92232776
     _nickName: rsideHair
@@ -20251,6 +20272,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 35852455
     _transformUniqueID: 87178894
     _nickName: front-leftHair
@@ -20277,6 +20300,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 8001781
     _transformUniqueID: 79520446
     _nickName: front-rightHair
@@ -20303,6 +20328,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 19881841
     _transformUniqueID: 14934927
     _nickName: front-midHair
@@ -20329,6 +20356,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 72999417
     _transformUniqueID: 10890861
     _nickName: rightEyebrow
@@ -20355,6 +20384,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 81622104
     _transformUniqueID: 63927508
     _nickName: leftEyebrow
@@ -20381,6 +20412,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 42162171
   _boneList_All: []
   _childMeshGroupTransforms:
@@ -20670,7 +20703,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -20696,6 +20728,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -22027,7 +22061,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -22053,6 +22086,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -23062,7 +23097,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -23088,6 +23122,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -23900,7 +23936,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -23926,6 +23961,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -24778,7 +24815,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -24804,6 +24840,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -24942,6 +24980,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 34593881
     _transformUniqueID: 42515443
     _nickName: rightflush
@@ -24968,6 +25008,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 75680720
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -25667,7 +25709,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -25693,6 +25734,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -26759,7 +26802,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -26785,6 +26827,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -28423,7 +28467,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -28449,6 +28492,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -29420,7 +29465,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -29446,6 +29490,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -30473,7 +30519,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -30499,6 +30544,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -31548,7 +31595,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -31574,6 +31620,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -31712,6 +31760,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 67739074
     _transformUniqueID: 32773156
     _nickName: rightEyelid
@@ -31738,6 +31788,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 88687362
     _transformUniqueID: 99022012
     _nickName: rightLower
@@ -31764,6 +31816,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 97037645
     _transformUniqueID: 60672892
     _nickName: rightEyeball
@@ -31790,6 +31844,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 98460589
     _transformUniqueID: 65660033
     _nickName: rightUpper
@@ -31816,6 +31872,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 75680720
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -32539,7 +32597,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -32565,6 +32622,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -33568,6 +33627,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 63223831
     _transformUniqueID: 71788609
     _nickName: larm
@@ -33594,6 +33655,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 14722887
     _transformUniqueID: 44413446
     _nickName: lhand
@@ -33620,6 +33683,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 28107053
     _transformUniqueID: 71916950
     _nickName: lLowerArm
@@ -33646,6 +33711,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 79281190
     _transformUniqueID: 49428979
     _nickName: lwide sleeve
@@ -33672,6 +33739,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 42162171
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -34842,7 +34911,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -34868,6 +34936,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -35917,7 +35987,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -35943,6 +36012,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -37806,7 +37877,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -37832,6 +37902,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -38940,7 +39012,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -38966,6 +39037,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -46997,7 +47070,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -47023,6 +47095,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -48066,7 +48140,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -48092,6 +48165,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -48384,7 +48459,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -48410,6 +48484,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -49702,7 +49778,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -49728,6 +49803,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -51587,7 +51664,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -51613,6 +51689,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -53043,7 +53121,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -53069,6 +53146,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -55074,7 +55153,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -55100,6 +55178,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -59653,7 +59733,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -59679,6 +59758,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -60531,7 +60612,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -60557,6 +60637,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -61406,7 +61488,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -61432,6 +61513,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -61724,7 +61807,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -61750,6 +61832,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -62042,7 +62126,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -62068,6 +62151,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -62326,6 +62411,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 33991125
     _transformUniqueID: 59868945
     _nickName: leftLower
@@ -62352,6 +62439,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 68158579
     _transformUniqueID: 51613646
     _nickName: leftEyelid
@@ -62378,6 +62467,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 77130739
     _transformUniqueID: 62226072
     _nickName: leftEyeball
@@ -62404,6 +62495,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 78945800
     _transformUniqueID: 81039520
     _nickName: leftUpper
@@ -62430,6 +62523,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 75680720
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -63581,7 +63676,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -63607,6 +63701,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -63822,6 +63918,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 69591808
     _transformUniqueID: 96138847
     _nickName: skirt
@@ -63848,6 +63946,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 78677518
     _transformUniqueID: 21319783
     _nickName: skirt
@@ -63874,6 +63974,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 98074065
     _transformUniqueID: 88575019
     _nickName: upperBody
@@ -63900,6 +64002,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 48212933
     _transformUniqueID: 26702984
     _nickName: coat
@@ -63926,6 +64030,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 42162171
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -66586,7 +66692,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -66612,6 +66717,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -67464,7 +67571,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -67490,6 +67596,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -69037,6 +69145,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 83387985
     _transformUniqueID: 37643641
     _nickName: rUpperArm
@@ -69063,6 +69173,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 87915686
     _transformUniqueID: 11302114
     _nickName: rUpperArm
@@ -69089,6 +69201,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 77118005
     _transformUniqueID: 2218876
     _nickName: rhand
@@ -69115,6 +69229,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 75067838
     _transformUniqueID: 2081546
     _nickName: rarm
@@ -69141,6 +69257,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 30630789
     _transformUniqueID: 15029525
     _nickName: rLowerArm
@@ -69167,6 +69285,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 42162171
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -69820,7 +69940,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -69846,6 +69965,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -71018,7 +71139,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -71044,6 +71164,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -73240,7 +73362,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -73266,6 +73387,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -75292,7 +75415,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -75318,6 +75440,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -75610,7 +75734,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -75636,6 +75759,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -75928,7 +76053,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -75954,6 +76078,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -77637,7 +77763,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -77663,6 +77788,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -77955,7 +78082,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -77981,6 +78107,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 350b90fd1ff559a46a270e0feacd354c, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -78788,6 +78916,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 65865521
     _transformUniqueID: 78635687
     _nickName: backhead
@@ -78814,6 +78944,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 36630454
     _transformUniqueID: 44460288
     _nickName: backcoat
@@ -78840,6 +78972,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 40125904
     _transformUniqueID: 19440294
     _nickName: + pattern
@@ -78866,6 +79000,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: -1
   _boneList_All:
   - _name: Bone 12
@@ -82258,6 +82394,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 3004470
     _transformUniqueID: 75610824
     _nickName: lUpperLeg
@@ -82284,6 +82422,8 @@ MonoBehaviour:
     _materialSetID: 95973
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 42162171
   _boneList_All: []
   _childMeshGroupTransforms: []
