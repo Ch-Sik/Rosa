@@ -4,6 +4,8 @@ using UnityEngine;
 
 public abstract class GimmickSignalReceiver : MonoBehaviour
 {
+    protected bool isOnAct = false;
+
     private void Awake()
     {
         gameObject.tag = "Receiver";

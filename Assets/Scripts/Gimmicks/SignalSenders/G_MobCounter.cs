@@ -10,22 +10,22 @@ public class G_MobCounter : GimmickSignalSender
 {
     #region State
 
-    public override void Init(int state)
+    public override void Init(GimmickSignalSenderState defaultState)
     {
-        SetState(state);
-        switch (state)
+        SetState(defaultState);
+        switch (defaultState)
         {
-            case 0:
-                isActive = false;
+            case GimmickSignalSenderState.Activated: // Active
+                isInteractable = true;
                 break;
-            case 1: // Active
-                isActive = true;
+            case GimmickSignalSenderState.Inactivated: // InActive
+                isInteractable = false;
                 break;
-            case 2: // InActive
-                isActive = false;
-                break;
+            default:
+                Debug.LogError("잘못된 enum value");
+                return;
         }
-        ImmediateSendSignal();
+        // ImmediateSendSignal();
     }
 
     #endregion
@@ -37,23 +37,23 @@ public class G_MobCounter : GimmickSignalSender
     public void Start()
     {
         foreach (var mob in mobs)
-            mob.OnDead += DieSignal;
+            mob.Dead += OnMonsterDie;
 
         fullCount = mobs.Count;
     }
 
-    public void DieSignal(GameObject monster)
+    public void OnMonsterDie(GameObject monster)
     {
-        //이미 클리어로 기록된다면,
-        if (GetState() == 1)
+        //이미 클리어로 기록되었다면 스킵
+        if (GetState() == GimmickSignalSenderState.Activated)
             return;
 
         deadMobCount++;
 
         if (deadMobCount == fullCount)
         {
-            SetState(1);
-            isActive = true;
+            SetState(GimmickSignalSenderState.Activated);
+            isInteractable = true;
             SendSignal();
         }
     }

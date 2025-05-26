@@ -7,19 +7,22 @@ public class G_PressurePlate : GimmickSignalSender
 {
     #region State
 
-    public override void Init(int state)
+    public override void Init(GimmickSignalSenderState defaultState)
     {
-        SetState(state);
-        switch (state)
+        SetState(defaultState);
+        switch (defaultState)
         {
-            case 0:
+            case GimmickSignalSenderState.Activated: // Active
+                // 아무것도 안함
                 break;
-            case 1: // Active
+            case GimmickSignalSenderState.Inactivated: // InActive
+                // 아무것도 안함
                 break;
-            case 2: // InActive
-                break;
+            default:
+                Debug.LogError("잘못된 enum value");
+                return;
         }
-        ImmediateSendSignal();
+        // ImmediateSendSignal();
     }
 
     #endregion
@@ -39,7 +42,7 @@ public class G_PressurePlate : GimmickSignalSender
 
     private void SetSprite()
     {
-        if (isActive)
+        if (isInteractable)
         {
             spriteRenderer.sprite = active;
         }
@@ -76,7 +79,7 @@ public class G_PressurePlate : GimmickSignalSender
 
         if (count > 0)
         {
-            isActive = true;
+            isInteractable = true;
             SetSprite();
             SendSignal();
         }
@@ -91,7 +94,7 @@ public class G_PressurePlate : GimmickSignalSender
 
         if (count < 1)
         {
-            isActive = false;
+            isInteractable = false;
             SetSprite();
             SendSignal();
         }

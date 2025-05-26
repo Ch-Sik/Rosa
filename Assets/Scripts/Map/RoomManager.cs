@@ -56,23 +56,11 @@ public class RoomManager : MonoBehaviour
         safePositions = new HashSet<Vector2Int>(GetSafeLandingPosition());
     }
     #region Save/Load
-    public List<int> GetAllGimmicksStates()
-    {
-        List<int> senders = new List<int>();
 
-
-        for (int i = 0; i < senderRefs.Count; i++)
-            senders.Add(senderRefs[i].GetState());
-        /*
-        for (int i = 0; i < receiverStates.Count; i++)
-            receivers.Add(receiverStates[i].GetState());
-        for (int i = 0; i < connectorStates.Count; i++)
-            connectors.Add(connectorStates[i].GetState());
-        */
-
-        return senders;
-    }
-
+    // 25.05.27) 메모 추가
+    // 그냥 씬에 존재하는 모든 Sender와 Receiver, Connetor를 찾는 함수
+    // 각 기믹의 상태 세이브/로드를 각 기믹 스스로가 담당하게 바꾸면서
+    // 쓸모 없어지긴 했는데 어딘가 쓸모가 있을 것 같아서 일단 남겨둠
     private void GetAllGimmicks()
     {
         senderRefs = new List<GimmickSignalSender>();
@@ -93,22 +81,6 @@ public class RoomManager : MonoBehaviour
         connectors = connectors.OrderBy(x => x.transform.position.magnitude).ToArray();
         for (int i = 0; i < connectors.Length; i++)
             connectorRefs.Add(connectors[i].GetComponent<GimmickSignalConnector>());
-    }
-
-    public void SetAllGimmickStates(List<int> senders)
-    {
-        GetAllGimmicks();
-
-        if (senders.Count != senderRefs.Count /*||
-            receivers.Count != receiverRefs.Count ||
-            connectors.Count != connectorRefs.Count*/
-            )
-        {
-            return;
-        }
-
-        for (int i = 0; i < senderRefs.Count; i++)
-            senderRefs[i].Init(senders[i]);
     }
     #endregion
 

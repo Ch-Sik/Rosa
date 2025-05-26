@@ -43,7 +43,6 @@ public class SaveLoadManager : MonoBehaviour
 
     [FoldoutGroup("Paths"), ReadOnly] public string pathName = "SaveFile";
     [FoldoutGroup("Paths"), ReadOnly] public string flagPathName = "Flag";
-    [FoldoutGroup("Paths"), ReadOnly] public string mapPathName = "Maps";
     [FoldoutGroup("Paths"), ReadOnly] public string playerPathName = "Player";
     [FoldoutGroup("Paths"), ReadOnly] public string optionPathName = "Option";
 
@@ -97,7 +96,6 @@ public class SaveLoadManager : MonoBehaviour
             MakeDirectory($"{Application.persistentDataPath}/{pathName}");
 #endif
         MakeDirectory(GetPath(flagPathName));
-        MakeDirectory(GetPath(mapPathName));
         MakeDirectory(GetPath(playerPathName));
         MakeDirectory(GetPath(optionPathName));
     }
@@ -106,49 +104,6 @@ public class SaveLoadManager : MonoBehaviour
         //폴더가 존재하지 않는 경우 생성
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
-    }
-    #endregion
-
-    #region Room state
-
-    // SaveMap() 함수 테스트용.
-    // MapManager.Instance.SaveSceneState()를 통해 SaveLoadManager.SaveMap()을 간접 호출;
-    [Button]
-    public void SaveCurrentRoomState()
-    {
-        MapManager.Instance.SaveSceneState();
-    }
-
-    //세이브 처리부 - MapLoader에서 자동 호출 됌.
-    public void SaveMap(string sceneName, List<int> senders)
-    {
-        MapSaveData Data = new MapSaveData()
-        {
-            sceneName = sceneName,
-        };
-        Data.SaveSender(senders);
-
-        string filePath = GetPath(mapPathName) + $"/{sceneName}.json";
-        string json = JsonConvert.SerializeObject(Data, serializeSetting);
-        File.WriteAllText(filePath, json);
-        Debug.Log($"[Saved] Map 데이터 저장됨 to {filePath}");
-    }
-
-    public bool CanLoadSceneState(string sceneName) { return File.Exists(GetPath(mapPathName) + $"/{sceneName}.json"); }
-
-    public MapSaveData LoadSceneState(string sceneName)
-    {
-        string filePath = GetPath(mapPathName) + $"/{sceneName}.json";
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError($"[Map Data] {filePath}를 찾을 수 없다.");
-            return null;
-        }
-
-        string json = File.ReadAllText(filePath);
-        MapSaveData Data = JsonConvert.DeserializeObject<MapSaveData>(json);
-
-        return Data;
     }
     #endregion
 
@@ -197,6 +152,10 @@ public class SaveLoadManager : MonoBehaviour
         string filePath = GetPath(playerPathName) + "/player.json";
         string json = JsonConvert.SerializeObject(data, serializeSetting);
         File.WriteAllText(filePath, json);
+
+        Debug.Log($"[Player Position Data] {filePath}에 저장 완료."
+            + "\nJSON 파일 내용:\n"
+            + json);
     }
 
     [Button]

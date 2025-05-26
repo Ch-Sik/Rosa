@@ -6,28 +6,37 @@ using UnityEngine;
 
 public class G_Lever : GimmickSignalSender
 {
-    #region State
+    public bool isOnce = true;
+    [SerializeField] Transform leverHandle;
 
-    public override void Init(int state)
-    { 
-        SetState(state);
-        switch (state)
+    /// <summary> 레버가 작동하는 도중인지 여부 </summary>
+    public bool isInteracting = false;      
+    [SerializeField] private InteractiveObject interactiveObject;
+
+    public override void Init(GimmickSignalSenderState state)
+    {
+        if (GetState() != state)
         {
-            case 0:
-                break;
-            case 1: // Active
-                ImmediateActiveLever();
-                break;
-            case 2: // InActive
-                ImmediateInactiveLever();
-                break;
+            SetState(state);
+            switch (state)
+            {
+                case GimmickSignalSenderState.Activated: // Active
+                    ToggleOnLever();
+                    break;
+                case GimmickSignalSenderState.Inactivated: // InActive
+                    ToggleOffLever();
+                    break;
+                default:
+                    Debug.LogError("잘못된 enum value");
+                    return;
+            }
         }
-        ImmediateSendSignal();
+        // ImmediateSendSignal();
     }
 
-    private void ImmediateActiveLever()
+    private void ToggleOnLever()
     {
-        isActive = true;
+        isInteractable = true;
 
         if (isOnce)
         {
@@ -38,84 +47,77 @@ public class G_Lever : GimmickSignalSender
         leverHandle.DORotate(new Vector3(0, 0, -90), 0f, RotateMode.LocalAxisAdd).SetRelative(true);
     }
 
-    private void ImmediateInactiveLever()
+    private void ToggleOffLever()
     {
-        isActive = false;
+        isInteractable = false;
 
         leverHandle.DORotate(new Vector3(0, 0, +90), 0f, RotateMode.LocalAxisAdd).SetRelative(true);
-    }
-
-    #endregion
-
-
-    public bool isOnce = true;
-    [SerializeField] Transform leverHandle;
-
-    public bool onAct = false;
-    [SerializeField] private InteractiveObject interactiveObject;
-
-    private IEnumerator ActivateLever()
-    {
-        DOTween.Sequence()
-            .AppendCallback(() => onAct = true)
-            .Append(leverHandle.DORotate(new Vector3(0, 0, -90), 0.4f, RotateMode.LocalAxisAdd).SetRelative(true))
-            .AppendCallback(() =>
-            {
-                onAct = false;
-                SendSignal();
-            });
-        yield return 0;
-    }
-
-    private IEnumerator InActivateLever()
-    {
-        DOTween.Sequence()
-            .AppendCallback(() => onAct = true)
-            .Append(leverHandle.DORotate(new Vector3(0, 0, +90), 0.4f, RotateMode.LocalAxisAdd).SetRelative(true))
-            .AppendCallback(() =>
-            {
-                onAct = false;
-                SendSignal();
-            });
-        yield return 0;
     }
 
     [Button]
     public void LeverAction()
     {
-        if (onAct)
+        // 이미 레버 사용중인 경우 중복 사용 걸러냄
+        if (isInteracting)
             return;
 
+        Debug.Log("레버 사용됨");
 
-        if (isActive)
+        // 현재 비활성화 상태인경우 -> 활성화함
+        if (GetState() == GimmickSignalSenderState.Inactivated)
         {
-            if (isOnce)
-                return;
-            SetState(2);
-            InActiveLever();
+            SetState(GimmickSignalSenderState.Activated);
+            ActivateSignal(true);
         }
+        // 현재 활성화 상태인 경우 -> 비활성화함
         else
         {
-            SetState(1);
-            ActiveLever();
+            // 1회용인 레버의 경우 비활성화 자체가 불가능
+            if (isOnce)
+                return;
+            SetState(GimmickSignalSenderState.Inactivated);
+            ActivateSignal(false);
         }
     }
     
-    public void ActiveLever()
+    public void ActivateSignal(bool value)
     {
-        isActive = true;
-        StartCoroutine(ActivateLever());
+        if (value)
+            StartCoroutine(ActivateLever());
+        else
+            StartCoroutine(InactivateLever());
 
-        if (isOnce)
+        if (value == true && isOnce)
         {
+            isInteractable = false;
             interactiveObject.canUse = false;
             interactiveObject.OnInactive();
         }
     }
 
-    public void InActiveLever()
+    private IEnumerator ActivateLever()
     {
-        isActive = false;
-        StartCoroutine(InActivateLever());
+        DOTween.Sequence()
+            .AppendCallback(() => isInteracting = true)
+            .Append(leverHandle.DORotate(new Vector3(0, 0, -90), 0.4f, RotateMode.LocalAxisAdd).SetRelative(true))
+            .AppendCallback(() =>
+            {
+                isInteracting = false;
+                SendSignal();
+            });
+        yield return 0;
+    }
+
+    private IEnumerator InactivateLever()
+    {
+        DOTween.Sequence()
+            .AppendCallback(() => isInteracting = true)
+            .Append(leverHandle.DORotate(new Vector3(0, 0, +90), 0.4f, RotateMode.LocalAxisAdd).SetRelative(true))
+            .AppendCallback(() =>
+            {
+                isInteracting = false;
+                SendSignal();
+            });
+        yield return 0;
     }
 }

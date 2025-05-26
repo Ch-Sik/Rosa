@@ -65,11 +65,12 @@ public class FlagManager : MonoBehaviour
         if (!_flags.ContainsKey(flag))
         {
             _flags.Add(flag, value);
-            Debug.Log($"새 플래그 항목 추가: {flag}");
+            Debug.Log($"새 플래그 항목 추가: {flag}, 값: {value}");
         }
         else
         {
             _flags[flag] = value;
+            Debug.Log($"플래그 값 업데이트: {flag}, 값: {value}");
         }
     }
 

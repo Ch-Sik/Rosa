@@ -215,10 +215,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71a2c7f947eafb3459bfb8e7ee1cdd94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isActive: 0
+  isInteractable: 1
+  state: 1
   isOnce: 1
   leverHandle: {fileID: 7572795277123486101}
-  onAct: 0
+  isInteracting: 0
   interactiveObject: {fileID: 9203681351043136028}
 --- !u!1001 &6702635070984787791
 PrefabInstance:

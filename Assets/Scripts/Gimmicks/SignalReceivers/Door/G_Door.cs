@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Com.LuisPedroFonseca.ProCamera2D;
-using Unity.VisualScripting.Antlr3.Runtime;
 
 /*
 [Serializable]
@@ -29,7 +28,7 @@ public class G_Door : GimmickSignalReceiver
     {
         cam = Camera.main.gameObject;
         cinematics = cam.GetComponent<ProCamera2DCinematics>();
-        col.enabled = true;
+        // col.enabled = true;
     }
 
     public void Init(bool activated)
@@ -39,6 +38,11 @@ public class G_Door : GimmickSignalReceiver
             col.enabled = false;
             doorSprite.localPosition = new Vector3(0, 2.5f, 0);
         }
+    }
+
+    public override void OnAct()
+    {
+        Open();
     }
 
     public void Open()
@@ -73,22 +77,21 @@ public class G_Door : GimmickSignalReceiver
         }
     }
 
-    public override void OnAct()
-    {
-        Open();
-    }
-
-    public override void OffAct()
-    {
-    }
-
     public override void ImmediateOnAct()
     {
         doorSprite.DOMoveY(2.5f, 0f).SetRelative(true);
         col.enabled = false;
     }
 
+    public override void OffAct()
+    {
+        if (!isOnAct) return;
+    }
+
+
+
     public override void ImmediateOffAct()
     {
+        if (!isOnAct) return;
     }
 }

@@ -4,13 +4,17 @@ using UnityEngine;
 
 public abstract class GimmickSignalSender : MonoBehaviour
 {
-    public bool isActive = false;
+    public bool isInteractable = false;             // 플레이어가 조작 가능한지 여부
     private GimmickSignalConnector handler;
+    [SerializeField] 
+    private GimmickSignalSenderState state = GimmickSignalSenderState.Inactivated;     // 신호를 발생시키고 있는지 여부
 
     private void Awake()
     {
         tag = "Sender";
     }
+
+    public abstract void Init(GimmickSignalSenderState state);
 
     //GimmickSignalHandler에 넣을 시, 이벤트 송신을 위한 Init 
     public void SetHandler(GimmickSignalConnector hander) { this.handler = hander; }
@@ -19,7 +23,14 @@ public abstract class GimmickSignalSender : MonoBehaviour
     public void SendSignal()
     {
         if (handler != null)
-            handler.Signal();
+        {
+            handler.OnSignal();
+            Debug.Log($"{gameObject.name}: 기믹 시그널 발생");
+        }
+        else
+        {
+            Debug.LogWarning("시그널 발생 조건은 만족하였으나, 시그널을 전달할 대상이 설정되지 않음");
+        }
     }
 
     public void ImmediateSendSignal()
@@ -29,19 +40,14 @@ public abstract class GimmickSignalSender : MonoBehaviour
             handler.ImmediateSignal();
     }
 
-    // 0 은 기본 상태, 그 외는 내부에서 상태를 정의함. 
-    private int state = 0;
-
-    public int GetState()
+    public GimmickSignalSenderState GetState()
     {
         return state;
     }
 
-    public void SetState(int state)
+    public void SetState(GimmickSignalSenderState state)
     {
         this.state = state;
         //이외 상태에 따른 변경
     }
-
-    public abstract void Init(int state);
 }

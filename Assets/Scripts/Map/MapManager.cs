@@ -197,9 +197,6 @@ public class MapManager : MonoBehaviour
         oldRooms = new List<SORoom>(newRooms);
         */
 
-        // 다른 방으로 진입할 경우, 현재 방의 상태 저장
-        SaveSceneState();
-
         Sequence seq = DOTween.Sequence()
         .Append(fadePanel.DOFade(1, 0.5f))
         .AppendCallback(() =>
@@ -387,8 +384,9 @@ public class MapManager : MonoBehaviour
                 yield return null;
             }
 
-            // 로드 완료되면 해당 방 안의 기믹들 상태 로드하여 복구
-            LoadSceneState();
+            // 25.05.27)
+            // 방 내부의 기믹 세이브 로드 책임을 각 기믹 스스로에게로 이동
+            // LoadSceneState();
 
             if (isClimbing)
                 PlayerRef.Instance.movement.wallClimbEnabled = true;
@@ -426,28 +424,31 @@ public class MapManager : MonoBehaviour
         SceneManager.UnloadSceneAsync(scene);
     }
 
-    public void SaveSceneState()
-    {
-        // TODO: 방 내부의 기믹 상태 저장
-        return;     // 기능 정상 작동하지 않으므로 일단 비활성화
+    // 25.05.27) 세이브로드를 모아서 하는 게 아니라 각 기믹 스스로가 
+    //           플래그를 조작하도록 하여 세이브/로드가 이루어질 수 있도록 수정
 
-        //현재 룸에 대한 저장
-        List<int> senders = new List<int>();
+    //public void SaveSceneState()
+    //{
+    //    // TODO: 방 내부의 기믹 상태 저장
+    //    return;     // 기능 정상 작동하지 않으므로 일단 비활성화
 
-        senders = currentRoomManager.GetAllGimmicksStates();
-        SaveLoadManager.Instance.SaveMap(currentRoom.scene.SceneName, senders);
-    }
+    //    //현재 룸에 대한 저장
+    //    List<int> senders = new List<int>();
 
-    public void LoadSceneState()
-    {
-        if (SaveLoadManager.Instance.CanLoadSceneState(currentRoom.scene.SceneName))
-        {
-            MapSaveData Data = SaveLoadManager.Instance.LoadSceneState(currentRoom.scene.SceneName);
+    //    senders = currentRoomManager.GetAllGimmicksStates();
+    //    SaveLoadManager.Instance.SaveMap(currentRoom.scene.SceneName, senders);
+    //}
 
-            if (Data != null)
-                currentRoomManager.SetAllGimmickStates(Data.LoadSenders());
-        }
-    }
+    //public void LoadSceneState()
+    //{
+    //    if (SaveLoadManager.Instance.CanLoadSceneState(currentRoom.scene.SceneName))
+    //    {
+    //        MapSaveData Data = SaveLoadManager.Instance.LoadSceneState(currentRoom.scene.SceneName);
+
+    //        if (Data != null)
+    //            currentRoomManager.SetAllGimmickStates(Data.LoadSenders());
+    //    }
+    //}
 
     public bool OpenSceneBySceneNameWithPosition(string SceneName, Vector2 Position)
     {

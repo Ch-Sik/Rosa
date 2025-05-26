@@ -20,7 +20,7 @@ public class MonsterRespawner : MonoBehaviour
     {
         foreach(var monster in toRespawns)
         {
-            monster.OnDead += WhenSomeMonsterDie;
+            monster.Dead += WhenSomeMonsterDie;
             monsterPosition.Add(monster.transform.position);
             // 대부분의 몬스터가 AI sensor들 때문에 empty parent를 가지고 있는 점 고려
             monsterParent.Add(monster.transform.parent.parent);
@@ -42,6 +42,6 @@ public class MonsterRespawner : MonoBehaviour
 
         // 다음 리스폰을 위해 정보 업데이트하기
         toRespawns[index] = newInstance.GetComponentInChildren<MonsterState>();
-        toRespawns[index].OnDead += WhenSomeMonsterDie;
+        toRespawns[index].Dead += WhenSomeMonsterDie;
     }
 }
