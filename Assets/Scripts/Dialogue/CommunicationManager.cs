@@ -209,12 +209,15 @@ public class CommunicationManager : MonoBehaviour
     private void StartCommunication()
     {
         isCommunicating = true;
+        Debug.Log($"대화 {communicationID} 시작");
         Communication();
     }
 
     //커뮤니케이션을 종료시킨다.
     public void EndCommunication()
     {
+        Debug.Log($"대화 {communicationID} 종료");
+
         ReturnCameraToPlayer();
         ResetDatas();
         UI.EndAnimation();
@@ -263,7 +266,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.TargetText: TargetText(target, data[i].text); return;
             case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); return;
             case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); return;
-            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); Next();  return;
+            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); return;
             // 25.05.13) CommunicationManager에서 임의 함수를 호출할 수 있는 기능 삭제
             //case CommunicationType.Function: Function(data[i].function); return;
             case CommunicationType.Function_DO_NOT_USE: Debug.LogError("CommunicationType.Function 사용 금지!"); return;
@@ -273,7 +276,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.HideAll: HideAll(); return;
             case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].position); return;
             case CommunicationType.WalkTo: WalkTo(target, data[i].position); return;        // 25.04.19 추가
-            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(data[i].key); Next(); return;
+            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(data[i].key); return;
         }
     }
 
@@ -351,7 +354,7 @@ public class CommunicationManager : MonoBehaviour
         ProCamera2D.Instance.FollowHorizontal = true;
         ProCamera2D.Instance.FollowVertical = true;
 
-        // Next();
+        Next();
     }
 
     //Function 처리
@@ -393,7 +396,7 @@ public class CommunicationManager : MonoBehaviour
     //룸의 특정 위치로 이동
     public void MoveRoom(SORoom room, Vector3 pos)
     {
-        MapManager.Instance.OpenScene(room, pos);
+        MapManager.Instance.Enter(room, pos);
         Next();
     }
 
@@ -441,6 +444,7 @@ public class CommunicationManager : MonoBehaviour
                 Debug.LogError("CommunicationManager.UnlockPlayerAction) 잘못된 키값 들어옴");
                 break;
         }
+        Next();
     }
 
     //다음 커뮤니케이션 실행

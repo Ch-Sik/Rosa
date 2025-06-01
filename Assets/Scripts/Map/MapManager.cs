@@ -344,13 +344,17 @@ public class MapManager : MonoBehaviour
 
     public void OpenScene(SORoom room)
     {
-        if (currentRoom != null) CloseScene(currentRoom);
-        StartCoroutine(AsyncOpenScene(room, Vector3.zero));
+        OpenScene(room, Vector2.zero);
     }
 
     public void OpenScene(SORoom room, Vector2 pos)
     {
-        if (currentRoom != null) CloseScene(currentRoom);
+        if (currentRoom != null)
+        {
+            Debug.Log($"[MapManager] 기존 방 언로드 시작: {currentRoom.name}");
+            CloseScene(currentRoom);
+        }
+        Debug.Log($"[MapManager] 다음 방 로드 시작: {room.name}");
         StartCoroutine(AsyncOpenScene(room, pos));
     }
 
