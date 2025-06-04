@@ -218,7 +218,11 @@ public class CommunicationManager : MonoBehaviour
     {
         Debug.Log($"대화 {communicationID} 종료");
 
-        ReturnCameraToPlayer();
+        // 카메라 리셋
+        // ProCamera2D.Instance.CenterOnTargets();
+        ProCamera2D.Instance.FollowHorizontal = true;
+        ProCamera2D.Instance.FollowVertical = true;
+
         ResetDatas();
         UI.EndAnimation();
         //기존 UI의 생성
@@ -231,7 +235,12 @@ public class CommunicationManager : MonoBehaviour
         OnCommunicationFinish?.Invoke(communicationID);
     }
 
-    //계속해서 무한 while하는 커뮤니케이션 함수
+    // 25.06.05) 함수 설명용 주석 수정
+    // Scriptable Object에 기록된 '대화 데이터' 하나하나를 처리하는 커뮤니케이션 함수
+    // Target text 또는 Player text가 아니라면 Communication - 임의의 함수 - Next - Communication 식으로 
+    // 스택이 계속 쌓이는 문제가 있긴 한데...
+    // Target text 또는 Player text가 나오면 리턴되면서 스택 해소되므로 
+    // 걍 냅두기로 함.
     public void Communication()
     {
         // 24.12.22) CommunicationType이 None이면 무시하고 다음으로 넘김
@@ -257,26 +266,29 @@ public class CommunicationManager : MonoBehaviour
         }
 
         //커뮤니케이션 타입에 따른 함수에 파라미터 전달
+        // 25.06.05) 주석 추가
+        // Show, MoveCameraTo 등, 자동으로 다음 항목으로 넘어가야 하는 경우의
+        // Next() 또는 DelayAndGoNext()는 각 함수 내에서 호출하는 것으로.
         switch (data[i].type)
         {
-            case CommunicationType.None: Next(); return;
-            case CommunicationType.Show: Show(target, data[i].location); return;
-            case CommunicationType.Hide: Hide(target); return;
-            case CommunicationType.SetEmotion: SetEmotion(target, data[i].emotion); return;
-            case CommunicationType.TargetText: TargetText(target, data[i].text); return;
-            case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); return;
-            case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); return;
-            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); return;
+            case CommunicationType.None: /* 아무것도 안함 */ break;
+            case CommunicationType.Show: Show(target, data[i].location); break;
+            case CommunicationType.Hide: Hide(target); break;
+            case CommunicationType.SetEmotion: SetEmotion(target, data[i].emotion); break;
+            case CommunicationType.TargetText: TargetText(target, data[i].text); break;
+            case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); break;
+            case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); break;
+            case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); break;
             // 25.05.13) CommunicationManager에서 임의 함수를 호출할 수 있는 기능 삭제
-            //case CommunicationType.Function: Function(data[i].function); return;
-            case CommunicationType.Function_DO_NOT_USE: Debug.LogError("CommunicationType.Function 사용 금지!"); return;
-            case CommunicationType.Delay: DelayAndGoNext(data[i].delay); return;
-            case CommunicationType.Sfx: Sfx(data[i].sfx); return;
-            case CommunicationType.Flag: SetFlag(data[i].key, data[i].flagValue); return;
-            case CommunicationType.HideAll: HideAll(); return;
-            case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].position); return;
-            case CommunicationType.WalkTo: WalkTo(target, data[i].position); return;        // 25.04.19 추가
-            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(data[i].key); return;
+            //case CommunicationType.Function: Function(data[i].function); break;
+            case CommunicationType.Function_DO_NOT_USE: Debug.LogError("CommunicationType.Function 사용 금지!"); break;
+            case CommunicationType.Delay: DelayAndGoNext(data[i].delay); break;
+            case CommunicationType.Sfx: Sfx(data[i].sfx); break;
+            case CommunicationType.Flag: SetFlag(data[i].key, data[i].flagValue); break;
+            case CommunicationType.HideAll: HideAll(); break;
+            case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].position); break;
+            case CommunicationType.WalkTo: WalkTo(target, data[i].position); break;        // 25.04.19 추가
+            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(data[i].key); break;
         }
     }
 
