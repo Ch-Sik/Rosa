@@ -41,6 +41,9 @@ public class MapManager : MonoBehaviour
     // 25.04.29) startPoint를 transform 대신 수치 입력의 Vector3로 대체
     public bool drawStartpointGizmo;
     public Vector3 startPoint;
+    // 25.06.06) 주석 추가
+    // 인스펙터 상에서 값을 지정해서 강제로 시작 방을 설정할 수 있음.
+    // 없으면 처음부터인지 이어하기인지에 따라 적절한 방을 찾아서 설정함. 
     public SORoom startRoom;
     
     public SORoom CurrentRoom { get { return currentRoom; } }
@@ -52,8 +55,6 @@ public class MapManager : MonoBehaviour
     // 25.05.04) 디버그용 좌표 출력 UI 제거
     // public TextMeshProUGUI positionDebugUI;
     [ShowInInspector] private Dictionary<string, SORoom> rooms;
-
-    public Image fadePanel;
 
     public Action OnNextRoomLoaded;
 
@@ -105,7 +106,7 @@ public class MapManager : MonoBehaviour
                 Debug.LogError("시작할 방을 찾을 수 없음");
                 return;
             }
-            Enter(startRoom);
+            EnterInitialRoom(startRoom, null);
         }
         // 이어하기 상황일 경우
         else
@@ -114,7 +115,8 @@ public class MapManager : MonoBehaviour
             PlayerPositionSave saveData = SaveLoadManager.Instance.LoadPlayerPosition();
             Debug.Log($"플레이어 위치 세이브데이터 로드: {saveData.room}\n위치: {saveData.position}");
             startRoom = rooms[saveData.room];
-            Enter(startRoom, saveData.position);
+            EnterInitialRoom(startRoom, saveData.position);
+            // Enter(startRoom, saveData.position);
         }
     }
 
@@ -128,39 +130,62 @@ public class MapManager : MonoBehaviour
     }
 
     #region Room Events
-    //강제 엔터
-    public void Enter(SORoom room)
+
+    public void EnterInitialRoom(SORoom room, Vector2? position)
     {
         Sequence seq = DOTween.Sequence()
-        .Append(fadePanel.DOFade(1, 0.5f))
+        .AppendCallback(() =>
+            {
+                if (position.HasValue)
+                {
+                    OpenScene(room, position.Value);
+                }
+                else
+                {
+                    OpenScene(room, startPoint);
+                }
+                currentRoom = room;
+            })
+        .AppendInterval(1)
         .AppendCallback(() =>
         {
-            OpenScene(room);
-            currentRoom = room;
-            Invoke("MoveStartPoint", 0.3f);
-        })
-        .AppendInterval(1)
-        .AppendCallback(MoveToStartPoint)
-        .Append(fadePanel.DOFade(0, 0.5f));
+            // 페이드 인 효과 적용
+            FadeoutPanel.FadeIn();
+        });
     }
+
+    // 25.06.05) 참조 없는 함수 주석 처리
+    ////강제 엔터
+    //public void Enter(SORoom room)
+    //{
+    //    float fadeTime = FadeoutPanel.fadeDuration;
+    //    Sequence seq = DOTween.Sequence()
+    //    .AppendCallback(()=> { FadeoutPanel.Fadeout(); })  // 페이드아웃
+    //    .AppendInterval(fadeTime)
+    //    .AppendCallback(() =>
+    //    {
+    //        OpenScene(room);
+    //        currentRoom = room;
+    //        // Invoke("MoveStartPoint", 0.3f);
+    //    })
+    //    .AppendInterval(1)
+    //    .AppendCallback(MoveToStartPoint)
+    //    .AppendCallback(()=> { FadeoutPanel.FadeIn(); }); // 페이드 인
+    //}
 
     public void Enter(SORoom room, Vector2 position)
     {
+        float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
         Sequence seq = DOTween.Sequence()
-        .Append(fadePanel.DOFade(1, 0.5f))
+        .AppendCallback(() => { FadeoutPanel.Fadeout(); })  // 페이드아웃
+        .AppendInterval(fadeTime)
         .AppendCallback(() =>
         {
             OpenScene(room, position);
             currentRoom = room;
         })
         .AppendInterval(1)
-        .Append(fadePanel.DOFade(0, 0.5f));
-    }
-
-    public void MoveToStartPoint()
-    {
-        player.position = startPoint;
-        player.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        .AppendCallback(() => { FadeoutPanel.FadeIn(); }); // 페이드 인
     }
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
@@ -196,9 +221,10 @@ public class MapManager : MonoBehaviour
 
         oldRooms = new List<SORoom>(newRooms);
         */
-
+        float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
         Sequence seq = DOTween.Sequence()
-        .Append(fadePanel.DOFade(1, 0.5f))
+        .AppendCallback(() => { FadeoutPanel.Fadeout(); })  // 페이드아웃
+        .AppendInterval(fadeTime)
         .AppendCallback(() =>
         {
             //        currentRoom = ports[0].room;     //flag
@@ -216,7 +242,7 @@ public class MapManager : MonoBehaviour
             currentRoom = nextRoom;
         })
         .AppendInterval(1)
-        .Append(fadePanel.DOFade(0, 0.5f));
+        .AppendCallback(() => { FadeoutPanel.FadeIn(); }); // 페이드 인
     }
 
     //포트 충돌 엔터

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,14 +20,23 @@ public class TitleScreenUI : MonoBehaviour
 
     public void OnClickNewGameButton()
     {
-        SceneManager.LoadScene(LoadingSceneName);
         Debug.Log("새 게임 시작");
+        StartEnterSequence();
     }
 
     public void OnClickContinueButton()
     {
-        SaveLoadManager.Instance.DisableNewGameFlag();
-        SceneManager.LoadScene(LoadingSceneName);
         Debug.Log("이어하기 시작");
+        SaveLoadManager.Instance.DisableNewGameFlag();
+        StartEnterSequence();
+    }
+
+    private void StartEnterSequence()
+    {
+        float fadeTime = FadeoutPanel.fadeDuration;
+        DOTween.Sequence()
+            .AppendCallback(() => { FadeoutPanel.Fadeout(); })
+            .AppendInterval(fadeTime)
+            .AppendCallback(() => { SceneManager.LoadSceneAsync(LoadingSceneName); });
     }
 }
