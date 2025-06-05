@@ -90,6 +90,23 @@ public class CommunicationManager : MonoBehaviour
         GetCharacterSpriteDatas();
     }
 
+    public void ReadyForCommunication()
+    {
+        SetInputStateToCommunicationMode();
+    }
+
+    private void SetInputStateToCommunicationMode()
+    {
+        InputManager.Instance.SetMoveInputState(PlayerMoveState.NO_MOVE);
+        InputManager.Instance.SetUiInputState(UiState.DIALOG);
+    }
+
+    private void ResetInputState()
+    {
+        InputManager.Instance.SetMoveInputState(PlayerMoveState.DEFAULT);
+        InputManager.Instance.SetUiInputState(UiState.IN_GAME);
+    }
+
     private void Update()
     {
         //커뮤니케이션 중이고,
@@ -151,12 +168,6 @@ public class CommunicationManager : MonoBehaviour
         textCount = 0;
     }
 
-    private void ResetPlayerState()
-    {
-        InputManager.Instance.SetMoveInputState(PlayerMoveState.DEFAULT);
-        InputManager.Instance.SetUiInputState(UiState.IN_GAME);
-    }
-
     [Button]
     //Communication 시작 전 작업
     public bool StartCommunication(int ID)
@@ -188,7 +199,6 @@ public class CommunicationManager : MonoBehaviour
         if (!Validation())
             return false;
 
-        //조작중단
         //기본 UI의 제거
         //커뮤니케이션 UI의 생성
         float time = UI.StartAnimation();
@@ -199,15 +209,17 @@ public class CommunicationManager : MonoBehaviour
         //시작
         Invoke("StartCommunication", time);
 
-        // 25.04.22) 이벤트 관리 추가
-        OnCommunicationStart?.Invoke(communicationID);
-
         return true;
     }
 
     //커뮤니케이션을 실행시킨다.
     private void StartCommunication()
     {
+        // 25.04.22) 이벤트 관리 추가
+        // 25.06.05) 이벤트 수행 타이밍을 대화를 위해 지정된 위치로 이동하기 시작하는 시점에서 
+        // 이동 후 실제 대화를 시작하는 타이밍으로 이동
+        OnCommunicationStart?.Invoke(communicationID);
+
         isCommunicating = true;
         Debug.Log($"대화 {communicationID} 시작");
         Communication();
@@ -230,7 +242,7 @@ public class CommunicationManager : MonoBehaviour
         // NPC가 자동으로 플레이어 바라보는 기능 복구
         NpcLookatPlayer.EnableGlobally = true;
         //조작시작
-        ResetPlayerState();
+        ResetInputState();
 
         OnCommunicationFinish?.Invoke(communicationID);
     }

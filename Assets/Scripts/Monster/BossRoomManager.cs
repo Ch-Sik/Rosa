@@ -104,6 +104,7 @@ public class BossRoomManager : MonoBehaviour
         if(doFinishCommunication)
         {
             DOVirtual.DelayedCall(finishCommunicationStartDelay, () => {
+                CommunicationManager.Instance.ReadyForCommunication();
                 CommunicationManager.Instance.StartCommunication(finishCommunicationID);
             });
         }

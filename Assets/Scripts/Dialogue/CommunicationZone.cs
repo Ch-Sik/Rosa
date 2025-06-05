@@ -14,47 +14,9 @@ public class CommunicationZone : MonoBehaviour
     [SerializeField] private Transform communicationStartTransform;
     private bool isPlayerMoving = false;
 
-    private void OnDrawGizmos()
+    private void Start()
     {
-        if (!showGizmos) return;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position, transform.localScale);
-    }
-
-    private void Update()
-    {
-        HandlePlayerMove();
-    }
-
-    private void HandlePlayerMove()
-    {
-        if (!isPlayerMoving) return;
-
-        if (communicationStartTransform == null)
-        {
-            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
-            return;
-        }
-
-        // 25.04.22) communicationStartTransform이 없어도 동작하도록 수정
-        if (communicationStartTransform != null 
-            && Mathf.Abs(PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x) > 0.2f)
-        {
-            int direction = PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x < 0 ? 1 : -1;
-            PlayerRef.Instance.movement.Walk(Vector2.one * direction);
-            PlayerRef.Instance.animation.anim.SetBool("isWalking", true);
-        }
-        else
-        {
-            PlayerRef.Instance.animation.anim.SetBool("isWalking", false);
-            PlayerRef.Instance.movement.Walk(Vector2.zero);
-            PlayerRef.Instance.movement.LookAt2D(transform.position);
-            isPlayerMoving = false;
-
-            // Invoke("StartCommunication", delay);
-            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
-        }
+        communicationStartTransform.gameObject.SetActive(false);
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -82,13 +44,54 @@ public class CommunicationZone : MonoBehaviour
         }
 
         isPlayerMoving = true;
+        CommunicationManager.Instance.ReadyForCommunication();
+    }
 
-        InputManager.Instance.SetMoveInputState(PlayerMoveState.NO_MOVE);
-        InputManager.Instance.SetUiInputState(UiState.DIALOG);
+    private void Update()
+    {
+        HandlePlayerMove();
+    }
+
+    private void HandlePlayerMove()
+    {
+        if (!isPlayerMoving) return;
+
+        if (communicationStartTransform == null)
+        {
+            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
+            return;
+        }
+
+        // 25.04.22) communicationStartTransform이 없어도 동작하도록 수정
+        if (communicationStartTransform != null
+            && Mathf.Abs(PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x) > 0.2f)
+        {
+            int direction = PlayerRef.Instance.transform.position.x - communicationStartTransform.position.x < 0 ? 1 : -1;
+            PlayerRef.Instance.movement.Walk(Vector2.one * direction);
+            PlayerRef.Instance.animation.anim.SetBool("isWalking", true);
+        }
+        else
+        {
+            PlayerRef.Instance.animation.anim.SetBool("isWalking", false);
+            PlayerRef.Instance.movement.Walk(Vector2.zero);
+            PlayerRef.Instance.movement.LookAt2D(transform.position);
+            isPlayerMoving = false;
+
+            // Invoke("StartCommunication", delay);
+            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
+        }
     }
 
     private void StartCommunication()
     {
         CommunicationManager.Instance.StartCommunication(ID);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!showGizmos) return;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(transform.position, transform.localScale);
     }
 }
