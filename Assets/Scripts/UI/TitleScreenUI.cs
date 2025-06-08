@@ -34,9 +34,22 @@ public class TitleScreenUI : MonoBehaviour
     private void StartEnterSequence()
     {
         float fadeTime = FadeoutPanel.fadeDuration;
-        DOTween.Sequence()
-            .AppendCallback(() => { FadeoutPanel.Fadeout(); })
-            .AppendInterval(fadeTime)
-            .AppendCallback(() => { SceneManager.LoadSceneAsync(LoadingSceneName); });
+        FadeoutPanel.Fadeout();
+
+        AsyncOperation asyncOper = SceneManager.LoadSceneAsync(LoadingSceneName);
+        asyncOper.allowSceneActivation = false;
+
+        StartCoroutine(SceneLoadCoroutine());
+        
+        IEnumerator SceneLoadCoroutine()
+        {
+            yield return new WaitForSeconds(fadeTime);
+            while(!asyncOper.isDone)
+            {
+                if (asyncOper.progress >= 0.9f) break;
+                yield return null;
+            }
+            asyncOper.allowSceneActivation = true;
+        }
     }
 }

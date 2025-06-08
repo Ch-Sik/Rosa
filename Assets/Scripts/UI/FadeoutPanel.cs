@@ -24,6 +24,15 @@ public class FadeoutPanel : MonoBehaviour
             }
             return instance._isTweening; 
         } }
+    public static bool isFadeOutActivated { get
+        {
+            if (instance == null)
+            {
+                Debug.LogError("FadeoutPanel의 인스턴스가 없음");
+                return false;
+            }
+            return instance._imageComponent.color.a == 1f;
+        } }
 
     [SerializeField] private Image _imageComponent;
     [SerializeField] private float _fadeDuration = 0.5f;

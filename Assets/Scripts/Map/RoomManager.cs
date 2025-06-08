@@ -343,23 +343,6 @@ public class RoomManager : MonoBehaviour
     }
     #endregion
 
-    #region Event
-    public void Enter(PortDirection direction, int index, float percentage,Vector3 playerPosition)
-    {
-        Debug.Log($"[{roomData.title}] [{direction}, {index}] 플레이어 입장");
-        
-        MapManager.Instance?.Enter(roomData, direction, index, percentage, playerPosition);
-    }
-
-    public void Exit(PortDirection direction, int index)
-    {
-        Debug.Log($"[{roomData.title}] [{direction}, {index}]플레이어 퇴장");
-        MapManager.Instance?.Exit(roomData);
-
-    }
-    #endregion
-
-
     private void OnDrawGizmos()
     {
         if (!showGizmos)

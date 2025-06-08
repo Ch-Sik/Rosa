@@ -106,7 +106,7 @@ public class MapManager : MonoBehaviour
                 Debug.LogError("시작할 방을 찾을 수 없음");
                 return;
             }
-            EnterInitialRoom(startRoom, null);
+            Enter(startRoom, startPoint);
         }
         // 이어하기 상황일 경우
         else
@@ -115,7 +115,7 @@ public class MapManager : MonoBehaviour
             PlayerPositionSave saveData = SaveLoadManager.Instance.LoadPlayerPosition();
             Debug.Log($"플레이어 위치 세이브데이터 로드: {saveData.room}\n위치: {saveData.position}");
             startRoom = rooms[saveData.room];
-            EnterInitialRoom(startRoom, saveData.position);
+            Enter(startRoom, saveData.position);
             // Enter(startRoom, saveData.position);
         }
     }
@@ -130,62 +130,49 @@ public class MapManager : MonoBehaviour
     }
 
     #region Room Events
-
-    public void EnterInitialRoom(SORoom room, Vector2? position)
+    public void Enter(PortDirection direction, List<ConnectedPort> ports)
     {
-        Sequence seq = DOTween.Sequence()
-        .AppendCallback(() =>
-            {
-                if (position.HasValue)
-                {
-                    OpenScene(room, position.Value);
-                }
-                else
-                {
-                    OpenScene(room, startPoint);
-                }
-                currentRoom = room;
-            })
-        .AppendInterval(1)
-        .AppendCallback(() =>
-        {
-            // 페이드 인 효과 적용
-            FadeoutPanel.FadeIn();
-        });
+        SORoom nextRoom = GetRoomSOtoConnectedPorts(ports);
+        player.SetParent(transform);
+        Vector2Int nextRoomPortPosition = nextRoom.GetRoomPort(direction, ports[0].index).ports[0];
+        Vector3 frontOfPortPosition = new Vector3(nextRoomPortPosition.x, nextRoomPortPosition.y) + GetMargin(direction);
+        Enter(nextRoom, frontOfPortPosition);
     }
-
-    // 25.06.05) 참조 없는 함수 주석 처리
-    ////강제 엔터
-    //public void Enter(SORoom room)
-    //{
-    //    float fadeTime = FadeoutPanel.fadeDuration;
-    //    Sequence seq = DOTween.Sequence()
-    //    .AppendCallback(()=> { FadeoutPanel.Fadeout(); })  // 페이드아웃
-    //    .AppendInterval(fadeTime)
-    //    .AppendCallback(() =>
-    //    {
-    //        OpenScene(room);
-    //        currentRoom = room;
-    //        // Invoke("MoveStartPoint", 0.3f);
-    //    })
-    //    .AppendInterval(1)
-    //    .AppendCallback(MoveToStartPoint)
-    //    .AppendCallback(()=> { FadeoutPanel.FadeIn(); }); // 페이드 인
-    //}
 
     public void Enter(SORoom room, Vector2 position)
     {
-        float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
-        Sequence seq = DOTween.Sequence()
-        .AppendCallback(() => { FadeoutPanel.Fadeout(); })  // 페이드아웃
-        .AppendInterval(fadeTime)
-        .AppendCallback(() =>
+        StartCoroutine(EnterCoroutine());
+        IEnumerator EnterCoroutine()
         {
-            OpenScene(room, position);
-            currentRoom = room;
-        })
-        .AppendInterval(1)
-        .AppendCallback(() => { FadeoutPanel.FadeIn(); }); // 페이드 인
+            bool wasClimbing;
+            PreservePlayerStates(out wasClimbing);
+            float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
+
+            AsyncOperation loadOp = StartLoadNextScene(room);
+
+            // 페이드아웃 효과 없었다면 적용
+            if (!FadeoutPanel.isFadeOutActivated)
+            {
+                FadeoutPanel.Fadeout();
+                yield return new WaitForSeconds(fadeTime);      // 최소한 페이드 효과 시간만큼은 기다리고
+            }
+            else
+            {
+                Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
+            }
+
+            while (loadOp.progress < 0.9f)                  // 로딩 시간 필요하면 더 기다리고
+            {
+                Debug.Log($"씬 로딩 중: {loadOp.progress * 100}%");
+                yield return null;
+            }
+            yield return new WaitForSeconds(0.5f);          // 로딩 마무리 될 때까지 기다림
+            ActivateNextScene(loadOp, room);
+            SetPlayerPositionAndStates(position, wasClimbing);
+
+            // 페이드아웃 효과 정리
+            FadeoutPanel.FadeIn();
+        }
     }
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
@@ -203,105 +190,6 @@ public class MapManager : MonoBehaviour
             return map.GetSORoomBySceneName(sceneName);
 
         return null;
-    }
-
-    public void Enter(PortDirection direction, List<ConnectedPort> ports)
-    {
-        /*
-        currentRoom = room;
-
-        List<SORoom> newRooms = new List<SORoom>();
-
-        newRooms.Clear();
-        newRooms.Add(room);
-        newRooms.AddRange(room.GetConnectedRooms());
-
-        CloseScenes(newRooms);
-        OpenScenes(newRooms);
-
-        oldRooms = new List<SORoom>(newRooms);
-        */
-        float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
-        Sequence seq = DOTween.Sequence()
-        .AppendCallback(() => { FadeoutPanel.Fadeout(); })  // 페이드아웃
-        .AppendInterval(fadeTime)
-        .AppendCallback(() =>
-        {
-            //        currentRoom = ports[0].room;     //flag
-            SORoom nextRoom = GetRoomSOtoConnectedPorts(ports);
-            player.SetParent(transform);
-
-            //        Vector2Int position = ports[0].room.(direction, ports[0].index).ports[0];
-            //        Vector3 destination = new Vector3(position.x, position.y) + GetMargin(direction);
-            Vector2Int position = nextRoom.GetRoomPort(direction, ports[0].index).ports[0];
-            Vector3 destination = new Vector3(position.x, position.y) + GetMargin(direction);
-
-            Debug.Log($"destination: {destination}");
-
-            OpenScene(nextRoom, destination);
-            currentRoom = nextRoom;
-        })
-        .AppendInterval(1)
-        .AppendCallback(() => { FadeoutPanel.FadeIn(); }); // 페이드 인
-    }
-
-    //포트 충돌 엔터
-    public void Enter(SORoom room, PortDirection direction, int index, float percentage, Vector3 playerPosition)
-    {
-        /*
-        currentRoom = room;
-
-        List<SORoom> newRooms = new List<SORoom>();
-
-        newRooms.Clear();
-        newRooms.Add(room);
-        newRooms.AddRange(room.GetConnectedRooms());
-
-        CloseScenes(newRooms);
-        OpenScenes(newRooms);
-
-        oldRooms = new List<SORoom>(newRooms);
-        */
-
-        CloseScene(currentRoom);
-        currentRoom = room;
-        StartCoroutine(AsyncOpenScene(currentRoom, Vector3.zero));
-
-        //플래그
-        FindConnectedPosition(room, direction, index, percentage, playerPosition);
-    }
-
-    public void Exit(SORoom room)
-    {
-    }
-
-    public void FindConnectedPosition(SORoom room, PortDirection direction, int index, float percentage, Vector3 playerPosition, int flag = 0)
-    {
-        if (!oldRooms.Contains(room))
-            return; //연결된 방 로드되지 않음.
-
-        //대상 Port
-        Debug.Log($"{room.title}의 {direction}의 {index}는 {percentage}");
-
-        RoomPort port = room.GetPort(direction, index);
-        List<ConnectedPort> connects = room.GetConnectedPort(direction, index);
-
-        ConnectedPort exitPort = connects[flag];
-
-//        Debug.Log($"{exitPort.room.title}의 {GetOppositeDirection(direction)}의 {exitPort.index}의 {port.GetPortPosition(percentage)}연결됨");
-
-        Vector3 transportPosition = port.GetPortPosition(percentage);
-        if (port.isHorizontal())
-            transportPosition.y = playerPosition.y;
-        else
-            transportPosition.x = playerPosition.x;
-
-        transportPosition += GetMargin(GetOppositeDirection(direction));
-        transportPosition += GetTransportPostion(exitPort, direction);
-
-        Debug.Log($"transportPosition: {transportPosition}");
-
-        player.position = transportPosition;
     }
 
     public Vector3 GetMargin(PortDirection direction)
@@ -348,103 +236,62 @@ public class MapManager : MonoBehaviour
     #endregion
 
     #region Scene Methods
-    public void OpenScenes(List<SORoom> rooms)
+    
+    private void PreservePlayerStates(out bool wasClimbing)
     {
-        //이미 열려있는 씬이라면, 리턴
-        foreach (SORoom room in rooms)
+        // 덩굴 기어올라서 맵 이동하는 경우 고려
+        wasClimbing = false;
+        if (PlayerRef.Instance.movement.isWallClimbing)
         {
-            if (IsOpenScene(room))
-                continue;
+            wasClimbing = true;
 
-            OpenScene(room);
+            Debug.Log("매달린 상태 해제");
+            PlayerRef.Instance.movement.wallClimbEnabled = false;
+            PlayerRef.Instance.movement.UnstickFromWall();
         }
+
+        // 플레이어가 덩굴 등의 자식 오브젝트로 설정되어 Scene Unload 때 같이 unload되는 것 방지
+        player.SetParent(null);
+        cam.MoveCameraInstantlyToPosition(player.position);
     }
 
-    private bool IsOpenScene(SORoom room)
+    private AsyncOperation StartLoadNextScene(SORoom room)
     {
-        if(oldRooms.Contains(room))
-            return true;
+        SceneField sceneF = room.scene;
+        // 해당 씬이 이미 로드되어있다면 리턴
+        if (SceneManager.GetSceneByName(sceneF).isLoaded)
+        {
+            Debug.LogError("[MapManager] 해당 씬은 이미 로드되어있음");
+            return null;
+        }
 
-        return false;
+        //비동기 로드 개시
+        Debug.Log($"[MapManager] 다음 방 로드 시작: {room.name}");
+        AsyncOperation sceneLoadOperation = SceneManager.LoadSceneAsync(sceneF.SceneName, LoadSceneMode.Additive);
+        sceneLoadOperation.allowSceneActivation = false;
+
+        return sceneLoadOperation;
     }
 
-    public void OpenScene(SORoom room)
+    private void ActivateNextScene(AsyncOperation sceneLoadOperation, SORoom room)
     {
-        OpenScene(room, Vector2.zero);
-    }
-
-    public void OpenScene(SORoom room, Vector2 pos)
-    {
+        // 로드된 씬 활성화 허용
+        sceneLoadOperation.allowSceneActivation = true;
+        // 기존 씬 있다면 언로드
         if (currentRoom != null)
         {
             Debug.Log($"[MapManager] 기존 방 언로드 시작: {currentRoom.name}");
             CloseScene(currentRoom);
         }
-        Debug.Log($"[MapManager] 다음 방 로드 시작: {room.name}");
-        StartCoroutine(AsyncOpenScene(room, pos));
+        currentRoom = room;
     }
 
-    //동기화를 위한 코루틴 사용
-    public IEnumerator AsyncOpenScene(SORoom room, Vector3 playerPosition)
+    private void SetPlayerPositionAndStates(Vector2 playerPosition, bool isClimbing)
     {
-        SceneField scene = room.scene;
-        if (!SceneManager.GetSceneByName(scene.SceneName).isLoaded)
-        {
-            bool isClimbing = false;    
-
-            if (PlayerRef.Instance.movement.isWallClimbing)
-            {
-                Debug.Log("매달린 상태 해제");
-                PlayerRef.Instance.movement.wallClimbEnabled = false;
-                PlayerRef.Instance.movement.UnstickFromWall();
-
-                isClimbing = true;
-            }
-            player.SetParent(transform);
-            player.SetParent(null);
-            player.position = playerPosition;
-            cam.MoveCameraInstantlyToPosition(player.position);
-
-            //비동기 로드
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene.SceneName, LoadSceneMode.Additive);
-
-            //로드 완료될 때까지 대기
-            while (!asyncLoad.isDone)
-            {
-                yield return null;
-            }
-
-            // 25.05.27)
-            // 방 내부의 기믹 세이브 로드 책임을 각 기믹 스스로에게로 이동
-            // LoadSceneState();
-
-            if (isClimbing)
-                PlayerRef.Instance.movement.wallClimbEnabled = true;
-
-            chapterDebugUI.text = room.scene.SceneName;
-
-            // 25.03.03 추가
-            // 로드 후 이벤트 발생시킴
-            OnNextRoomLoaded?.Invoke();
-        }
-
-        /*
-        Scene sce = SceneManager.GetSceneByName(scene.SceneName);
-        GameObject[] objects = sce.GetRootGameObjects();
-        foreach (GameObject obj in objects)
-            obj.GetComponent<Room>()?.Init();
-        */
-    }
-
-    public void CloseScenes(List<SORoom> rooms)
-    {
-        //차집합이라면, 클로즈
-        List<SORoom> differences = oldRooms.Except(rooms).ToList();
-
-        differences.Remove(currentRoom);
-
-        foreach (SORoom room in differences)
-            CloseScene(room);
+        player.position = playerPosition;
+        cam.MoveCameraInstantlyToPosition(playerPosition);
+        if (isClimbing)
+            PlayerRef.Instance.movement.wallClimbEnabled = true;
     }
 
     public void CloseScene(SORoom room)
@@ -452,49 +299,6 @@ public class MapManager : MonoBehaviour
         SceneField scene = room.scene;
 
         SceneManager.UnloadSceneAsync(scene);
-    }
-
-    // 25.05.27) 세이브로드를 모아서 하는 게 아니라 각 기믹 스스로가 
-    //           플래그를 조작하도록 하여 세이브/로드가 이루어질 수 있도록 수정
-
-    //public void SaveSceneState()
-    //{
-    //    // TODO: 방 내부의 기믹 상태 저장
-    //    return;     // 기능 정상 작동하지 않으므로 일단 비활성화
-
-    //    //현재 룸에 대한 저장
-    //    List<int> senders = new List<int>();
-
-    //    senders = currentRoomManager.GetAllGimmicksStates();
-    //    SaveLoadManager.Instance.SaveMap(currentRoom.scene.SceneName, senders);
-    //}
-
-    //public void LoadSceneState()
-    //{
-    //    if (SaveLoadManager.Instance.CanLoadSceneState(currentRoom.scene.SceneName))
-    //    {
-    //        MapSaveData Data = SaveLoadManager.Instance.LoadSceneState(currentRoom.scene.SceneName);
-
-    //        if (Data != null)
-    //            currentRoomManager.SetAllGimmickStates(Data.LoadSenders());
-    //    }
-    //}
-
-    public bool OpenSceneBySceneNameWithPosition(string SceneName, Vector2 Position)
-    {
-        if (!rooms.ContainsKey(SceneName))
-        {
-            Debug.LogError($"[Scene Load Error] 해당 이름의 씬을 찾을 수 없다. : {SceneName}");
-            return false;
-        }
-
-        if (SceneManager.GetSceneByName(currentRoom.scene.SceneName).isLoaded)
-            CloseScene(currentRoom);
-        StartCoroutine(AsyncOpenScene(rooms[SceneName], Position));
-
-        PlayerRef.Instance.transform.position = Position;
-
-        return true;
     }
     #endregion
 
