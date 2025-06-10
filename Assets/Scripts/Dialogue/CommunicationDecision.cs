@@ -25,7 +25,7 @@ public class CommunicationDecision
         // 첫 대화가 아니고 조건 대화 플래그 섰을 때
         foreach (var flagID in flagedID)
         {
-            int id = flagID.IsAvailable();
+            int id = flagID.GetIdIfAvailable();
 
             if (id != -1)
                 return id;
@@ -56,7 +56,7 @@ public class CommunicationDecision
 [Serializable]
 public class CommunicationDecisionNode
 {
-    public int IsAvailable()
+    public int GetIdIfAvailable()
     {
         //일회용 대화이고, 이미 소진되었다면,
         if (isOnce && isUsed)
@@ -74,6 +74,13 @@ public class CommunicationDecisionNode
 
     public bool isOnce = true;
     bool isUsed = false;
-    public List<KeyValuePair<string, int>> requireFlags = new List<KeyValuePair<string, int>>();
+    public List<FlagRequirement> requireFlags = new();
     public int ID;
+}
+
+[Serializable]
+public struct FlagRequirement
+{
+    public string Key;
+    public int Value;
 }

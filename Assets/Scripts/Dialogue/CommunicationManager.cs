@@ -406,6 +406,7 @@ public class CommunicationManager : MonoBehaviour
     public void SetFlag(string key, int value)
     {
         FlagManager.Instance.SetFlag(key, value);
+        Next();
     }
 
     //24.12.22) 한꺼번에 숨기기 추가
