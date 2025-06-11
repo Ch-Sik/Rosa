@@ -57,8 +57,10 @@ public class CommunicationManager : MonoBehaviour
     //캐릭터 스프라이트 입력 그룹
     public List<CharacterEmotion> characterDatas = new List<CharacterEmotion>();
     //캐릭터 스프라이트 매치 그룹
-    [ShowInInspector] public Dictionary<CommunicationTarget, CharacterEmotion> characters = new Dictionary<CommunicationTarget, CharacterEmotion>();
-    [ShowInInspector] public Dictionary<int, CommunicationSO> communicationDatas = new Dictionary<int, CommunicationSO>();
+    [ShowInInspector] 
+    public Dictionary<CommunicationTarget, CharacterEmotion> characters = new Dictionary<CommunicationTarget, CharacterEmotion>();
+    [ShowInInspector, InfoBox("프로젝트 내에 존재하는 모든 대화 데이터.\nStart 시에 알아서 스캔해서 가져오므로 수동 설정할 필요 없음.")] 
+    public Dictionary<int, CommunicationSO> communicationDatas = new Dictionary<int, CommunicationSO>();
 
     public string folderName = "Dialogue";                          //폴더이름 수식
     public float endDelay = 1.5f;                                   //종료 딜레이
