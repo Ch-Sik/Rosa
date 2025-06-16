@@ -13,7 +13,10 @@ public class CameraCollisionHandler : MonoBehaviour
     private void Start()
     {
         proCamera2D = GetComponent<ProCamera2D>();
-        MapManager.Instance.OnNextRoomLoaded += AdjustCameraInfluenceTemporarily;
+        // 25.06.15) 
+        // AdjustCameraInfluenceTemporarily 함수 비정상 작동, 임시로 코드 비활성화
+        // 비정상 작동했던 상황 1-b에서 1-7로 넘어갈때
+        // MapManager.Instance.OnNextRoomLoaded += AdjustCameraInfluenceTemporarily;
     }
 
     // 다른 방으로 넘어갔을 때 맵의 경계 콜라이더와 카메라가 겹쳐진 채로 시작하는 문제를 처리하는 함수

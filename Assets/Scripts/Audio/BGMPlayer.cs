@@ -17,6 +17,9 @@ public class BGMPlayer : MonoBehaviour
     [SerializeField] bool playAutomatically;
     [SerializeField] float fadeDuration = 0.3f;
 
+    [SerializeField, ReadOnly] AudioClip currentPlayingClip;
+    public AudioClip CurrentPlayingClip { get { return currentPlayingClip; } }
+
     AudioManager audioManager;
     Sequence fadeSeq = null;
     bool readyToFade = true;
@@ -38,6 +41,8 @@ public class BGMPlayer : MonoBehaviour
         {
             PlayBGM(startBGMclip);
         }
+
+        MapManager.Instance.OnNextRoomLoaded += PlayRoomBGM;
     }
 
     void OnVolumeChanged(AudioType type, float value)
@@ -50,6 +55,7 @@ public class BGMPlayer : MonoBehaviour
     [Button("브금 전환 테스트")]
     public void PlayBGM(AudioClip newClip)
     {
+        currentPlayingClip = newClip;
         if (audioSourceA.isPlaying)
         {
             if (audioSourceA.clip != newClip)
@@ -99,10 +105,15 @@ public class BGMPlayer : MonoBehaviour
             });
     }
 
-    // 전투 등이 종료되었을 때 현재 상황에 맞는 기본 브금으로 돌아가기
-    public void PlayDefaultBGM()
+    // SORoom에 정의된 각 방의 기본 BGM 재생
+    public void PlayRoomBGM()
     {
-        // TODO: 맵 데이터에 BGM 저장하여 그거 읽어오도록 구현하면 좋을 것 같은데
-        PlayBGM(startBGMclip);      // 일단 임시로 시작 브금 재생하도록 함.
+        if(MapManager.Instance == null)
+        {
+            Debug.LogError("MapManager instance is Null!");
+            return;
+        }
+        // 같은 브금이 재생중일 때의 예외 처리는 PlayBGM 내부에서 이루어짐
+        PlayBGM(MapManager.Instance.CurrentRoom.defaultBGM);
     }
 }

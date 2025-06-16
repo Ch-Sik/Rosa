@@ -12,6 +12,7 @@ public class SORoom : ScriptableObject
     public int flagIndex;
     public string title;
     public string subTitle;
+    public AudioClip defaultBGM;
 
     public Vector2Int size;
     public Vector2Int offset;

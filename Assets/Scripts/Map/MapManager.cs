@@ -170,6 +170,9 @@ public class MapManager : MonoBehaviour
             ActivateNextScene(loadOp, room);
             SetPlayerPositionAndStates(position, wasClimbing);
 
+            // OnNextRoomLoaded는 currentRoom이 갱신된 이후에 호출
+            OnNextRoomLoaded?.Invoke();
+
             // 페이드아웃 효과 정리
             FadeoutPanel.FadeIn();
         }

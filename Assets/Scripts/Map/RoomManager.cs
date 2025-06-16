@@ -11,6 +11,10 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// 각 방에 하나씩 존재하며 주로 editor-time에 port, safe/danger position 등을 계산하여 roomData에 bake해주는 스크립트
+/// runtime시에는 roomCenterTransform 관리
+/// </summary>
 public class RoomManager : MonoBehaviour
 {
     public bool showGizmos = false;

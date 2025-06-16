@@ -19181,13 +19181,14 @@ MonoBehaviour:
   bgmClip:
   - {fileID: 8300000, guid: 803b2206d578cd9478602d190a79aa00, type: 3}
   - {fileID: 8300000, guid: 2eef0d024c253b0449386e687f904fde, type: 3}
-  doEngageCommunication: 1
+  bgmReturnDelay: 3
+  useIntroCommunication: 1
   bossAI: {fileID: 1152961466}
-  engageCommunicationID: 104
-  engageCommunicationEndDelay: 1
-  doFinishCommunication: 1
-  finishCommunicationID: 105
-  finishCommunicationStartDelay: 4
+  IntroCommunication_ID: 104
+  IntroCommunication_BossActivateDelay: 1
+  useOutroCommunication: 1
+  OutroCommunication_ID: 105
+  OutroCommunication_StartDelay: 4
 --- !u!1001 &1152961464
 PrefabInstance:
   m_ObjectHideFlags: 0
