@@ -28,6 +28,11 @@ public class NpcLookatPlayer : MonoBehaviour
         OnRestore += ResetLookingDir;
     }
 
+    private void OnDestroy()
+    {
+        OnRestore -= ResetLookingDir;
+    }
+
     // Update is called once per frame
     void Update()
     {

@@ -8415,6 +8415,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+--- !u!114 &667698054 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8302710365595097917, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+  m_PrefabInstance: {fileID: 667698053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b3ad9f2e397194baf2d5658d9bd26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &667698055 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2805880738015498677, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+  m_PrefabInstance: {fileID: 667698053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e43e7170fb45b4b81dcd16d0ff55d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &681609631
 Mesh:
   m_ObjectHideFlags: 0
@@ -10664,6 +10686,62 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &929560729
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 929560731}
+  - component: {fileID: 929560730}
+  m_Layer: 0
+  m_Name: BossRoomManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &929560730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929560729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c66e9b3ee709d3b47b46360970a15ba7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bossBlackboard: {fileID: 667698054}
+  bgmClip:
+  - {fileID: 8300000, guid: 803b2206d578cd9478602d190a79aa00, type: 3}
+  - {fileID: 8300000, guid: 2eef0d024c253b0449386e687f904fde, type: 3}
+  bgmReturnDelay: 3
+  useIntroCommunication: 1
+  bossAI: {fileID: 667698055}
+  IntroCommunication_ID: 204
+  IntroCommunication_BossActivateDelay: 1
+  useOutroCommunication: 1
+  OutroCommunication_ID: 205
+  OutroCommunication_StartDelay: 4
+--- !u!4 &929560731
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 929560729}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 13.89876, y: -34.28971, z: -0.02029502}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &932504764
 Mesh:
   m_ObjectHideFlags: 0
@@ -25365,6 +25443,7 @@ SceneRoots:
   - {fileID: 1435128605}
   - {fileID: 353077798}
   - {fileID: 1083460808}
+  - {fileID: 929560731}
   - {fileID: 1037020563}
   - {fileID: 921291666}
   - {fileID: 833133402}
