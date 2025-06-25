@@ -268,6 +268,12 @@ public class MapManager : MonoBehaviour
             return null;
         }
 
+        if (currentRoomManager != null)
+        {
+            Debug.Log($"[MapManager] 현재 씬의 Trigger 비활성화");
+            currentRoomManager.InactiveTriggers();
+        }
+
         //비동기 로드 개시
         Debug.Log($"[MapManager] 다음 방 로드 시작: {room.name}");
         AsyncOperation sceneLoadOperation = SceneManager.LoadSceneAsync(sceneF.SceneName, LoadSceneMode.Additive);
