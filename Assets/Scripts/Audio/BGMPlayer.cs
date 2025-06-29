@@ -39,7 +39,10 @@ public class BGMPlayer : MonoBehaviour
 
         if(playAutomatically)
         {
-            PlayBGM(startBGMclip);
+            if (startBGMclip != null)
+                PlayBGM(startBGMclip);
+            else
+                Debug.LogError("시작 BGM이 설정되어있지 않음");
         }
 
         MapManager.Instance.OnNextRoomLoaded += PlayRoomBGM;
