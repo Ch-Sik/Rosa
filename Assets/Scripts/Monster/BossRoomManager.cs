@@ -20,6 +20,7 @@ public class BossRoomManager : MonoBehaviour
     [SerializeField, FoldoutGroup("보스전 시작 대화"), ShowIf("useIntroCommunication")] 
     PandaBehaviour bossAI;
     [SerializeField, FoldoutGroup("보스전 시작 대화"), ShowIf("useIntroCommunication")]
+    [Tooltip("임의의 대화가 끝났을 때 그 대화가 이 값과 같다면 보스를 활성화함.")]
     int IntroCommunication_ID;
     [Tooltip("대화 끝난 후 몇 초 후에 보스가 움직이도록 할 것인지")]
     [SerializeField, FoldoutGroup("보스전 시작 대화"), ShowIf("useIntroCommunication")]
