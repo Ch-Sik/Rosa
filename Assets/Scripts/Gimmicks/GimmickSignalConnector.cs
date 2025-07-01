@@ -85,8 +85,16 @@ public class GimmickSignalConnector : MonoBehaviour
 
         curIsActive = isActive;
 
-        // 25.05.27) 세이브/로드를 위해 플래그 연동 추가
-        FlagManager.Instance.SetFlag(saveKey, isActive? 1 : 0);
+        // 25.06.29) 플래그 키값 주어지지 않았을 때에도 작동은 되도록 내결함성 개선
+        if (saveKey != null && saveKey.Length > 0)
+        {
+            // 25.05.27) 세이브/로드를 위해 플래그 연동 추가
+            FlagManager.Instance.SetFlag(saveKey, isActive ? 1 : 0);
+        }
+        else
+        {
+            Debug.LogWarning("기믹에 세이브를 위한 키가 할당되어있지 않음! 작동한 기믹이 제대로 저장되지 않을 수 있음");
+        }
 
         if (isActive) OnAct();
         else OffAct();
