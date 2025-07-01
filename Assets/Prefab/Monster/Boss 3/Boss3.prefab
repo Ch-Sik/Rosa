@@ -500,11 +500,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scripts:
-  - {fileID: 4900000, guid: 3b5bb107da6b4874db13bd9628101f84, type: 3}
+  - {fileID: 4900000, guid: 013c54c2b93e13b4fa1f902ca5f8f678, type: 3}
   autoReset: 1
   tickOn: 0
   sourceInfos:
-  - isFoldout: 0
+  - isFoldout: 1
     breakPoints: 
     breakPointStatuses: 
     collapsedLines: 25000000280000002b0000003200000007000000
@@ -574,6 +574,7 @@ MonoBehaviour:
   isSuperArmour: 1
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 0
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -871,7 +872,7 @@ MonoBehaviour:
   recoveryDuration: 0
   superArmourOnRecovery: 1
   currentState: 0
-  downOffset: 5
+  downOffset: 8
 --- !u!114 &4185031067649235076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1245,10 +1246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 7429371615221284302}
-  renderer: {fileID: 7386986288265426974}
   destroyOnAttackEnd: 0
-  startupColor: {r: 1, g: 0.6223974, b: 0, a: 0.69803923}
-  activatedColor: {r: 0.98188305, g: 1, b: 0, a: 1}
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
 --- !u!58 &7429371615221284302
@@ -1474,10 +1472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 4612528516717474916}
-  renderer: {fileID: 144029100541346595}
   destroyOnAttackEnd: 0
-  startupColor: {r: 1, g: 0.6223974, b: 0, a: 0.69803923}
-  activatedColor: {r: 0.98188305, g: 1, b: 0, a: 1}
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
 --- !u!58 &4612528516717474916

@@ -57,7 +57,7 @@ tree("Phase1")
             // '주작' 서브트리
             sequence
                 CheckCooldown("Pheonix", 25.0)            // 주작 사용 가능?
-                RisingPheonix()
+                tree("RisingPheonix")
             // '바위던지기' 서브트리
             sequence
                 CheckCountGEQ("ThrowRock",4)            // 바위던지기 사용 가능?
@@ -86,3 +86,7 @@ tree("Phase1")
 tree("MeleeAttack")
     MeleeAttack()
 
+tree("RisingPheonix")
+    sequence
+        PheonixFlyUp()
+        PheonixRise()
