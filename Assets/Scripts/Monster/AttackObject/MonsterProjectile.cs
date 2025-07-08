@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // TODO: 투사체 회전 옵션 만들기
 public class MonsterProjectile : MonoBehaviour
@@ -11,10 +12,12 @@ public class MonsterProjectile : MonoBehaviour
     private bool useGravity = false;
     [SerializeField, Tooltip("속도 계수. 중력 사용하지 않을 때에만 사용할 것")]
     private float speedScale = 1f;
-    [SerializeField, Tooltip("투사체 스폰 시의 랜덤 회전값. 0 이하면 비활성화")]
+    [SerializeField, Tooltip("발사 시의 회전값 옵션")]
+    ProjectileRotationMode startRotationMode = ProjectileRotationMode.RandomRotation;
+    [SerializeField, ShowIf("startRotationMode", Value = ProjectileRotationMode.RandomRotation), Tooltip("투사체 스폰 시의 랜덤 회전값. 0 이하면 0으로 취급")]
     private float randomRotationOnStart = 0;
     [SerializeField, Tooltip("투사체 랜덤 회전 속도 여부")]
-    private bool useRandomRotation = false;
+    private bool useRandomAngularVelocity = false;
     [SerializeField, Tooltip("랜덤 회전 최대치")]
     private float randomRotationRange = 30f;
 
@@ -33,14 +36,14 @@ public class MonsterProjectile : MonoBehaviour
     [SerializeField]
     protected new Rigidbody2D rigidbody;
     [SerializeField]
-    protected new Collider2D collider;
+    public Collider2D[] colliders;
     [SerializeField]
     private Animator animator;
 
     public virtual void InitProjectile(Vector2 direction)
     {
         // 필요 컴포넌트 설정
-        if(rigidbody == null)
+        if (rigidbody == null)
         {
             rigidbody = GetComponent<Rigidbody2D>();
             Debug.Assert(rigidbody != null, $"{gameObject.name}: Rigidbody2D 레퍼런스가 설정되어있지 않음");
@@ -49,26 +52,42 @@ public class MonsterProjectile : MonoBehaviour
             rigidbody.isKinematic = false;
         else
             rigidbody.isKinematic = true;
-        if(collider == null)
+        if (colliders == null || colliders.Length == 0)
         {
-            collider = GetComponent<Collider2D>();
-            Debug.Assert(collider != null);
+            colliders = GetComponents<Collider2D>();
+            Debug.Assert(colliders != null && colliders.Length > 0, $"{gameObject.name}: Collider2D 레퍼런스가 설정되어있지 않음");
         }
 
         // 만약 콜라이더 꺼져있다면 활성화
-        collider.enabled = true;
+        foreach (var c in colliders)
+            c.enabled = true;
 
         // 기본 속도 설정
         rigidbody.velocity = direction * speedScale;
         // Debug.Log($"투사체 속도:{direction * speedScale}");
+
         // 기본 회전값 설정
-        if(randomRotationOnStart > 0)
+        switch (startRotationMode)
         {
-            transform.rotation = Quaternion.Euler(0, 0, Random.Range(-randomRotationOnStart, randomRotationOnStart));
+            case ProjectileRotationMode.DefaultFixed:
+                // 아무것도 하지 않음
+                break;
+            case ProjectileRotationMode.RandomRotation:
+                if (randomRotationOnStart > 0)
+                {
+                    transform.rotation = Quaternion.Euler(0, 0, Random.Range(-randomRotationOnStart, randomRotationOnStart));
+                }
+                break;
+            case ProjectileRotationMode.UseVelocityDir:
+                transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+                break;
+            default:
+                Debug.LogWarning("투사체 발사시의 회전값 옵션이 올바르지 않은 것 같음");
+                break;
         }
 
         // 회전값 설정
-        if (useRandomRotation)
+        if (useRandomAngularVelocity)
         {
             rigidbody.angularVelocity = Random.Range(-randomRotationRange, randomRotationRange);
         }
@@ -97,7 +116,8 @@ public class MonsterProjectile : MonoBehaviour
                     break;
                 case ProjectileWallHitOption.Disable:
                     rigidbody.velocity = Vector2.zero;
-                    this.collider.enabled = false;
+                    foreach (var c in colliders)
+                        c.enabled = false;
                     StartCoroutine(DisableWithDelay());
                     IEnumerator DisableWithDelay()
                     {
@@ -107,7 +127,8 @@ public class MonsterProjectile : MonoBehaviour
                     break;
                 case ProjectileWallHitOption.Destroy:
                     rigidbody.velocity = Vector2.zero;
-                    this.collider.enabled = false;
+                    foreach (var c in colliders)
+                        c.enabled = false;
                     Disappear(1f);
                     break;
                 case ProjectileWallHitOption.Stop:
@@ -133,7 +154,8 @@ public class MonsterProjectile : MonoBehaviour
         {
             Debug.Log("몬스터 투사체 플레이어와 접촉");
             rigidbody.velocity = Vector2.zero;
-            this.collider.enabled = false;
+            foreach (var c in colliders)
+                c.enabled = false;
             Disappear(1f);
         }
 

@@ -51,7 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 0
   speedScale: 1
-  useRandomRotation: 0
+  startRotationMode: 2
+  randomRotationOnStart: 0
+  useRandomAngularVelocity: 0
   randomRotationRange: 30
   blockingLayers:
     serializedVersion: 2
@@ -61,7 +63,8 @@ MonoBehaviour:
   useLifetime: 1
   lifetime: 10
   rigidbody: {fileID: 590830042199353066}
-  collider: {fileID: 0}
+  colliders:
+  - {fileID: 2134112932470141981}
   animator: {fileID: 6616223299964120055}
 --- !u!61 &2134112932470141981
 BoxCollider2D:
@@ -325,6 +328,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da6199ed90dc22546bd3b89000b0388f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clusterLifetime: 3
+  animator: {fileID: 0}
   projRight: {fileID: 6444338206488600145}
   projUp: {fileID: 5297356842791998113}
   projLeft: {fileID: 6619223604009095311}
@@ -380,7 +385,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 0
   speedScale: 1
-  useRandomRotation: 0
+  startRotationMode: 2
+  randomRotationOnStart: 0
+  useRandomAngularVelocity: 0
   randomRotationRange: 30
   blockingLayers:
     serializedVersion: 2
@@ -390,7 +397,8 @@ MonoBehaviour:
   useLifetime: 1
   lifetime: 10
   rigidbody: {fileID: 6110736289422873741}
-  collider: {fileID: 0}
+  colliders:
+  - {fileID: 7781517644436410321}
   animator: {fileID: 1398130451998877444}
 --- !u!61 &7781517644436410321
 BoxCollider2D:
@@ -604,7 +612,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 0
   speedScale: 1
-  useRandomRotation: 0
+  startRotationMode: 2
+  randomRotationOnStart: 0
+  useRandomAngularVelocity: 0
   randomRotationRange: 30
   blockingLayers:
     serializedVersion: 2
@@ -614,7 +624,8 @@ MonoBehaviour:
   useLifetime: 1
   lifetime: 10
   rigidbody: {fileID: 5267065318502100120}
-  collider: {fileID: 0}
+  colliders:
+  - {fileID: 2856684052338063930}
   animator: {fileID: 2768122876919104358}
 --- !u!61 &2856684052338063930
 BoxCollider2D:
@@ -828,7 +839,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 0
   speedScale: 1
-  useRandomRotation: 0
+  startRotationMode: 2
+  randomRotationOnStart: 0
+  useRandomAngularVelocity: 0
   randomRotationRange: 30
   blockingLayers:
     serializedVersion: 2
@@ -838,7 +851,8 @@ MonoBehaviour:
   useLifetime: 1
   lifetime: 10
   rigidbody: {fileID: 3342212050682816045}
-  collider: {fileID: 0}
+  colliders:
+  - {fileID: 3167578240247843350}
   animator: {fileID: 5253078602051276050}
 --- !u!61 &3167578240247843350
 BoxCollider2D:

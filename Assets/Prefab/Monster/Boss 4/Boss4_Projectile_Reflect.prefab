@@ -50,7 +50,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 0
   speedScale: 1
-  useRandomRotation: 0
+  startRotationMode: 2
+  randomRotationOnStart: 0
+  useRandomAngularVelocity: 0
   randomRotationRange: 30
   blockingLayers:
     serializedVersion: 2
@@ -60,7 +62,8 @@ MonoBehaviour:
   useLifetime: 1
   lifetime: 3
   rigidbody: {fileID: 7916833494928794093}
-  collider: {fileID: 5169987012387767840}
+  colliders:
+  - {fileID: 5169987012387767840}
   animator: {fileID: 0}
 --- !u!114 &4004690672735563679
 MonoBehaviour:

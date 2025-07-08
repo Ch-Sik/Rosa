@@ -81,7 +81,10 @@ public class LastBossEnergyBall : MonsterProjectile
 
                 var damageComponent = collision.gameObject.GetComponent<MonsterDamageReceiver>();
                 damageComponent.GetHitt(damageToBoss, 0);       // 최종보스는 넉백 안받으므로 angle 설정 안해줘도 됨.
-                this.collider.enabled = false;
+                foreach(var col in colliders)
+                {
+                    col.enabled = false;
+                }
                 Disappear(1f);                  // 사라질 연출 고려 1초 대기
             }
         }

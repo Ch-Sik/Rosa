@@ -50,8 +50,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGravity: 1
   speedScale: 1
+  startRotationMode: 2
   randomRotationOnStart: 360
-  useRandomRotation: 1
+  useRandomAngularVelocity: 0
   randomRotationRange: 30
   blockingLayers:
     serializedVersion: 2
@@ -61,7 +62,8 @@ MonoBehaviour:
   useLifetime: 0
   lifetime: 0
   rigidbody: {fileID: 3905194349331104663}
-  collider: {fileID: 8302385115658067482}
+  colliders:
+  - {fileID: 8302385115658067482}
   animator: {fileID: 0}
 --- !u!58 &8302385115658067482
 CircleCollider2D:

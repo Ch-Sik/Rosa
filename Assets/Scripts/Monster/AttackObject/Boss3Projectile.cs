@@ -17,8 +17,11 @@ public class Boss3Projectile : MonsterProjectile
         {
             rigidbody.velocity = Vector2.zero;
             rigidbody.isKinematic = true;
-            collider.enabled = false;
-            collider.excludeLayers = LayerMask.GetMask("Ground");     // 깃털 회수 중에 지형과 부딪혀 공격 판정 해제되는 것 방지
+            foreach(var col in colliders)
+            {
+                col.enabled = false;
+                col.excludeLayers = LayerMask.GetMask("Ground");     // 깃털 회수 중에 지형과 부딪혀 공격 판정 해제되는 것 방지
+            }
         }
 
         if(canDestroyMushroom && (other.tag == "Mushroom"))
@@ -36,10 +39,16 @@ public class Boss3Projectile : MonsterProjectile
         // 돌아가기 시퀀스
         DOTween.Sequence()
         .Append(rigidbody.DOMoveY(rigidbody.position.y + 0.6f, 1f))
-        .InsertCallback(0.1f, () => {
+        .InsertCallback(0.5f, () => {
             // TODO: 깃털 활성화되는 거 시각화 필요
-            collider.enabled = true;
+            foreach(var col in colliders)
+            {
+                col.enabled = true;
+            }
         })
+        .Insert(0.5f, transform.DORotate(new Vector3(0, 0, 360), 0.4f)
+                    .SetRelative().SetEase(Ease.InOutCubic)
+                )
         .AppendInterval(0.2f)
         .Append(rigidbody.DOMove(returnPosition, 0.4f))
         .AppendCallback(()=>{

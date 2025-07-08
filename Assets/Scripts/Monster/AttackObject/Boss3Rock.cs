@@ -13,6 +13,9 @@ public class Boss3Rock : MonsterProjectile
     [Tooltip("플레이어가 '튕겨내기'를 성공시켰을 때 데미지 입힐 컴포넌트")]
     [ReadOnly] public MonsterDamageReceiver damageReceiver;
 
+    [Tooltip("플레이어가 '튕겨내기'를 성공시켰을 때 투사체가 튕겨내어져 돌아가는 시간")]
+    [SerializeField] private float returnTime = 1.8f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,7 +39,7 @@ public class Boss3Rock : MonsterProjectile
 
             // 철두루미쪽으로 돌아가기
             DOTween.Sequence()
-            .Append(rigidbody.DOJump(returnPosition, 2, 1, 1.8f))
+            .Append(rigidbody.DOJump(returnPosition, 2, 1, returnTime))
             .AppendCallback(() => {
                 damageReceiver.GetHitt(1, 0);   // 보스는 어차피 넉백 없으니 attackAngle 무시
                 Disappear(1f);
