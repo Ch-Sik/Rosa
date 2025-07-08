@@ -4321,6 +4321,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6213656083984059022, guid: 64a0727e2464ad84fb24fa2cb1033757, type: 3}
   m_PrefabInstance: {fileID: 544049608}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &617592248
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 617592249}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &617592249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617592248}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.5, y: -2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &625063851
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4460,6 +4491,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
   gimmicks:
   - {fileID: 1021171398}
   signals:
@@ -4477,6 +4510,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
   gimmicks:
   - {fileID: 1021171398}
   signals:
@@ -36311,3 +36346,4 @@ SceneRoots:
   - {fileID: 1105617652}
   - {fileID: 1270436955}
   - {fileID: 1425506886}
+  - {fileID: 617592249}
