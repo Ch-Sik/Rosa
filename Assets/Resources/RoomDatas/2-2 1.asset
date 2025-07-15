@@ -19,6 +19,7 @@ MonoBehaviour:
   flagIndex: 0
   title: 
   subTitle: 
+  defaultBGM: {fileID: 0}
   size: {x: 162, y: 31}
   offset: {x: 4, y: -8}
   topPorts: []
@@ -49,10 +50,4 @@ MonoBehaviour:
     - {x: 4, y: -2}
     - {x: 4, y: -1}
     - {x: 4, y: 0}
-    connectedPorts:
-    - flag: 
-      flagIndex: 0
-      scene:
-        m_SceneAsset: {fileID: 102900000, guid: bf7d68fc2855d624fbcb045b49751664, type: 3}
-        m_SceneName: 2-1
-      index: 0
+    connectedPorts: []
