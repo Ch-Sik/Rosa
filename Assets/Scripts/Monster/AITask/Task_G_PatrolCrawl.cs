@@ -57,7 +57,7 @@ public class Task_G_PatrolCrawl : Task_Base
         rigidbody.isKinematic = true;
 
         // 시작하자마자 방향 설정
-        forwardVector = moveDir.toVector2();
+        forwardVector = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z) * moveDir.toVector2();
         if (GetCurrentDir() != moveDir)
         {
             Flip();
