@@ -175,6 +175,12 @@ public class MapManager : MonoBehaviour
 
             // 페이드아웃 효과 정리
             FadeoutPanel.FadeIn();
+
+            // 25.07.17 추가)
+            // Instantiate 시에 각 '방' 씬에다가 생성되도록 설정
+            yield return new WaitForSeconds(0.1f);
+            Scene nextRoomScene = SceneManager.GetSceneByName(room.name);
+            SceneManager.SetActiveScene(nextRoomScene);
         }
     }
 
