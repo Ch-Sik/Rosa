@@ -4552,7 +4552,6 @@ GameObject:
   m_Component:
   - component: {fileID: 647631860}
   - component: {fileID: 647631861}
-  - component: {fileID: 647631862}
   m_Layer: 0
   m_Name: GimmickManager
   m_TagString: Untagged
@@ -4588,26 +4587,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useSave: 0
-  saveKey: 
-  gimmicks:
-  - {fileID: 1021171398}
-  signals:
-  - {fileID: 1405494926}
-  isActive: 0
---- !u!114 &647631862
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 647631859}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useSave: 0
-  saveKey: 
+  saveKey: 301door1
   gimmicks:
   - {fileID: 1021171398}
   signals:
