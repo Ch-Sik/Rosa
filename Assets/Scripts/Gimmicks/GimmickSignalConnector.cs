@@ -1,3 +1,5 @@
+using Com.LuisPedroFonseca.ProCamera2D;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,14 +8,17 @@ public class GimmickSignalConnector : MonoBehaviour
 {
     [SerializeField] bool useSave;
     [SerializeField] string saveKey;
+    [Tooltip("SignalConnector에서 시네마틱 사용이 ON이더라도, 각 SignalReceiver에서 시네마틱 사용이 설정되어있어야 함")]
+    [SerializeField] bool useCinematic = true;
 
     public List<GimmickSignalReceiver> gimmicks = new List<GimmickSignalReceiver>();
     public List<GimmickSignalSender> signals = new List<GimmickSignalSender>();
 
-    public bool isActive = false;
+    [ReadOnly] public bool isActive = false;
     // true에서 true로 업데이트 될 때 이벤트 발생하는 것을 방지하기 위해,
     // 기존 isActive값 보관
-    private bool curIsActive = false;   
+    private bool curIsActive = false;
+    ProCamera2DCinematics cinematicsComponent;
 
     public void Awake()
     {
@@ -26,6 +31,11 @@ public class GimmickSignalConnector : MonoBehaviour
         // 필수 필드값 초기화
         for (int i = 0; i < signals.Count; i++)
             signals[i]?.SetHandler(this);
+
+        if(useCinematic)
+        {
+            cinematicsComponent = Camera.main.GetComponent<ProCamera2DCinematics>();
+        }
 
         if (useSave)
         {
@@ -100,51 +110,86 @@ public class GimmickSignalConnector : MonoBehaviour
         else OffAct();
     }
 
-    public void OnAct()
+    [Button("Force Gimmicks ON")]
+    private void OnAct()
     {
         for (int i = 0; i < gimmicks.Count; i++)
             gimmicks[i].OnAct();
+        if (useCinematic)
+            ShowCinematic();
     }
 
-    public void OffAct()
+    [Button("Force Gimmicks OFF")]
+    private void OffAct()
     {
         for(int i = 0; i < gimmicks.Count; i++)
             gimmicks[i].OffAct();
     }
 
-    public void ImmediateSignal()
+    private void ShowCinematic()
     {
-        for (int i = 0; i < signals.Count; i++)
-            if (!signals[i].isInteractable)
-            {
-                isActive = false;
-                ImmediateChangeState();
-            }
-
-        isActive = true;
-        ImmediateChangeState();
-    }
-
-    public void ImmediateChangeState()
-    {
-        if (curIsActive == isActive)
+        if(cinematicsComponent == null)
+        {
+            Debug.LogError("ProCamera2DCinematics 컴포넌트를 찾을 수 없음!");
             return;
+        }
 
-        curIsActive = isActive;
+        // 기존 시네마틱 타겟이 있다면 클리어
+        cinematicsComponent.CinematicTargets.Clear();
 
-        if (isActive) ImmediateOnAct();
-        else ImmediateOffAct();
+        // 설정된 SignalReceiver중에 시네마틱 On으로 되어있는 녀석들을 추가
+        foreach(var signalReceiver in gimmicks)
+        {
+            if(signalReceiver.useCinematic)
+                cinematicsComponent.AddCinematicTarget(
+                    signalReceiver.transform,
+                    signalReceiver.cinematicsSetting.easeInDur, 
+                    signalReceiver.cinematicsSetting.holdDur,
+                    signalReceiver.cinematicsSetting.zoomAmount);
+        }
+
+        // 시네마틱 연출 실행
+        cinematicsComponent.Play();
+        Debug.Log("시네마틱 연출 실행됨");
     }
 
-    public void ImmediateOnAct()
-    {
-        for (int i = 0; i < gimmicks.Count; i++)
-            gimmicks[i].ImmediateOnAct();
-    }
+    // 25.07.18)
+    // 불필요한 함수들 주석 처리
+    //public void ImmediateSignal()
+    //{
+    //    for (int i = 0; i < signals.Count; i++)
+    //        if (!signals[i].isInteractable)
+    //        {
+    //            isActive = false;
+    //            ImmediateChangeState();
+    //            return;
+    //        }
 
-    public void ImmediateOffAct()
-    {
-        for (int i = 0; i < gimmicks.Count; i++)
-            gimmicks[i].ImmediateOffAct();
-    }
+    //    isActive = true;
+    //    ImmediateChangeState();
+    //    return;
+    //}
+
+    //public void ImmediateChangeState()
+    //{
+    //    if (curIsActive == isActive)
+    //        return;
+
+    //    curIsActive = isActive;
+
+    //    if (isActive) ImmediateOnAct();
+    //    else ImmediateOffAct();
+    //}
+
+    //public void ImmediateOnAct()
+    //{
+    //    for (int i = 0; i < gimmicks.Count; i++)
+    //        gimmicks[i].ImmediateOnAct();
+    //}
+
+    //public void ImmediateOffAct()
+    //{
+    //    for (int i = 0; i < gimmicks.Count; i++)
+    //        gimmicks[i].ImmediateOffAct();
+    //}
 }

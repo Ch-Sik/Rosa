@@ -48,14 +48,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c24da198ae9fce34c9db5e0e647e3c1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useCinematic: 1
+  cinematicsSetting:
+    easeInDur: 1
+    holdDur: 2
+    zoomAmount: 2
   col: {fileID: 1900680994488096227}
   doorSprite: {fileID: 4697701630394500864}
   openTime: 0.8
   openDelay: 1
-  cinematicsSettings:
-  - easeInDur: 1
-    holdDur: 2
-    zoomAmount: 2
 --- !u!61 &1900680994488096227
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -172,7 +173,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1405156249
-  m_SortingLayer: 1
+  m_SortingLayer: 0
   m_SortingOrder: 49
   m_Sprite: {fileID: 21300000, guid: 71a64f2072f975f42868b9bbe45f4a90, type: 3}
   m_Color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
@@ -256,7 +257,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1405156249
-  m_SortingLayer: 1
+  m_SortingLayer: 0
   m_SortingOrder: 49
   m_Sprite: {fileID: 21300000, guid: dd4804a92840884468e771a432e970d6, type: 3}
   m_Color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
@@ -340,7 +341,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1405156249
-  m_SortingLayer: 1
+  m_SortingLayer: 0
   m_SortingOrder: 48
   m_Sprite: {fileID: 21300000, guid: 9d1cb6a51089c2a4bba8d398d68e43a5, type: 3}
   m_Color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}

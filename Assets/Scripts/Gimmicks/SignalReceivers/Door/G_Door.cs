@@ -20,14 +20,10 @@ public class G_Door : GimmickSignalReceiver
     [SerializeField] private Transform doorSprite;
     [SerializeField] private float openTime;
     [SerializeField] private float openDelay = 1.5f;                                      //Procam2dCinem은 기본 1초의 Easing 타임을 ㅏㄱ짐.
-    GameObject cam;
-    ProCamera2DCinematics cinematics;
-    public List<cinematicsSetting> cinematicsSettings = new List<cinematicsSetting>();
+    
 
     private void Start()
     {
-        cam = Camera.main.gameObject;
-        cinematics = cam.GetComponent<ProCamera2DCinematics>();
         // col.enabled = true;
     }
 
@@ -47,7 +43,6 @@ public class G_Door : GimmickSignalReceiver
 
     public void Open()
     {
-        Cinematic();
         Sequence sq = DOTween.Sequence()
             .AppendInterval(openDelay)
             .Append(doorSprite.DOMoveY(1.5f, openTime * 0.6f).SetRelative(true))
@@ -56,25 +51,6 @@ public class G_Door : GimmickSignalReceiver
                 col.enabled = false;
             })
             .Append(doorSprite.DOMoveY(1f, openTime * 0.4f).SetRelative(true));
-    }
-
-    public void Cinematic()
-    {
-        if (cinematics != null)
-        {
-            while (cinematics.CinematicTargets.Count > 0)
-            {
-                cinematics.CinematicTargets.RemoveAt(0);
-            }
-
-            for (int i = 0; i < cinematicsSettings.Count; i++)
-            {
-                cinematics.AddCinematicTarget(transform, cinematicsSettings[i].easeInDur, cinematicsSettings[i].holdDur, cinematicsSettings[i].zoomAmount);
-            }
-
-            cinematics.Play();
-            //추후에 이벤트 취급으로 하여 플레이어의 조작을 막을 필요가 있음
-        }
     }
 
     public override void ImmediateOnAct()

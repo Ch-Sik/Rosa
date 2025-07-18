@@ -50,6 +50,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c63a2d1faf3cdcc46b23a9c110b4b672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useCinematic: 1
+  cinematicsSetting:
+    easeInDur: 1
+    holdDur: 2
+    zoomAmount: 3
   isActivated: 1
   risingPower: 3
   particles:

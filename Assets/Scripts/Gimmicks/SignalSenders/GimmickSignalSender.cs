@@ -33,12 +33,14 @@ public abstract class GimmickSignalSender : MonoBehaviour
         }
     }
 
-    public void ImmediateSendSignal()
-    {
-        Debug.Log("전송");
-        if (handler != null)
-            handler.ImmediateSignal();
-    }
+    // 25.07.18)
+    // 불필요한 함수 주석 처리
+    //public void ImmediateSendSignal()
+    //{
+    //    Debug.Log("전송");
+    //    if (handler != null)
+    //        handler.ImmediateSignal();
+    //}
 
     public GimmickSignalSenderState GetState()
     {
