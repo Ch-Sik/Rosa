@@ -34,7 +34,7 @@ public class GimmickSignalConnector : MonoBehaviour
 
         if(useCinematic)
         {
-            cinematicsComponent = Camera.main.GetComponent<ProCamera2DCinematics>();
+            cinematicsComponent = Camera.main?.GetComponent<ProCamera2DCinematics>();
         }
 
         if (useSave)

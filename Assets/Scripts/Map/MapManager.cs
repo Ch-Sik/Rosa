@@ -20,15 +20,17 @@ public class MapManager : MonoBehaviour
     {
         get
         {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<MapManager>();
-                if (instance == null)
-                {
-                    GameObject obj = new GameObject();
-                    instance = obj.AddComponent<MapManager>();
-                }
-            }
+            // 25.07.23)
+            // instance가 null이면 그냥 null을 리턴해야 함
+            //if (instance == null)
+            //{
+            //    instance = FindObjectOfType<MapManager>();
+            //    if (instance == null)
+            //    {
+            //        GameObject obj = new GameObject();
+            //        instance = obj.AddComponent<MapManager>();
+            //    }
+            //}
             return instance;
         }
     }
@@ -65,6 +67,7 @@ public class MapManager : MonoBehaviour
 
     private void Awake()
     {
+        instance = this;
         LoadAllRooms();
     }
 

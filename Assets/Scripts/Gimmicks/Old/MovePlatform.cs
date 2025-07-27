@@ -173,8 +173,8 @@ public class MovePlatform : MonoBehaviour
 
     private void Start()
     {
-        cam = Camera.main.gameObject;
-        cinematics = cam.GetComponent<ProCamera2DCinematics>();
+        cam = Camera.main?.gameObject;
+        cinematics = cam?.GetComponent<ProCamera2DCinematics>();
 
         transform.position = points[0].position;
 

@@ -26,7 +26,7 @@ public class TerrainShadowGenerator : MonoBehaviour
 
 #if UNITY_EDITOR
     [Button("타일맵 이미지를 가공하여 그림자 이미지 생성")]
-    void GenerateShadowImage()
+    public void GenerateShadowImage()
     {
         startTime = DateTime.Now;
 

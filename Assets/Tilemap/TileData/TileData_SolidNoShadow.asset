@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46f39c0f27c33284fa30436cda780e70, type: 3}
-  m_Name: basicTileData
+  m_Name: TileData_SolidNoShadow
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -22,14 +22,6 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   tiles:
-  - {fileID: 11400000, guid: 26c01fdd23631714bbc5621fea0d64f4, type: 2}
-  - {fileID: 11400000, guid: 6a28e1640e8e0b44f95a5bab452cb0cd, type: 2}
-  - {fileID: 11400000, guid: ecf9ba79695e12747abfa6b3a09c09e4, type: 2}
-  - {fileID: 11400000, guid: 338bad0c1ffa1bc4a82acb70e6d76a2f, type: 2}
-  - {fileID: 11400000, guid: ca1f5b6f2ce1fdd409d27a63d183fdf3, type: 2}
-  - {fileID: 11400000, guid: cd79b4f0a459e0548ba9a54089129aa2, type: 2}
-  - {fileID: 11400000, guid: 9ad88adc1df35ea4781e27ad7cdc46c4, type: 2}
-  - {fileID: 11400000, guid: e9b819e0763f5404e88f8aaa0b1c9f55, type: 2}
   - {fileID: 11400000, guid: 5a4bf29f584c89641a7178a2243456a1, type: 2}
   - {fileID: 11400000, guid: dfdddce80295e184e8770667a67ac3a8, type: 2}
   - {fileID: 11400000, guid: ca45a2c87ccb6584fa8d8b8c32502be8, type: 2}
@@ -39,10 +31,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4138ec4e67a065d4d9f5ac44f979310c, type: 2}
   - {fileID: 11400000, guid: ba38b5d751adbc240a499e141df8e00e, type: 2}
   - {fileID: 11400000, guid: 0d9a89ceb034d7249bcf209fb983f577, type: 2}
-  - {fileID: 11400000, guid: 38b91f36029bed94198e6c66f028c888, type: 2}
-  - {fileID: 11400000, guid: f3d37cc2e63ecb1448e35a10f3bec05f, type: 2}
-  - {fileID: 11400000, guid: 77911152088edcd4eac7c6fdcc7fcaa8, type: 2}
-  - {fileID: 11400000, guid: 8f480524b07a6e342ba2b8179db866c9, type: 2}
-  - {fileID: 11400000, guid: 662a46e7aff7a864486d8a03f19c04d9, type: 2}
-  - {fileID: 11400000, guid: 42488f953b4f96b468ee2f4b5f00abf0, type: 2}
-  category: 1
+  category: 2

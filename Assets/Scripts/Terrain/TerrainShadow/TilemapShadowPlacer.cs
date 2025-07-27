@@ -16,7 +16,7 @@ public class TilemapShadowPlacer : MonoBehaviour
     [ReadOnly] public string filePath;
 
     [Button("생성된 이미지를 씬에 배치")]
-    void PlaceShadowSprite()
+    public void PlaceShadowSprite()
     {
         // 스프라이트 가져오기 및 설정 조정
         filePath = shadowGenerator.totalPath;

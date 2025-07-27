@@ -46,7 +46,7 @@ public class RoomManager : MonoBehaviour
 
     private void Awake()
     {
-        MapManager.Instance.currentRoomManager = this;
+        // MapManager.Instance.currentRoomManager = this;
     }
 
     private void Start()

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46f39c0f27c33284fa30436cda780e70, type: 3}
-  m_Name: noMagicTile
+  m_Name: TileData_Solid
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -22,7 +22,12 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   tiles:
-  - {fileID: 11400000, guid: 08ec2a681605efc429175c21d2f11b82, type: 2}
-  - {fileID: 11400000, guid: eef17f2f0c4dd8f4fa02de1a48c2ce51, type: 2}
-  - {fileID: 11400000, guid: eba6240b0ead53849a3a7c7e23f7a3ea, type: 2}
-  category: 2
+  - {fileID: 11400000, guid: 26c01fdd23631714bbc5621fea0d64f4, type: 2}
+  - {fileID: 11400000, guid: 6a28e1640e8e0b44f95a5bab452cb0cd, type: 2}
+  - {fileID: 11400000, guid: ecf9ba79695e12747abfa6b3a09c09e4, type: 2}
+  - {fileID: 11400000, guid: 338bad0c1ffa1bc4a82acb70e6d76a2f, type: 2}
+  - {fileID: 11400000, guid: ca1f5b6f2ce1fdd409d27a63d183fdf3, type: 2}
+  - {fileID: 11400000, guid: cd79b4f0a459e0548ba9a54089129aa2, type: 2}
+  - {fileID: 11400000, guid: 9ad88adc1df35ea4781e27ad7cdc46c4, type: 2}
+  - {fileID: 11400000, guid: e9b819e0763f5404e88f8aaa0b1c9f55, type: 2}
+  category: 1

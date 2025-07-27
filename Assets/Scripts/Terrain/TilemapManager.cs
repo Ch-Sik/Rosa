@@ -21,7 +21,8 @@ public class TilemapManager : SerializedMonoBehaviour
         InitTileData();
     }
 
-    void InitTileData()
+    [Button("Data From Tiles 수동 갱신")]
+    public void InitTileData()
     {
         // 딕셔너리가 컴파일타임에 값 할당이 안되서 우선 리스트에 데이터를 담아두고 런타임에 이를 옮겨야 함.
         dataFromTiles = new Dictionary<TileBase, TileData>();
@@ -32,6 +33,7 @@ public class TilemapManager : SerializedMonoBehaviour
                 dataFromTiles.Add(tile, tileData);
             }
         }
+        Debug.Log("TileData Dictionary 갱신됨");
     }
 
     public TileData GetTileData(TileBase tile)

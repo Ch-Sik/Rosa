@@ -12,6 +12,7 @@ public class RoomExtractor : MonoBehaviour
 {
     public Tilemap tilemap;
     public TilemapManager tilemapManager;
+    public bool refreshTileDataInTilemapManager;
 
     public int pixelPerTile = 16;                                      //타일의 픽셀 크기 (16x16)
     //public float pixelsPerUnit = 16f;                                   //스프라이트의 Pixel Per Unit 값
@@ -53,6 +54,10 @@ public class RoomExtractor : MonoBehaviour
     {
         // 작업 수행 전 타일맵 바운드 축소
         tilemap.CompressBounds();
+
+        // TilemapManager의 TileData dictionary 갱신
+        if (refreshTileDataInTilemapManager)
+            tilemapManager.InitTileData();
 
         // 타일맵 바운드 가져오기
         bounds = tilemap.cellBounds;
