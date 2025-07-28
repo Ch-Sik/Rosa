@@ -153,6 +153,11 @@ public class RoomManager : MonoBehaviour
         tri.GetComponent<RoomPortObject>().SetRoomToPort(roomPort.connectedPorts, roomPort.direction);
     }
 
+    public void InactiveTriggers()
+    {
+        this.triggerParent.SetActive(false);
+    }
+
     [Button]
     public void ClearRoom()
     {
