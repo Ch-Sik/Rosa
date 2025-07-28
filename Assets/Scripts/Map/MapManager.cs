@@ -142,6 +142,7 @@ public class MapManager : MonoBehaviour
         Enter(nextRoom, frontOfPortPosition);
     }
 
+    [Button("Debug: 다른 방으로 강제 이동")]
     public void Enter(SORoom room, Vector2 position)
     {
         StartCoroutine(EnterCoroutine());
