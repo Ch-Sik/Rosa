@@ -51,19 +51,9 @@ public class MapManager : MonoBehaviour
     public SORoom CurrentRoom { get { return currentRoom; } }
     //현재 열린 씬
     private SORoom currentRoom;
-
-    public List<SORoom> oldRooms = new List<SORoom>();
-    public TextMeshProUGUI chapterDebugUI;
-    // 25.05.04) 디버그용 좌표 출력 UI 제거
-    // public TextMeshProUGUI positionDebugUI;
     [ShowInInspector] private Dictionary<string, SORoom> rooms;
 
     public Action OnNextRoomLoaded;
-
-    private void Update()
-    {
-        // positionDebugUI.text = $"{player.position.x.ToString("F1")} , {player.position.y.ToString("F1")}";
-    }
 
     private void Awake()
     {
