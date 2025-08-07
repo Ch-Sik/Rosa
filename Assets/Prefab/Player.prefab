@@ -1297,7 +1297,6 @@ GameObject:
   - component: {fileID: 3646023609308882471}
   - component: {fileID: 397363777454347669}
   - component: {fileID: 7610741375092814335}
-  - component: {fileID: 8652223635564073729}
   m_Layer: 9
   m_Name: GroundCheck
   m_TagString: Untagged
@@ -1405,25 +1404,6 @@ ParentConstraint:
   m_Sources:
   - sourceTransform: {fileID: 5262888439632956338}
     weight: 1
---- !u!114 &8652223635564073729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8915614022770787503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bb653881bf67344a9676248a6b01b70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 5124247239520633849}
-  playerDamageReceiver: {fileID: 7376123347842105714}
-  hitEffects: {fileID: 1811383673813836875}
-  layer_attackable:
-    serializedVersion: 2
-    m_Bits: 8388608
-  hitEffectDuration: 1
 --- !u!1001 &6192842209190001376
 PrefabInstance:
   m_ObjectHideFlags: 0
