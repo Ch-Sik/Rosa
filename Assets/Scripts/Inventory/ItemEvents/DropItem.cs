@@ -13,7 +13,9 @@ public class DropItem : MonoBehaviour
 
     public void AddItem()
     {
-        ItemToastMessage.Instance.AddItem(item, quantity);
+        // 25.08.08) 아이템 획득 UI가 특수 아이템획득 시에만 표시되도록 변경
+        if(item.rarity != ItemRarity.normal)
+            ItemToastMessage.Instance.AddItem(item, quantity);
 
         Destroy(gameObject);
     }
