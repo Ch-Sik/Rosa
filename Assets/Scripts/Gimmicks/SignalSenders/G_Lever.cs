@@ -40,7 +40,7 @@ public class G_Lever : GimmickSignalSender
 
         if (isOnce)
         {
-            interactiveObject.canUse = false;
+            interactiveObject.canInteract = false;
             interactiveObject.OnInactive();
         }
 
@@ -90,7 +90,7 @@ public class G_Lever : GimmickSignalSender
         if (value == true && isOnce)
         {
             isInteractable = false;
-            interactiveObject.canUse = false;
+            interactiveObject.canInteract = false;
             interactiveObject.OnInactive();
         }
     }

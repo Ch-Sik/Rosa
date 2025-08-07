@@ -8,7 +8,9 @@ public class InteractiveObject : MonoBehaviour
 {
     public bool showGizmos = false;
 
-    public bool canUse = true;
+    [FormerlySerializedAs("canUse")]
+    public bool canInteract = true;
+    public bool autoInteract = false;
 
     Collider2D col;
     public UnityEvent function;
@@ -16,7 +18,7 @@ public class InteractiveObject : MonoBehaviour
 
     private void Start()
     {
-        interactiveKeyUI.SetActive(false);
+        interactiveKeyUI?.SetActive(false);
 
         col = GetComponent<Collider2D>();
         col.isTrigger = true;
@@ -39,7 +41,7 @@ public class InteractiveObject : MonoBehaviour
 
     public void SetEvent()
     {
-        if (!canUse)
+        if (!canInteract)
             return;
 
         PlayerRef.Instance.controller.ResetInteraction();
@@ -48,36 +50,52 @@ public class InteractiveObject : MonoBehaviour
 
     private void OnActive() 
     {
-        interactiveKeyUI.SetActive(true);
+        interactiveKeyUI?.SetActive(true);
     }
 
     public void OnInactive()
     {
-        interactiveKeyUI.SetActive(false);
+        interactiveKeyUI?.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!canUse)
+        if (!canInteract)
             return;
 
         if (collision.tag != "Player")
             return;
 
         OnActive();
-        SetEvent();
+        if (autoInteract)
+        {
+            // auto interact라면 function 바로 실행
+            function.Invoke();
+        }
+        else
+        {
+            // 아니면 플레이어 '상호작용' 입력 이벤트에 function 예약
+            SetEvent();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!canUse)
+        if (!canInteract)
             return;
 
         if (collision.tag != "Player")
             return;
 
         OnInactive();
-        RemoveEvent();
+        if (autoInteract)
+        {
+            // Do nothing
+        }
+        else
+        {
+            RemoveEvent();
+        }
     }
 
     private void OnDrawGizmos()

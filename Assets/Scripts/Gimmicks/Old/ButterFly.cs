@@ -77,7 +77,7 @@ public class Butterfly : MonoBehaviour
     public void SetInteractive()
     {
         if (isCaged)
-            interactiveObject.canUse = false;
+            interactiveObject.canInteract = false;
     }
 
     private void InitPosition()
@@ -98,7 +98,7 @@ public class Butterfly : MonoBehaviour
 
     public void Release()
     {
-        interactiveObject.canUse = true;
+        interactiveObject.canInteract = true;
 
     }
 
