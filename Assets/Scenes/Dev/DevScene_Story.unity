@@ -1050,9 +1050,6 @@ MonoBehaviour:
   drawStartpointGizmo: 0
   startPoint: {x: 0, y: 0, z: 0}
   startRoom: {fileID: 11400000, guid: 6856910e83052554bb94afff13a046e9, type: 2}
-  oldRooms: []
-  chapterDebugUI: {fileID: 0}
-  fadePanel: {fileID: 0}
 --- !u!114 &57329816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1101,7 +1098,6 @@ MonoBehaviour:
   useProjectSave: 1
   pathName: SaveFile
   flagPathName: Flag
-  mapPathName: Maps
   playerPathName: Player
   optionPathName: Option
 --- !u!43 &57590204
@@ -13925,13 +13921,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bossBlackboard: {fileID: 2078816005}
   bgmClip: []
-  doEngageCommunication: 1
+  bgmReturnDelay: 3
+  useIntroCommunication: 0
   bossAI: {fileID: 2078816004}
-  engageCommunicationID: 104
-  engageCommunicationEndDelay: 1
-  doFinishCommunication: 1
-  finishCommunicationID: 105
-  finishCommunicationStartDelay: 2
+  IntroCommunication_ID: 0
+  IntroCommunication_BossActivateDelay: 0
+  useOutroCommunication: 0
+  OutroCommunication_ID: 0
+  OutroCommunication_StartDelay: 0
 --- !u!4 &576410174
 Transform:
   m_ObjectHideFlags: 0
@@ -95051,6 +95048,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 0}
   tilemapManager: {fileID: 0}
+  refreshTileDataInTilemapManager: 0
   pixelPerTile: 16
   folderPath: Assets/TilemapSprite
   useCustomFilename: 0
@@ -95306,10 +95304,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6751770703288354382, guid: 13f06774b8c840f4cb6e542759e5cc9e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 13f06774b8c840f4cb6e542759e5cc9e, type: 3}
 --- !u!43 &1855600154
 Mesh:

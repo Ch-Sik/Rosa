@@ -10099,6 +10099,7 @@ MonoBehaviour:
   useAutoCinematic: 1
   type: 0
   waitDelay: 0
+  startDelay: 0
   showGizmos: 0
   points: []
   speed: 0.5
@@ -10106,6 +10107,11 @@ MonoBehaviour:
   onWait: 0
   isReverse: 0
   curReverseState: 0
+  breachHeight: 3
+  breachUpTime: 1
+  breachDownTime: 0.7
+  timeBetweenDown: 1
+  timeBetweenBreach: 1
   cinematicsSettings: []
 --- !u!4 &570994744 stripped
 Transform:
@@ -10759,6 +10765,7 @@ MonoBehaviour:
   useAutoCinematic: 1
   type: 0
   waitDelay: 0
+  startDelay: 0
   showGizmos: 0
   points: []
   speed: 0.5
@@ -10766,6 +10773,11 @@ MonoBehaviour:
   onWait: 0
   isReverse: 0
   curReverseState: 0
+  breachHeight: 3
+  breachUpTime: 1
+  breachDownTime: 0.7
+  timeBetweenDown: 1
+  timeBetweenBreach: 1
   cinematicsSettings: []
 --- !u!1001 &649246948
 PrefabInstance:
@@ -13284,13 +13296,10 @@ MonoBehaviour:
   map: {fileID: 11400000, guid: 5b04adb3897b80946b4b67a819695b8c, type: 2}
   player: {fileID: 2062834429}
   cam: {fileID: 821021866}
-  room: {fileID: 0}
-  startPoint: {fileID: 1012768785}
+  currentRoomManager: {fileID: 0}
+  drawStartpointGizmo: 0
+  startPoint: {x: 0, y: 0, z: 0}
   startRoom: {fileID: 11400000, guid: 8a42244a2d2c80f4fa9ee79fa8318dac, type: 2}
-  currentRoom: {fileID: 0}
-  oldRooms: []
-  chapter: {fileID: 1744366450}
-  position: {fileID: 1693875824}
 --- !u!1001 &842103279
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14522,7 +14531,7 @@ SpriteRenderer:
   m_Size: {x: 25.6, y: 6.4}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1083460808
@@ -94922,6 +94931,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 1156996454}
   signals:
@@ -94954,6 +94966,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 133086332}
   signals:
@@ -94971,6 +94986,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 287382975}
   signals:
@@ -94988,6 +95006,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 2122038152}
   signals:
@@ -95005,6 +95026,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 904369991}
   - {fileID: 45866402}

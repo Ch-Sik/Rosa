@@ -100,7 +100,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  interactiveKeySprite: {fileID: 6743582066697181364}
+  interactiveKeyUI: {fileID: 0}
 --- !u!212 &6962069512704063568
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa71b197bdfddba48b4899c54da064a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isTrue: 0
   item: {fileID: 11400000, guid: 2223d203f5e56a04a8ccd103fcec0e2b, type: 2}
   code: 0
   quantity: 1

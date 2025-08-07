@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.23944432, g: 0.28491014, b: 0.33044663, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1019,13 +1019,10 @@ MonoBehaviour:
   map: {fileID: 11400000, guid: 0051b36d8ddf12b49b2911a837cba031, type: 2}
   player: {fileID: 5262888440015344438}
   cam: {fileID: 210034125}
-  room: {fileID: 0}
-  startPoint: {fileID: 2061483551}
+  currentRoomManager: {fileID: 0}
+  drawStartpointGizmo: 0
+  startPoint: {x: 0, y: 0, z: 0}
   startRoom: {fileID: 11400000, guid: 1afa4a78fe950bc44a5dc199c78ae7f7, type: 2}
-  currentRoom: {fileID: 0}
-  oldRooms: []
-  chapter: {fileID: 1838996231}
-  position: {fileID: 805628655}
 --- !u!114 &1018947828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1038,7 +1035,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f7649215f3c6ef42a3855b4ef42322a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flagSO: {fileID: 11400000, guid: 68973b75cd843464e9ab5da8ee745626, type: 2}
 --- !u!114 &1018947829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1055,7 +1051,6 @@ MonoBehaviour:
   useProjectSave: 1
   pathName: SaveFile
   flagPathName: Flag
-  mapPathName: Maps
   playerPathName: Player
   optionPathName: Option
 --- !u!1 &1047433009
@@ -2292,6 +2287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 0}
   tilemapManager: {fileID: 0}
+  refreshTileDataInTilemapManager: 0
   pixelPerTile: 16
   folderPath: Assets/TilemapSprite
   useCustomFilename: 0

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class InteractiveObject : MonoBehaviour
 {
@@ -11,11 +12,11 @@ public class InteractiveObject : MonoBehaviour
 
     Collider2D col;
     public UnityEvent function;
-    public GameObject interactiveKey;
+    public GameObject interactiveKeyUI;
 
     private void Start()
     {
-        interactiveKey.SetActive(false);
+        interactiveKeyUI.SetActive(false);
 
         col = GetComponent<Collider2D>();
         col.isTrigger = true;
@@ -47,12 +48,12 @@ public class InteractiveObject : MonoBehaviour
 
     private void OnActive() 
     {
-        interactiveKey.SetActive(true);
+        interactiveKeyUI.SetActive(true);
     }
 
     public void OnInactive()
     {
-        interactiveKey.SetActive(false);
+        interactiveKeyUI.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

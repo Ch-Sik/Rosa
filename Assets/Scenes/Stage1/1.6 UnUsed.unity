@@ -1660,6 +1660,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 342854043}
   signals:
@@ -1677,6 +1680,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 314955363}
   signals:
@@ -1694,6 +1700,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 665539338}
   signals:
@@ -84067,6 +84076,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2618d3616bd1dd3429cbd7642e4ee4f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useCinematic: 1
+  cinematicsSetting:
+    easeInDur: 0
+    holdDur: 0
+    zoomAmount: 0
   mp: {fileID: 691576204}
 --- !u!1001 &600625139
 PrefabInstance:
@@ -90350,6 +90364,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useSave: 0
+  saveKey: 
+  useCinematic: 1
   gimmicks:
   - {fileID: 593456572}
   signals:

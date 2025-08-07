@@ -7818,6 +7818,7 @@ MonoBehaviour:
   useAutoCinematic: 1
   type: 0
   waitDelay: 0
+  startDelay: 0
   showGizmos: 0
   points:
   - {fileID: 274284761563013357}
@@ -7827,6 +7828,11 @@ MonoBehaviour:
   onWait: 0
   isReverse: 0
   curReverseState: 0
+  breachHeight: 3
+  breachUpTime: 1
+  breachDownTime: 0.7
+  timeBetweenDown: 1
+  timeBetweenBreach: 1
   cinematicsSettings: []
 --- !u!1001 &2517140805304949886
 PrefabInstance:
@@ -8031,7 +8037,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8070248769361624792, guid: db4b1d3955783154eb3a615bd5a14f67, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: db4b1d3955783154eb3a615bd5a14f67, type: 3}
 --- !u!4 &6929759385633948501
 Transform:
