@@ -1,13 +1,16 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "Item_0", menuName = "Inventory/Item")]
 public class SO_Item : ScriptableObject
 {
-    public bool isStackable = true;
-    public ItemCode itemCode;
-    public Sprite itemImage;
     public string itemName;
+    [FormerlySerializedAs("itemCode")]
+    public ItemCode code;
+    [FormerlySerializedAs("itemImage")]
+    public Sprite sprite;
     public ItemRarity rarity;
+    public bool isStackable = true;
     [TextArea(0, 10)] public string itemDescription;
 }
 

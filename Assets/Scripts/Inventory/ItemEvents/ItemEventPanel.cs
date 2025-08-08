@@ -15,7 +15,7 @@ public class ItemEventPanel : MonoBehaviour
     [Button]
     public void SetData(SO_Item item, int quantity)
     {
-        dataImage.sprite = item.itemImage;
+        dataImage.sprite = item.sprite;
         dataText.text = item.itemName;
 
         if (quantity == 1)

@@ -56,7 +56,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5343948873282582934}
         m_TargetAssemblyTypeName: DropItem, Assembly-CSharp
-        m_MethodName: AddItem
+        m_MethodName: OnInteraction
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -80,7 +80,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: 2223d203f5e56a04a8ccd103fcec0e2b, type: 2}
-  code: 0
   quantity: 1
 --- !u!212 &6962069512704063568
 SpriteRenderer:
@@ -180,7 +179,7 @@ GameObject:
   - component: {fileID: 7138799914075545231}
   - component: {fileID: 6743582066697181364}
   m_Layer: 0
-  m_Name: Interaction Key Sprite
+  m_Name: Interaction Key UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

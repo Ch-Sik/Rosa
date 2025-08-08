@@ -8,14 +8,15 @@ using UnityEngine;
 public class DropItem : MonoBehaviour
 {
     public SO_Item item;
-    [HideInInspector] public ItemCode code;
     [Min(1)] public int quantity = 1;
 
-    public void AddItem()
+    public void OnInteraction()
     {
         // 25.08.08) 아이템 획득 UI가 특수 아이템획득 시에만 표시되도록 변경
         if(item.rarity != ItemRarity.normal)
             ItemToastMessage.Instance.AddItem(item, quantity);
+
+        InventoryController.Instance.AddItem(item.code, quantity);
 
         Destroy(gameObject);
     }

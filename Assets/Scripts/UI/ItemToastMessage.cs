@@ -34,7 +34,7 @@ public class ItemToastMessage : MonoBehaviour
     [Button]
     public void AddItem(SO_Item item, int quantity)
     {
-        itemImage.sprite = item.itemImage;
+        itemImage.sprite = item.sprite;
         itemName.text = item.itemName;
         itemQuantity.text = $"x{quantity}";
 

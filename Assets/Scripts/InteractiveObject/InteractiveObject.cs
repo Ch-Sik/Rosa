@@ -10,6 +10,7 @@ public class InteractiveObject : MonoBehaviour
 
     [FormerlySerializedAs("canUse")]
     public bool canInteract = true;
+    [Tooltip("유효거리 내로 다가오면 자동으로 상호작용 진행 여부")]
     public bool autoInteract = false;
 
     Collider2D col;
