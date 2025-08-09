@@ -795,7 +795,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e113cb5f79775d4e97cc058691c5b5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryUI: {fileID: 0}
   eventController: {fileID: 0}
 --- !u!4 &1079587441
 Transform:
@@ -2025,6 +2024,22 @@ PrefabInstance:
     - target: {fileID: 3304661309547001356, guid: 23b4c8f4e260d754e96c25b2b0dc712c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7855161928197896393, guid: 23b4c8f4e260d754e96c25b2b0dc712c, type: 3}
+      propertyPath: AM_Action.m_Id
+      value: 27062767-782b-480c-8e53-dcbb108735a6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7855161928197896393, guid: 23b4c8f4e260d754e96c25b2b0dc712c, type: 3}
+      propertyPath: AM_Action.m_Name
+      value: AM_Action
+      objectReference: {fileID: 0}
+    - target: {fileID: 7855161928197896393, guid: 23b4c8f4e260d754e96c25b2b0dc712c, type: 3}
+      propertyPath: AM_MoveGlide.m_Id
+      value: b67f1f0f-b312-41b2-85dc-7b82d70145a6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7855161928197896393, guid: 23b4c8f4e260d754e96c25b2b0dc712c, type: 3}
+      propertyPath: AM_MoveGlide.m_Name
+      value: AM_Move Glide
       objectReference: {fileID: 0}
     - target: {fileID: 7855161928197896393, guid: 23b4c8f4e260d754e96c25b2b0dc712c, type: 3}
       propertyPath: AM_ActionDisabled.m_Id

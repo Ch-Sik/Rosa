@@ -64,6 +64,7 @@ public class PlayerController : MonoBehaviour
         inputManager.AM_MoveDefault.FindAction("Gliding").canceled += OnCancleGliding;
         inputManager.AM_MoveDefault.FindAction("Dash").performed += OnDash;
         inputManager.AM_MoveDefault.FindAction("Mushroom").performed += OnMushroom;
+        inputManager.AM_MoveDefault.FindAction("Attack").performed += OnAttack;
 
 
         // Climb 액션맵 바인딩
@@ -137,6 +138,11 @@ public class PlayerController : MonoBehaviour
     {
         // Debug.Log("Mushroom");
         playerMove.MakeMushroom();
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        playerMove.TryAttack();
     }
 
     public void OnClimbMove(InputAction.CallbackContext context)

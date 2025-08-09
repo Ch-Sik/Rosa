@@ -139,6 +139,12 @@ public class PlayerMovement : MonoBehaviour
     [FoldoutGroup("버섯 점프 관련")]
     [SerializeField] VfxPlayer mushJumpVfx;
 
+    // 공격 관련
+    [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 활성화 여부")]
+    [SerializeField, ReadOnly] bool attackEnabled = false;
+
+
 
     // 슈퍼대시 관련
     //[FoldoutGroup("슈퍼대쉬(오이) 관련")]
@@ -955,6 +961,18 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("버섯 설치 성공");
     }
 
+    #endregion
+
+    #region 공격 관련
+    public void TryAttack()
+    {
+        if (isGliding)
+        {
+            Debug.Log("활강 중에는 공격을 할 수 없음!");
+            return;
+        }
+        Debug.Log("Attack!");
+    }
     #endregion
 
     #region 그라운드 체크. PlayerGroundCheck.cs에서 참조
