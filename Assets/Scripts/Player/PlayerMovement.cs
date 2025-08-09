@@ -824,52 +824,8 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
 
-    /*
-    #region 슈퍼대시 관련
-    public void PrepareSuperDash()
-    {
-        Debug.Log("Prepare Super Dash");
-        rb.gravityScale = 0;
-        rb.velocity = Vector2.zero;
-        moveVector = Vector2.zero;
-        playerControl.SetMoveState(PlayerMoveState.SUPERDASH_READY);
-    }
-
-    public void LaunchSuperDash(LR direction)
-    {
-        Debug.Log("Launch Super Dash");
-        isDoingSuperDash = true;
-        LookAt2DLocal(direction.toVector2());
-        playerControl.SetMoveState(PlayerMoveState.SUPERDASH);
-        moveVector = direction.toVector2() * superDashSpeed;
-    }
-
-    public void CancelSuperDashBeforeLaunch()
-    {
-        Debug.Log("Cancel Super Dash Before Launch");
-        rb.gravityScale = gravityScale;
-        playerControl.SetMoveState(PlayerMoveState.DEFAULT);
-    }
-
-    public void CancelSuperDashAfterLaunch()
-    {
-        Debug.Log("Cancel Super Dash After Launch");
-        isDoingSuperDash = false;
-        rb.gravityScale = gravityScale;
-        moveVector = Vector2.zero;
-        playerControl.SetMoveState(PlayerMoveState.DEFAULT);
-    }
-
-    public void OnMoveDuringSuperDash(LR direction)
-    {
-        if (facingDirection == direction) return;
-        CancelSuperDashAfterLaunch();
-    }
-    #endregion
-    */
-
     #region 활강 관련
-    internal void Gliding()
+    internal void StartGliding()
     {
         if (!glidingEnabled)
         {

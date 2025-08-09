@@ -34,19 +34,12 @@ public class InputManager : MonoBehaviour
 
     // InputAction Asset
     public InputActionAsset _inputAsset;
+
     // Input ActionMaps
     // 움직임 관련
     public InputActionMap AM_MoveDefault;
     public InputActionMap AM_MoveClimb;
-    public InputActionMap AM_MoveSuperDashReady;
-    public InputActionMap AM_MoveSuperDash;
-    public InputActionMap AM_Gliding;
-    /*
-    // 액션 관련
-    public InputActionMap AM_ActionDefault;
-    public InputActionMap AM_ActionMagicReady;
-    public InputActionMap AM_ActionDisabled;
-    */
+    
     // UI 조작 관련
     public InputActionMap AM_UiInGame;
     public InputActionMap AM_UiDialogue;
@@ -71,15 +64,9 @@ public class InputManager : MonoBehaviour
         {
             AM_MoveDefault = _inputAsset.FindActionMap("MoveDefault");
             AM_MoveClimb = _inputAsset.FindActionMap("Climb");
-            AM_MoveSuperDashReady = _inputAsset.FindActionMap("SuperDashReady");
-            AM_MoveSuperDash = _inputAsset.FindActionMap("SuperDash");
+            //AM_MoveSuperDashReady = _inputAsset.FindActionMap("SuperDashReady");
+            //AM_MoveSuperDash = _inputAsset.FindActionMap("SuperDash");
         }
-        // 공격, 마법 등 액션 관련 Action Map
-        //{
-        //    AM_ActionDefault = _inputAsset.FindActionMap("ActionDefault");
-        //    AM_ActionMagicReady = _inputAsset.FindActionMap("MagicReady");
-        //    AM_ActionDisabled = _inputAsset.FindActionMap("ActionDisable");
-        //}
         // 일시정지, 메뉴, 상점 등 UI 관련 Action Map
         {
             AM_UiInGame = _inputAsset.FindActionMap("InGame");
@@ -108,12 +95,6 @@ public class InputManager : MonoBehaviour
                 case PlayerMoveState.CLIMBING:
                     AM_MoveClimb.Disable();
                     break;
-                case PlayerMoveState.SUPERDASH_READY:
-                    AM_MoveSuperDashReady.Disable();
-                    break;
-                case PlayerMoveState.SUPERDASH:
-                    AM_MoveSuperDash.Disable();
-                    break;
                 case PlayerMoveState.NO_MOVE:
                     break;
                 // 아무것도 안함
@@ -126,12 +107,6 @@ public class InputManager : MonoBehaviour
                 break;
             case PlayerMoveState.CLIMBING:
                 AM_MoveClimb.Enable();
-                break;
-            case PlayerMoveState.SUPERDASH_READY:
-                AM_MoveSuperDashReady.Enable();
-                break;
-            case PlayerMoveState.SUPERDASH:
-                AM_MoveSuperDash.Enable();
                 break;
             case PlayerMoveState.NO_MOVE:
                 // 아무것도 안함

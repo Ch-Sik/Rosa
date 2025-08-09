@@ -12,7 +12,6 @@ using UnityEngine.Animations;
 public class PlayerDamageInflictor : MonoBehaviour
 {
     public Rigidbody2D rb;                          // 플레이어 몸체의 rigidbody. 플레이어가 아래로 내려가는 중일 때에만 적을 밟을 수 있게 하기 위해 사용.
-    PlayerCombat playerCombat;                      //PlayerCombat과 이벤트 전달을 위해 직접 연결
     [SerializeField] PlayerDamageReceiver playerDamageReceiver;
     [SerializeField] ObjectPool hitEffects;                       // 공격 적중시의 이펙트 풀
 

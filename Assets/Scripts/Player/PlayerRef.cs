@@ -28,12 +28,10 @@ public class PlayerRef : MonoBehaviour
     public PlayerState state;
     public PlayerController controller;
     public PlayerMovement movement;
-    // public PlayerMagic magic;
-    public PlayerCombat combat;
     public PlayerGrabCube grabCube;
     
     public PlayerAnimation animation;
-    public PlayerSound sound;
+    public PlayerAudio sound;
 
     public Rigidbody2D rb;
     public BoxCollider2D col;
@@ -50,10 +48,9 @@ public class PlayerRef : MonoBehaviour
         if(controller == null) controller = GetComponent<PlayerController>();
         if(movement == null) movement = GetComponent<PlayerMovement>();
         // if(magic == null) magic = GetComponent<PlayerMagic>();
-        if(combat == null) combat = GetComponent<PlayerCombat>();
         if (grabCube == null) grabCube = GetComponentInChildren<PlayerGrabCube>();
         if(animation == null) animation = GetComponent<PlayerAnimation>();
-        if(sound == null) sound = GetComponent<PlayerSound>();
+        if(sound == null) sound = GetComponent<PlayerAudio>();
 
         if(rb == null) rb = GetComponent<Rigidbody2D>();
         if(col == null) col = GetComponent<BoxCollider2D>();
