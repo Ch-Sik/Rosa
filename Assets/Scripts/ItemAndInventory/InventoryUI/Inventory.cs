@@ -41,5 +41,9 @@ public class Inventory
         bag[itemCode] -= quantity;
         return true;
     }
-    public int GetQuantity(ItemCode itemCode) { return bag[itemCode]; }
+    public int GetQuantity(ItemCode itemCode) { 
+        if(bag.ContainsKey(itemCode))
+            return bag[itemCode];
+        else return 0;
+    }
 }

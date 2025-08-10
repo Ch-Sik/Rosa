@@ -975,11 +975,38 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("활강 중에는 공격을 할 수 없음!");
             return;
         }
-        if(!attackEnabled)
+        if (!attackEnabled)
         {
             Debug.Log("공격 미습득");
             return;
         }
+        // 현재 '공격 아이템' 가지고 있는 갯수 체크
+        if (InventoryController.Instance == null)
+        {
+            Debug.LogError("InventoryController 인스턴스가 존재하지 않아 공격 아이템 소지 여부를 확인할 수 없음");
+            return;
+        }
+        // 만약 가지고 있지 않다면 '공격 실패' 수행
+        if (InventoryController.Instance.GetQuantity(ItemCode.AttackItem) == 0)
+        {
+            FailAttack();
+        }
+        // 가지고 있다면 '진짜 공격' 수행하고 공격 아이템 1개 소모
+        else
+        {
+            ExecuteAttack();
+            InventoryController.Instance.RemoveItem(ItemCode.AttackItem, 1);
+        }
+    }
+
+    private void FailAttack()
+    {
+        // TODO: 공격 실패하는 연출 추가
+        Debug.Log("공격 아이템 갯수가 모자라서 공격 실패");
+    }
+
+    private void ExecuteAttack()
+    {
         // 현재 바라보는 방향에 따라 투사체 발사 방향 결정
         Vector2 attackDir = transform.localScale.toLR().toVector2();
         // 투사체 생성 및 발사
@@ -987,7 +1014,6 @@ public class PlayerMovement : MonoBehaviour
         attackInstance.GetComponent<ProjectileBase>().InitProjectile(attackDir);
 
         Debug.Log("투사체 생성 및 발사 수행");
-        
     }
     #endregion
 

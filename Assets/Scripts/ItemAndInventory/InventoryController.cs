@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Inventory 클래스와 InventoryUI 클래스를 총괄하며, 아이템을 추가하고 뺄 수 있는 클래스
+/// Inventory 클래스의 생명주기를 관리하고 그 레퍼런스를 싱글톤으로 전역으로 접근 가능하게 함.
+/// 세이브/로드 시의 초기화도 관여
 /// </summary>
-
-//InventoryController가 굳이 싱글턴일 이유는 없다. 나중에 싱글턴으로 객체리퍼를 담아놔도 좋을 것이지만, 테스트를 위해 싱글턴 처리했다.
 public class InventoryController : MonoBehaviour
 {
+    #region 싱글턴
     private static InventoryController instance;
     public static InventoryController Instance
     {
@@ -36,18 +36,37 @@ public class InventoryController : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
+    #endregion
 
-    //아이템 획득 알림 스크립트
-    public ItemEventController eventController;
     //인벤토리 데이터
-    public Inventory inventory;
+    private Inventory inventory;
 
-    //인벤토리 오픈 시퀀스 데이터
-    private Sequence openEvent;
+    // 아이템 증감 이벤트
+    public delegate void ItemEvent(ItemCode itemCode, int quantity);
+    public ItemEvent OnItemAdded;
+    public ItemEvent OnItemRemoved;
+
+    public void AddItem(ItemCode itemCode, int quantity)
+    {
+        inventory.AddItem(itemCode, quantity);
+        OnItemAdded?.Invoke(itemCode, quantity);
+    }
+
+    public void RemoveItem(ItemCode itemCode, int quantity)
+    {
+        inventory.RemoveItem(itemCode, quantity);
+        OnItemRemoved?.Invoke(itemCode, quantity);
+    }
+
+    public int GetQuantity(ItemCode itemCode)
+    {
+        return inventory.GetQuantity(itemCode);
+    }
 
     private void Start()
     {
-        LoadInventory();
+        // TODO: 인벤토리 세이브로드 시스템과 연계되도록 구현
+        // LoadInventory();
     }
 
     //저장된 데이터로부터 인벤토리를 로드함
@@ -60,22 +79,4 @@ public class InventoryController : MonoBehaviour
          */
         inventory = new Inventory();
     }
-
-    [Button]
-    public void AddItem(ItemCode itemCode, int quantity)
-    { 
-        inventory.AddItem(itemCode, quantity);
-    }
-
-    [Button]
-    public bool RemoveItem(ItemCode itemCode, int quantity)
-    {
-        if (!inventory.RemoveItem(itemCode, quantity))
-            return false;
-
-        return true;
-    }
-
-    public void OnOpen() { }
-    public void OnClose() { }
 }
