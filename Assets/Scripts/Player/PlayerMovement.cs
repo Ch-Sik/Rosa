@@ -144,6 +144,10 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("공격 활성화 여부")]
     [SerializeField, ReadOnly] bool attackEnabled = false;
 
+    [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 투사체 프리팹")]
+    [SerializeField] GameObject attackPrefab;
+
 
 
     // 슈퍼대시 관련
@@ -971,7 +975,19 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("활강 중에는 공격을 할 수 없음!");
             return;
         }
-        Debug.Log("Attack!");
+        if(!attackEnabled)
+        {
+            Debug.Log("공격 미습득");
+            return;
+        }
+        // 현재 바라보는 방향에 따라 투사체 발사 방향 결정
+        Vector2 attackDir = transform.localScale.toLR().toVector2();
+        // 투사체 생성 및 발사
+        GameObject attackInstance = Instantiate(attackPrefab, transform.position, Quaternion.identity);
+        attackInstance.GetComponent<ProjectileBase>().InitProjectile(attackDir);
+
+        Debug.Log("투사체 생성 및 발사 수행");
+        
     }
     #endregion
 

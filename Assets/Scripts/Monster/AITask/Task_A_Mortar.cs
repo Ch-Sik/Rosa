@@ -81,7 +81,7 @@ public class Task_A_Mortar : Task_A_Base
         GameObject instance = Instantiate(projectilePrefab, muzzle.position, Quaternion.identity);
 
         // 투사체 초기화 & 속도 설정
-        MonsterProjectile component = instance.GetComponent<MonsterProjectile>();
+        ProjectileBase component = instance.GetComponent<ProjectileBase>();
         component.InitProjectile(launchVector);
     }
 }

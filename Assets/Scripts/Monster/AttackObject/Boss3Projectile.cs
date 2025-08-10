@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boss3Projectile : MonsterProjectile
+public class Boss3Projectile : ProjectileBase
 {
     // 벽에 박혀있는지 여부
     [SerializeField] private bool isStuck = false;

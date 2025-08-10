@@ -55,7 +55,7 @@ public class Task_A_Boss4OrbAttack : Task_A_Base
         {
             // 각 구체 별로 발사 벡터 계산 후 발사
             Vector2 launchDir = (enemyPosition - (Vector2)orb.transform.position).normalized;
-            orb.GetComponent<MonsterProjectile>().InitProjectile(launchDir * projectileSpeed);
+            orb.GetComponent<ProjectileBase>().InitProjectile(launchDir * projectileSpeed);
         }
     }
 

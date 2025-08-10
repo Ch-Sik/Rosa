@@ -6,10 +6,10 @@ public class LastBossCrossBladeCluster : MonoBehaviour
 {
     [SerializeField] float clusterLifetime = 3f;
     [SerializeField] Animator animator = null;
-    [SerializeField] MonsterProjectile projRight;
-    [SerializeField] MonsterProjectile projUp;
-    [SerializeField] MonsterProjectile projLeft;
-    [SerializeField] MonsterProjectile projDown;
+    [SerializeField] ProjectileBase projRight;
+    [SerializeField] ProjectileBase projUp;
+    [SerializeField] ProjectileBase projLeft;
+    [SerializeField] ProjectileBase projDown;
 
     private void Start()
     {

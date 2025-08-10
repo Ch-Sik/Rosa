@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LastBossEnergyBall : MonsterProjectile
+public class LastBossEnergyBall : ProjectileBase
 {
     [SerializeField] int damageToPlayer = 1;
     [SerializeField] int damageToBoss = 1;

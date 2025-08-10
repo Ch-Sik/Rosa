@@ -146,7 +146,7 @@ public class Task_A_MultipleMortar : Task_A_Base
             int randomIndex = Random.Range(0, projectilePrefabs.Length);
             projectile = Instantiate(projectilePrefabs[randomIndex], muzzle.position, Quaternion.identity);
 
-            projectile.GetComponent<MonsterProjectile>().InitProjectile(launchVectors[i]);
+            projectile.GetComponent<ProjectileBase>().InitProjectile(launchVectors[i]);
         }
     }
 

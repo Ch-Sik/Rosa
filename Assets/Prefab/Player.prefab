@@ -747,7 +747,6 @@ MonoBehaviour:
   state: {fileID: 0}
   controller: {fileID: 0}
   movement: {fileID: 0}
-  combat: {fileID: 0}
   grabCube: {fileID: 0}
   animation: {fileID: 0}
   sound: {fileID: 0}
@@ -784,7 +783,6 @@ MonoBehaviour:
   currentCubeActionState: 0
   inputAsset: {fileID: 0}
   playerMove: {fileID: 0}
-  playerCombat: {fileID: 0}
   rb: {fileID: 0}
   playerAnim: {fileID: 0}
   playerRef: {fileID: 0}
@@ -833,6 +831,8 @@ MonoBehaviour:
   mushJumpMoveSpeed: 7
   mushJumpPower: 20
   mushJumpVfx: {fileID: 4547567644446938227}
+  attackEnabled: 0
+  attackPrefab: {fileID: 1385914800207387471, guid: d297966778a84a5479ef144573c5625e, type: 3}
   knockbackStrength: 0.001
   grabSpeedCoef: 0.5
   glidingEnabled: 0

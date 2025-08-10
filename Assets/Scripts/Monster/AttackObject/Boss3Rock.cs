@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-public class Boss3Rock : MonsterProjectile
+public class Boss3Rock : ProjectileBase
 {
     [SerializeField] private LayerMask mushroomLayer;
 

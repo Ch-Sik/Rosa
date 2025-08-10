@@ -99,7 +99,7 @@ public abstract class Task_A_MultipleProjectile : Task_A_Base
         for(int i=0; i<projectileCount; i++)
         {
             GameObject instance = Instantiate(projectilePrefab, muzzlePoints[i], Quaternion.identity);
-            instance.GetComponent<MonsterProjectile>().InitProjectile(launchDir[i] * projectileSpeed);
+            instance.GetComponent<ProjectileBase>().InitProjectile(launchDir[i] * projectileSpeed);
         }
     }
 

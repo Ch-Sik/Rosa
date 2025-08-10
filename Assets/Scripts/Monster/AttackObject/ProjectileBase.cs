@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 // TODO: 투사체 회전 옵션 만들기
-public class MonsterProjectile : MonoBehaviour
+public class ProjectileBase : MonoBehaviour
 {
     [SerializeField, Tooltip("중력 영향 여부")]
     private bool useGravity = false;
@@ -21,8 +21,10 @@ public class MonsterProjectile : MonoBehaviour
     [SerializeField, Tooltip("랜덤 회전 최대치")]
     private float randomRotationRange = 30f;
 
+    [SerializeField, Tooltip("투사체가 공격 목표로 하는 레이어")]
+    private LayerMask targetLayers = 0b00000_00000_00000_00100_00000;           // 기본값: 7:"Player"
     [SerializeField, Tooltip("투사체와 충돌하여 가로막힐 레이어")]
-    private LayerMask blockingLayers = 656384;          // 기본값: "Ground", "Cube", "PlayerGrab"
+    private LayerMask blockingLayers = 0b00000_10100_00001_00000_00000;         // 기본값: 19:"PlayerGrab", 17:"Cube", 10:"Ground", 
     [SerializeField, Tooltip("버섯 파괴 가능?")]
     protected bool canDestroyMushroom = false;
     [SerializeField, Tooltip("투사체가 벽에 닿았을 때 행동 설정")]
@@ -106,8 +108,18 @@ public class MonsterProjectile : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collider)
     {
+        // 목표에 닿았다면
+        if(( (1 << collider.gameObject.layer) & targetLayers) != 0)
+        {
+            Debug.Log($"투사체가 목표 {collider.gameObject.name}에 접촉");
+            rigidbody.velocity = Vector2.zero;
+            foreach (var c in colliders)
+                c.enabled = false;
+            Disappear(1f);
+        }
+
         // 벽에 닿았다면
-        if((1 << collider.gameObject.layer & blockingLayers) != 0)
+        if(( (1 << collider.gameObject.layer) & blockingLayers) != 0)
         {
             switch(onWallHit)
             {
@@ -148,15 +160,6 @@ public class MonsterProjectile : MonoBehaviour
                     Debug.LogError("잘못된 ProjectileWallHitOption!");
                     break;
             }
-        }
-
-        if(collider.gameObject.CompareTag("Player"))
-        {
-            Debug.Log("몬스터 투사체 플레이어와 접촉");
-            rigidbody.velocity = Vector2.zero;
-            foreach (var c in colliders)
-                c.enabled = false;
-            Disappear(1f);
         }
 
         if(canDestroyMushroom && (collider.tag == "Mushroom"))
