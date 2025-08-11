@@ -20,17 +20,15 @@ public class MapManager : MonoBehaviour
     {
         get
         {
-            // 25.07.23)
-            // instance가 null이면 그냥 null을 리턴해야 함
-            //if (instance == null)
-            //{
-            //    instance = FindObjectOfType<MapManager>();
-            //    if (instance == null)
-            //    {
-            //        GameObject obj = new GameObject();
-            //        instance = obj.AddComponent<MapManager>();
-            //    }
-            //}
+            if (instance == null)
+            {
+                instance = FindObjectOfType<MapManager>();
+                if (instance == null)
+                {
+                    GameObject obj = new GameObject();
+                    instance = obj.AddComponent<MapManager>();
+                }
+            }
             return instance;
         }
     }
@@ -38,6 +36,7 @@ public class MapManager : MonoBehaviour
     public MapDataSO map;
     public Transform player;
     public ProCamera2D cam;
+    public CameraCollisionHandler camCollisionHandler;
     //시작할 씬
     public RoomManager currentRoomManager;
     // 25.04.29) startPoint를 transform 대신 수치 입력의 Vector3로 대체
@@ -51,13 +50,22 @@ public class MapManager : MonoBehaviour
     public SORoom CurrentRoom { get { return currentRoom; } }
     //현재 열린 씬
     private SORoom currentRoom;
+
+    public List<SORoom> oldRooms = new List<SORoom>();
+    public TextMeshProUGUI chapterDebugUI;
+    // 25.05.04) 디버그용 좌표 출력 UI 제거
+    // public TextMeshProUGUI positionDebugUI;
     [ShowInInspector] private Dictionary<string, SORoom> rooms;
 
     public Action OnNextRoomLoaded;
 
+    private void Update()
+    {
+        // positionDebugUI.text = $"{player.position.x.ToString("F1")} , {player.position.y.ToString("F1")}";
+    }
+
     private void Awake()
     {
-        instance = this;
         LoadAllRooms();
     }
 
@@ -121,6 +129,47 @@ public class MapManager : MonoBehaviour
 
         return room;
     }
+    #region Cam Management
+
+    private float influenceX;
+    private float influenceY;
+
+    public void ResetCamInfluence()
+    {
+        var targets = cam.CameraTargets;
+        if (targets.Count == 0) return;
+        for (int i = 0; i < targets.Count; i++)
+            if (targets[i].TargetTransform.gameObject == PlayerRef.Instance.gameObject)
+            {
+                Debug.Log($"[Map Manager] 플레이어 발견 및, 초기화 완료");
+                //현재 수치 저장 및 0으로 초기화
+                influenceX = targets[i].TargetInfluenceV;
+                influenceY = targets[i].TargetInfluenceH;
+
+                targets[i].TargetInfluenceV = 0;
+                targets[i].TargetInfluenceH = 0;
+
+                return;
+            }
+    }
+
+    public void RestoreCamInfluence()
+    {
+        var targets = cam.CameraTargets;
+        if (targets.Count == 0) return;
+        for (int i = 0; i < targets.Count; i++)
+            if (targets[i].TargetTransform.gameObject == PlayerRef.Instance.gameObject)
+            {
+                Debug.Log($"[Map Manager] 플레이어 발견 및, 복원 완료");
+                //저장된 수치로 복원
+                targets[i].TargetInfluenceV = influenceX;
+                targets[i].TargetInfluenceH = influenceY;
+
+                return;
+            }
+    }
+
+    #endregion
 
     #region Room Events
     public void Enter(PortDirection direction, List<ConnectedPort> ports)
@@ -132,7 +181,6 @@ public class MapManager : MonoBehaviour
         Enter(nextRoom, frontOfPortPosition);
     }
 
-    [Button("Debug: 다른 방으로 강제 이동")]
     public void Enter(SORoom room, Vector2 position)
     {
         StartCoroutine(EnterCoroutine());
@@ -169,12 +217,6 @@ public class MapManager : MonoBehaviour
 
             // 페이드아웃 효과 정리
             FadeoutPanel.FadeIn();
-
-            // 25.07.17 추가)
-            // Instantiate 시에 각 '방' 씬에다가 생성되도록 설정
-            yield return new WaitForSeconds(0.1f);
-            Scene nextRoomScene = SceneManager.GetSceneByName(room.name);
-            SceneManager.SetActiveScene(nextRoomScene);
         }
     }
 
@@ -276,7 +318,9 @@ public class MapManager : MonoBehaviour
 
         //비동기 로드 개시
         Debug.Log($"[MapManager] 다음 방 로드 시작: {room.name}");
+        ResetCamInfluence();
         AsyncOperation sceneLoadOperation = SceneManager.LoadSceneAsync(sceneF.SceneName, LoadSceneMode.Additive);
+        RestoreCamInfluence();
         sceneLoadOperation.allowSceneActivation = false;
 
         return sceneLoadOperation;
@@ -298,6 +342,7 @@ public class MapManager : MonoBehaviour
     private void SetPlayerPositionAndStates(Vector2 playerPosition, bool isClimbing)
     {
         player.position = playerPosition;
+
         cam.MoveCameraInstantlyToPosition(playerPosition);
         if (isClimbing)
             PlayerRef.Instance.movement.wallClimbEnabled = true;

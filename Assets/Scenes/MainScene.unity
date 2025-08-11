@@ -275,10 +275,13 @@ MonoBehaviour:
   map: {fileID: 11400000, guid: 0051b36d8ddf12b49b2911a837cba031, type: 2}
   player: {fileID: 5262888440015344438}
   cam: {fileID: 210034125}
+  camCollisionHandler: {fileID: 210034126}
   currentRoomManager: {fileID: 0}
   drawStartpointGizmo: 0
   startPoint: {x: 15, y: -2, z: 0}
   startRoom: {fileID: 11400000, guid: 2e54b6a3986115b4f8114830236b3049, type: 2}
+  oldRooms: []
+  chapterDebugUI: {fileID: 0}
 --- !u!4 &179386181
 Transform:
   m_ObjectHideFlags: 0
@@ -407,7 +410,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0867eb3d2336d2f4eb2b41402eb121cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proCamera2D: {fileID: 0}
+  showGizmos: 0
+  minDistance: 0.5
+  maxDistance: 10
+  moveSmoothness: 0.1
+  proCameraComponent: {fileID: 210034125}
 --- !u!4 &210034133 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7250734593268076291, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
@@ -795,7 +802,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e113cb5f79775d4e97cc058691c5b5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventController: {fileID: 0}
 --- !u!4 &1079587441
 Transform:
   m_ObjectHideFlags: 0
