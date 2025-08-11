@@ -939,6 +939,12 @@ public class PlayerMovement : MonoBehaviour
 
     public void MakeMushroom()
     {
+        if(!mushJumpEnabled)
+        {
+            Debug.Log("버섯 점프 미습득");
+            return;
+        }
+
         Debug.Log("버섯 설치 시도...");
         // 플레이어 정면 방향으로 offset만큼 이동한 포인트.
         Vector2 frontPosition = (Vector2)(transform.position) + facingDirection.toVector2() * mushroomOffset;
