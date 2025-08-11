@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e518f5c5409f3424c90641ad374330bc, type: 3}
-  m_Name: Item04
+  m_Name: AttackItem
   m_EditorClassIdentifier: 
-  isStackable: 1
-  itemCode: 3
-  itemImage: {fileID: 351883130, guid: 6bfbabaf876c33d4588eb6a7ef716c68, type: 3}
-  itemName: "\uD14C\uC2A4\uD2B8 \uC544\uC774\uD15C 4"
+  itemName: "\uB098\uBB47\uAC00\uC9C0"
+  code: 2
+  sprite: {fileID: 764524218, guid: 6bfbabaf876c33d4588eb6a7ef716c68, type: 3}
   rarity: 0
-  itemDescription: "\uD14C\uC2A4\uD2B8 \uC544\uC774\uD15C 4 \uC785\uB2C8\uB2E4!"
+  maxQuantity: 1
+  itemDescription: "\uACF5\uACA9\uC6A9 \uC544\uC774\uD15C. \uB098\uBB47\uAC00\uC9C0\uB77C\uB294
+    \uC774\uB984\uC740 \uC784\uC2DC."

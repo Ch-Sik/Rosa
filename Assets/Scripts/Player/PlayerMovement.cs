@@ -987,7 +987,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         // 만약 가지고 있지 않다면 '공격 실패' 수행
-        if (InventoryController.Instance.GetQuantity(ItemCode.AttackItem) == 0)
+        if (InventoryController.Instance.GetQuantity(ItemCode.AttackItem) <= 0)
         {
             FailAttack();
         }
@@ -1014,6 +1014,12 @@ public class PlayerMovement : MonoBehaviour
         attackInstance.GetComponent<ProjectileBase>().InitProjectile(attackDir);
 
         Debug.Log("투사체 생성 및 발사 수행");
+    }
+
+    [Button]
+    void EnableAttack()
+    {
+        attackEnabled = true;
     }
     #endregion
 

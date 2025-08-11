@@ -10,7 +10,7 @@ public class SO_Item : ScriptableObject
     [FormerlySerializedAs("itemImage")]
     public Sprite sprite;
     public ItemRarity rarity;
-    public bool isStackable = true;
+    public int maxQuantity = 1;
     [TextArea(0, 10)] public string itemDescription;
 }
 
