@@ -13,6 +13,10 @@ PrefabInstance:
       value: PlayerAttackProjectile Variant
       objectReference: {fileID: 0}
     - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: speedScale
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: targetLayers.m_Bits
       value: 8388608
       objectReference: {fileID: 0}
