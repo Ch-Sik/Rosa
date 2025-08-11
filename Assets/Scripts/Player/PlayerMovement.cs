@@ -148,6 +148,9 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("공격 투사체 프리팹")]
     [SerializeField] GameObject attackPrefab;
 
+    [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 투사체 발사 위치")]
+    [SerializeField] Transform attackMuzzle;
 
 
     // 슈퍼대시 관련
@@ -1010,7 +1013,7 @@ public class PlayerMovement : MonoBehaviour
         // 현재 바라보는 방향에 따라 투사체 발사 방향 결정
         Vector2 attackDir = transform.localScale.toLR().toVector2();
         // 투사체 생성 및 발사
-        GameObject attackInstance = Instantiate(attackPrefab, transform.position, Quaternion.identity);
+        GameObject attackInstance = Instantiate(attackPrefab, attackMuzzle.position, Quaternion.identity);
         attackInstance.GetComponent<ProjectileBase>().InitProjectile(attackDir);
 
         Debug.Log("투사체 생성 및 발사 수행");
