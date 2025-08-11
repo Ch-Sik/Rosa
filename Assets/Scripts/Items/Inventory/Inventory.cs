@@ -30,12 +30,19 @@ public class Inventory
         this.bag = data;
     }
 
-    public void AddItem(ItemCode itemCode, int quantity) { bag[itemCode] += quantity; }
+    public void AddItem(ItemCode itemCode, int quantity) { 
+        bag[itemCode] += quantity; 
+    }
+
+    public void SetItem(ItemCode itemCode, int quantity)
+    {
+        bag[itemCode] = quantity;
+    }
 
     // 제거할 아이템이 없다면 false 리턴, 정상적으로 제거하면 true 리턴
     public bool RemoveItem(ItemCode itemCode, int quantity)
     {
-        if ((bag[itemCode] -= quantity) < 0)
+        if ((bag[itemCode] - quantity) < 0)
             return false;
 
         bag[itemCode] -= quantity;
