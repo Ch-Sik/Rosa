@@ -13,7 +13,7 @@ public class CameraCollisionHandler : MonoBehaviour
 
     public ProCamera2D proCameraComponent;
 
-    void Start()
+    void Awake()
     {
         MapManager.Instance.OnNextRoomLoaded += AdjustCameraPosition;
     }
@@ -22,6 +22,9 @@ public class CameraCollisionHandler : MonoBehaviour
     public void AdjustCameraPosition()
     {
         Debug.Log("AdjustCameraPosition 호출됨");
+
+        // 일단 카메라를 플레이어 위치로 옮김
+        proCameraComponent.MoveCameraInstantlyToPosition(PlayerRef.Instance.transform.position);
 
         Vector3 moveDir = Vector3.zero;
         int hitCount = 0;

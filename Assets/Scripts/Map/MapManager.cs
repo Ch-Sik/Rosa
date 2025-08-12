@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
-using Com.LuisPedroFonseca.ProCamera2D;
 using TMPro;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
@@ -35,9 +34,6 @@ public class MapManager : MonoBehaviour
 
     public MapDataSO map;
     public Transform player;
-    public ProCamera2D cam;
-    public CameraCollisionHandler camCollisionHandler;
-    //시작할 씬
     public RoomManager currentRoomManager;
     // 25.04.29) startPoint를 transform 대신 수치 입력의 Vector3로 대체
     public bool drawStartpointGizmo;
@@ -129,47 +125,6 @@ public class MapManager : MonoBehaviour
 
         return room;
     }
-    #region Cam Management
-
-    private float influenceX;
-    private float influenceY;
-
-    public void ResetCamInfluence()
-    {
-        var targets = cam.CameraTargets;
-        if (targets.Count == 0) return;
-        for (int i = 0; i < targets.Count; i++)
-            if (targets[i].TargetTransform.gameObject == PlayerRef.Instance.gameObject)
-            {
-                Debug.Log($"[Map Manager] 플레이어 발견 및, 초기화 완료");
-                //현재 수치 저장 및 0으로 초기화
-                influenceX = targets[i].TargetInfluenceV;
-                influenceY = targets[i].TargetInfluenceH;
-
-                targets[i].TargetInfluenceV = 0;
-                targets[i].TargetInfluenceH = 0;
-
-                return;
-            }
-    }
-
-    public void RestoreCamInfluence()
-    {
-        var targets = cam.CameraTargets;
-        if (targets.Count == 0) return;
-        for (int i = 0; i < targets.Count; i++)
-            if (targets[i].TargetTransform.gameObject == PlayerRef.Instance.gameObject)
-            {
-                Debug.Log($"[Map Manager] 플레이어 발견 및, 복원 완료");
-                //저장된 수치로 복원
-                targets[i].TargetInfluenceV = influenceX;
-                targets[i].TargetInfluenceH = influenceY;
-
-                return;
-            }
-    }
-
-    #endregion
 
     #region Room Events
     public void Enter(PortDirection direction, List<ConnectedPort> ports)
@@ -187,12 +142,22 @@ public class MapManager : MonoBehaviour
         IEnumerator EnterCoroutine()
         {
             bool wasClimbing;
-            PreservePlayerStates(out wasClimbing);
+            AsyncOperation loadOp;
             float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
+            bool hasOldSceneToUnload = false;
+            Scene oldScene = SceneManager.GetActiveScene(); // Scene이 notNullable이라서 일단 아무 값이나 집어넣기;
 
-            AsyncOperation loadOp = StartLoadNextScene(room);
+            // 필요한 정보 수집
+            if (currentRoom != null)
+            {
+                hasOldSceneToUnload = true;
+                oldScene = SceneManager.GetSceneByName(currentRoom.scene);
+            }
 
-            // 페이드아웃 효과 없었다면 적용
+            // 페이드아웃 시작하기 전부터 다음 씬 로드 시작
+            loadOp = StartLoadNextScene(room);
+
+            // 페이드아웃 효과 적용
             if (!FadeoutPanel.isFadeOutActivated)
             {
                 FadeoutPanel.Fadeout();
@@ -203,16 +168,38 @@ public class MapManager : MonoBehaviour
                 Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
             }
 
-            while (loadOp.progress < 0.9f)                  // 로딩 시간 필요하면 더 기다리고
-            {
-                Debug.Log($"씬 로딩 중: {loadOp.progress * 100}%");
-                yield return null;
-            }
-            yield return new WaitForSeconds(0.5f);          // 로딩 마무리 될 때까지 기다림
-            ActivateNextScene(loadOp, room);
-            SetPlayerPositionAndStates(position, wasClimbing);
+            // 플레이어 상태 백업 & 잠시 치워둠.
+            MakePlayerReadyForTeleport(out wasClimbing);
 
-            // OnNextRoomLoaded는 currentRoom이 갱신된 이후에 호출
+            // 페이드아웃과 플레이어 치워두기가 끝나면 다음 씬 활성화 허용
+            AllowActivateNextScene(loadOp);
+
+            yield return loadOp;
+
+            // Unload 시작하고 기존 씬이 확실히 inactivate될 때까지 대기
+            // 참고: Unity에서 제공하는 SceneManagement의 한계로 load와 unload는 동시에 수행 불가능
+            //      그래서 다음 씬이 Activate된 이후 unload가 이어서 수행되게 됨.
+            if (hasOldSceneToUnload)
+            {
+                StartUnloadOldScene(oldScene);
+                while (oldScene.isLoaded)
+                {
+                    Debug.Log("기존 씬 언로드 시작될 때까지 대기중");
+                    yield return 0;
+                }
+            }
+
+            // currentRoom 갱신
+            currentRoom = room;
+
+            // 플레이어 상태 복구 & 위치 설정
+            RestorePlayerStates(wasClimbing);
+            player.position = position;
+
+            // 확실히 기존 씬 언로드 되도록 & 플레이어 착지 모션 안보이도록 추가로 기다림
+            yield return new WaitForSeconds(0.7f);
+
+            // OnNextRoomLoaded는 씬 전환이 이루어진 이후에 호출
             OnNextRoomLoaded?.Invoke();
 
             // 페이드아웃 효과 정리
@@ -222,8 +209,6 @@ public class MapManager : MonoBehaviour
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
     {
-        SORoom room = null;
-
         string flag = "";
         string sceneName = "";
 
@@ -282,7 +267,7 @@ public class MapManager : MonoBehaviour
 
     #region Scene Methods
     
-    private void PreservePlayerStates(out bool wasClimbing)
+    private void MakePlayerReadyForTeleport(out bool wasClimbing)
     {
         // 덩굴 기어올라서 맵 이동하는 경우 고려
         wasClimbing = false;
@@ -296,8 +281,11 @@ public class MapManager : MonoBehaviour
         }
 
         // 플레이어가 덩굴 등의 자식 오브젝트로 설정되어 Scene Unload 때 같이 unload되는 것 방지
+        // MainScene이 '먼저 로드된 씬'이므로 각 방씬들이 아닌 MainScene에 속하게 됨.
         player.SetParent(null);
-        cam.MoveCameraInstantlyToPosition(player.position);
+
+        // 플레이어가 이상한 지형/몬스터와 충돌하는 것을 막기 위해 비활성화
+        PlayerRef.Instance.gameObject.SetActive(false);
     }
 
     private AsyncOperation StartLoadNextScene(SORoom room)
@@ -318,41 +306,32 @@ public class MapManager : MonoBehaviour
 
         //비동기 로드 개시
         Debug.Log($"[MapManager] 다음 방 로드 시작: {room.name}");
-        ResetCamInfluence();
         AsyncOperation sceneLoadOperation = SceneManager.LoadSceneAsync(sceneF.SceneName, LoadSceneMode.Additive);
-        RestoreCamInfluence();
         sceneLoadOperation.allowSceneActivation = false;
 
         return sceneLoadOperation;
     }
 
-    private void ActivateNextScene(AsyncOperation sceneLoadOperation, SORoom room)
+    private AsyncOperation StartUnloadOldScene(Scene scene)
     {
+        // 기존 씬 있다면 언로드
+        Debug.Log($"[MapManager] 기존 방 언로드 시작");
+        return SceneManager.UnloadSceneAsync(scene);
+    }
+
+    private void AllowActivateNextScene(AsyncOperation sceneLoadOperation)
+    {
+        Debug.Log($"[MapManager] 다음 방 활성화 허용");
         // 로드된 씬 활성화 허용
         sceneLoadOperation.allowSceneActivation = true;
-        // 기존 씬 있다면 언로드
-        if (currentRoom != null)
-        {
-            Debug.Log($"[MapManager] 기존 방 언로드 시작: {currentRoom.name}");
-            CloseScene(currentRoom);
-        }
-        currentRoom = room;
     }
 
-    private void SetPlayerPositionAndStates(Vector2 playerPosition, bool isClimbing)
+    private void RestorePlayerStates(bool isClimbing)
     {
-        player.position = playerPosition;
-
-        cam.MoveCameraInstantlyToPosition(playerPosition);
         if (isClimbing)
             PlayerRef.Instance.movement.wallClimbEnabled = true;
-    }
 
-    public void CloseScene(SORoom room)
-    {
-        SceneField scene = room.scene;
-
-        SceneManager.UnloadSceneAsync(scene);
+        PlayerRef.Instance.gameObject.SetActive(true);
     }
     #endregion
 
