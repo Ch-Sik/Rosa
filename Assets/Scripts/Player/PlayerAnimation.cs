@@ -45,7 +45,8 @@ public class PlayerAnimation : MonoBehaviour
     {
         UpdateVariables();
         UpdateAnimParameters();
-        UpdateHeadDir();
+        // 25.08.16) 마우스 방향 바라보기 삭제
+        // UpdateHeadDir();
     }
 
     private void UpdateVariables()
