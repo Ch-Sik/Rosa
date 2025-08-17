@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
 /// 타이틀 화면 UI 담당
@@ -10,6 +11,7 @@ using UnityEngine.SceneManagement;
 public class TitleScreenUI : MonoBehaviour
 {
     [SerializeField] string LoadingSceneName;
+    [SerializeField] Button button_newGame, button_contiue;
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +24,8 @@ public class TitleScreenUI : MonoBehaviour
     {
         Debug.Log("새 게임 시작");
         StartEnterSequence();
+        // EnterSequence 두번 시작되어 오류 발생하는 것을 방지하기 위해 버튼 더블클릭 방지
+        DeactivateButtons();
     }
 
     public void OnClickContinueButton()
@@ -29,6 +33,7 @@ public class TitleScreenUI : MonoBehaviour
         Debug.Log("이어하기 시작");
         SaveLoadManager.Instance.DisableNewGameFlag();
         StartEnterSequence();
+        DeactivateButtons();
     }
 
     private void StartEnterSequence()
@@ -51,5 +56,11 @@ public class TitleScreenUI : MonoBehaviour
             }
             asyncOper.allowSceneActivation = true;
         }
+    }
+
+    private void DeactivateButtons()
+    {
+        button_contiue.interactable = false;
+        button_newGame.interactable = false;
     }
 }
