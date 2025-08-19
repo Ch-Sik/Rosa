@@ -171,9 +171,6 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("활강 활성화 여부")]
     [SerializeField, ReadOnly] bool glidingEnabled = false;
 
-    [FoldoutGroup("활강 관련")]
-    float defaultGravityScale = 2.8f;
-
     [FoldoutGroup("활강 관련")] 
     [SerializeField] float glidingGravityScale = 0.1f;
 
@@ -300,7 +297,7 @@ public class PlayerMovement : MonoBehaviour
         facingDirection = spriteDirection;
         groundLayer = LayerMask.NameToLayer("Ground");
         climbableLayer = LayerMask.NameToLayer("Climbable");
-        defaultGravityScale = rb.gravityScale;
+        originGravityScale = rb.gravityScale;
         defaultMoveSpeed = moveSpeed;
     }
 
@@ -857,7 +854,7 @@ public class PlayerMovement : MonoBehaviour
     internal void CancleGliding()
     {
         isGliding = false;
-        rb.gravityScale = defaultGravityScale;
+        rb.gravityScale = originGravityScale;
     }
 
     public void Rising(float risingPower)
@@ -901,7 +898,6 @@ public class PlayerMovement : MonoBehaviour
         {
             dashCooldownTimer = Timer.StartTimer();
             isDashing = true;
-            originGravityScale = rb.gravityScale;
 
             Debug.Log("Dash");
 
@@ -921,7 +917,10 @@ public class PlayerMovement : MonoBehaviour
     {
         isDashing = false;
 
-        rb.gravityScale = originGravityScale;
+        if (isGliding)
+            rb.gravityScale = glidingGravityScale;
+        else
+            rb.gravityScale = originGravityScale;
         rb.velocity = Vector2.zero;
     }
 
