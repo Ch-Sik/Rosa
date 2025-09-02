@@ -109,6 +109,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2618d3616bd1dd3429cbd7642e4ee4f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useCinematic: 1
+  cinematicsSetting:
+    easeInDur: 0
+    holdDur: 0
+    zoomAmount: 0
   mp: {fileID: 3688589845874839619}
 --- !u!1 &7271056781942156237
 GameObject:
@@ -131,7 +136,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &6242622361041943908
 Transform:
@@ -163,6 +168,7 @@ MonoBehaviour:
   useAutoCinematic: 1
   type: 0
   waitDelay: 0.5
+  startDelay: 0
   showGizmos: 0
   points:
   - {fileID: 7528119377161528838}
@@ -172,6 +178,11 @@ MonoBehaviour:
   onWait: 0
   isReverse: 0
   curReverseState: 0
+  breachHeight: 3
+  breachUpTime: 1
+  breachDownTime: 0.7
+  timeBetweenDown: 1
+  timeBetweenBreach: 1
   cinematicsSettings:
   - easeInDur: 1
     holdDur: 2
