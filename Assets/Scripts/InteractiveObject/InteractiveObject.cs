@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +20,8 @@ public class InteractiveObject : MonoBehaviour
 
     private void Start()
     {
-        interactiveKeyUI?.SetActive(false);
+        if (interactiveKeyUI != null)
+            interactiveKeyUI.SetActive(false);
 
         col = GetComponent<Collider2D>();
         col.isTrigger = true;
@@ -51,12 +53,14 @@ public class InteractiveObject : MonoBehaviour
 
     private void OnActive() 
     {
-        interactiveKeyUI?.SetActive(true);
+        if(interactiveKeyUI != null)
+            interactiveKeyUI.SetActive(true);
     }
 
     public void OnInactive()
     {
-        interactiveKeyUI?.SetActive(false);
+        if (interactiveKeyUI != null)
+            interactiveKeyUI?.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -104,5 +108,11 @@ public class InteractiveObject : MonoBehaviour
         if (!showGizmos)
             return;
         Gizmos.color = Color.green;
+    }
+
+    [Button("상호작용 테스트")]
+    private void TestInteraction()
+    {
+        function.Invoke();
     }
 }
