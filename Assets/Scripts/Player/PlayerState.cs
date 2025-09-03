@@ -12,67 +12,55 @@ public class PlayerState : MonoBehaviour
     // 컴포넌트 참조
     private PlayerStateUI stateUI;
 
+    // property
+    public int MaxHP { get { return _maxHP; } }
+    public float CurrentHP { get { return _currentHP; } }
+
     // states
-    [SerializeField] private int maxHP;
-    [SerializeField] private int currentHP;
-    [SerializeField] private int attackDmg;
-    [SerializeField] private int[] magicLevel;    // 0이면 안배움, 1이면 기본, 2이면 업그레이드 상태
+    [SerializeField] private int _maxHP;
+    [SerializeField] private float _currentHP;
+
+    // events
+    public delegate void HpEvent(float currentValue);
+    public HpEvent OnHpChanged;
 
     private void Start()
     {
         Init();
     }
 
-    // states getter
-    public int AttackDmg { get { return attackDmg; } }
-
     public void Init(/*int maxHP, int attackDmg, bool[] plantMagicUnlock ...*/)
     {
         // HP, 공격력 등의 값 초기화하기
         stateUI = PlayerStateUI.Instance;
-        currentHP = maxHP;
-        for (int i = 0; i < maxHP; i++)
-        {
-            stateUI.AddHPUI();
-        }
+        _currentHP = _maxHP;
     }
 
-    public int GetHP() { return currentHP; }
-
-    public void Heal(int amount) 
+    // 소숫점 단위로 회복
+    public void Heal(float amount)
     {
-        stateUI.Heal(amount);
-        while(amount > 0)
-        {
-            if (currentHP >= maxHP) return;
-            currentHP++;
-            amount--;
-        }
+        if (amount <= 0) return;
+
+        Debug.Log($"체력 회복: {amount}");
+        _currentHP = Mathf.Min(_currentHP + amount, _maxHP);
+        OnHpChanged?.Invoke(_currentHP);
     }
+
+    // 정수 단위로 데미지
     public void TakeDamage(int amount) 
     {
-        Debug.Log("피해 입음 : " + amount);
-        if(stateUI == null)
-        {
-            Debug.LogError("체력 UI 레퍼런스가 할당되지 않음!");
-            return;
-        }
-        stateUI.TakeDamage(amount);
+        if (amount <= 0) return;
 
-        while (amount > 0)
+        Debug.Log("피해 입음 : " + amount);
+        _currentHP = Mathf.Max(_currentHP - amount, 0);
+        OnHpChanged?.Invoke(_currentHP);
+
+        if (_currentHP <= 0)
         {
-            if (currentHP <= 1)
-            {
-                currentHP--;
-                if (RespawnManager.Instance != null)
-                    RespawnManager.Instance.Respawn();
-                else
-                    Debug.LogWarning("RespawnManager가 씬에 존재하지 않음");
-                return;
-            }
-            currentHP--;
-            amount--;
+            if (RespawnManager.Instance != null)
+                RespawnManager.Instance.Respawn();
+            else
+                Debug.LogWarning("RespawnManager가 씬에 존재하지 않음");
         }
     }
-    public void UpgradePlantMagic(SkillCode magicCode) { } // 획득 및 업그레이드
 }

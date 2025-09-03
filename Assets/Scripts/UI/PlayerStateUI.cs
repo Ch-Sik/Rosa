@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,43 +18,44 @@ public class PlayerStateUI : MonoBehaviour
     // [SerializeField] TMP_Text text_selectedMagic;
     [SerializeField] GameObject heart;
     [SerializeField] GameObject heartContainer;
-    [SerializeField] Sprite filled;
-    [SerializeField] Sprite empty;
-    [SerializeField] List<Image> hearts = new List<Image>();
-    int curHp = 0;
+    [SerializeField] List<HeartIcon> heartUiList = new List<HeartIcon>();
+    float curHp = 0;
 
     private void Awake()
     {
         _instance = this;
     }
 
-    public void AddHPUI()
+    private void Start()
     {
-        GameObject h = Instantiate(heart, heartContainer.transform);
-        hearts.Add(h.GetComponent<Image>());
-        curHp++;
+        PlayerRef.Instance.state.OnHpChanged += OnHpChanged;
+
+        Initialize();
     }
 
-    public void Heal(int amount) 
+    [Button("강제 초기화 진행")]
+    private void Initialize()
     {
-        while(amount > 0)
+        Debug.Log($"PlayerStateUI 초기화 수행");
+        // 필드값 설정
+        curHp = PlayerRef.Instance.state.CurrentHP;
+
+        // UI에 필요한 만큼 하트 아이콘 생성
+        for (int i = 0; i < PlayerRef.Instance.state.MaxHP; i++)
         {
-            if (curHp >= hearts.Count) return;
-            hearts[curHp].sprite = filled;
+            GameObject h = Instantiate(heart, heartContainer.transform);
+            heartUiList.Add(h.GetComponent<HeartIcon>());
             curHp++;
-            amount--;
         }
-        
-        
     }
-    public void TakeDamage(int amount)
+
+    [Button("HP 게이지 테스트")]
+    public void OnHpChanged(float newHP)
     {
-        while (amount > 0)
+        for(int i=0; i<heartUiList.Count; i++)
         {
-            if (curHp <= 0) return;
-            curHp--;
-            hearts[curHp].sprite = empty;
-            amount--;
+            heartUiList[i].ChangeHeartValue(Mathf.Min(newHP, 1.0f));
+            newHP -= 1.0f;
         }
     }
 

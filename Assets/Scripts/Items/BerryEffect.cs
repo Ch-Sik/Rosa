@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class BerryEffect : MonoBehaviour
 {
+    [SerializeField] float _healAmount;
+
     public void OnGetBerry()
     {
-        // TODO: 여기에 베리 습득시의 효과 구현
         Debug.Log("베리 습득");
+        PlayerRef.Instance.state.Heal(_healAmount);
     }
 }

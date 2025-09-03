@@ -45,7 +45,7 @@ public class RespawnManager : MonoBehaviour
     [Button]
     public void Respawn()
     {
-        if (PlayerRef.Instance.state.GetHP() <= 0)
+        if (PlayerRef.Instance.state.CurrentHP <= 0)
             PlayerRef.Instance.state.Heal(healAmount);
 
         if (PlayerRef.Instance.movement.isGrabCube)
