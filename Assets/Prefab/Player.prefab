@@ -730,6 +730,7 @@ GameObject:
   - component: {fileID: 7376123347842105714}
   - component: {fileID: 4348864029274202990}
   - component: {fileID: 454193726804920390}
+  - component: {fileID: 1562384959795432479}
   - component: {fileID: 5124247239520633849}
   - component: {fileID: 7860466541598936615}
   - component: {fileID: 5950979649482116841}
@@ -796,10 +797,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0e3e5c4656a734aa1ad619b01a85b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 5
-  currentHP: 0
-  attackDmg: 1
-  magicLevel: 
+  _maxHP: 0
+  _currentHP: 0
 --- !u!114 &7834158099626650541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -954,6 +953,18 @@ MonoBehaviour:
   footstep: {fileID: 8300000, guid: 5a0fbb62c7fcf324bb7e60ebf4659f5d, type: 3}
   climb: {fileID: 8300000, guid: 722c2596689fb53429b89a6e44d15725, type: 3}
   whoosh: {fileID: 0}
+--- !u!114 &1562384959795432479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6606165383981438929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f41208426aaff74ca7a982928f358f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &5124247239520633849
 Rigidbody2D:
   serializedVersion: 4
