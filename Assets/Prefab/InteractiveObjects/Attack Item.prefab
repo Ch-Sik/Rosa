@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4492376021979254742, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: m_Name
-      value: Attack Item Variant
+      value: Attack Item
       objectReference: {fileID: 0}
     - target: {fileID: 5343948873282582934, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: item
@@ -63,6 +63,10 @@ PrefabInstance:
     - target: {fileID: 6541380861961686383, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6962069512704063568, guid: 74b002008b07363489272fd9c9006418, type: 3}
+      propertyPath: m_SortingOrder
+      value: 140
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

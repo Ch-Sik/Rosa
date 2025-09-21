@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 public class CommunicationZone : MonoBehaviour
 {
     public bool showGizmos = false;
 
-    public float delayAfterWalk = 0.3f;
+    [FormerlySerializedAs("delayAfterWalk")]
+    [SerializeField] private float communicationStartDelay = 0.3f;
     public CommunicationDecision decision;
-    [HideInInspector] public int ID = -1;
-
     [SerializeField] private Transform communicationStartTransform;
+
+    [HideInInspector] public int ID = -1;
     private bool isPlayerMoving = false;
 
     private void Start()
@@ -58,7 +60,8 @@ public class CommunicationZone : MonoBehaviour
 
         if (communicationStartTransform == null)
         {
-            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
+            DOVirtual.DelayedCall(communicationStartDelay, StartCommunication);
+            isPlayerMoving = false;
             return;
         }
 
@@ -78,7 +81,7 @@ public class CommunicationZone : MonoBehaviour
             isPlayerMoving = false;
 
             // Invoke("StartCommunication", delay);
-            DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
+            DOVirtual.DelayedCall(communicationStartDelay, StartCommunication);
         }
     }
 
