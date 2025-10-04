@@ -79,6 +79,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1471474429042492283}
   m_SourcePrefab: {fileID: 100100000, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+--- !u!58 &1528419509112557260 stripped
+CircleCollider2D:
+  m_CorrespondingSourceObject: {fileID: 5326312231019476412, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+  m_PrefabInstance: {fileID: 6691458111558237040}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3245708322660951352 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
@@ -100,6 +105,7 @@ MonoBehaviour:
   quantity: 1
   hasLifetime: 1
   lifetime: 5
+  interactTrigger: {fileID: 1528419509112557260}
 --- !u!50 &3240697950117872969
 Rigidbody2D:
   serializedVersion: 4
