@@ -20,4 +20,13 @@ public class DropItem : MonoBehaviour
 
         Destroy(gameObject);
     }
+
+    // 낙하하다가 지면에 닿으면 그대로 멈추기. 
+    // rigidbody & non-trigger collider가 부착되지 않은 npc형 dropItem에는 해당 안됨.
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if(rb != null)
+            rb.isKinematic = true;
+    }
 }
