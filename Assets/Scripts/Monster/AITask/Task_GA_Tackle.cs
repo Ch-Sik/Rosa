@@ -16,8 +16,8 @@ public class Task_GA_Tackle : Task_A_Base
     [Title("공격 관련")]
     [SerializeField, Tooltip("돌진 패턴 공격력")]
     protected int tackleAttackPower;
-    [SerializeField, Tooltip("돌진 속도 (m/s)")]
-    protected float tackleSpeed = 5;
+    [SerializeField, Tooltip("돌진 최대 속도 (m/s)")]
+    protected float tackleMaxSpeed = 5;
     [SerializeField, Tooltip("돌진 가속도 (m/s^2)")]
     protected float tackleAccel = 1000;
     [SerializeField, Tooltip("돌진 중 방향 전환 허용")]
@@ -189,7 +189,7 @@ public class Task_GA_Tackle : Task_A_Base
         // velocity.y = rigidbody.velocity.y;
         // rigidbody.velocity = velocity;
 
-        Vector2 targetVelocity = tackleDir * tackleSpeed;
+        Vector2 targetVelocity = tackleDir * tackleMaxSpeed;
         if ((targetVelocity.x - rigidbody.velocity.x) * tackleDir.x > 0)    // 목표 속도에 미달한 경우 가속
         {
             rigidbody.AddForce(tackleDir * tackleAccel * rigidbody.mass * Time.deltaTime, ForceMode2D.Force);

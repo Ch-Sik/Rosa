@@ -20,6 +20,13 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
     [Tooltip("그로기 풀린 이후 정신차리는 모션 시간")]
     [SerializeField] float groggyRecoveryAnimDuration;
 
+    [FoldoutGroup("공격 아이템 스폰 관련")]
+    [SerializeField] bool spawnAttackItem;
+    [FoldoutGroup("공격 아이템 스폰 관련"), ShowIf("spawnAttackItem")]
+    [SerializeField] GameObject attackItem;
+    [FoldoutGroup("공격 아이템 스폰 관련"), ShowIf("spawnAttackItem")]
+    [SerializeField] Transform attackItemSpawnTransform;
+
     [Title("피격 판정. 임시 무적 적용하는 데 필요")]
     [SerializeField] MonsterDamageReceiver damageReceiver;
 
@@ -112,8 +119,13 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         Debug.Log("벽에다 대가리 꽁!!!");
         groggyTimer = Timer.StartTimer();
         blackboard.Set(BBK.isGroggy, true);    // 애니메이션을 위한 블랙보드 설정
-        damageComponent.attackEnabled = false;    // 플레이어가 밟을 수 있게 데미지 비활성화
         damageReceiver.SetTempInvincible(false);    // 돌진시의 무적 해제
+
+        // 공격 아이템 스폰
+        Instantiate(attackItem, attackItemSpawnTransform.position, attackItemSpawnTransform.rotation);
+
+        // 플레이어 밀어내기
+        ThrowPlayer();
     }
 
     private void OnGroggyLast()
@@ -123,21 +135,21 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         return;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if(other.gameObject.layer == LayerMask.NameToLayer("GroundCheck"))
-        {
-            Debug.Log("플레이어에게 밟힘!");
-            // 플레이어에게 밟혔는데 그게 마침 그로기중이었다면
-            if(groggyTimer != null)
-            {
-                // 그로기 대신 스턴으로 이행
-                DoStun();
-                // 그리고 머리 위에 있는 플레이어를 저 멀리 밀어내기
-                ThrowPlayer();
-            }
-        }
-    }
+    //private void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    if(other.gameObject.layer == LayerMask.NameToLayer("GroundCheck"))
+    //    {
+    //        Debug.Log("플레이어에게 밟힘!");
+    //        // 플레이어에게 밟혔는데 그게 마침 그로기중이었다면
+    //        if(groggyTimer != null)
+    //        {
+    //            // 그로기 대신 스턴으로 이행
+    //            DoStun();
+    //            // 그리고 머리 위에 있는 플레이어를 저 멀리 밀어내기
+    //            ThrowPlayer();
+    //        }
+    //    }
+    //}
 
     private void OnGroggyEnd()
     {
@@ -146,7 +158,6 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         if(groggyTimer.duration < groggyDuration + groggyRecoveryAnimDuration)
         {
             blackboard.Set(BBK.isGroggy, false);
-            damageComponent.attackEnabled = true;        // 몸통 데미지 다시 활성화
         }
         else
         {
@@ -171,10 +182,11 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
 
     private void ThrowPlayer()
     {
-        Vector2 knockbackVector = GetCurrentDir().opposite().toVector2() * 2f + Vector2.up * 1f;
-        PlayerRef.Instance.movement.Knockback(
-            knockbackVector.normalized, knockbackVector.magnitude
-        );
+        Vector2 knockbackVector = GetCurrentDir().opposite().toVector2();
+        if(PlayerRef.Instance.movement.isWallClimbing)
+            PlayerRef.Instance.movement.Knockback(
+                knockbackVector.normalized, knockbackVector.magnitude
+            );
     }
 
     private void OnStunLast()

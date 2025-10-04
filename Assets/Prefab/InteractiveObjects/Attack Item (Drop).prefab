@@ -48,14 +48,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7478917350489411070, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8112644880858791717}
+    - target: {fileID: 7478917350489411070, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnInteraction
+      objectReference: {fileID: 0}
+    - target: {fileID: 7478917350489411070, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: FieldItem, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
       propertyPath: m_Name
-      value: Attack Item (Drop) Variant
+      value: Attack Item (Drop)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 407120747010238472, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 8112644880858791717}
     - targetCorrespondingSourceObject: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
       insertIndex: 4
       addedObject: {fileID: 3240697950117872969}
@@ -68,6 +84,22 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
   m_PrefabInstance: {fileID: 6691458111558237040}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8112644880858791717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3245708322660951352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2743c2c618e7c4085695976ab40948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  item: {fileID: 11400000, guid: ec69c91fd2c17f949a27e50aeed7c37c, type: 2}
+  quantity: 1
+  hasLifetime: 1
+  lifetime: 5
 --- !u!50 &3240697950117872969
 Rigidbody2D:
   serializedVersion: 4

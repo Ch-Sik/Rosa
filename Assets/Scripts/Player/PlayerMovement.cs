@@ -306,6 +306,7 @@ public class PlayerMovement : MonoBehaviour
         dashEnabled = FlagManager.Instance?.GetFlag("dashEnabled") == 1 ? true : false;
         mushJumpEnabled = FlagManager.Instance?.GetFlag("mushJumpEnabled") == 1 ? true : false;
         glidingEnabled = FlagManager.Instance?.GetFlag("glidingEnabled") == 1 ? true : false;
+        attackEnabled = FlagManager.Instance?.GetFlag("attackEnabled") == 1 ? true : false;
     }
     #endregion
 
@@ -1027,6 +1028,7 @@ public class PlayerMovement : MonoBehaviour
     [Button, FoldoutGroup("공격 관련")]
     void EnableAttack()
     {
+        FlagManager.Instance?.SetFlag("glidingEnabled", 1);
         attackEnabled = true;
     }
     #endregion
@@ -1133,17 +1135,17 @@ public class PlayerMovement : MonoBehaviour
         //aimLine.transform.localScale = theScale;
     }
 
-    public void Knockback(Vector2 knockbackDirNormalized, float customKnockbackPow)
+    public void Knockback(Vector2 normalizedDir, float customKnockbackPow)
     {
-        DoKnockback(knockbackDirNormalized.normalized * customKnockbackPow);
+        DoKnockback(normalizedDir.normalized * customKnockbackPow);
     }
 
-    public void Knockback(Vector2 knockbackDirNormalized)
+    public void Knockback(Vector2 normalizedDir)
     {
-        DoKnockback(knockbackDirNormalized.normalized * knockbackStrength);
+        DoKnockback(normalizedDir.normalized * knockbackStrength);
     }
 
-    public void DoKnockback(Vector2 knockbackVector)
+    private void DoKnockback(Vector2 knockbackVector)
     {
         // 만약 담쟁이에 매달린 상태라면
         if (playerControl.currentMoveState == PlayerMoveState.CLIMBING)
@@ -1151,7 +1153,7 @@ public class PlayerMovement : MonoBehaviour
             // 벽에서 떨어짐
             UnstickFromWall();
             // 넉백 방향 강제 수정
-            knockbackVector = facingDirection.isRIGHT() ? Vector2.left : Vector2.right;
+            knockbackVector.x = Mathf.Abs(knockbackVector.x) * (facingDirection.isRIGHT() ? -1 : 1);
         }
         rb.velocity = Vector2.zero;
         rb.AddForce(knockbackVector * knockbackStrength, ForceMode2D.Impulse);

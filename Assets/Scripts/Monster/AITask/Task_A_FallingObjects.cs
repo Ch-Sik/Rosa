@@ -43,11 +43,12 @@ public class Task_A_FallingObjects : Task_A_Base
     [SerializeField, ShowIf("spawnMode", Value = FallingAttackSpawnMode.Random)]
     [Tooltip("낙하물끼리의 간격 최소값")]
     private float minSpawnInterval = 0.3f;
+    [SerializeField] GameObject attackItemPrefab;
 
     private float leftEnd, rightEnd;        // 보스방의 왼쪽/오른쪽 끝의 x좌표
     private float secondsPerDrop;           // 낙하물 하나 떨어뜨릴 때마다 시간 간격
     private int curStalactiteCount;
-    private List<MonsterStalactite> attackInstance = new List<MonsterStalactite>();
+    private List<MonsterStalactite> attackInstanceList = new List<MonsterStalactite>();
     
 
     [Task]
@@ -95,9 +96,22 @@ public class Task_A_FallingObjects : Task_A_Base
             int randomIndex = Random.Range(0, attackPrefabs.Length);
             GameObject instance = Instantiate(attackPrefabs[randomIndex], 
                         new Vector3(spawnPosX[i], transform.position.y + spawnHeight, 0), Quaternion.identity);
-            attackInstance.Add(instance.GetComponent<MonsterStalactite>());
+            attackInstanceList.Add(instance.GetComponent<MonsterStalactite>());
             instance.GetComponent<MonsterStalactite>().Init();
         }
+
+        // 공격 아이템도 스폰해서 떨구기
+        if(attackItemPrefab != null)
+        {
+            float posX = GetSpawnCoordinate();
+            GameObject instance = Instantiate(attackItemPrefab, 
+                    new Vector3(posX, transform.position.y + spawnHeight, 0), Quaternion.identity);
+        }
+    }
+
+    private float GetSpawnCoordinate()
+    {
+        return Random.Range(leftEnd, rightEnd);
     }
 
     private float[] GetSpawnCoordinates()
@@ -181,8 +195,8 @@ public class Task_A_FallingObjects : Task_A_Base
             {
                 // 소환 위치를 잘못설정해서 낙하물이 낙하하기도 전에 지형에 부딪혀 
                 // 파괴되는 경우를 대비해서 null check 해야 함.
-                if (attackInstance[curStalactiteCount] != null)
-                    attackInstance[curStalactiteCount].Launch();
+                if (attackInstanceList[curStalactiteCount] != null)
+                    attackInstanceList[curStalactiteCount].Launch();
                 curStalactiteCount++;
             }
         }
@@ -191,7 +205,7 @@ public class Task_A_FallingObjects : Task_A_Base
         {
             if (curStalactiteCount < numOfInstance)
             {
-                foreach (var instance in attackInstance)
+                foreach (var instance in attackInstanceList)
                 {
                     // 여기도 동일하게 null check 필요
                     if(instance != null)
@@ -205,21 +219,21 @@ public class Task_A_FallingObjects : Task_A_Base
     protected override void Fail()
     {
         base.Fail();
-        attackInstance.Clear();
+        attackInstanceList.Clear();
     }
 
     protected override void Succeed()
     {
         base.Succeed();
-        attackInstance.Clear();
+        attackInstanceList.Clear();
     }
 
     private void OnDie()
     {
-        if (attackInstance.Count > 0)
+        if (attackInstanceList.Count > 0)
         {
             Debug.Log("몬스터 사망으로 인해 남아있는 낙하물 정리");
-            foreach (var instance in attackInstance)
+            foreach (var instance in attackInstanceList)
             {
                 if (instance != null)
                     Destroy(instance);
