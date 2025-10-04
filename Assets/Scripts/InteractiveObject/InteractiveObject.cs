@@ -1,6 +1,8 @@
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -13,10 +15,14 @@ public class InteractiveObject : MonoBehaviour
     public bool canInteract = true;
     [Tooltip("유효거리 내로 다가오면 자동으로 상호작용 진행 여부")]
     public bool autoInteract = false;
+    [HideIf("autoInteract")]
+    public float coolDown = 0f;
 
-    Collider2D col;
     public UnityEvent function;
     public GameObject interactiveKeyUI;
+
+    Collider2D col;
+    private float lastInterationTime = -10000f;
 
     private void Start()
     {
@@ -48,7 +54,21 @@ public class InteractiveObject : MonoBehaviour
             return;
 
         PlayerRef.Instance.controller.ResetInteraction();
-        PlayerRef.Instance.controller.SetInteraction(() => function.Invoke());
+        PlayerRef.Instance.controller.SetInteraction(OnInteration);
+    }
+
+    private void OnInteration()
+    {
+        if(Time.time - lastInterationTime < coolDown)
+        {
+            Debug.Log("쿨타임이라서 상호작용할 수 없음");
+            return;
+        }
+
+        function.Invoke();
+        lastInterationTime = Time.time;
+        OnInactive();
+        DOVirtual.DelayedCall(coolDown, () => { OnActive(); });
     }
 
     private void OnActive() 
