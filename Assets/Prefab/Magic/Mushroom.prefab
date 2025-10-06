@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1405156249
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 99
   m_Sprite: {fileID: 21300000, guid: ebc0e077e781ea342adf0e86de329288, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -137,6 +137,8 @@ MonoBehaviour:
   animancer: {fileID: 276872344364966689}
   spawnAnim: {fileID: 7400000, guid: 9b09c69c627a7d640920654f781b06f8, type: 2}
   disappearAnim: {fileID: 7400000, guid: 8bd765aa0200f854f8c7b2974bbca31b, type: 2}
+  spawnVfx: {fileID: 2044516109871083586, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+  disappearVfx: {fileID: 7497358978028250641, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
 --- !u!114 &276872344364966689
 MonoBehaviour:
   m_ObjectHideFlags: 0

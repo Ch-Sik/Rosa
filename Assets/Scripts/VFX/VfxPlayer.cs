@@ -10,7 +10,9 @@ public class VfxPlayer : MonoBehaviour
 
     public void PlayVFX()
     {
-        animator?.Play(animStateName, -1, 0);
-        audioSource?.Play();
+        if(animator)
+            animator.Play(animStateName, -1, 0);
+        if(audioSource)
+            audioSource.Play();
     }
 }

@@ -5439,6 +5439,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 34ad51f486e268244a31a7e2ca1b0de0, type: 3}
+--- !u!1001 &3275987453325632941
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6840492900309054239, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_Name
+      value: Mushroom Disappear VFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.7097826
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.935
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8919252795409411825, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
 --- !u!1001 &5009964556530739314
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5500,6 +5557,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dff6c20f5540f3843828c629df070725, type: 3}
+--- !u!1001 &5844817943481024288
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3257062766201276094, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_Name
+      value: Mushroom Spawn VFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.708
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.588
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.005481109
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109236841040760895, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 87e1d1fad60052d4dab7b19810b97031, type: 3}
 --- !u!1001 &7021938175651734110
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6056,3 +6170,5 @@ SceneRoots:
   - {fileID: 1304984575}
   - {fileID: 2044573582880648075}
   - {fileID: 1766786720}
+  - {fileID: 5844817943481024288}
+  - {fileID: 3275987453325632941}

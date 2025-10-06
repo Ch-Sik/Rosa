@@ -11,20 +11,29 @@ public class MagicMushroom : MonoBehaviour
     [SerializeField] AnimancerComponent animancer;
     [SerializeField] AnimationClip spawnAnim;
     [SerializeField] AnimationClip disappearAnim;
+    [Space(10)]
+    [SerializeField] VfxPoolEntity spawnVfx;
+    [SerializeField] VfxPoolEntity disappearVfx;
 
     private void Start()
     {
         MapManager.Instance.OnNextRoomLoaded += DestroyMushroom;
         if (animancer && spawnAnim)
             animancer.Play(spawnAnim);
+        if (spawnVfx)
+            VfxManager.Instance.SpawnVfxObject(spawnVfx, transform.position);
     }
 
     // 사라지는 연출 후에 삭제
     public void Disappear()
     {
         trigger.enabled = false;
+
         if (animancer && disappearAnim)
             animancer.Play(disappearAnim);
+        if (disappearVfx)
+            VfxManager.Instance.SpawnVfxObject(disappearVfx, transform.position);
+
         Invoke("DestroyMushroom", 0.5f);
     }
 
@@ -39,8 +48,9 @@ public class MagicMushroom : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Player"))
         {
-            // if (PlayerRef.Instance.movement.isGrounded)
-                PlayerRef.Instance.movement.MushJump();
+            PlayerRef.Instance.movement.MushJump();
+            if (spawnVfx)
+                VfxManager.Instance.SpawnVfxObject(spawnVfx, transform.position);
         }
         
         if(collision.gameObject.CompareTag("Cube"))
