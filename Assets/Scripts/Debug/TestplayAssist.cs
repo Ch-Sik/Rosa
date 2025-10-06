@@ -41,7 +41,15 @@ public class TestplayAssist : MonoBehaviour
         // 로깅
         Debug.Log(roomSO.name + ", " + pos + "로 이동");
 
-        // 강제이동 수행
-        MapManager.Instance.Enter(roomSO, pos);
+        if (MapManager.Instance.CurrentRoom == roomSO)
+        {
+            PlayerRef.Instance.transform.position = pos;
+        }
+        else
+        {
+            // 강제이동 수행
+            MapManager.Instance.Enter(roomSO, pos);
+        }
+        GetComponentInParent<PauseMenuUI>().ClosePauseMenu();
     }
 }
