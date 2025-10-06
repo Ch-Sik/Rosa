@@ -146,18 +146,15 @@ public class MapManager : MonoBehaviour
             float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
             bool hasOldSceneToUnload = false;
             Scene oldScene = SceneManager.GetActiveScene(); // Scene이 notNullable이라서 일단 아무 값이나 집어넣기;
-
-            // 필요한 정보 수집
             if (currentRoom != null)
             {
                 hasOldSceneToUnload = true;
                 oldScene = SceneManager.GetSceneByName(currentRoom.scene);
             }
 
-            // 페이드아웃 시작하기 전부터 다음 씬 로드 시작
+            // 다음 씬 로드 시작
             loadOp = StartLoadNextScene(room);
 
-            // 페이드아웃 효과 적용
             if (!FadeoutPanel.isFadeOutActivated)
             {
                 FadeoutPanel.Fadeout();
@@ -168,41 +165,34 @@ public class MapManager : MonoBehaviour
                 Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
             }
 
-            // 플레이어 상태 백업 & 잠시 치워둠.
             MakePlayerReadyForTeleport(out wasClimbing);
 
-            // 페이드아웃과 플레이어 치워두기가 끝나면 다음 씬 활성화 허용
-            AllowActivateNextScene(loadOp);
-
+            // 페이드아웃과 플레이어 치워두기가 끝난 후에만 다음 씬 활성화 허용
+            loadOp.allowSceneActivation = true;
             yield return loadOp;
 
-            // Unload 시작하고 기존 씬이 확실히 inactivate될 때까지 대기
+            // 기존 씬 완전히 Unload
             // 참고: Unity에서 제공하는 SceneManagement의 한계로 load와 unload는 동시에 수행 불가능
-            //      그래서 다음 씬이 Activate된 이후 unload가 이어서 수행되게 됨.
+            //      그래서 다음 씬이 Activate된 이후에나 unload를 수행해야 함. 
             if (hasOldSceneToUnload)
             {
                 StartUnloadOldScene(oldScene);
                 while (oldScene.isLoaded)
                 {
-                    Debug.Log("기존 씬 언로드 시작될 때까지 대기중");
                     yield return 0;
                 }
             }
 
-            // currentRoom 갱신
+            // 이쯤 되면 씬 전환 완료로 취급
             currentRoom = room;
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentRoom.scene.SceneName));
 
             // 플레이어 상태 복구 & 위치 설정
             RestorePlayerStates(wasClimbing);
             player.position = position;
+            yield return new WaitForSeconds(0.7f);  // 플레이어 착지 모션 숨기기
 
-            // 확실히 기존 씬 언로드 되도록 & 플레이어 착지 모션 안보이도록 추가로 기다림
-            yield return new WaitForSeconds(0.7f);
-
-            // OnNextRoomLoaded는 씬 전환이 이루어진 이후에 호출
             OnNextRoomLoaded?.Invoke();
-
-            // 페이드아웃 효과 정리
             FadeoutPanel.FadeIn();
         }
     }
@@ -317,13 +307,6 @@ public class MapManager : MonoBehaviour
         // 기존 씬 있다면 언로드
         Debug.Log($"[MapManager] 기존 방 언로드 시작");
         return SceneManager.UnloadSceneAsync(scene);
-    }
-
-    private void AllowActivateNextScene(AsyncOperation sceneLoadOperation)
-    {
-        Debug.Log($"[MapManager] 다음 방 활성화 허용");
-        // 로드된 씬 활성화 허용
-        sceneLoadOperation.allowSceneActivation = true;
     }
 
     private void RestorePlayerStates(bool isClimbing)
