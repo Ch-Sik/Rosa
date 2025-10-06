@@ -34,6 +34,8 @@ public class ProjectileBase : MonoBehaviour
     private bool useLifetime = false;
     [SerializeField, ShowIf("useLifetime")]
     private float lifetime;
+    [SerializeField]
+    private float disappearDelay = 1f;
 
     [SerializeField]
     protected new Rigidbody2D rigidbody;
@@ -103,79 +105,85 @@ public class ProjectileBase : MonoBehaviour
 
     void OnLifetimeEnd()
     {
-        Disappear(1f);
+        Disappear();
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collider)
     {
-        // 목표에 닿았다면
-        if(( (1 << collider.gameObject.layer) & targetLayers) != 0)
-        {
-            Debug.Log($"투사체가 목표 {collider.gameObject.name}에 접촉");
-            rigidbody.velocity = Vector2.zero;
-            foreach (var c in colliders)
-                c.enabled = false;
-            Disappear(1f);
-        }
+        if (((1 << collider.gameObject.layer) & targetLayers) != 0)
+            HandleHitTarget();
 
-        // 벽에 닿았다면
-        if(( (1 << collider.gameObject.layer) & blockingLayers) != 0)
-        {
-            switch(onWallHit)
-            {
-                case ProjectileWallHitOption.Ignore:
-                    // Do nothing
-                    break;
-                case ProjectileWallHitOption.Disable:
-                    rigidbody.velocity = Vector2.zero;
-                    foreach (var c in colliders)
-                        c.enabled = false;
-                    StartCoroutine(DisableWithDelay());
-                    IEnumerator DisableWithDelay()
-                    {
-                        yield return new WaitForSeconds(1f);
-                        gameObject.SetActive(false);
-                    }
-                    break;
-                case ProjectileWallHitOption.Destroy:
-                    rigidbody.velocity = Vector2.zero;
-                    foreach (var c in colliders)
-                        c.enabled = false;
-                    Disappear(1f);
-                    break;
-                case ProjectileWallHitOption.Stop:
-                    rigidbody.velocity = Vector2.zero;
-                    break;
-                case ProjectileWallHitOption.Reflect:
-                    RaycastHit2D hit = Physics2D.Raycast(transform.position, rigidbody.velocity, 10f, blockingLayers);
-                    if (hit.collider != null)
-                    {
-                        // 벽에 부딪혔을 때 반사 수행
-                        Vector2 normal = hit.normal;
-                        Vector2 reflected = Vector2.Reflect(rigidbody.velocity, normal);
-                        rigidbody.velocity = reflected;
-                    }
-                    break;
-                default:
-                    Debug.LogError("잘못된 ProjectileWallHitOption!");
-                    break;
-            }
-        }
+        if (((1 << collider.gameObject.layer) & blockingLayers) != 0)
+            HandleHitWall();
+        
+        if (canDestroyMushroom && (collider.tag == "Mushroom"))
+            HandleHitMushroom(collider);
+    }
 
-        if(canDestroyMushroom && (collider.tag == "Mushroom"))
+    private void HandleHitTarget()
+    {
+        // 데미지 주는 것은 MonsterDamageInflictor에서 하므로 여기서는 사라지기만 처리하면 됨.
+        rigidbody.velocity = Vector2.zero;
+        foreach (var c in colliders)
+            c.enabled = false;
+        Disappear();
+    }
+
+    private void HandleHitWall()
+    {
+        switch (onWallHit)
         {
-            Debug.Log("버섯 파괴 시전");
-            collider.GetComponent<MagicMushroom>().DoDestroy();
+            case ProjectileWallHitOption.Ignore:
+                // Do nothing
+                break;
+            case ProjectileWallHitOption.Disable:
+                rigidbody.velocity = Vector2.zero;
+                foreach (var c in colliders)
+                    c.enabled = false;
+                StartCoroutine(DisableWithDelay());
+                IEnumerator DisableWithDelay()
+                {
+                    yield return new WaitForSeconds(1f);
+                    gameObject.SetActive(false);
+                }
+                break;
+            case ProjectileWallHitOption.Destroy:
+                rigidbody.velocity = Vector2.zero;
+                foreach (var c in colliders)
+                    c.enabled = false;
+                Disappear();
+                break;
+            case ProjectileWallHitOption.Stop:
+                rigidbody.velocity = Vector2.zero;
+                break;
+            case ProjectileWallHitOption.Reflect:
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, rigidbody.velocity, 10f, blockingLayers);
+                if (hit.collider != null)
+                {
+                    // 벽에 부딪혔을 때 반사 수행
+                    Vector2 normal = hit.normal;
+                    Vector2 reflected = Vector2.Reflect(rigidbody.velocity, normal);
+                    rigidbody.velocity = reflected;
+                }
+                break;
+            default:
+                Debug.LogError("잘못된 ProjectileWallHitOption!");
+                break;
         }
     }
 
-    public void Disappear(float delay)
+    private static void HandleHitMushroom(Collider2D collider)
+    {
+        collider.GetComponent<MagicMushroom>().Disappear();
+    }
+
+    public void Disappear()
     {
         if(animator != null)
         {
             animator.SetTrigger("disappear");
         }
-        Invoke("DoDestroy", delay);
+        Invoke("DoDestroy", disappearDelay);
     }
 
     void DoDestroy()

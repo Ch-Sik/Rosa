@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 2997462389811818992}
   - component: {fileID: 8663460164153873139}
   - component: {fileID: 4542513106196829839}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Mushroom
   m_TagString: Mushroom
   m_Icon: {fileID: 0}
@@ -130,6 +130,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e40018aba3d90724f833170b10408f3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  anim: {fileID: 0}
+  trigger: {fileID: 4542513106196829839}
   jumpPower: 20
 --- !u!61 &4542513106196829839
 BoxCollider2D:

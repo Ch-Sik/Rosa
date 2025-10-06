@@ -33,10 +33,8 @@ public class Task_A_Boss3ThrowRock : Task_A_Base
         if (throwed) return;
         if (activeTimer.duration > throwDelay)
         {
-            Boss3Rock projectileComponent = rockInstance.GetComponent<Boss3Rock>();
+            ProjectileBase projectileComponent = rockInstance.GetComponent<ProjectileBase>();
             projectileComponent.InitProjectile(GetCurrentDir().toVector2() * throwSpeed);
-            projectileComponent.returnPosition = receiver.position;
-            projectileComponent.damageReceiver = GetComponent<MonsterDamageReceiver>();
             throwed = true;
         }
     }

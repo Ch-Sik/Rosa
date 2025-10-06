@@ -82,7 +82,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 3, y: 3}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5314532955115710411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5df6f17d1be3b23488792ca107913f5b, type: 3}
+  m_Script: {fileID: 11500000, guid: d65cc318db7b0524ca33c1ace1322877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   useGravity: 0
@@ -106,23 +106,21 @@ MonoBehaviour:
   randomRotationOnStart: 0
   useRandomAngularVelocity: 0
   randomRotationRange: 30
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
   blockingLayers:
     serializedVersion: 2
     m_Bits: 656384
-  canDestroyMushroom: 0
+  canDestroyMushroom: 1
   onWallHit: 3
   useLifetime: 0
   lifetime: 0
+  disappearDelay: 1
   rigidbody: {fileID: 0}
   colliders:
   - {fileID: 1564339269941484740}
   animator: {fileID: 0}
-  mushroomLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  returnPosition: {x: 0, y: 0, z: 0}
-  damageReceiver: {fileID: 0}
-  returnTime: 1
 --- !u!114 &-7660184339708960641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,13 +174,13 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 6.74, y: 6.9}
-    newSize: {x: 2, y: 2}
+    newSize: {x: 3, y: 3}
     adaptiveTilingThreshold: 0.5
     drawMode: 1
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.8, y: 1.8}
+  m_Size: {x: 2.8, y: 2.8}
   m_EdgeRadius: 0
 --- !u!50 &8284300658473394410
 Rigidbody2D:

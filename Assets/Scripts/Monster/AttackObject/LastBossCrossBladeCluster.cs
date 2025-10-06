@@ -58,13 +58,13 @@ public class LastBossCrossBladeCluster : MonoBehaviour
     {
         // 자탄 삭제
         if(projRight != null)
-            projRight.Disappear(1f);
+            projRight.Disappear();
         if (projUp != null)
-            projUp.Disappear(1f);
+            projUp.Disappear();
         if (projLeft != null)
-            projLeft.Disappear(1f);
+            projLeft.Disappear();
         if (projDown != null)
-            projDown.Disappear(1f);
+            projDown.Disappear();
         // 자기 자신도 삭제
         Disappear(1f);
     }

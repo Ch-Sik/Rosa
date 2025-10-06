@@ -85,7 +85,7 @@ public class LastBossEnergyBall : ProjectileBase
                 {
                     col.enabled = false;
                 }
-                Disappear(1f);                  // 사라질 연출 고려 1초 대기
+                Disappear();                  // 사라질 연출 고려 1초 대기
             }
         }
     }

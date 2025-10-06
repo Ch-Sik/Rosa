@@ -27,23 +27,4 @@ public class Boss3Rock : ProjectileBase
     {
         
     }
-
-    protected override void OnTriggerEnter2D(Collider2D collider)
-    {
-        base.OnTriggerEnter2D(collider);
-        // 버섯과 충돌했다면
-        if(collider.CompareTag("Mushroom"))
-        {
-            // 현재 진행중인 속도 초기화
-            rigidbody.velocity = Vector2.zero;
-
-            // 철두루미쪽으로 돌아가기
-            DOTween.Sequence()
-            .Append(rigidbody.DOJump(returnPosition, 2, 1, returnTime))
-            .AppendCallback(() => {
-                damageReceiver.GetHitt(1, 0);   // 보스는 어차피 넉백 없으니 attackAngle 무시
-                Disappear(1f);
-            });
-        }
-    }
 }

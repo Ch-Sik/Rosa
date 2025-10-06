@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class MagicMushroom : MonoBehaviour
 {
+    [SerializeField] Animator anim;
+    [SerializeField] Collider2D trigger;
+    [Space(10)]
     [SerializeField] float jumpPower; // 점프력
-    Animator anim;
 
     private void Start()
     {
@@ -16,7 +18,8 @@ public class MagicMushroom : MonoBehaviour
     // Destroy는 즉시 삭제하는 것, Disappear는 사라지는 연출 후에 사라지는 것.
     public void Disappear()
     {
-        if(anim != null)
+        trigger.enabled = false;
+        if (anim != null)
         {
             // TODO: 버섯 사라지는 연출 적용
         }
