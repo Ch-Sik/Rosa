@@ -11,8 +11,7 @@ public class Boss3Projectile : ProjectileBase
     // 벽에 닿아도 사라지지 않고 남아있도록 함수 오버라이드
     protected override void OnTriggerEnter2D(Collider2D other)
     {
-        // Destroy하는 코드는 삭제
-        // 제자리에 박혀있기, 충돌(공격)판정은 비활성화
+        // Destroy하는 대신 제자리에 박혀있기, 충돌(공격)판정은 비활성화
         if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             rigidbody.velocity = Vector2.zero;
@@ -27,7 +26,7 @@ public class Boss3Projectile : ProjectileBase
         if(canDestroyMushroom && (other.tag == "Mushroom"))
         {
             Debug.Log("버섯 파괴 시전");
-            other.GetComponent<MagicMushroom>().DoDestroy();
+            other.GetComponent<MagicMushroom>().Disappear();
         }
     }
 

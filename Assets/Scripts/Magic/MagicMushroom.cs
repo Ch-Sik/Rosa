@@ -1,31 +1,34 @@
-using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Animancer;
 
 public class MagicMushroom : MonoBehaviour
 {
-    [SerializeField] Animator anim;
-    [SerializeField] Collider2D trigger;
-    [Space(10)]
     [SerializeField] float jumpPower; // 점프력
+    [Space(10)]
+    [SerializeField] Collider2D trigger;
+    [SerializeField] AnimancerComponent animancer;
+    [SerializeField] AnimationClip spawnAnim;
+    [SerializeField] AnimationClip disappearAnim;
 
     private void Start()
     {
         MapManager.Instance.OnNextRoomLoaded += DestroyMushroom;
+        if (animancer && spawnAnim)
+            animancer.Play(spawnAnim);
     }
 
-    // Destroy는 즉시 삭제하는 것, Disappear는 사라지는 연출 후에 사라지는 것.
+    // 사라지는 연출 후에 삭제
     public void Disappear()
     {
         trigger.enabled = false;
-        if (anim != null)
-        {
-            // TODO: 버섯 사라지는 연출 적용
-        }
+        if (animancer && disappearAnim)
+            animancer.Play(disappearAnim);
         Invoke("DestroyMushroom", 0.5f);
     }
 
+    // 버섯 즉시 삭제
     void DestroyMushroom()
     {
         MapManager.Instance.OnNextRoomLoaded -= DestroyMushroom;
@@ -48,12 +51,5 @@ public class MagicMushroom : MonoBehaviour
             collision.gameObject.GetComponent<G_Cube>().MushJump(dir);
         }
         
-    }
-
-    public void DoDestroy()
-    {
-        // TODO: 파괴 연출 추가
-        GetComponent<Collider2D>().enabled = false;
-        Destroy(transform.parent.gameObject, 1f);
     }
 }
