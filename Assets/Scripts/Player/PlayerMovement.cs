@@ -787,7 +787,8 @@ public class PlayerMovement : MonoBehaviour
         Collider2D[] hitWall = Physics2D.OverlapAreaAll(pointTop, pointBot);
         foreach (var i in hitWall)
         {
-            if (i.gameObject.layer == climbableLayer)
+            if (i.gameObject.layer == climbableLayer
+                || i.gameObject.layer == groundLayer)
                 return false;
         }
         return true;

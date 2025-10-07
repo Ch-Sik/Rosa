@@ -117,6 +117,8 @@ public class BGMPlayer : MonoBehaviour
             return;
         }
         // 같은 브금이 재생중일 때의 예외 처리는 PlayBGM 내부에서 이루어짐
-        PlayBGM(MapManager.Instance.CurrentRoom.defaultBGM);
+        AudioClip roomBGM = MapManager.Instance.CurrentRoom.defaultBGM;
+        if (roomBGM)
+            PlayBGM(roomBGM);
     }
 }
