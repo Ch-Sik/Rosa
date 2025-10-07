@@ -38,12 +38,17 @@ public class BossRoomManager : MonoBehaviour
     [SerializeField, FoldoutGroup("보스방 벽 관련")]
     bool requireWallActivation;
     [SerializeField, FoldoutGroup("보스방 벽 관련"), ShowIf("requireWallActivation")]
+    bool disableWallRenderer;       
+    [SerializeField, FoldoutGroup("보스방 벽 관련"), ShowIf("requireWallActivation")]
     GameObject bossRoomWall;
 
     [SerializeField, FoldoutGroup("보스방 카메라 관련")]
     ProCamera2DTriggerBoundaries bossRoomCameraTrigger;
     [SerializeField, FoldoutGroup("보스방 카메라 관련")]
     ProCamera2DTriggerBoundaries resetCameraTrigger;
+
+    [SerializeField, FoldoutGroup("보스방 탈출 방지 관련")]
+    RoomManager roomManager;
 
     BGMPlayer bgmPlayer;
 
@@ -57,6 +62,8 @@ public class BossRoomManager : MonoBehaviour
             bossRoomCameraTrigger.gameObject.SetActive(false);
         if (resetCameraTrigger)
             resetCameraTrigger.gameObject.SetActive(false);
+        if (roomManager)
+            roomManager.InactiveTriggers();     // 플레이어 보스방에서 탈출 방지
 
         if(useIntroCommunication)
         {
@@ -81,10 +88,14 @@ public class BossRoomManager : MonoBehaviour
         if (requireWallActivation)
         {
             bossRoomWall.SetActive(true);
-            var previews = bossRoomWall.GetComponentsInChildren<SpriteRenderer>();
-            foreach (var preview in previews)
+            // 투명벽
+            if (disableWallRenderer)
             {
-                preview.enabled = false;
+                var previews = bossRoomWall.GetComponentsInChildren<SpriteRenderer>();
+                foreach (var preview in previews)
+                {
+                    preview.enabled = false;
+                }
             }
         }
         if (bossRoomCameraTrigger)

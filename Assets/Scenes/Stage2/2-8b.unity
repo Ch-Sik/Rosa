@@ -4573,72 +4573,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &442732983
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 442732984}
-  - component: {fileID: 442732985}
-  m_Layer: 0
-  m_Name: Release Camera Trigger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &442732984
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 442732983}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 30, y: 100, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1308178144}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &442732985
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 442732983}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34b478e2db66d4cb7b7963570736e9e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 0}
-  _serializedAxis: 0
-  UpdateInterval: 0.1
-  TriggerShape: 1
-  UseTargetsMidPoint: 1
-  TriggerTarget: {fileID: 0}
-  NumericBoundaries: {fileID: 0}
-  AreBoundariesRelative: 1
-  UseTopBoundary: 0
-  TopBoundary: 10
-  UseBottomBoundary: 0
-  BottomBoundary: -10
-  UseLeftBoundary: 0
-  LeftBoundary: -15
-  UseRightBoundary: 0
-  RightBoundary: 15
-  TransitionDuration: 1
-  TransitionEaseType: 0
-  ChangeZoom: 0
-  TargetZoom: 1.5
-  ZoomSmoothness: 1
-  _setAsStartingBoundaries: 0
 --- !u!21 &444239569
 Material:
   serializedVersion: 8
@@ -9368,66 +9302,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &929560729
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 929560731}
-  - component: {fileID: 929560730}
-  m_Layer: 0
-  m_Name: BossRoomManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &929560730
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 929560729}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c66e9b3ee709d3b47b46360970a15ba7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bossBlackboard: {fileID: 667698054}
-  bgmClip:
-  - {fileID: 8300000, guid: 803b2206d578cd9478602d190a79aa00, type: 3}
-  - {fileID: 8300000, guid: 2eef0d024c253b0449386e687f904fde, type: 3}
-  bgmReturnDelay: 3
-  useIntroCommunication: 1
-  bossAI: {fileID: 667698055}
-  IntroCommunication_ID: 204
-  IntroCommunication_BossActivateDelay: 1
-  useOutroCommunication: 1
-  OutroCommunication_ID: 205
-  OutroCommunication_StartDelay: 4
-  requireWallActivation: 1
-  bossRoomWall: {fileID: 1807979701}
-  bossRoomCameraTrigger: {fileID: 1474434632}
-  resetCameraTrigger: {fileID: 442732985}
---- !u!4 &929560731
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 929560729}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &938697188
 Mesh:
   m_ObjectHideFlags: 0
@@ -17448,39 +17322,6 @@ Material:
     m_Colors:
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_BuildTextureStacks: []
---- !u!1 &1308178143
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1308178144}
-  m_Layer: 0
-  m_Name: CameraTriggers
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1308178144
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308178143}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 22.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1474434631}
-  - {fileID: 442732984}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1319920854
 Material:
   serializedVersion: 8
@@ -18766,72 +18607,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &1474434630
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1474434631}
-  - component: {fileID: 1474434632}
-  m_Layer: 0
-  m_Name: BossRoom Camera Trigger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1474434631
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474434630}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 30, y: 100, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1308178144}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1474434632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474434630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34b478e2db66d4cb7b7963570736e9e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pc2D: {fileID: 0}
-  _serializedAxis: 0
-  UpdateInterval: 0.1
-  TriggerShape: 1
-  UseTargetsMidPoint: 1
-  TriggerTarget: {fileID: 0}
-  NumericBoundaries: {fileID: 0}
-  AreBoundariesRelative: 1
-  UseTopBoundary: 1
-  TopBoundary: 10
-  UseBottomBoundary: 1
-  BottomBoundary: -10
-  UseLeftBoundary: 1
-  LeftBoundary: -15
-  UseRightBoundary: 1
-  RightBoundary: 15
-  TransitionDuration: 1
-  TransitionEaseType: 0
-  ChangeZoom: 0
-  TargetZoom: 1.5
-  ZoomSmoothness: 1
-  _setAsStartingBoundaries: 0
 --- !u!43 &1494603651
 Mesh:
   m_ObjectHideFlags: 0
@@ -25420,6 +25195,79 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1001 &4912986927042522795
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: bossAI
+      value: 
+      objectReference: {fileID: 667698055}
+    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: bossRoomWall
+      value: 
+      objectReference: {fileID: 1807979701}
+    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: bossBlackboard
+      value: 
+      objectReference: {fileID: 667698054}
+    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: disableWallRenderer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4974183228258060345, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: m_Name
+      value: BossRoomManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -25427,10 +25275,9 @@ SceneRoots:
   - {fileID: 1435128605}
   - {fileID: 353077798}
   - {fileID: 1083460808}
-  - {fileID: 929560731}
+  - {fileID: 4912986927042522795}
   - {fileID: 1037020563}
   - {fileID: 1807979702}
-  - {fileID: 1308178144}
   - {fileID: 921291666}
   - {fileID: 833133402}
   - {fileID: 1180050691}

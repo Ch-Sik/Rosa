@@ -333,6 +333,13 @@ public class RoomManager : MonoBehaviour
                 topPort.Add(new RoomPort(PortDirection.Top, port, index[3]));
                 index[3]++;
             }
+            // 25.10.07)
+            // 방 가운데에 포트 생성할 수 있도록 허용, left port로 취급
+            else
+            {
+                lefPort.Add(new RoomPort(PortDirection.Lef, port, index[0]));
+                index[0]++;
+            }
         }
 
         return (topPort, botPort, rigPort, lefPort);
