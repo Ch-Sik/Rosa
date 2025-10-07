@@ -43,6 +43,8 @@ public class ProjectileBase : MonoBehaviour
     public Collider2D[] colliders;
     [SerializeField]
     private Animator animator;
+    [SerializeField]
+    private VfxPoolEntity hitEffect;
 
     public virtual void InitProjectile(Vector2 direction)
     {
@@ -182,6 +184,10 @@ public class ProjectileBase : MonoBehaviour
         if(animator != null)
         {
             animator.SetTrigger("disappear");
+        }
+        if(hitEffect != null)
+        {
+            VfxManager.Instance.SpawnVfxObject(hitEffect, transform.position);
         }
         Invoke("DoDestroy", disappearDelay);
     }
