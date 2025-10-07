@@ -244,6 +244,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1210515925474742746, guid: dff6c20f5540f3843828c629df070725, type: 3}
+      propertyPath: attackEnabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1684912345544643784, guid: dff6c20f5540f3843828c629df070725, type: 3}
       propertyPath: _maxHP
       value: 5

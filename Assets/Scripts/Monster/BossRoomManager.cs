@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Panda;
 using DG.Tweening;
+using Com.LuisPedroFonseca.ProCamera2D;
 
 public class BossRoomManager : MonoBehaviour
 {
@@ -39,6 +40,11 @@ public class BossRoomManager : MonoBehaviour
     [SerializeField, FoldoutGroup("보스방 벽 관련"), ShowIf("requireWallActivation")]
     GameObject bossRoomWall;
 
+    [SerializeField, FoldoutGroup("보스방 카메라 관련")]
+    ProCamera2DTriggerBoundaries bossRoomCameraTrigger;
+    [SerializeField, FoldoutGroup("보스방 카메라 관련")]
+    ProCamera2DTriggerBoundaries resetCameraTrigger;
+
     BGMPlayer bgmPlayer;
 
     // Start is called before the first frame update
@@ -46,6 +52,11 @@ public class BossRoomManager : MonoBehaviour
     {
         Debug.Assert(bossBlackboard != null);
         bossBlackboard.OnBlackboardUpdated += OnBossBlackboardUpdated;
+
+        if (bossRoomCameraTrigger)
+            bossRoomCameraTrigger.gameObject.SetActive(false);
+        if (resetCameraTrigger)
+            resetCameraTrigger.gameObject.SetActive(false);
 
         if(useIntroCommunication)
         {
@@ -68,7 +79,16 @@ public class BossRoomManager : MonoBehaviour
     {
         bossAI.enabled = true;
         if (requireWallActivation)
+        {
             bossRoomWall.SetActive(true);
+            var previews = bossRoomWall.GetComponentsInChildren<SpriteRenderer>();
+            foreach (var preview in previews)
+            {
+                preview.enabled = false;
+            }
+        }
+        if (bossRoomCameraTrigger)
+            bossRoomCameraTrigger.gameObject.SetActive(true);
     }
 
     // 보스의 상태가 변화되었을 때 호출.
@@ -116,6 +136,12 @@ public class BossRoomManager : MonoBehaviour
     {
         // SORoom에 정의된 각 방의 기본 BGM으로 복구
         DOVirtual.DelayedCall(bgmReturnDelay, () => { bgmPlayer.PlayRoomBGM(); });
+
+        // 카메라 해방
+        if (bossRoomCameraTrigger)
+            bossRoomCameraTrigger.gameObject.SetActive(false);
+        if(resetCameraTrigger)
+            resetCameraTrigger.gameObject.SetActive(true);
 
         // 보스 사망 후 대화
         if (useOutroCommunication)
