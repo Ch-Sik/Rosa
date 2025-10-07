@@ -814,6 +814,13 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // 대시 중이라면 대시 종료
+        if (isDashing)
+        {
+            EndDash();
+            playerRef.animation.UpdateAnimParameters(); // 애니메이션 플래그 강제 업데이트
+        }
+
         //큐브를 옮기는 중이라면, 큐브를 놓아버림
         if (isGrabCube)
             PlayerRef.Instance.grabCube.UnGrab();
@@ -917,6 +924,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void EndDash()
     {
+        if (!isDashing) return;
         isDashing = false;
 
         if (isGliding)
@@ -945,8 +953,12 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("버섯 점프 미습득");
             return;
         }
+        if(isDashing)
+        {
+            Debug.Log("대시중에는 버섯 설치 불가");
+            return;
+        }
 
-        Debug.Log("버섯 설치 시도...");
         // 플레이어 정면 방향으로 offset만큼 이동한 포인트.
         Vector2 frontPosition = (Vector2)(transform.position) + facingDirection.toVector2() * mushroomOffset;
         Collider2D overlapTest = Physics2D.OverlapCircle(frontPosition, 0.1f, LayerMask.GetMask("Ground"));
@@ -972,7 +984,6 @@ public class PlayerMovement : MonoBehaviour
 
         // 설치 수행
         mushroomInstance = Instantiate(mushroomPrefab, rayhit.point, Quaternion.identity);
-        Debug.Log("버섯 설치 성공");
     }
 
     #endregion

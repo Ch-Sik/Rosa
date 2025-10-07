@@ -54,7 +54,7 @@ public class PlayerAnimation : MonoBehaviour
         // isDoingAttack = playerRef.combat.isDoingAttack;
     }
 
-    void UpdateAnimParameters()
+    public void UpdateAnimParameters()
     {
         if (PlayerRef.Instance.movement.isMovingByScript) return;
 
