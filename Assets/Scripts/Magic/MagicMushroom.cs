@@ -41,7 +41,13 @@ public class MagicMushroom : MonoBehaviour
     void DestroyMushroom()
     {
         MapManager.Instance.OnNextRoomLoaded -= DestroyMushroom;
-        Destroy(gameObject);
+        if(gameObject)
+            Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        MapManager.Instance.OnNextRoomLoaded -= DestroyMushroom;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

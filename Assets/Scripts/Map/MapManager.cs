@@ -165,7 +165,7 @@ public class MapManager : MonoBehaviour
                 Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
             }
 
-            MakePlayerReadyForTeleport(out wasClimbing);
+            StorePlayer(out wasClimbing);
 
             // 페이드아웃과 플레이어 치워두기가 끝난 후에만 다음 씬 활성화 허용
             loadOp.allowSceneActivation = true;
@@ -188,7 +188,7 @@ public class MapManager : MonoBehaviour
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentRoom.scene.SceneName));
 
             // 플레이어 상태 복구 & 위치 설정
-            RestorePlayerStates(wasClimbing);
+            UnstorePlayer(wasClimbing);
             player.position = position;
             yield return new WaitForSeconds(0.7f);  // 플레이어 착지 모션 숨기기
 
@@ -257,7 +257,7 @@ public class MapManager : MonoBehaviour
 
     #region Scene Methods
     
-    private void MakePlayerReadyForTeleport(out bool wasClimbing)
+    private void StorePlayer(out bool wasClimbing)
     {
         // 덩굴 기어올라서 맵 이동하는 경우 고려
         wasClimbing = false;
@@ -271,11 +271,19 @@ public class MapManager : MonoBehaviour
         }
 
         // 플레이어가 덩굴 등의 자식 오브젝트로 설정되어 Scene Unload 때 같이 unload되는 것 방지
-        // MainScene이 '먼저 로드된 씬'이므로 각 방씬들이 아닌 MainScene에 속하게 됨.
-        player.SetParent(null);
+        player.SetParent(transform);
 
         // 플레이어가 이상한 지형/몬스터와 충돌하는 것을 막기 위해 비활성화
         PlayerRef.Instance.gameObject.SetActive(false);
+    }
+
+    private void UnstorePlayer(bool isClimbing)
+    {
+        if (isClimbing)
+            PlayerRef.Instance.movement.wallClimbEnabled = true;
+
+        PlayerRef.Instance.gameObject.SetActive(true);
+        PlayerRef.Instance.transform.SetParent(null);
     }
 
     private AsyncOperation StartLoadNextScene(SORoom room)
@@ -307,14 +315,6 @@ public class MapManager : MonoBehaviour
         // 기존 씬 있다면 언로드
         Debug.Log($"[MapManager] 기존 방 언로드 시작");
         return SceneManager.UnloadSceneAsync(scene);
-    }
-
-    private void RestorePlayerStates(bool isClimbing)
-    {
-        if (isClimbing)
-            PlayerRef.Instance.movement.wallClimbEnabled = true;
-
-        PlayerRef.Instance.gameObject.SetActive(true);
     }
     #endregion
 
