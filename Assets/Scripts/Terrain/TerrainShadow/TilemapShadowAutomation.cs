@@ -14,6 +14,11 @@ public class TilemapShadowAutomation : MonoBehaviour
     [Button("원버튼 타일맵 그림자 생성")]
     void BakeAndPlaceTileShadow()
     {
+        StartCoroutine(BakeAndPlaceTileShadowInternal());
+    }
+
+    IEnumerator BakeAndPlaceTileShadowInternal()
+    {
         roomExtractor = GetComponent<RoomExtractor>();
         terrainShadowGenerator = GetComponent<TerrainShadowGenerator>();
         tilemapShadowPlacer = GetComponent<TilemapShadowPlacer>();
@@ -21,6 +26,8 @@ public class TilemapShadowAutomation : MonoBehaviour
         roomExtractor.ConvertTilemapsToSprite();
         terrainShadowGenerator.GenerateShadowImage();
         tilemapShadowPlacer.PlaceShadowSprite();
+
+        yield return null;
 
         bool destroySelf = EditorUtility.DisplayDialog(
             "작업 완료",
