@@ -34,6 +34,11 @@ public class BossRoomManager : MonoBehaviour
     [SerializeField, FoldoutGroup("보스전 끝 대화"), ShowIf("useOutroCommunication")]
     float OutroCommunication_StartDelay;
 
+    [SerializeField, FoldoutGroup("보스방 벽 관련")]
+    bool requireWallActivation;
+    [SerializeField, FoldoutGroup("보스방 벽 관련"), ShowIf("requireWallActivation")]
+    GameObject bossRoomWall;
+
     BGMPlayer bgmPlayer;
 
     // Start is called before the first frame update
@@ -62,6 +67,8 @@ public class BossRoomManager : MonoBehaviour
     void ActivateBoss()
     {
         bossAI.enabled = true;
+        if (requireWallActivation)
+            bossRoomWall.SetActive(true);
     }
 
     // 보스의 상태가 변화되었을 때 호출.

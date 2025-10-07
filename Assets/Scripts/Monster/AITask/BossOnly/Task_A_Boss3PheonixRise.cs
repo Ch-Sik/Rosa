@@ -14,6 +14,7 @@ public class Task_A_Boss3PheonixRise : Task_A_Base
     [SerializeField] Transform bossroomCenter;
     [Tooltip("지면에 착지하기까지 걸리는 시간")]
     [SerializeField] float landingTime = 1f;
+    [SerializeField] GameObject attackItemPrefab;
 
     Rigidbody2D _rigidbody;
     MonsterDamageInflictor _bodyDamageComponent;
@@ -84,7 +85,15 @@ public class Task_A_Boss3PheonixRise : Task_A_Base
                 attackObject.SetActive(true);
                 Debug.Log($"startPosition: {_startPosition}");
             })
-            .Append(_rigidbody.DOMoveY(_startPosition.y + 20, 1f));
+            .Append(_rigidbody.DOMoveY(_startPosition.y + 20, 1f))
+            // 9. 플레이어 근처에 공격 아이템 스폰
+            .AppendCallback(() => {
+                Vector2 spawnPosition = new Vector2(
+                    PlayerRef.Instance.transform.position.x + Random.Range(-5f, +5f),
+                    transform.position.y
+                    );
+                Instantiate(attackItemPrefab, spawnPosition, Quaternion.identity);
+                });
     }
 
     protected override void OnRecoveryBegin()
@@ -92,7 +101,7 @@ public class Task_A_Boss3PheonixRise : Task_A_Base
         attackObject.SetActive(false);
         _bodyDamageComponent.attackEnabled = true;
 
-        // 8. 플레이어 위치 고려해서 반대쪽에 내려오기
+        // 10. 플레이어 위치 고려해서 반대쪽에 내려오기
         float offsetFromCenter = Mathf.Abs(_startPosition.x - bossroomCenter.position.x);
         if(_target.transform.position.x > bossroomCenter.transform.position.x)
         {
