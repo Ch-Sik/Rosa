@@ -19,6 +19,7 @@ public class TileData : SerializedScriptableObject
     // 아래 둘은 기존 코드 호환용
     public bool isPlantable { get { return category == TileCategory.SOLID; } }
     public bool isSubstance { get { return category > TileCategory.DECORATION; } }
+    public bool isCastShadow { get { return category == TileCategory.SOLID; } }
 
     // 서로 다른 TileData를 가진 타일들끼리 겹쳐져있을 때 TileCategory가 더 높은 것을 우선시함.
     public static TileData Merge(TileData[] datas)

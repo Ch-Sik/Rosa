@@ -18,7 +18,7 @@ public class TilemapShadowAutomation : MonoBehaviour
         terrainShadowGenerator = GetComponent<TerrainShadowGenerator>();
         tilemapShadowPlacer = GetComponent<TilemapShadowPlacer>();
 
-        roomExtractor.ConvertTilemapToSprite();
+        roomExtractor.ConvertTilemapsToSprite();
         terrainShadowGenerator.GenerateShadowImage();
         tilemapShadowPlacer.PlaceShadowSprite();
 
