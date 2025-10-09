@@ -17,6 +17,10 @@ PrefabInstance:
       value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: hitEffect
+      value: 
+      objectReference: {fileID: -1845715186463036551, guid: d166f5db2c7a9ab4b814493a9e1afc49, type: 3}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: speedScale
       value: 11
       objectReference: {fileID: 0}
@@ -25,16 +29,40 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: spriteRenderer
+      value: 
+      objectReference: {fileID: 2918319031892685031}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: angularVelocity
+      value: -360
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: randomRotationRange
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: targetLayers.m_Bits
       value: 8388608
       objectReference: {fileID: 0}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: randomRotationOnStart
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: useRandomAngularVelocity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: flipRotationWhenLookingLeft
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3092172275926816396, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 25.529877
+      value: 9.309076
       objectReference: {fileID: 0}
     - target: {fileID: 3092172275926816396, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.1110768
+      value: -1.7257745
       objectReference: {fileID: 0}
     - target: {fileID: 3092172275926816396, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: m_LocalPosition.z
@@ -68,6 +96,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4521437318996962378, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 7311d19107e50c4428f45f1080f7fcc2, type: 3}
+    - target: {fileID: 4521437318996962378, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4521437318996962378, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2259351784067206909, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
     m_RemovedGameObjects: []
@@ -96,3 +136,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   ignoreDuration: 2
+--- !u!212 &2918319031892685031 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4521437318996962378, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+  m_PrefabInstance: {fileID: 1639500461289217197}
+  m_PrefabAsset: {fileID: 0}

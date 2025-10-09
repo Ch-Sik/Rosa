@@ -864,7 +864,10 @@ MonoBehaviour:
   attackEnabled: 1
   attackPrefab: {fileID: 1385914800207387471, guid: d297966778a84a5479ef144573c5625e, type: 3}
   attackMuzzle: {fileID: 7372847501198011651}
-  attackStartDelay: 1
+  attackVfx: {fileID: 7718512537084146728, guid: b07536614810e25448b7d70c67aaa837, type: 3}
+  attackStartupDuration: 0.55
+  attackRecoveryDuration: 0.3
+  moveSpeedMultiplierWhileAttack: 0.3
   knockbackStrength: 0.001
   grabSpeedCoef: 0.5
   glidingEnabled: 0

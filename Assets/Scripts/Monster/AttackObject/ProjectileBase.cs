@@ -12,15 +12,24 @@ public class ProjectileBase : MonoBehaviour
     private bool useGravity = false;
     [SerializeField, Tooltip("속도 계수. 중력 사용하지 않을 때에만 사용할 것")]
     private float speedScale = 1f;
+
+    [Space(10)]
     [SerializeField, Tooltip("발사 시의 회전값 옵션")]
     ProjectileRotationMode startRotationMode = ProjectileRotationMode.RandomRotation;
     [SerializeField, ShowIf("startRotationMode", Value = ProjectileRotationMode.RandomRotation), Tooltip("투사체 스폰 시의 랜덤 회전값. 0 이하면 0으로 취급")]
     private float randomRotationOnStart = 0;
+
+    [Space(10)]
     [SerializeField, Tooltip("투사체 랜덤 회전 속도 여부")]
     private bool useRandomAngularVelocity = false;
-    [SerializeField, Tooltip("랜덤 회전 최대치")]
-    private float randomRotationRange = 30f;
+    [SerializeField, ShowIf("useRandomAngularVelocity"), Tooltip("랜덤 회전 최대치")]
+    private float randomAngularVelocityRange = 30f;
+    [SerializeField, HideIf("useRandomAngularVelocity"), Tooltip("발사 시의 회전 각속도")]
+    private float angularVelocity = 0;
+    [SerializeField, Tooltip("투사체 발사 방향에 따라 회전 방향 반전")]
+    private bool flipRotationWhenLookingLeft = false;
 
+    [Space(10)]
     [SerializeField, Tooltip("투사체가 공격 목표로 하는 레이어")]
     private LayerMask targetLayers = 0b00000_00000_00000_00100_00000;           // 기본값: 7:"Player"
     [SerializeField, Tooltip("투사체와 충돌하여 가로막힐 레이어")]
@@ -30,6 +39,7 @@ public class ProjectileBase : MonoBehaviour
     [SerializeField, Tooltip("투사체가 벽에 닿았을 때 행동 설정")]
     protected ProjectileWallHitOption onWallHit = ProjectileWallHitOption.Destroy;
 
+    [Space(10)]
     [SerializeField, Tooltip("수명 사용")]
     private bool useLifetime = false;
     [SerializeField, ShowIf("useLifetime")]
@@ -37,12 +47,15 @@ public class ProjectileBase : MonoBehaviour
     [SerializeField]
     private float disappearDelay = 1f;
 
+    [Space(10)]
     [SerializeField]
     protected new Rigidbody2D rigidbody;
     [SerializeField]
     public Collider2D[] colliders;
     [SerializeField]
     private Animator animator;
+    [SerializeField]
+    private SpriteRenderer spriteRenderer;
     [SerializeField]
     private VfxPoolEntity hitEffect;
 
@@ -93,13 +106,17 @@ public class ProjectileBase : MonoBehaviour
         }
 
         // 회전값 설정
+        float av = 0;
         if (useRandomAngularVelocity)
-        {
-            rigidbody.angularVelocity = Random.Range(-randomRotationRange, randomRotationRange);
-        }
+            av = Random.Range(-randomAngularVelocityRange, randomAngularVelocityRange);
+        else if(angularVelocity != 0)
+            av = angularVelocity;
+        if (flipRotationWhenLookingLeft && rigidbody.velocity.x < 0)
+            av *= -1;
+        rigidbody.angularVelocity = av;
 
         // 수명 옵션 사용시 수명 설정
-        if(useLifetime)
+        if (useLifetime)
         {
             Invoke("OnLifetimeEnd", lifetime);
         }
@@ -187,6 +204,10 @@ public class ProjectileBase : MonoBehaviour
         }
         if(hitEffect != null)
         {
+            if(!animator && spriteRenderer)
+            {
+                spriteRenderer.enabled = false;
+            }
             VfxManager.Instance.SpawnVfxObject(hitEffect, transform.position);
         }
         Invoke("DoDestroy", disappearDelay);

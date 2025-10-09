@@ -149,6 +149,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform attackMuzzle;
 
     [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 이펙트")]
+    [SerializeField] VfxPoolEntity attackVfx;
+
+    [FoldoutGroup("공격 관련")]
     [Tooltip("공격 선딜레이")]
     [SerializeField] float attackStartupDuration = 0.55f;
 
@@ -1033,6 +1037,8 @@ public class PlayerMovement : MonoBehaviour
         if(isGrounded)
             rb.velocity *= moveSpeedMultiplierWhileAttack;
         PlayerRef.Instance.animation.SetAttackAnimTrigger();
+        var magicCircle = VfxManager.Instance.SpawnVfxObject(attackVfx, attackMuzzle.position);
+        magicCircle.transform.SetParent(transform);
 
         yield return new WaitForSeconds(attackStartupDuration);
 
@@ -1042,6 +1048,7 @@ public class PlayerMovement : MonoBehaviour
         GameObject attackInstance = Instantiate(attackPrefab, attackMuzzle.position, Quaternion.identity);
         attackInstance.GetComponent<ProjectileBase>().InitProjectile(attackDir);
 
+        magicCircle.transform.SetParent(null);
         yield return new WaitForSeconds(attackRecoveryDuration);
 
         isDoingAttack = false;
@@ -1050,7 +1057,7 @@ public class PlayerMovement : MonoBehaviour
     [Button, FoldoutGroup("공격 관련")]
     void EnableAttack()
     {
-        FlagManager.Instance?.SetFlag("glidingEnabled", 1);
+        FlagManager.Instance?.SetFlag("attackEnabled", 1);
         attackEnabled = true;
     }
     #endregion
