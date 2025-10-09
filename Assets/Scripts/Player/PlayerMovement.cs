@@ -25,10 +25,6 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("공격 중에 좌우 이동 불가능하게 설정")]
     public bool noMoveOnAttack;
 
-    [FoldoutGroup("좌우 이동 관련")]
-    [Tooltip("공격과 동시에 이동이 가능할 경우, 그 때의 이동 속도 조정")]
-    [SerializeField] float attackSpeedCoef = 0.5f;
-
     // 점프 관련 파라미터
     [FoldoutGroup("점프 관련")]
     [Tooltip("플레이어 점프 파워")]
@@ -142,7 +138,7 @@ public class PlayerMovement : MonoBehaviour
     // 공격 관련
     [FoldoutGroup("공격 관련")]
     [Tooltip("공격 활성화 여부")]
-    [SerializeField, ReadOnly] bool attackEnabled = false;
+    [SerializeField, ReadOnly] bool attackEnabled = true;
 
     [FoldoutGroup("공격 관련")]
     [Tooltip("공격 투사체 프리팹")]
@@ -152,6 +148,17 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("공격 투사체 발사 위치")]
     [SerializeField] Transform attackMuzzle;
 
+    [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 선딜레이")]
+    [SerializeField] float attackStartupDuration = 0.55f;
+
+    [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 후딜레이")]
+    [SerializeField] float attackRecoveryDuration = 0.3f;
+
+    [FoldoutGroup("공격 관련")]
+    [Tooltip("공격 도중에 이동속도 배율")]
+    [SerializeField] float moveSpeedMultiplierWhileAttack = 0.3f;
 
     // 슈퍼대시 관련
     //[FoldoutGroup("슈퍼대쉬(오이) 관련")]
@@ -354,7 +361,7 @@ public class PlayerMovement : MonoBehaviour
             // isWallClimbingTop = false;
         }
         // isDoingAttack = playerRef.combat.isDoingAttack;
-        isNotMoveable = isDoingLedgeClimb || isKnockbacked || isWallJumping || isDashing;
+        isNotMoveable = isDoingLedgeClimb || isKnockbacked || isWallJumping || isDashing || isDoingAttack;
     }
 
     /// <summary>
@@ -401,10 +408,6 @@ public class PlayerMovement : MonoBehaviour
             }
             else
                 playerControl.currentCubeActionState = PlayerCubeActionState.DEFAULT;
-
-            // 공격 중에도 이동속도 조정
-            if (isDoingAttack)
-                xVelocity *= attackSpeedCoef;
 
             rb.velocity = new Vector2(xVelocity, rb.velocity.y);
 
@@ -991,16 +994,14 @@ public class PlayerMovement : MonoBehaviour
     #region 공격 관련
     public void TryAttack()
     {
-        if (isGliding)
-        {
-            Debug.Log("활강 중에는 공격을 할 수 없음!");
-            return;
-        }
+        if (isDoingAttack) return;
+
         if (!attackEnabled)
         {
             Debug.Log("공격 미습득");
             return;
         }
+
         // 현재 '공격 아이템' 가지고 있는 갯수 체크
         if (InventoryController.Instance == null)
         {
@@ -1015,7 +1016,7 @@ public class PlayerMovement : MonoBehaviour
         // 가지고 있다면 '진짜 공격' 수행하고 공격 아이템 1개 소모
         else
         {
-            ExecuteAttack();
+            StartCoroutine(ExecuteAttack());
             InventoryController.Instance.RemoveItem(ItemCode.AttackItem, 1);
         }
     }
@@ -1026,15 +1027,24 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("공격 아이템 갯수가 모자라서 공격 실패");
     }
 
-    private void ExecuteAttack()
+    private IEnumerator ExecuteAttack()
     {
+        isDoingAttack = true;
+        if(isGrounded)
+            rb.velocity *= moveSpeedMultiplierWhileAttack;
+        PlayerRef.Instance.animation.SetAttackAnimTrigger();
+
+        yield return new WaitForSeconds(attackStartupDuration);
+
         // 현재 바라보는 방향에 따라 투사체 발사 방향 결정
         Vector2 attackDir = transform.localScale.toLR().toVector2();
         // 투사체 생성 및 발사
         GameObject attackInstance = Instantiate(attackPrefab, attackMuzzle.position, Quaternion.identity);
         attackInstance.GetComponent<ProjectileBase>().InitProjectile(attackDir);
 
-        Debug.Log("투사체 생성 및 발사 수행");
+        yield return new WaitForSeconds(attackRecoveryDuration);
+
+        isDoingAttack = false;
     }
 
     [Button, FoldoutGroup("공격 관련")]
@@ -1081,7 +1091,10 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     internal void OnLanded()
     {
-        // playerRef.animation.SetTrigger("Grounded");
+        // 공격 중 착지 시 '공격 중 이동속도' 적용
+        if(isDoingAttack)
+            rb.velocity = new Vector2(rb.velocity.x * moveSpeedMultiplierWhileAttack, rb.velocity.y);
+
         if (isSlidingOnWall)
         {
             isSlidingOnWall = false;
