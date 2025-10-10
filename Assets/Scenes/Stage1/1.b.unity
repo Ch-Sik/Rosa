@@ -27056,22 +27056,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 70415370637131227, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: LeftBoundary
-      value: -12
-      objectReference: {fileID: 0}
-    - target: {fileID: 70415370637131227, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: RightBoundary
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 70415370637131227, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: BottomBoundary
-      value: -7
-      objectReference: {fileID: 0}
-    - target: {fileID: 70415370637131227, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: NumericBoundaries
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14
@@ -27121,48 +27105,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1235804014}
     - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: bossRoomWall
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: bossBlackboard
       value: 
       objectReference: {fileID: 1152961465}
-    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: IntroCommunication_ID
-      value: 104
-      objectReference: {fileID: 0}
-    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: OutroCommunication_ID
-      value: 105
-      objectReference: {fileID: 0}
-    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: requireWallActivation
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1847873242508564829, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4974183228258060345, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: m_Name
       value: BossRoomManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 6726877517569765222, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8729397771046992088, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 24
-      objectReference: {fileID: 0}
-    - target: {fileID: 8729397771046992088, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 8729397771046992088, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

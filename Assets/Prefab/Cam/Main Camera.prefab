@@ -279,6 +279,7 @@ GameObject:
   - component: {fileID: 3672845301725501897}
   - component: {fileID: 1737751086690306168}
   - component: {fileID: 3862254003809010175}
+  - component: {fileID: 3276312704690265121}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -374,7 +375,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b8c96e2cdc154e848a3d9fe62464d42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraTargets: []
+  CameraTargets:
+  - TargetTransform: {fileID: 0}
+    TargetInfluenceH: 1
+    TargetInfluenceV: 1
+    TargetOffset: {x: 0, y: 0}
   CenterTargetOnStart: 1
   Axis: 0
   UpdateType: 1
@@ -536,6 +541,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ef00df8487b7ab47ba48d96cc23d4d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3276312704690265121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012507004362759126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6903f12ac8ae44a41ba2a44700ec60ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pc2D: {fileID: 7038311778365337352}
+  _serializedAxis: 0
+  UseNumericBoundaries: 0
+  UseTopBoundary: 0
+  TopBoundary: 10
+  TargetTopBoundary: 0
+  UseBottomBoundary: 0
+  BottomBoundary: -10
+  TargetBottomBoundary: 0
+  UseLeftBoundary: 0
+  LeftBoundary: -10
+  TargetLeftBoundary: 0
+  UseRightBoundary: 0
+  RightBoundary: 10
+  TargetRightBoundary: 0
+  IsCameraPositionHorizontallyBounded: 0
+  IsCameraPositionVerticallyBounded: 0
+  CurrentBoundariesTrigger: {fileID: 0}
+  HasFiredTransitionStarted: 0
+  HasFiredTransitionFinished: 0
+  UseSoftBoundaries: 1
+  Softness: 0.5
+  SoftAreaSize: 0.1
+  UseBoundaryDelayOnEnterScene: 1
+  BoundaryDelayFrames: 10
 --- !u!1 &5843878641736531910
 GameObject:
   m_ObjectHideFlags: 0

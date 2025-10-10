@@ -188,21 +188,9 @@ PrefabInstance:
       value: Main Camera
       objectReference: {fileID: 0}
     - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: CameraTargets.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
       propertyPath: CameraTargets.Array.data[0].TargetTransform
       value: 
       objectReference: {fileID: 5262888440015344438}
-    - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: CameraTargets.Array.data[0].TargetInfluenceH
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7038311778365337352, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
-      propertyPath: CameraTargets.Array.data[0].TargetInfluenceV
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7250734593268076291, guid: d38759011fc1fb04b9e846a299946b4a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.3
@@ -1687,7 +1675,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a044ab7c956a4f044be42ef37f795e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxList: {fileID: 11400000, guid: 4812c93c5de7b91448c53aa0a0e08d18, type: 2}
 --- !u!4 &1923832892
 Transform:
   m_ObjectHideFlags: 0
