@@ -12,6 +12,10 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
     protected GameObject tackleVFX;
     [SerializeField, Tooltip("돌진 중 벽에 박았을 때 활성화될 이펙트 오브젝트")]
     protected GameObject stunVFX;
+    [SerializeField]
+    protected VfxPoolEntity wallCrashParticle;
+    [SerializeField]
+    protected Transform wallCrashParticleSpawnPos;
 
     [FoldoutGroup("그로기 관련")]
     [Tooltip("그로기 유지 시간")]
@@ -63,6 +67,8 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
                 {
                     tackleVFX?.SetActive(false);
                     stunVFX?.SetActive(true);
+                    VfxManager.Instance.SpawnVfxObject(wallCrashParticle, wallCrashParticleSpawnPos.position);
+                    CameraShake.ShakeCamera(CameraShakePreset.Large, true);
                     OnGroggyStart();
                 }
                 // 그로기 중간 프레임
@@ -108,10 +114,6 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
     protected override void OnRecoveryBegin()
     {
         base.OnRecoveryBegin();
-
-        // 이펙트 정리되지 않은 게 있다면 확실히 정리
-        tackleVFX?.SetActive(false);
-        stunVFX?.SetActive(false);
     }
 
     private void OnGroggyStart()
@@ -147,6 +149,10 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         {
             groggyTimer = null;
             Flip();
+
+            // 이펙트 정리되지 않은 게 있다면 확실히 정리
+            tackleVFX?.SetActive(false);
+            stunVFX?.SetActive(false);
             Succeed();
         }
     }

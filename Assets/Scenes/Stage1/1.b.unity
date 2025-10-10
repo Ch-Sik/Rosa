@@ -24211,6 +24211,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 623632159}
+    - target: {fileID: 878127836212732119, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_TranslationOffsets.Array.data[0].x
+      value: -1.3999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 878127836212732119, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_TranslationOffsets.Array.data[0].y
+      value: 0.25999832
+      objectReference: {fileID: 0}
     - target: {fileID: 1236347669613151455, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -24359,6 +24367,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1924519393}
+    - target: {fileID: 5014228560854930113, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5209647455033362308, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -30311,6 +30323,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3605365651790919264, guid: 72a7d27a03da2a84485c8d40eb59947e, type: 3}
   m_PrefabInstance: {fileID: 900472119431351022}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2492253679812460827
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3922289706504999138, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_Name
+      value: Boos1 wall crash VFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 24.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -37.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.035519537
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7420850032455207700, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dd521c0cff9e1254188d211c368c73c8, type: 3}
 --- !u!1001 &6699770036620828526
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30584,3 +30653,4 @@ SceneRoots:
   - {fileID: 2105821276}
   - {fileID: 94238503}
   - {fileID: 474260418}
+  - {fileID: 2492253679812460827}
