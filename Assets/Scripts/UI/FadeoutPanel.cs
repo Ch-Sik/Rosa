@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class FadeoutPanel : MonoBehaviour
 {
-    static FadeoutPanel instance;
+    static FadeoutPanel instance = null;
 
     public static float fadeDuration { get { 
             if (instance == null)
@@ -37,7 +37,6 @@ public class FadeoutPanel : MonoBehaviour
     {
         if(instance != null)
         {
-            Debug.LogWarning("FadeoutPanel 중복 감지, 새 인스턴스는 자동 Destroy");
             Destroy(gameObject);
             return;
         }

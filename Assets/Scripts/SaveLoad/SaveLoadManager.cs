@@ -10,29 +10,14 @@ public class SaveLoadManager : MonoBehaviour
 {
     #region Singleton
     private static SaveLoadManager instance;
-    public static SaveLoadManager Instance
-    {
-        get
-        {
-            if (null == instance)
-            {
-                return null;
-            }
-            return instance;
-        }
-    }
+    public static SaveLoadManager Instance { get => instance; }
 
     private void Awake()
     {
         if (instance == null)
-        {
             instance = this;
-            //DontDestroyOnLoad(this.gameObject);
-        }
         else
-        {
-            Destroy(this.gameObject);
-        }
+            Destroy(gameObject);
     }
     #endregion
 

@@ -1,7 +1,9 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 일시정지 메뉴
@@ -62,7 +64,25 @@ public class PauseMenuUI : MonoBehaviour
 
     public void ToTitleScene()
     {
-        throw new NotImplementedException();
+        StartCoroutine(Co_ToTitleScene());
+    }
+
+    private IEnumerator Co_ToTitleScene()
+    {
+        Time.timeScale = 1f;
+
+        FadeoutPanel.Fadeout();
+        yield return new WaitForSeconds(FadeoutPanel.fadeDuration + 0.1f);
+
+        var op = SceneManager.LoadSceneAsync("Title");
+        while (op.isDone) yield return null;
+        op = SceneManager.UnloadSceneAsync(MapManager.Instance.CurrentRoom.scene);
+        while (op.isDone) yield return null;
+
+        // MainScene 언로드되기 전에 FadeIn 되어 보이는 것 방지
+        DOVirtual.DelayedCall(0.5f, () => { FadeoutPanel.FadeIn(); });
+        // PauseMenuUI가 MainScene에 속해서 가장 마지막에 언로드
+        SceneManager.UnloadSceneAsync("MainScene");
     }
 
     public static void RestartGame()
