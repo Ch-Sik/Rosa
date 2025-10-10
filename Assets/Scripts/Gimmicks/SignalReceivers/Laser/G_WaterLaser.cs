@@ -29,7 +29,7 @@ public class G_WaterLaser : GimmickSignalReceiver
     Coroutine cor;
     Sequence seq;
 
-    public bool isUseIgnoreDuration = false;
+    public bool overrideInvincibleDuration = false;
     public float ignoreDuration = 2f;
 
     private void Start()
@@ -174,16 +174,14 @@ public class G_WaterLaser : GimmickSignalReceiver
     {
         if (go.CompareTag("Player"))
         {
-            bool isMonsterBody = gameObject.layer.Equals(LayerMask.NameToLayer("Monster"));
-
             // Debug.Log("damaged");
-            if (!isUseIgnoreDuration)
+            if (!overrideInvincibleDuration)
             {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1, isMonsterBody);
+                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
             }
             else
             {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1, ignoreDuration, isMonsterBody);
+                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1, ignoreDuration);
             }
 
         }

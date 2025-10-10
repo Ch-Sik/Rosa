@@ -8,7 +8,7 @@ public class MonsterDamageInflictor : MonoBehaviour
     public int damage;
     public bool attackEnabled = true;
 
-    public bool isUseIgnoreDuration = false;
+    public bool overrideInvincibleDuration = false;
     public float ignoreDuration = 2f; 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -26,16 +26,14 @@ public class MonsterDamageInflictor : MonoBehaviour
     {
         if (go.CompareTag("Player"))
         {
-            bool isMonsterBody = gameObject.layer.Equals(LayerMask.NameToLayer("Monster"));
-
             // Debug.Log("damaged");
-            if(!isUseIgnoreDuration)
+            if(!overrideInvincibleDuration)
             {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, damage, isMonsterBody);
+                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, damage);
             }
             else
             {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, damage,ignoreDuration, isMonsterBody);
+                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, damage, ignoreDuration);
             }
            
         }

@@ -15,67 +15,34 @@ public class PlayerDamageReceiver : MonoBehaviour
         playerRef = PlayerRef.Instance;
     }
 
-    public void GetDamage(GameObject target, int damage, bool isDamageFromMonsterBody = false)
+    public void GetDamage(GameObject target, int damage)
+    {
+        GetDamage(target, damage, defaultNoDmgTime);
+    }
+
+    public void GetDamage(GameObject target, int damage, float ignoreDur)
     {
         if (ignoreDamage) return;
-        
-        // if(!isJustEndedIgnoreTime && isDamageFromMonsterBody && target.transform.position.y < transform.position.y - 0.73f)
-        // {
-        //     Debug.Log("몬스터가 플레이어보다 아래에 있음 = 플레이어가 밟은 상황, 데미지 무시");
-        //     return;
-        // }
 
-        Debug.Log("플레이어가 다음 대상에게 피격됨:" + target.name);
+        Debug.Log("플레이어 피격 from:" + target.name);
 
         playerRef.animation.BlinkEffect();
         playerRef.animation.SetTrigger("Hit");
+        CameraShake.ShakeCamera(CameraShakePreset.PlayerHit);
 
         Vector2 knockbackOrigin = new Vector2(target.transform.position.x,
                     target.transform.position.y - (target.transform.localScale.y / 2));
         playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
         playerRef.state.TakeDamage(damage);
 
-        int originalLayer = target.layer;
-        int collisionLayer = gameObject.layer;
-
-        // 현재 게임 오브젝트와 충돌한 오브젝트의 충돌을 무시
-        Debug.Log("플레이어 무적 시작");
-        Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
-
-        // 일정 시간 후 충돌 무시 해제
-        StartCoroutine(RestoreCollision(originalLayer, collisionLayer, defaultNoDmgTime));
+        StartCoroutine(IgnoreCollisionForAWhile(target.layer, ignoreDur));
     }
 
-    public void GetDamage(GameObject target, int damage, float ignoreDur, bool isDamageFromMonsterBody = false)
+    IEnumerator IgnoreCollisionForAWhile(int originalLayer, float delay)
     {
-        if(isDamageFromMonsterBody && target.transform.position.y < transform.position.y - 0.73f)
-        {
-            Debug.Log("몬스터가 플레이어보다 아래에 있음 = 플레이어가 밟은 상황, 데미지 무시");
-            return;
-        }
-
-        Debug.Log($"다음으로부터 피격: {target.name}");
-
-        playerRef.animation.BlinkEffect();
-        playerRef.animation.SetTrigger("Hit");
-
-        Vector2 knockbackOrigin = new Vector2(target.transform.position.x,
-                    target.transform.position.y - (target.transform.localScale.y / 2));
-        playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
-        playerRef.state.TakeDamage(damage);
-
-        int originalLayer = target.layer;
         int collisionLayer = gameObject.layer;
-
-        // 현재 게임 오브젝트와 충돌한 오브젝트의 충돌을 무시
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
 
-        // 일정 시간 후 충돌 무시 해제
-        StartCoroutine(RestoreCollision(originalLayer, collisionLayer, ignoreDur));
-    }
-
-    IEnumerator RestoreCollision(int originalLayer, int collisionLayer, float delay)
-    {
         yield return new WaitForSeconds(delay);
 
         // 충돌 무시 해제
