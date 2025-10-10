@@ -135,22 +135,6 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         return;
     }
 
-    //private void OnTriggerEnter2D(Collider2D other)
-    //{
-    //    if(other.gameObject.layer == LayerMask.NameToLayer("GroundCheck"))
-    //    {
-    //        Debug.Log("플레이어에게 밟힘!");
-    //        // 플레이어에게 밟혔는데 그게 마침 그로기중이었다면
-    //        if(groggyTimer != null)
-    //        {
-    //            // 그로기 대신 스턴으로 이행
-    //            DoStun();
-    //            // 그리고 머리 위에 있는 플레이어를 저 멀리 밀어내기
-    //            ThrowPlayer();
-    //        }
-    //    }
-    //}
-
     private void OnGroggyEnd()
     {
         // Debug.Log("그로기 끝");
@@ -162,6 +146,7 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         else
         {
             groggyTimer = null;
+            Flip();
             Succeed();
         }
     }
