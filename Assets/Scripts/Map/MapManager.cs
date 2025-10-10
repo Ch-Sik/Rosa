@@ -212,7 +212,7 @@ public class MapManager : MonoBehaviour
         return null;
     }
 
-    public Vector3 GetMargin(PortDirection direction)
+    public static Vector3 GetMargin(PortDirection direction)
     {
         switch (direction)
         {

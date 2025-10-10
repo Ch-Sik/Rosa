@@ -59,13 +59,11 @@ public class FadeoutPanel : MonoBehaviour
     
     public static void Fadeout()
     {
-        Debug.Log("Fade out");
         instance.DoFade(true);
     }
 
     public static void FadeIn()
     {
-        Debug.Log("Fade in");
         instance.DoFade(false);
     }
 

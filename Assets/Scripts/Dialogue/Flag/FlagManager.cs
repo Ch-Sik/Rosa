@@ -50,9 +50,13 @@ public class FlagManager : MonoBehaviour
         else
         {
             _flags = SaveLoadManager.Instance.LoadFlag();
-            if (_flags == null)
+            if (_flags != null)
             {
-                Debug.LogWarning("(이어하기) 기존 저장된 플래그 저장소가 없으므로 새로 생성");
+                Debug.Log("플래그 저장소 로드");
+            }
+            else
+            {
+                Debug.LogError("플래그 저장소 불러오기 실패");
                 _flags = new Dictionary<string, int>();
             }
         }

@@ -34,18 +34,25 @@ public class SORoom : ScriptableObject
 
     public RoomPort GetRoomPort(PortDirection direction, int index)
     {
-        switch (direction)
+        try
         {
-            case PortDirection.Top:
-                return topPorts[index];
-            case PortDirection.Bot:
-                return botPorts[index];
-            case PortDirection.Rig:
-                return rigPorts[index];
-            case PortDirection.Lef:
-                return lefPorts[index];
-
-            default: return null;
+            switch (direction)
+            {
+                case PortDirection.Top:
+                    return topPorts[index];
+                case PortDirection.Bot:
+                    return botPorts[index];
+                case PortDirection.Rig:
+                    return rigPorts[index];
+                case PortDirection.Lef:
+                    return lefPorts[index];
+                default:
+                    return null;
+            }
+        }
+        catch
+        { 
+            return null;
         }
     }
 

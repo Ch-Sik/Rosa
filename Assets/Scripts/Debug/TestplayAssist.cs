@@ -1,9 +1,11 @@
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VInspector.Libs;
 
 public class TestplayAssist : MonoBehaviour
 {
@@ -33,10 +35,26 @@ public class TestplayAssist : MonoBehaviour
         string roomName = roomSelectDropdown.options[roomSelectDropdown.value].text;
         SORoom roomSO = MapManager.Instance.map.GetSORoomBySceneName(roomName);
 
-        // 좌표 정보 가져오기
-        float x = float.Parse(Xcoord.text);
-        float y = float.Parse(Ycoord.text);
-        Vector2 pos = new Vector2(x, y);
+
+        Vector2 pos = Vector2.zero;
+        if (Xcoord.text.IsNullOrEmpty() && Ycoord.text.IsNullOrEmpty())
+        {
+            foreach (PortDirection dir in (PortDirection[])Enum.GetValues(typeof(PortDirection)))
+            {
+                RoomPort port = roomSO.GetRoomPort(dir, 0);
+                if (port == null)
+                    continue;
+                pos = new Vector3(port.ports[0].x, port.ports[0].y, 0) + MapManager.GetMargin(dir);
+            }
+        }
+        else
+        {
+            // 좌표 정보 가져오기
+            float x, y;
+            if (!float.TryParse(Xcoord.text, out x)) x = 0f;
+            if (!float.TryParse(Ycoord.text, out y)) y = 0f;
+            pos = new Vector2(x, y);
+        }
 
         // 로깅
         Debug.Log(roomSO.name + ", " + pos + "로 이동");
@@ -51,5 +69,25 @@ public class TestplayAssist : MonoBehaviour
             MapManager.Instance.Enter(roomSO, pos);
         }
         GetComponentInParent<PauseMenuUI>().ClosePauseMenu();
+    }
+
+    public void EnablePlayerAttack()
+    {
+        PlayerRef.Instance.movement.EnableAttack();
+    }
+
+    public void EnablePlayerDash()
+    {
+        PlayerRef.Instance.movement.EnableDash();
+    }
+
+    public void EnablePlayerMushJump()
+    {
+        PlayerRef.Instance.movement.EnableMushJump();
+    }
+
+    public void EnablePlayerGliding()
+    {
+        PlayerRef.Instance.movement.EnableGliding();
     }
 }

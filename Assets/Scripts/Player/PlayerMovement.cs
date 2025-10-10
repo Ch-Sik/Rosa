@@ -1055,8 +1055,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     [Button, FoldoutGroup("공격 관련")]
-    void EnableAttack()
+    public void EnableAttack()
     {
+        Debug.Log("공격 습득");
         FlagManager.Instance?.SetFlag("attackEnabled", 1);
         attackEnabled = true;
     }
