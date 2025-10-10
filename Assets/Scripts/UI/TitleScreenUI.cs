@@ -23,16 +23,19 @@ public class TitleScreenUI : MonoBehaviour
     public void OnClickNewGameButton()
     {
         Debug.Log("새 게임 시작");
+        SaveLoadManager.Instance.SetNewGameFlag(true);
         StartEnterSequence();
-        // EnterSequence 두번 시작되어 오류 발생하는 것을 방지하기 위해 버튼 더블클릭 방지
+
+        // EnterSequence 두번 시작되어 오류 발생하는 것 방지
         DeactivateButtons();
     }
 
     public void OnClickContinueButton()
     {
         Debug.Log("이어하기 시작");
-        SaveLoadManager.Instance.DisableNewGameFlag();
+        SaveLoadManager.Instance.SetNewGameFlag(false);
         StartEnterSequence();
+
         DeactivateButtons();
     }
 

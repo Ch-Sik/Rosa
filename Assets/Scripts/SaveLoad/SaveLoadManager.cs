@@ -34,9 +34,9 @@ public class SaveLoadManager : MonoBehaviour
     // 25.04.29) newtonsoft json으로 변경된 것으로 인해 발생한 self-loop문제 처리
     private JsonSerializerSettings serializeSetting;
 
-    public void DisableNewGameFlag()
+    public void SetNewGameFlag(bool value)
     {
-        _isNewGame = false;
+        _isNewGame = value;
     }
 
     // SaveLoadManager.Start()는 TestScene01 씬 로드시에 한번만 호출되어야 함.
