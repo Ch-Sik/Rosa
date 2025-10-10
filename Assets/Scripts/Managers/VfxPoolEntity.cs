@@ -9,7 +9,10 @@ using UnityEngine.Pool;
 public class VfxPoolEntity : MonoBehaviour
 {
     [InfoBox("스폰된 VFX가 일정시간 후 알아서 오브젝트 풀로 돌아가는 것 담당하는 컴포넌트")]
+    [SerializeField] int maxPoolSize = 5;
     [SerializeField] float minReleaseTime = 1f;
+
+    public int MaxPoolSize { get => maxPoolSize; }
     IObjectPool<VfxPoolEntity> _poolToReturn;
     float _releaseTime;
 
