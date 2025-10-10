@@ -11,6 +11,8 @@ public class Task_GA_Shockwave : Task_A_Base
     [SerializeField]
     private GameObject attackPrefab;
     [SerializeField]
+    private VfxPoolEntity vfx;
+    [SerializeField]
     private Transform muzzle;
 
     private void Start()
@@ -58,6 +60,8 @@ public class Task_GA_Shockwave : Task_A_Base
         Vector2 dir = enemy.transform.position - transform.position;
 
         GameObject shockwave = Instantiate(attackPrefab, muzzle.position, Quaternion.identity);
+        VfxManager.Instance.SpawnVfxObject(vfx, muzzle.position);
+        CameraShake.ShakeCamera(CameraShakePreset.Small);
         shockwave.GetComponent<MonsterShockwave>().Init(dir.toLR());
     }
 }
