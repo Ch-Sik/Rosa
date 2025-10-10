@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 616992587017311682}
   - component: {fileID: 2554714974980051149}
   - component: {fileID: 976697169438585296}
+  - component: {fileID: 3571836322221463421}
   m_Layer: 25
   m_Name: Boss1_Shockwave Attack long
   m_TagString: Untagged
@@ -54,6 +55,7 @@ MonoBehaviour:
   frontSpeed: 8
   backSpeed: 6.3
   vfx: {fileID: 0}
+  _dir: 0
 --- !u!114 &1964203919097936900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,7 +70,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 2
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!50 &616992587017311682
 Rigidbody2D:
@@ -129,7 +131,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.42321324}
   m_SpriteTilingProperty:
     border: {x: 0.15625, y: 0.15625, z: 0.15625, w: 0.15625}
     pivot: {x: 0.5, y: 0.5}
@@ -140,7 +142,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 0.15357351}
   m_EdgeRadius: 0
 --- !u!212 &976697169438585296
 SpriteRenderer:
@@ -194,6 +196,51 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!61 &3571836322221463421
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721283632189696070}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.250793, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0.15625, y: 0.15625, z: 0.15625, w: 0.15625}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.49841398, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &7059802389037655470
 GameObject:
   m_ObjectHideFlags: 0
