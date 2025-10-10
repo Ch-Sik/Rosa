@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 /// <summary>
@@ -9,7 +9,14 @@ using UnityEngine;
 public class PauseMenuUI : MonoBehaviour
 {
     [SerializeField] GameObject uiObject;
-    bool isPaused = false;
+
+    public static PauseMenuUI Instance;
+    [SerializeField, ReadOnly] bool _isPaused = false;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -20,19 +27,25 @@ public class PauseMenuUI : MonoBehaviour
 
     private void OnPerformedPauseButton(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if(isPaused)
+        if(_isPaused)
         {
             ClosePauseMenu();
         }
         else
         {
+            // 25.10.10) 방 이동 등 Fadeout 도중에 일시정지 불가능하게 수정
+            if (FadeoutPanel.isFadeOutActivated)
+            {
+                Debug.Log("일시정지 메뉴를 열 수 없는 상태임");
+                return;
+            }
             OpenPauseMenu();
         }
     }
 
     public void OpenPauseMenu()
     {
-        isPaused = true;
+        _isPaused = true;
         Time.timeScale = 0f;
         uiObject.SetActive(true);
         // TODO: 일시정지 메뉴 열기 전 상태(걷기/기어오르기 등)을 저장해뒀다가 일시정지 해제되면 복구
@@ -41,7 +54,7 @@ public class PauseMenuUI : MonoBehaviour
 
     public void ClosePauseMenu()
     {
-        isPaused = false;
+        _isPaused = false;
         Time.timeScale = 1f;
         uiObject.SetActive(false);
         InputManager.Instance.SetUiInputState(UiState.IN_GAME);
@@ -49,10 +62,7 @@ public class PauseMenuUI : MonoBehaviour
 
     public void ToTitleScene()
     {
-        //ClosePauseMenu();
-        // RestartGame();
-        Process.Start(Application.dataPath + "/../Rosa.exe");
-        Application.Quit();
+        throw new NotImplementedException();
     }
 
     public static void RestartGame()

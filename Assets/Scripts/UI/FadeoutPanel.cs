@@ -16,14 +16,7 @@ public class FadeoutPanel : MonoBehaviour
             }
             return instance._fadeDuration;
         } }
-    public static bool isTweening { get {
-            if (instance == null)
-            {
-                Debug.LogError("FadeoutPanel의 인스턴스가 없음");
-                return false;
-            }
-            return instance._isTweening; 
-        } }
+
     public static bool isFadeOutActivated { get
         {
             if (instance == null)
@@ -31,7 +24,7 @@ public class FadeoutPanel : MonoBehaviour
                 Debug.LogError("FadeoutPanel의 인스턴스가 없음");
                 return false;
             }
-            return instance._imageComponent.color.a == 1f;
+            return instance._imageComponent.color.a > 0f;
         } }
 
     [SerializeField] private Image _imageComponent;
@@ -75,11 +68,16 @@ public class FadeoutPanel : MonoBehaviour
                 "이미 Fade효과 수행 중인데 추가로 Fade 효과가 수행되면 의도치 않은 효과가 발생할 수 있음"
             );
         }
-        _isTweening = true;
         // alpha가 1이 되면 화면을 검은색으로 덮어버리면서 Fade Out 효과
         // alpha가 0이 되면 투명해지면서 Fade In 효과
         DOTween.Sequence()
+            .AppendCallback(()=>
+            {
+                _isTweening = true;
+            })
             .Append(_imageComponent.DOFade(fadeOutToBlack ? 1 : 0, _fadeDuration))
-            .AppendCallback(() => { _isTweening = false; });
+            .AppendCallback(() => { 
+                _isTweening = false;
+            });
     }
 }
