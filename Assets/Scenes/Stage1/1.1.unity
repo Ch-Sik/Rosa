@@ -818,7 +818,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3439804615902123104, guid: cb7bd8ec528a50c45962557c316336e2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 25.75
+      value: 26
       objectReference: {fileID: 0}
     - target: {fileID: 3439804615902123104, guid: cb7bd8ec528a50c45962557c316336e2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -857,7 +857,8 @@ PrefabInstance:
       value: DownJumpable
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3221971462606780567, guid: cb7bd8ec528a50c45962557c316336e2, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb7bd8ec528a50c45962557c316336e2, type: 3}
