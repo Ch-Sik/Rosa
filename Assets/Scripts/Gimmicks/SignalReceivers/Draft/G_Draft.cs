@@ -7,13 +7,12 @@ public class G_Draft : GimmickSignalReceiver
     public bool isActivated = false;
     public float risingPower = 3.0f;
     public GameObject[] particles;
+    public Animator[] fanAnimators;
 
     private void Start()
     {
-        if(isActivated)
-            ToggleParticles(true);
-        else
-            ToggleParticles(false);
+        ToggleParticles(isActivated);
+        ToggleSpriteAnimation(isActivated);
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -40,12 +39,14 @@ public class G_Draft : GimmickSignalReceiver
     {
         isActivated = true;
         ToggleParticles(true);
+        ToggleSpriteAnimation(true);
     }
 
     public override void OffAct()
     {
         isActivated = false;
         ToggleParticles(false);
+        ToggleSpriteAnimation(false);
     }
 
     private void ToggleParticles(bool value)
@@ -62,15 +63,25 @@ public class G_Draft : GimmickSignalReceiver
             }
     }
 
+    private void ToggleSpriteAnimation(bool value)
+    {
+        foreach(var anim in fanAnimators)
+        {
+            anim.SetBool("running", value);
+        }
+    }
+
     public override void ImmediateOnAct()
     {
         isActivated = true;
         ToggleParticles(true);
+        ToggleSpriteAnimation(true);
     }
 
     public override void ImmediateOffAct()
     {
         isActivated = false;
         ToggleParticles(false);
+        ToggleSpriteAnimation(false);
     }
 }
