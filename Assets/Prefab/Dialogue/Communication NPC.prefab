@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 99
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -289,6 +289,10 @@ PrefabInstance:
     - target: {fileID: 4035436581713103772, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       propertyPath: decision.flagedID.Array.data[0].isOnce
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633219411028924736, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
+      propertyPath: m_SortingOrder
+      value: 99
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
