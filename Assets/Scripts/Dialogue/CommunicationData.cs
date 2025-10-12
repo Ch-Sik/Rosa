@@ -68,6 +68,7 @@ public enum CommunicationType
     MoveRoom,                   //특정 룸으로 이동시킨다.
     WalkTo,                     // 25.04.19) 캐릭터를 설정한 x좌표까지 걷게 한다.
     UnlockPlayerAction,         // 25.05.12) 캐릭터의 특정 액션을 해금한다.
+    DisappearNPC,
 }
 
 public enum CommunicationTarget

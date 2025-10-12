@@ -83,4 +83,9 @@ public class NpcMovement : MonoBehaviour
         scale.x = Mathf.Abs(scale.x) * dir.toFloat() * -1;
         transform.localScale = scale;
     }
+
+    public void Disappear()
+    {
+        Destroy(gameObject);
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using Com.LuisPedroFonseca.ProCamera2D;
 using DG.Tweening;
 using Sirenix.OdinInspector;
@@ -66,7 +67,7 @@ public class CommunicationManager : MonoBehaviour
     public float endDelay = 1.5f;                                   //종료 딜레이
     public CommunicationUI UI;                                      //UI관리
     public CommunicationTextLanguage language;                                   //게임 언어 수식
-    public int i = 0;                                               //전역으로 사용할 반복자
+    public int curIndex = 0;                                               //전역으로 사용할 반복자
     public bool isTalking = false;                                  //말하는 중인지 파악
     public bool isCommunicating = false;                            //대화 중인지 파악
     public CommunicationTarget curTarget;                           //현재 대화중인 대상
@@ -132,7 +133,7 @@ public class CommunicationManager : MonoBehaviour
             //만약 UI에서 텍스팅 중이라면, 빠르게 종료
             if (UI.isTalking)
             {
-                UI.EarlyDone(data[i].text);
+                UI.EarlyDone(data[curIndex].text);
             }
             //만약 UI에서 텍스팅 중이 아니라면, 다음 커뮤니케이션을 살펴서 UI를 관리하고, 다음 커뮤니케이션으로 이동한다.
             else
@@ -147,11 +148,11 @@ public class CommunicationManager : MonoBehaviour
     //현재 대화 중일 때, 다음 턴에도 대화가 예상된다면 UI관리 Boolean형 데이터를 전달한다.
     public bool FlexibleTextingHelper()
     {
-        if (i + 1 >= data.Count)
+        if (curIndex + 1 >= data.Count)
             return true;
 
-        if (data[i + 1].type == CommunicationType.TargetText ||
-            data[i + 1].type == CommunicationType.PlayerText)
+        if (data[curIndex + 1].type == CommunicationType.TargetText ||
+            data[curIndex + 1].type == CommunicationType.PlayerText)
             return false;
 
         return true;
@@ -164,7 +165,7 @@ public class CommunicationManager : MonoBehaviour
         isCommunicating = false;
         curTarget = CommunicationTarget.None;
         isTalking = false;
-        i = 0;
+        curIndex = 0;
         CSV.Clear();
         textData.Clear();
         textCount = 0;
@@ -258,51 +259,47 @@ public class CommunicationManager : MonoBehaviour
     public void Communication()
     {
         // 24.12.22) CommunicationType이 None이면 무시하고 다음으로 넘김
-        while (i < data.Count && data[i].type == CommunicationType.None)
-            i++;
+        while (curIndex < data.Count && data[curIndex].type == CommunicationType.None)
+            curIndex++;
 
         //끝 판독
-        if (i >= data.Count)
+        if (curIndex >= data.Count)
         {
             EndCommunication();
             return;
         }
 
-        //타겟 리셋 및 타겟 추적
-        CommunicationTarget target = CommunicationTarget.None;
-        if (data[i].type == CommunicationType.TargetText ||
-            data[i].type == CommunicationType.Show ||
-            data[i].type == CommunicationType.Hide ||
-            data[i].type == CommunicationType.SetEmotion ||
-            data[i].type == CommunicationType.WalkTo)       // 25.04.19 추가
-        {
-            target = data[i].target;
-        }
+        HandleCurCommunication(data[curIndex]);
+    }
 
-        //커뮤니케이션 타입에 따른 함수에 파라미터 전달
-        // 25.06.05) 주석 추가
-        // Show, MoveCameraTo 등, 자동으로 다음 항목으로 넘어가야 하는 경우의
-        // Next() 또는 DelayAndGoNext()는 각 함수 내에서 호출하는 것으로.
-        switch (data[i].type)
+    void HandleCurCommunication(CommunicationData curData)
+    {
+        CommunicationTarget target = curData.target;
+        
+        switch (curData.type)
         {
             case CommunicationType.None: /* 아무것도 안함 */ break;
-            case CommunicationType.Show: Show(target, data[i].location); break;
+            case CommunicationType.Show: Show(target, curData.location); break;
             case CommunicationType.Hide: Hide(target); break;
-            case CommunicationType.SetEmotion: SetEmotion(target, data[i].emotion); break;
-            case CommunicationType.TargetText: TargetText(target, data[i].text); break;
-            case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, data[i].text); break;
-            case CommunicationType.MoveCameraTo: MoveCameraTo(data[i].position); break;
+            case CommunicationType.SetEmotion: SetEmotion(target, curData.emotion); break;
+            case CommunicationType.TargetText: TargetText(target, curData.text); break;
+            case CommunicationType.PlayerText: TargetText(CommunicationTarget.Player, curData.text); break;
+            case CommunicationType.MoveCameraTo: MoveCameraTo(curData.position); break;
             case CommunicationType.ReturnCameraToPlayer: ReturnCameraToPlayer(); break;
             // 25.05.13) CommunicationManager에서 임의 함수를 호출할 수 있는 기능 삭제
             //case CommunicationType.Function: Function(data[i].function); break;
-            case CommunicationType.Function_DO_NOT_USE: Debug.LogError("CommunicationType.Function 사용 금지!"); break;
-            case CommunicationType.Delay: DelayAndGoNext(data[i].delay); break;
-            case CommunicationType.Sfx: Sfx(data[i].sfx); break;
-            case CommunicationType.Flag: SetFlag(data[i].key, data[i].flagValue); break;
+            case CommunicationType.Function_DO_NOT_USE: 
+                Debug.LogError("CommunicationType.Function 사용 금지!");
+                throw new NotImplementedException();
+                break;
+            case CommunicationType.Delay: DelayAndGoNext(curData.delay); break;
+            case CommunicationType.Sfx: Sfx(curData.sfx); break;
+            case CommunicationType.Flag: SetFlag(curData.key, curData.flagValue); break;
             case CommunicationType.HideAll: HideAll(); break;
-            case CommunicationType.MoveRoom: MoveRoom(data[i].room, data[i].position); break;
-            case CommunicationType.WalkTo: WalkTo(target, data[i].position); break;        // 25.04.19 추가
-            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(data[i].key); break;
+            case CommunicationType.MoveRoom: MoveRoom(curData.room, curData.position); break;
+            case CommunicationType.WalkTo: WalkTo(target, curData.position); break;        // 25.04.19 추가
+            case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(curData.key); break;
+            case CommunicationType.DisappearNPC: DisappearNPC(target); break;
         }
     }
 
@@ -310,6 +307,21 @@ public class CommunicationManager : MonoBehaviour
     //F를 입력받아 스킵할 때의 함수
     public void Skip()
     {
+        // 25.10.12) 스킵시에도 방 이동이나 능력 획득은 정상적으로 되게 수정
+        while (curIndex < data.Count)
+        {
+            curIndex++;
+            switch (data[curIndex].type)
+            {
+                case CommunicationType.UnlockPlayerAction:
+                case CommunicationType.MoveRoom:
+                case CommunicationType.Flag:
+                case CommunicationType.WalkTo:
+                    HandleCurCommunication(data[curIndex]);
+                    break;
+            }
+        }
+        
         EndCommunication();
         isTalking = false;
         isCommunicating = false;
@@ -453,6 +465,12 @@ public class CommunicationManager : MonoBehaviour
         DelayAndGoNext(t);
     }
 
+    public void DisappearNPC(CommunicationTarget targetCharacter)
+    {
+        npcMovements[targetCharacter].Disappear();
+        Next();
+    }
+
     // 25.05.13) 플레이어 액션 해금 기능 추가
     public void UnlockPlayerAction(string actionToUnlock)
     {
@@ -477,7 +495,7 @@ public class CommunicationManager : MonoBehaviour
     //다음 커뮤니케이션 실행
     public void Next()
     {
-        i++;
+        curIndex++;
         Communication();
     }
     #endregion
