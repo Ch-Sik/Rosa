@@ -736,6 +736,7 @@ GameObject:
   - component: {fileID: 5950979649482116841}
   - component: {fileID: 1561906219881309557}
   - component: {fileID: 8353430972254208965}
+  - component: {fileID: 5486010697871753317}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -797,8 +798,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0e3e5c4656a734aa1ad619b01a85b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHP: 0
-  _currentHP: 0
+  _maxHP: 5
+  _currentHP: 5
 --- !u!114 &7834158099626650541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1210,6 +1211,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5486010697871753317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6606165383981438929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6736277fa870942b1517a9c0d73f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showGizmos: 1
+  healAmount: 3
+  enemyCount: 0
 --- !u!1 &7548452401162725897
 GameObject:
   m_ObjectHideFlags: 0
@@ -1438,7 +1454,7 @@ ParentConstraint:
   m_TranslationAtRest: {x: 0, y: -0.75, z: 0}
   m_RotationAtRest: {x: 0, y: 0, z: 0}
   m_TranslationOffsets:
-  - {x: 0, y: -0.7500001, z: 0}
+  - {x: 0, y: -0.75, z: 0}
   m_RotationOffsets:
   - {x: 0, y: 0, z: 0}
   m_AffectTranslationX: 1

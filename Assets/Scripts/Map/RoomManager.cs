@@ -30,16 +30,10 @@ public class RoomManager : MonoBehaviour
     [FoldoutGroup("PreDatas")]
     public TileBase portTile;
     [FoldoutGroup("PreDatas")]
-    public TileBase dangerTile;
-    [FoldoutGroup("PreDatas")]
-    public TileBase safeTile;
-    [FoldoutGroup("PreDatas")]
     public GameObject triggerParent;
     [FoldoutGroup("PreDatas")]
     public GameObject trigger;
-
-    public HashSet<Vector2Int> safePositions = new HashSet<Vector2Int>();
-
+    
     public List<GimmickSignalSender> senderRefs = new List<GimmickSignalSender>();
     public List<GimmickSignalReceiver> receiverRefs = new List<GimmickSignalReceiver>();
     public List<GimmickSignalConnector> connectorRefs = new List<GimmickSignalConnector>();
@@ -56,8 +50,6 @@ public class RoomManager : MonoBehaviour
 
         if (MapManager.Instance != null)
             MapManager.Instance.currentRoomManager = this;
-
-        safePositions = new HashSet<Vector2Int>(GetSafeLandingPosition());
     }
     #region Save/Load
 
@@ -214,39 +206,6 @@ public class RoomManager : MonoBehaviour
 #endif
     }
 
-    public HashSet<Vector2Int> GetSafeLandingPosition()
-    {
-        HashSet<Vector2Int> tiles = new HashSet<Vector2Int>(GetTilesPositionInTilemap(tilemap));
-        HashSet<Vector2Int> tempTiles = new HashSet<Vector2Int>(GetTilesPositionInTilemap(tempTilemap));
-        HashSet<Vector2Int> safeTiles = new HashSet<Vector2Int>();
-
-        HashSet<Vector2Int> danger = new HashSet<Vector2Int>();
-
-        foreach (Vector2Int tile in tempTiles)
-        {
-            if (tempTilemap.GetTile((Vector3Int)tile) == dangerTile)
-                danger.Add(tile);
-            else if (tempTilemap.GetTile((Vector3Int)tile) == safeTile)
-                safeTiles.Add(tile);
-        }
-
-        foreach (Vector2Int tile in tiles)
-        {
-            Vector2Int pos = tile + Vector2Int.up;
-
-            if (pos.y >= roomData.offset.y + roomData.size.y)
-                continue;
-
-            if (danger.Contains(pos))
-                continue;
-
-            if (!tiles.Contains(pos))
-                safeTiles.Add(pos);
-        }
-
-        return safeTiles;
-    }
-
     private List<Vector2Int> GetTilesPositionInTilemap(Tilemap tileMap)
     {
         List<Vector2Int> availablePlaces = new List<Vector2Int>();
@@ -358,15 +317,4 @@ public class RoomManager : MonoBehaviour
         return neighbors;
     }
     #endregion
-
-    private void OnDrawGizmos()
-    {
-        if (!showGizmos)
-            return;
-
-        foreach (Vector2Int pos in safePositions)
-        {
-            Gizmos.DrawCube(new Vector3(pos.x + 0.5f, pos.y + 0.5f), Vector3.one);
-        }
-    }
 }

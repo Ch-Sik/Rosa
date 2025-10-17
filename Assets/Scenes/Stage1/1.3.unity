@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -67601,6 +67600,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: WildBoar New
       objectReference: {fileID: 0}
+    - target: {fileID: 1894636070776224567, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
+      propertyPath: m_Size.x
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 1894636070776224567, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
+      propertyPath: m_Size.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1894636070776224567, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
+      propertyPath: m_Offset.x
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1894636070776224567, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
+      propertyPath: m_Offset.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2091620268479207575, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 85.600006
@@ -67639,6 +67654,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091620268479207575, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6250437384453665890, guid: f2ab6a60c499c644ca5d5a770b6be4c3, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

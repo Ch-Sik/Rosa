@@ -79,7 +79,7 @@ public class PlayerCrushDetector : MonoBehaviour
         // 압사 리스폰 + 사망 리스폰으로 리스폰이 2번 연속 발생하는 것을 방지하기 위해 플레이어 현재 체력 검사
         if(PlayerRef.Instance.state.CurrentHP > damageOnCrush)
         { 
-            RespawnManager.Instance.Respawn();
+            RespawnHandler.Instance.Respawn();
         }
         PlayerRef.Instance.state.TakeDamage(damageOnCrush);
     }

@@ -57,8 +57,8 @@ public class PlayerState : MonoBehaviour
 
         if (_currentHP <= 0)
         {
-            if (RespawnManager.Instance != null)
-                RespawnManager.Instance.Respawn();
+            if (RespawnHandler.Instance != null)
+                RespawnHandler.Instance.Respawn();
             else
                 Debug.LogWarning("RespawnManager가 씬에 존재하지 않음");
         }

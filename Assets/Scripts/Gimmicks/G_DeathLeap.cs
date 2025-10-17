@@ -8,7 +8,7 @@ public class G_DeathLeap : MonoBehaviour
     {
         if(collision.tag == "Player")
         {
-            RespawnManager.Instance.Respawn();
+            RespawnHandler.Instance.Respawn();
         }
     }
 }

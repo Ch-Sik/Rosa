@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class RespawnSector : MonoBehaviour
 {
-    private RespawnManager respawnManager;
+    private RespawnHandler _respawnHandler;
 
     [SerializeField] Transform respawnPoint;
 
     private void Start()
     {
-        respawnManager = RespawnManager.Instance;
+        _respawnHandler = RespawnHandler.Instance;
     }
 
 
