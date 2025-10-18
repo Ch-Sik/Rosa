@@ -77,6 +77,8 @@ public class BossRoomManager : MonoBehaviour
     {
         if(communicationID == IntroCommunication_ID)
         {
+            if (bossRoomCameraTrigger)
+                bossRoomCameraTrigger.gameObject.SetActive(true);
             DOVirtual.DelayedCall(IntroCommunication_BossActivateDelay, ActivateBoss);
             CommunicationManager.Instance.OnCommunicationFinish -= OnIntroCommunicationFinish;
         }
@@ -98,8 +100,6 @@ public class BossRoomManager : MonoBehaviour
                 }
             }
         }
-        if (bossRoomCameraTrigger)
-            bossRoomCameraTrigger.gameObject.SetActive(true);
     }
 
     // 보스의 상태가 변화되었을 때 호출.
