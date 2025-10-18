@@ -146,7 +146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &9131677831848639067
 MonoBehaviour:
@@ -161,10 +161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 428070418936363717}
-  renderer: {fileID: 2949977877121273048}
   destroyOnAttackEnd: 0
-  startupColor: {r: 1, g: 0.991336, b: 0.48584908, a: 1}
-  activatedColor: {r: 1, g: 0, b: 0, a: 1}
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
 --- !u!1 &688608208184816670
@@ -580,7 +577,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &8956487569551053262
 MonoBehaviour:
@@ -595,10 +592,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 1467795899616339182}
-  renderer: {fileID: 4664933529540248432}
   destroyOnAttackEnd: 1
-  startupColor: {r: 1, g: 0.991336, b: 0.48584908, a: 1}
-  activatedColor: {r: 1, g: 0, b: 0, a: 1}
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
 --- !u!1 &4606555599206977503
@@ -646,8 +640,8 @@ Transform:
   m_GameObject: {fileID: 4606555599206977503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.04, y: -0.85, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalPosition: {x: 6.55, y: -1.54, z: 0}
+  m_LocalScale: {x: -0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1110316707915944266}
@@ -725,7 +719,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 0
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &8363686761869978936
 MonoBehaviour:
@@ -748,6 +742,7 @@ MonoBehaviour:
   isSuperArmour: 0
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 0
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -1360,7 +1355,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 0
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!50 &7709390815822576510
 Rigidbody2D:
@@ -1567,7 +1562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &1260042865083766449
 MonoBehaviour:
@@ -1582,10 +1577,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collider: {fileID: 8095921971788706080}
-  renderer: {fileID: 7257957877817499348}
   destroyOnAttackEnd: 1
-  startupColor: {r: 1, g: 0.991336, b: 0.48584908, a: 1}
-  activatedColor: {r: 1, g: 0, b: 0, a: 1}
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
 --- !u!1 &7660831487411799989
