@@ -6,14 +6,12 @@ using UnityEngine;
 public class CircularBuffer<T>
 {
     private T[] _buffer;
-    private HashSet<T> _set =  new HashSet<T>();
+    public int Count => _count;
     
+    private int _count;
     private readonly int _capacity;
     private int _nextIndex;
-
-    public int Count => _count;
-    private int _count;
-
+    
     public CircularBuffer(int capacity)
     {
         if (capacity <= 0)
@@ -26,12 +24,7 @@ public class CircularBuffer<T>
 
     public bool Add(T item)
     {
-        if (_set.Contains(item)) 
-            return false;
-        
-        _set.Remove(_buffer[_nextIndex]);
         _buffer[_nextIndex] = item;
-        _set.Add(item);
         _nextIndex = (_nextIndex + 1) % _capacity;
         if (_count < _capacity)
             _count++;
@@ -47,8 +40,6 @@ public class CircularBuffer<T>
 
     public void Reset()
     {
-        _buffer = new T[_capacity];
-        _set = new  HashSet<T>();
-        _nextIndex = 0;
+        _count = 0;
     }
 }

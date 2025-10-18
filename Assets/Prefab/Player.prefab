@@ -1223,7 +1223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c6736277fa870942b1517a9c0d73f52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGizmos: 1
+  showGizmos: 0
   healAmount: 3
   enemyCount: 0
 --- !u!1 &7548452401162725897
@@ -1454,7 +1454,7 @@ ParentConstraint:
   m_TranslationAtRest: {x: 0, y: -0.75, z: 0}
   m_RotationAtRest: {x: 0, y: 0, z: 0}
   m_TranslationOffsets:
-  - {x: 0, y: -0.75, z: 0}
+  - {x: 0, y: -0.7500001, z: 0}
   m_RotationOffsets:
   - {x: 0, y: 0, z: 0}
   m_AffectTranslationX: 1

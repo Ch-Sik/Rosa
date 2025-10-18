@@ -35,15 +35,25 @@ public class RespawnHandler : MonoBehaviour
             return;
 
         if (!PlayerRef.Instance.movement.isGrounded) return;
-        if (enemyCount > 0) return;
+        // 땅 끝에 발이 걸치고 있을 경우를 대비해 한 번 더 검사
+        var rayHit = Physics2D.Raycast(PlayerRef.Instance.transform.position, Vector2.down, 1.0f, 1 << LayerMask.NameToLayer("Ground"));
+        if (rayHit.collider == null) return;
+        
+        if (enemyCount > 0)
+        {
+            UpdateRespawnPoint(_lastAddedRespawnPoint);
+            return;
+        }
 
         Vector2Int curPosition = new Vector2Int((int)(_player.transform.position.x),
                                                 (int)(_player.transform.position.y - 0.8f));
         UpdateRespawnPoint(curPosition);
+        _lastAddedRespawnPoint = curPosition;
     }
 
     public void UpdateRespawnPoint(Vector2Int curPos)
     {
+        if (respawnPoints.GetLastNth(1) == curPos) return;
         respawnPoints.Add(curPos);
     }
 
@@ -67,14 +77,12 @@ public class RespawnHandler : MonoBehaviour
     {
         if (!col.GetComponent<AIPerception>()) return;
         enemyCount++;
-        Debug.Log("[RespawnHandler] Enemy AI Perception detected");
     }
 
     private void OnTriggerExit2D(Collider2D col)
     {
         if (!col.GetComponent<AIPerception>()) return;
         enemyCount--;
-        Debug.Log("[RespawnHandler] Enemy AI De-perception detected");
     }
     
     private void OnDrawGizmos()
