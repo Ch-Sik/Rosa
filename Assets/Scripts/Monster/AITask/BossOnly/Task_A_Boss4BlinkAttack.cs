@@ -24,7 +24,11 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
     [Tooltip("공격 이펙트 & 판정 히트박스")]
     [SerializeField] GameObject attackColliderAndVFX;
 
-    float startHeight;  // 패턴 시작할 때의 높이 == 지면에 발디디고 있을 때의 높이 저장
+    [Tooltip("공격 아이템")] 
+    [SerializeField] private GameObject attackItemPrefab;
+
+    private float _startHeight;  // 패턴 시작할 때의 높이 == 지면에 발디디고 있을 때의 높이 저장
+    private bool _isSpawnedAttackItem = false;
 
     [Task]
     private void BlinkAttack()
@@ -34,7 +38,8 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
 
     protected override void OnStartupBegin()
     {
-        startHeight = transform.position.y;
+        _startHeight = transform.position.y;
+        _isSpawnedAttackItem = false;
         DOTween.Sequence()
             .AppendInterval(blinkDelay)
             .AppendCallback(()=>
@@ -62,7 +67,7 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
 
         // 대상 머리 위로 순간이동
         Vector3 newPosition = enemy.transform.position;
-        newPosition.y = startHeight + jumpHeight;
+        newPosition.y = _startHeight + jumpHeight;
         transform.position = newPosition;
 
         // 공격 & 몸통 충돌 판정 켜기
@@ -85,5 +90,15 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
         attackColliderAndVFX.SetActive(false);
         if(blinkVFX != null)
             blinkVFX?.SetActive(false);
+    }
+    
+    protected override void OnRecoveryLast()
+    {
+        if (_isSpawnedAttackItem) return;
+        blackboard.TryGet(BBK.isGrounded, out bool isGrounded);
+        if (!isGrounded) return;
+
+        Instantiate(attackItemPrefab, attackColliderAndVFX.transform.position, Quaternion.identity);
+        _isSpawnedAttackItem = true;
     }
 }

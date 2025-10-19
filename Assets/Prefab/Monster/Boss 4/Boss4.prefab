@@ -689,7 +689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b20cb10af2dc08c4bb164d108091d559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 40
+  maxHP: 20
   currentHP: 0
   blackboard: {fileID: 0}
 --- !u!114 &2483334464590425624
@@ -801,7 +801,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
   bossState: {fileID: 0}
-  phaseMinHP: 0300000000000000
+  phaseMinHP: 0a00000000000000
   currentPhase: 0
 --- !u!114 &4115012578230078719
 MonoBehaviour:
@@ -1086,6 +1086,7 @@ MonoBehaviour:
   bodyCollider: {fileID: 6671818774169967242}
   jumpHeight: 10
   attackColliderAndVFX: {fileID: 5317062497357948356}
+  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
 --- !u!114 &1366959600749458094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11056,7 +11057,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2482709353101089656, guid: 3a21df22aa7df6d4da45376d7fc41124, type: 3}
       propertyPath: m_Size.x
-      value: 19.18
+      value: 28
       objectReference: {fileID: 0}
     - target: {fileID: 4846449587730072185, guid: 3a21df22aa7df6d4da45376d7fc41124, type: 3}
       propertyPath: m_Name
@@ -11065,6 +11066,10 @@ PrefabInstance:
     - target: {fileID: 4846449587730072185, guid: 3a21df22aa7df6d4da45376d7fc41124, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4993433186229199948, guid: 3a21df22aa7df6d4da45376d7fc41124, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
