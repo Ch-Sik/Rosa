@@ -54,6 +54,7 @@ public class CommunicationInteraction : MonoBehaviour
         if(communicationStartTransform == null)
         {
             DOVirtual.DelayedCall(delayAfterWalk, StartCommunication);
+            isPlayerMoving = false;
             return;
         }
 

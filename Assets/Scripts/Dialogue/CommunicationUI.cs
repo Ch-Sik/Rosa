@@ -182,12 +182,16 @@ public class CommunicationUI : MonoBehaviour
         TargetImage targetImage = null;
         if(hasPortrait)
             targetImage = targetImages[index];
+        
 
         talk = DOTween.Sequence()
         .AppendCallback(() =>
         {
             isTalking = true;
-            charName.text = CommunicationManager.Instance.characters[target].Name;
+
+
+            if(target != CommunicationTarget.None)
+                charName.text = CommunicationManager.Instance.characters[target].Name;
             Dialogue.text = "";
 
             for (int i = 0; i < targetImages.Count; i++)
