@@ -16,6 +16,8 @@ public class NpcMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator anim;
 
+    [SerializeField] private VfxPoolEntity disappearVfx;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -86,6 +88,14 @@ public class NpcMovement : MonoBehaviour
 
     public void Disappear()
     {
-        Destroy(gameObject);
+        StartCoroutine(CoDisappear());
+
+        IEnumerator CoDisappear()
+        {
+            if(disappearVfx)
+                VfxManager.Instance.SpawnVfxObject(disappearVfx, transform.position);
+            yield return new WaitForSeconds(0.1f);
+            Destroy(gameObject);
+        }
     }
 }

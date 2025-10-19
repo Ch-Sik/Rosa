@@ -7,7 +7,12 @@ using UnityEngine.Events;
 public class CommunicationData
 {
     public CommunicationType type;
-    [ShowIf("@type == CommunicationType.TargetText || type == CommunicationType.Show || type == CommunicationType.Hide || type == CommunicationType.SetEmotion || type == CommunicationType.WalkTo")]
+    [ShowIf("@type == CommunicationType.TargetText " +
+                    "|| type == CommunicationType.Show " +
+                    "|| type == CommunicationType.Hide " +
+                    "|| type == CommunicationType.SetEmotion " +
+                    "|| type == CommunicationType.WalkTo" +
+                    "|| type == CommunicationType.DisappearNPC")]
     public CommunicationTarget target;
     [ShowIf("@type == CommunicationType.SetEmotion")]
     public Emotion emotion;
