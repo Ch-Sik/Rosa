@@ -308,9 +308,8 @@ public class CommunicationManager : MonoBehaviour
     public void Skip()
     {
         // 25.10.12) 스킵시에도 방 이동이나 능력 획득은 정상적으로 되게 수정
-        while (curIndex < data.Count)
+        while (++curIndex < data.Count)
         {
-            curIndex++;
             switch (data[curIndex].type)
             {
                 case CommunicationType.UnlockPlayerAction:

@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.SceneManagement;
 
 public class NpcMovement : MonoBehaviour
 {
@@ -17,9 +19,18 @@ public class NpcMovement : MonoBehaviour
     [SerializeField] private Animator anim;
 
     [SerializeField] private VfxPoolEntity disappearVfx;
+    [SerializeField, ReadOnly] private string npcDisappearSaveKey;
 
     // Start is called before the first frame update
     void Start()
+    {
+        if (FlagManager.Instance.GetFlag(npcDisappearSaveKey) == 1)
+            Destroy(gameObject);
+        else
+            Init();
+    }
+
+    void Init()
     {
         Debug.Assert(rb != null, "NpcMovement: rigidbody가 지정되어 있지 않음!");
         rb.isKinematic = true;
@@ -88,6 +99,7 @@ public class NpcMovement : MonoBehaviour
 
     public void Disappear()
     {
+        FlagManager.Instance.SetFlag(npcDisappearSaveKey, 1);
         StartCoroutine(CoDisappear());
 
         IEnumerator CoDisappear()
@@ -98,4 +110,15 @@ public class NpcMovement : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    #if UNITY_EDITOR
+    public void OnValidate()
+    {
+        if (Application.isPlaying) return;
+        string sceneName = SceneManager.GetActiveScene().name;
+        string characterName = character.Count > 0 ? character[0].ToString() : "Anonymous";
+        npcDisappearSaveKey = sceneName + "_" + characterName;
+        
+    }
+    #endif
 }

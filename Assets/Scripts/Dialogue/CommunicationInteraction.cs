@@ -16,7 +16,8 @@ public class CommunicationInteraction : MonoBehaviour
 
     private void Start()
     {
-        communicationStartTransform.gameObject.SetActive(false);
+        if(communicationStartTransform)
+            communicationStartTransform.gameObject.SetActive(false);
     }
 
     [Button]
