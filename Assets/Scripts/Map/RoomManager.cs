@@ -13,7 +13,7 @@ using UnityEditor;
 
 /// <summary>
 /// 각 방에 하나씩 존재하며 주로 editor-time에 port, safe/danger position 등을 계산하여 roomData에 bake해주는 스크립트
-/// runtime시에는 roomCenterTransform 관리
+/// 런타임 시에는 Port 위치에 TriggerCollider 배치 담당
 /// </summary>
 public class RoomManager : MonoBehaviour
 {
@@ -24,9 +24,7 @@ public class RoomManager : MonoBehaviour
     [Title("RoomDatas")]
     public SORoom roomData;
     public Tilemap tempTilemap;
-
-    public Transform roomCenterTransfrom;
-
+    
     [FoldoutGroup("PreDatas")]
     public TileBase portTile;
     [FoldoutGroup("PreDatas")]
@@ -37,11 +35,6 @@ public class RoomManager : MonoBehaviour
     public List<GimmickSignalSender> senderRefs = new List<GimmickSignalSender>();
     public List<GimmickSignalReceiver> receiverRefs = new List<GimmickSignalReceiver>();
     public List<GimmickSignalConnector> connectorRefs = new List<GimmickSignalConnector>();
-
-    private void Awake()
-    {
-        // MapManager.Instance.currentRoomManager = this;
-    }
 
     private void Start()
     {

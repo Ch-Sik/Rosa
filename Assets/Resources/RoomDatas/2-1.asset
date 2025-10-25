@@ -20,8 +20,8 @@ MonoBehaviour:
   title: 
   subTitle: 
   defaultBGM: {fileID: 0}
-  size: {x: 176, y: 26}
-  offset: {x: 4, y: -8}
+  size: {x: 176, y: 27}
+  offset: {x: 4, y: -9}
   topPorts: []
   botPorts: []
   rigPorts:
@@ -33,6 +33,16 @@ MonoBehaviour:
     - {x: 179, y: 4}
     - {x: 179, y: 5}
     - {x: 179, y: 6}
+    - {x: 179, y: 7}
+    - {x: 179, y: 8}
+    - {x: 179, y: 9}
+    - {x: 179, y: 10}
+    - {x: 179, y: 11}
+    - {x: 179, y: 12}
+    - {x: 179, y: 13}
+    - {x: 179, y: 14}
+    - {x: 179, y: 15}
+    - {x: 179, y: 16}
     connectedPorts:
     - flag: 
       flagIndex: 0
@@ -40,13 +50,4 @@ MonoBehaviour:
         m_SceneAsset: {fileID: 102900000, guid: a93de6ae18a289a4e9d1f92d077b3ead, type: 3}
         m_SceneName: 2-3
       index: 0
-  lefPorts:
-  - flag: 
-    index: 0
-    direction: 3
-    ports:
-    - {x: 4, y: -3}
-    - {x: 4, y: -2}
-    - {x: 4, y: -1}
-    - {x: 4, y: 0}
-    connectedPorts: []
+  lefPorts: []
