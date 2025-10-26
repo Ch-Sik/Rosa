@@ -4,8 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using VInspector.Libs;
 
 public class TestplayAssist : MonoBehaviour
 {
@@ -37,7 +35,7 @@ public class TestplayAssist : MonoBehaviour
 
 
         Vector2 pos = Vector2.zero;
-        if (Xcoord.text.IsNullOrEmpty() && Ycoord.text.IsNullOrEmpty())
+        if (Xcoord.text.Length < 1 && Ycoord.text.Length < 1)
         {
             foreach (PortDirection dir in (PortDirection[])Enum.GetValues(typeof(PortDirection)))
             {

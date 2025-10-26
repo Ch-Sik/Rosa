@@ -1,11 +1,8 @@
+#if UNITY_EDITOR
+
 using System;
-using System.IO;
-using System.Collections;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using UnityToolbarExtender;
 
@@ -15,7 +12,7 @@ class PlayGameFromStartButton : EditorWindow
 {
     private const string EditingSceneName = "EditingSceneName";
     private const string StartingScenePath = "Assets/Scenes/Title.unity";
-
+    
     private static string _lastScenePath
     {
         get => PlayerPrefs.GetString(EditingSceneName, string.Empty);
@@ -75,3 +72,4 @@ static class ToolbarStyles
         };
     }
 }
+#endif
