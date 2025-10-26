@@ -73,13 +73,13 @@ public class InteractiveObject : MonoBehaviour
 
     private void OnActive() 
     {
-        if(interactiveKeyUI != null)
+        if (!autoInteract && interactiveKeyUI != null)
             interactiveKeyUI.SetActive(true);
     }
 
     public void OnInactive()
     {
-        if (interactiveKeyUI != null)
+        if (!autoInteract && interactiveKeyUI != null)
             interactiveKeyUI?.SetActive(false);
     }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
@@ -18,7 +19,15 @@ public class FieldItem : MonoBehaviour
             ItemToastMessage.Instance.AddItem(item, quantity);
 
         InventoryController.Instance.AddItem(item.code, quantity);
+        Disappear();
+    }
 
-        Destroy(gameObject);
+    private void Disappear()
+    {
+        DOVirtual.DelayedCall(3f, () =>
+        {
+            if(gameObject)
+                Destroy(gameObject);
+        });
     }
 }

@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 
@@ -32,13 +33,16 @@ public class DropItem : FieldItem
         if (interactTrigger)
             interactTrigger.enabled = true;
 
-        if (hasLifetime)
-            StartCoroutine(Disappear());
+        if (hasLifetime) 
+            Disappear();
     }
-
-    private IEnumerator Disappear()
+    
+    private void Disappear()
     {
-        yield return new WaitForSeconds(lifetime);
-        Destroy(gameObject);
+        DOVirtual.DelayedCall(lifetime, () =>
+        {
+            if(gameObject)
+                Destroy(gameObject);
+        });
     }
 }
