@@ -148,7 +148,7 @@ public class ProjectileBase : MonoBehaviour
         Disappear();
     }
 
-    private void HandleHitWall()
+    protected virtual void HandleHitWall()
     {
         switch (onWallHit)
         {

@@ -98,15 +98,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 5314532955115710411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d65cc318db7b0524ca33c1ace1322877, type: 3}
+  m_Script: {fileID: 11500000, guid: 5df6f17d1be3b23488792ca107913f5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   useGravity: 0
   speedScale: 1
-  startRotationMode: 2
+  startRotationMode: 1
   randomRotationOnStart: 0
   useRandomAngularVelocity: 0
-  randomRotationRange: 30
+  randomAngularVelocityRange: 30
+  angularVelocity: 0
+  flipRotationWhenLookingLeft: 0
   targetLayers:
     serializedVersion: 2
     m_Bits: 128
@@ -122,7 +124,14 @@ MonoBehaviour:
   colliders:
   - {fileID: 1564339269941484740}
   animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
   hitEffect: {fileID: 0}
+  mushroomLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  returnPosition: {x: 0, y: 0, z: 0}
+  damageReceiver: {fileID: 0}
+  returnTime: 1.8
 --- !u!114 &-7660184339708960641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 0
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!61 &1564339269941484740
 BoxCollider2D:
