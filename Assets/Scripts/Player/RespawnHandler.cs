@@ -17,10 +17,12 @@ public class RespawnHandler : MonoBehaviour
     
     [SerializeField, ReadOnly] private int enemyCount = 0;
     private Vector2Int _lastAddedRespawnPoint;
+    private int platformLayer;
 
     private void Awake()
     {
         _instance = this; 
+        platformLayer = LayerMask.NameToLayer("Platform");
     }
 
     private void Start()
@@ -38,6 +40,9 @@ public class RespawnHandler : MonoBehaviour
         // 땅 끝에 발이 걸치고 있을 경우를 대비해 한 번 더 검사
         var rayHit = Physics2D.Raycast(PlayerRef.Instance.transform.position, Vector2.down, 1.0f, 1 << LayerMask.NameToLayer("Ground"));
         if (rayHit.collider == null) return;
+
+        if (PlayerRef.Instance.movement.platformBelow.layer == platformLayer)
+            return;
         
         if (enemyCount > 0)
         {
@@ -46,7 +51,7 @@ public class RespawnHandler : MonoBehaviour
         }
 
         Vector2Int curPosition = new Vector2Int((int)(_player.transform.position.x),
-                                                (int)(_player.transform.position.y - 0.8f));
+                                                (int)(_player.transform.position.y));
         UpdateRespawnPoint(curPosition);
         _lastAddedRespawnPoint = curPosition;
     }
@@ -60,6 +65,13 @@ public class RespawnHandler : MonoBehaviour
     [Button]
     public void Respawn()
     {
+        StartCoroutine(RespawnSequence());
+    }
+
+    private IEnumerator RespawnSequence()
+    {
+        FadeoutPanel.Fadeout();
+        yield return new WaitForSeconds(FadeoutPanel.fadeDuration);
         if (PlayerRef.Instance.state.CurrentHP <= 0)
             PlayerRef.Instance.state.Heal(healAmount);
 
@@ -70,9 +82,11 @@ public class RespawnHandler : MonoBehaviour
             PlayerRef.Instance.movement.UnstickFromWall();
 
         Vector2Int respawnPoint = respawnPoints.GetLastNth(5);
-        _player.transform.position = new Vector3(respawnPoint.x + 0.5f, respawnPoint.y + 0.5f, _player.transform.position.z);
+        _player.transform.position = new Vector3(respawnPoint.x + 0.5f, respawnPoint.y + 1.0f, _player.transform.position.z);
+        yield return new WaitForSeconds(0.5f);
+        FadeoutPanel.FadeIn();
     }
-    
+
     private void OnTriggerEnter2D(Collider2D col)
     {
         if (!col.GetComponent<AIPerception>()) return;
