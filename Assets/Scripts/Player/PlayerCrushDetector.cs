@@ -24,6 +24,8 @@ public class PlayerCrushDetector : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
+        if (collision.gameObject.tag == "Platform") return;
+        
         foreach (ContactPoint2D contact in collision.contacts)
         {
             // 수평 충돌 확인
