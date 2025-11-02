@@ -3,41 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Panda;
+using Unity.Jobs;
 
 [RequireComponent(typeof(MonsterDamageInflictor))]
 public class Task_GA_Tackle : Task_A_Base
 {
     // 컴포넌트 레퍼런스
-    [SerializeField]
-    protected new Rigidbody2D rigidbody;
-    [SerializeField]
-    protected MonsterDamageInflictor damageComponent;
+    [SerializeField] protected new Rigidbody2D rigidbody;
+    [SerializeField] protected MonsterDamageInflictor damageComponent;
 
-    [Title("공격 관련")]
-    [SerializeField, Tooltip("돌진 패턴 공격력")]
+    [Title("공격 관련")] [SerializeField, Tooltip("돌진 패턴 공격력")]
     protected int tackleAttackPower;
+
     [SerializeField, Tooltip("돌진 최대 속도 (m/s)")]
     protected float tackleMaxSpeed = 5;
+
     [SerializeField, Tooltip("돌진 가속도 (m/s^2)")]
     protected float tackleAccel = 1000;
+
     [SerializeField, Tooltip("돌진 중 방향 전환 허용")]
     protected bool allowUturn = false;
+
+    [SerializeField, ShowIf("allowUturn"), Tooltip("돌진 중 방향 전환 시의 딜레이")]
+    protected float lookBackDelay = 0f;
+
     [SerializeField, Tooltip("돌진 후 브레이크 계수")]
     protected float recoveryDrag = 3.0f;
 
-    [Title("벽에 박았을 때 관련")]
-    [SerializeField, Tooltip("돌진 중 벽에 박았을 때 스턴 활성화")]
+    [Title("벽에 박았을 때 관련")] [SerializeField, Tooltip("돌진 중 벽에 박았을 때 스턴 활성화")]
     protected bool wallStunEnabled;
+
     [SerializeField, Tooltip("돌진 중 벽에 박았을 때 스턴 시간")]
     protected float wallStunDuration;
 
-    [Title("절벽 만났을 때 관련")]
-    [SerializeField, Tooltip("돌진 중 절벽 만났을 때 멈춤")]
+    [Title("절벽 만났을 때 관련")] [SerializeField, Tooltip("돌진 중 절벽 만났을 때 멈춤")]
     protected bool cliffStopEnabled = false;
 
     protected Timer stunTimer = null;
     protected Vector2 tackleDir;
-    protected int defaultCollideDamage;    // 몸체 충돌 판정이 기본적으로 가지고 있던 데미지
+    protected int defaultCollideDamage; // 몸체 충돌 판정이 기본적으로 가지고 있던 데미지
+
+    protected Coroutine _flipCoroutine = null;
 
     private void Start()
     {
@@ -47,18 +53,21 @@ public class Task_GA_Tackle : Task_A_Base
             if (blackboard == null)
                 Debug.LogError($"{gameObject.name}: Blackboard를 찾을 수 없음!");
         }
+
         if (rigidbody == null)
         {
             rigidbody = GetComponent<Rigidbody2D>();
             if (rigidbody == null)
                 Debug.LogError($"{gameObject.name}: Rigidbody2D를 찾을 수 없음!");
         }
-        if(damageComponent == null)
+
+        if (damageComponent == null)
         {
             damageComponent = GetComponent<MonsterDamageInflictor>();
-            if(damageComponent == null)
+            if (damageComponent == null)
                 Debug.LogError($"{gameObject.name}: damageComponent를 찾을 수 없음!");
         }
+
         defaultCollideDamage = damageComponent.damage;
     }
 
@@ -78,7 +87,7 @@ public class Task_GA_Tackle : Task_A_Base
     protected override void OnStartupBegin()
     {
         // 방향 계산
-        CalculateAttackDirection();
+        CheckAttackDir();
     }
 
     protected override void OnActiveBegin()
@@ -101,14 +110,14 @@ public class Task_GA_Tackle : Task_A_Base
             if (stunTimer == null)
             {
                 stunTimer = Timer.StartTimer();
-                blackboard.Set(BBK.isStunned, true);    // 애니메이션을 위한 블랙보드 설정
+                blackboard.Set(BBK.isStunned, true); // 애니메이션을 위한 블랙보드 설정
                 Debug.Log("벽에다 대가리 꽁!!!");
             }
             // 스턴 중간 프레임
             else if (stunTimer.duration < wallStunDuration)
             {
                 ThisTask.debugInfo = $"stun: {wallStunDuration - stunTimer.duration}";
-                activeTimer.Reset();    // Task_A_Base에 의해 스턴 도중에 패턴 종료되는 것 방지
+                activeTimer.Reset(); // Task_A_Base에 의해 스턴 도중에 패턴 종료되는 것 방지
                 return;
             }
             // 스턴 마지막 프레임
@@ -134,9 +143,9 @@ public class Task_GA_Tackle : Task_A_Base
         }
 
         // 돌진 도중 방향 전환 옵션 켜진경우, 돌진 도중에도 방향 계속 체크
-        if(allowUturn)
+        if (allowUturn)
         {
-            CalculateAttackDirection(false);
+            CheckAttackDirWhileAttack();
         }
 
         // 실제 돌진 수행
@@ -166,21 +175,51 @@ public class Task_GA_Tackle : Task_A_Base
         rigidbody.drag = 0f;
     }
 
-    protected virtual void CalculateAttackDirection(bool showErrorMsg = true)
+    protected virtual void CheckAttackDir()
     {
         GameObject enemy;
         if (!blackboard.TryGet(BBK.Enemy, out enemy) || enemy == null)
         {
-            if(showErrorMsg)
-                Debug.LogError($"{gameObject.name}: 블랙보드에서 적을 찾을 수 없음!");
+            // if (showErrorMsg)
+            //     Debug.LogError($"{gameObject.name}: 블랙보드에서 적을 찾을 수 없음!");
             Fail();
             return;
         }
+
         tackleDir = (enemy.transform.position.x - transform.position.x) < 0 ? Vector2.left : Vector2.right;
 
         // 공격 방향에 따라 좌우 반전하기
         LookAt2D(enemy.transform.position);
     }
+
+    protected virtual void CheckAttackDirWhileAttack()
+    {
+        GameObject enemy;
+        if (!blackboard.TryGet(BBK.Enemy, out enemy) || enemy == null)
+        {
+            Fail();
+            return;
+        }
+
+        var newDir = (enemy.transform.position.x - transform.position.x) < 0 ? Vector2.left : Vector2.right;
+        if (newDir == tackleDir)
+            return;
+
+        // 공격 방향에 따라 좌우 반전하기
+        if (_flipCoroutine != null) return;
+        _flipCoroutine = StartCoroutine(WaitAndLookEnemy(enemy));
+    }
+
+    protected IEnumerator WaitAndLookEnemy(GameObject enemy)
+    {
+        yield return new WaitForSeconds(lookBackDelay);
+        
+        tackleDir = (enemy.transform.position.x - transform.position.x) < 0 ? Vector2.left : Vector2.right;
+        LookAt2D(enemy.transform.position);
+        
+        _flipCoroutine = null;
+    }
+
 
     protected virtual void DoTackle()
     {

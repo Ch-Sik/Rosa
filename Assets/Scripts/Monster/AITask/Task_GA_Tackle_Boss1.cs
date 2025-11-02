@@ -104,7 +104,7 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
         // 돌진 도중 방향 전환 옵션 켜진경우, 돌진 도중에도 방향 계속 체크
         if (allowUturn)
         {
-            CalculateAttackDirection(false);
+            CheckAttackDir();
         }
 
         // 실제 돌진 수행

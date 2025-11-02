@@ -595,7 +595,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &9134073767175717656
 MonoBehaviour:
@@ -618,6 +618,7 @@ MonoBehaviour:
   isSuperArmour: 1
   tempSuperArmour: 0
   isInvincible: 1
+  tempInvincible: 0
   knockbackCoeff: 0
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -743,6 +744,7 @@ MonoBehaviour:
   tackleSpeed: 8
   tackleAccel: 1000
   allowUturn: 1
+  lookBackDelay: 1
   recoveryDrag: 3
   wallStunEnabled: 0
   wallStunDuration: 0
