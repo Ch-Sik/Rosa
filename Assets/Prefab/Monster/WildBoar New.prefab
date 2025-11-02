@@ -94,7 +94,6 @@ MonoBehaviour:
   maxHP: 1
   currentHP: 0
   blackboard: {fileID: 0}
-  mobCounter: {fileID: 0}
 --- !u!114 &1912261046069545197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &1471369834468190040
 MonoBehaviour:
@@ -128,9 +127,11 @@ MonoBehaviour:
   rigidbody: {fileID: 0}
   portrait: {fileID: 0}
   pandaBT: {fileID: 0}
+  monsterAttackComponent: {fileID: 0}
   isSuperArmour: 0
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 5
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -245,7 +246,7 @@ MonoBehaviour:
   patternID: 0
   startupDuration: 0.4
   superArmourOnStartup: 1
-  activeDuration: 0.6
+  activeDuration: 1.2
   superArmourOnActive: 1
   recoveryDuration: 1.4
   superArmourOnRecovery: 0
@@ -253,12 +254,13 @@ MonoBehaviour:
   rigidbody: {fileID: 0}
   damageComponent: {fileID: 1912261046069545197}
   tackleAttackPower: 2
-  tackleSpeed: 8
+  tackleMaxSpeed: 5
   tackleAccel: 2000
   allowUturn: 0
   recoveryDrag: 1.1
   wallStunEnabled: 1
   wallStunDuration: 1.2
+  cliffStopEnabled: 0
 --- !u!50 &3168922545191321803
 Rigidbody2D:
   serializedVersion: 4
