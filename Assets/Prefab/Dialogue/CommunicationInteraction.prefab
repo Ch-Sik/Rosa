@@ -180,15 +180,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 3974633437901971439}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0d1216eac68bd14884bd616533535e4, type: 3}
+  m_Script: {fileID: 11500000, guid: aef43507945d09a42a71c0ebb97adb1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   delayAfterWalk: 0.3
+  WalkToTransform: {fileID: 169665131879626123}
   decision:
-    initialID: 0
-    iterativeID: 0
+    initialID: -1
+    iterativeID: -1
     flagedID: []
-  communicationStartTransform: {fileID: 169665131879626123}
   ID: 0
 --- !u!1001 &1045427726445833868
 PrefabInstance:

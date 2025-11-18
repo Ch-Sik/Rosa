@@ -15,6 +15,8 @@ public class InteractiveObject : MonoBehaviour
     public bool canInteract = true;
     [Tooltip("유효거리 내로 다가오면 자동으로 상호작용 진행 여부")]
     public bool autoInteract = false;
+    [Tooltip("제자리에서 쿨타임만 차면 반복 상호작용 허용 여부")]
+    public bool allowRepeatInteract = true;
     [HideIf("autoInteract")]
     public float coolDown = 0f;
 
@@ -68,7 +70,8 @@ public class InteractiveObject : MonoBehaviour
         function.Invoke();
         lastInterationTime = Time.time;
         OnInactive();
-        DOVirtual.DelayedCall(coolDown, () => { OnActive(); });
+        if(allowRepeatInteract)
+            DOVirtual.DelayedCall(coolDown, () => { OnActive(); });
     }
 
     private void OnActive() 

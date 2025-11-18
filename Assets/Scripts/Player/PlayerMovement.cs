@@ -209,15 +209,9 @@ public class PlayerMovement : MonoBehaviour
     [FoldoutGroup("플래그")]
     [ReadOnly] public bool isWallJumping = false;       // 벽 점프 중인지
     [FoldoutGroup("플래그")]
-    [ReadOnly] public bool isDoingMagic = false;
-    [FoldoutGroup("플래그")]
     [ReadOnly] public bool isKnockbacked = false;
     [FoldoutGroup("플래그")]
     [ReadOnly] public bool isSlidingOnWall = false;
-    [FoldoutGroup("플래그")]
-    [ReadOnly] public bool isDoingHooking = false;      // 후크액션을 수행하고 있는지
-    [FoldoutGroup("플래그")]
-    [ReadOnly] public bool isHitHookingTarget = false;  // 후크액션중 후크목표에 도달했는지
     [FoldoutGroup("플래그")]
     [ReadOnly] public bool isDoingAttack = false;
     [FoldoutGroup("플래그")]
@@ -232,7 +226,10 @@ public class PlayerMovement : MonoBehaviour
     [ReadOnly] public bool isMushJumping = false;       // 버섯점프를 하고 있는지
     [FoldoutGroup("플래그")]
     [ReadOnly] public bool isDashing = false;       // 대시 중인지
-
+    [FoldoutGroup("플래그")]
+    [ReadOnly] public bool isSitting = false;
+    [FoldoutGroup("플래그")]
+    [ReadOnly] public bool isJustSit = false;
     // 범위 지정
     [FoldoutGroup("벽 감지 범위")]
     public Vector2 detectWallTop = new Vector2(0.0f, 0.5f);
@@ -260,10 +257,6 @@ public class PlayerMovement : MonoBehaviour
 
     [BoxGroup("Debug/Vertical/General")]
     [ReadOnly, SerializeField] public GameObject platformBelow = null;
-
-    [BoxGroup("Debug/Vertical/General")]
-    [Tooltip("현재 매달려있는 담쟁이")]
-    [ReadOnly, SerializeField] public GameObject hangingIvy = null;
 
     [BoxGroup("Debug/Vertical/General")]
     [ReadOnly, SerializeField] public Vector2 moveVector;
@@ -365,7 +358,13 @@ public class PlayerMovement : MonoBehaviour
             // isWallClimbingTop = false;
         }
         // isDoingAttack = playerRef.combat.isDoingAttack;
-        isNotMoveable = isDoingLedgeClimb || isKnockbacked || isWallJumping || isDashing || isDoingAttack;
+        isNotMoveable = 
+            isDoingLedgeClimb 
+            || isKnockbacked 
+            || isWallJumping 
+            || isDashing 
+            || isDoingAttack
+            || isSitting;
     }
 
     /// <summary>
@@ -432,6 +431,10 @@ public class PlayerMovement : MonoBehaviour
     internal void Walk(Vector2 inputVector)
     {
         moveVector = new Vector2(inputVector.x, 0);
+        
+        // 25.11.19) 플레이어 의자에 앉기/일어서기 추가
+        if (Mathf.Abs(moveVector.x) > 0.1f && isSitting && !isJustSit)
+            isSitting = false;
     }
     #endregion
 
@@ -603,15 +606,6 @@ public class PlayerMovement : MonoBehaviour
                 isWallJumpReady = true;
             }
         }
-        else
-        {
-            if (!DetectWall())
-            {
-                // TODO: 지면으로 올라가기 구현
-                //Debug.Log("AAA");
-                //UnstickFromWall();
-            }
-        }
     }
 
     internal void StopClimb(Vector2 inputVector)
@@ -658,7 +652,6 @@ public class PlayerMovement : MonoBehaviour
         //    playerRef.magic.CancelMagic();
         //}
         rb.gravityScale = 0;
-        hangingIvy = ivy;
         transform.parent = ivy.transform;
     }
 
@@ -672,7 +665,6 @@ public class PlayerMovement : MonoBehaviour
         // playerControl.SetActionState(PlayerActionState.DEFAULT);
         rb.gravityScale = this.gravityScale;
 
-        hangingIvy = null;
         transform.parent = null;
     }
 
@@ -700,7 +692,6 @@ public class PlayerMovement : MonoBehaviour
     {
         // Debug.Log("LedgeClimbEnd");
 
-        hangingIvy = null;
         transform.parent = null;
         isDoingLedgeClimb = false;
         moveVector = Vector2.zero;
@@ -1125,6 +1116,20 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
 
+    #region 휴식 관련
+    
+    public void SitOnChair()
+    {
+        // 강제 정지
+        moveVector = Vector2.zero;
+        rb.velocity = Vector2.zero;
+        // 플래그 세팅
+        isSitting = true;
+        isJustSit = true;
+        DOVirtual.DelayedCall(1.0f, () => { isJustSit = false; });
+    }
+
+    #endregion
 
     public void LookAt2D(Vector2 worldPoint)
     {
@@ -1208,7 +1213,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Vector2 detectPointTop = (Vector2)transform.position
                             + Vector2.Scale(detectWallTop, new Vector2(facingDirection.isRIGHT() ? 1 : -1, 1));

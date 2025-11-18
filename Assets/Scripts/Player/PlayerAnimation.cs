@@ -86,6 +86,7 @@ public class PlayerAnimation : MonoBehaviour
         anim.SetBool("isSuperDashing", playerMove.isDoingSuperDash);
         // 25.05.20) 대시 애니메이션 추가
         anim.SetBool("isDashing", playerMove.isDashing);
+        anim.SetBool("Sit", playerMove.isSitting);
     }
 
     public void SetAttackAnimTrigger()
