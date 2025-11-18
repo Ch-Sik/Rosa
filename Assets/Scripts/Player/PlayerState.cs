@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 플레이어의 현재 상태를 보관하는 클래스
@@ -13,12 +14,14 @@ public class PlayerState : MonoBehaviour
     private PlayerStateUI stateUI;
 
     // property
-    public int MaxHP { get { return _maxHP; } }
-    public float CurrentHP { get { return _currentHP; } }
+    public int MaxHP { get { return maxHp; } }
+    public float CurrentHP { get { return currentHp; } }
 
     // states
-    [SerializeField] private int _maxHP;
-    [SerializeField] private float _currentHP;
+    [FormerlySerializedAs("_maxHP")] 
+    [SerializeField] private int maxHp;
+    [SerializeField] private float currentHp;
+    [SerializeField] private bool respawnOnDie;
 
     // events
     public delegate void HpEvent(float currentValue);
@@ -33,7 +36,8 @@ public class PlayerState : MonoBehaviour
     {
         // HP, 공격력 등의 값 초기화하기
         stateUI = PlayerStateUI.Instance;
-        _currentHP = _maxHP;
+        currentHp = maxHp;
+        OnHpChanged?.Invoke(currentHp);
     }
 
     // 소숫점 단위로 회복
@@ -42,8 +46,8 @@ public class PlayerState : MonoBehaviour
         if (amount <= 0) return;
 
         Debug.Log($"체력 회복: {amount}");
-        _currentHP = Mathf.Min(_currentHP + amount, _maxHP);
-        OnHpChanged?.Invoke(_currentHP);
+        currentHp = Mathf.Min(currentHp + amount, maxHp);
+        OnHpChanged?.Invoke(currentHp);
     }
 
     // 정수 단위로 데미지
@@ -52,15 +56,26 @@ public class PlayerState : MonoBehaviour
         if (amount <= 0) return;
 
         Debug.Log("피해 입음 : " + amount);
-        _currentHP = Mathf.Max(_currentHP - amount, 0);
-        OnHpChanged?.Invoke(_currentHP);
+        currentHp = Mathf.Max(currentHp - amount, 0);
+        OnHpChanged?.Invoke(currentHp);
 
-        if (_currentHP <= 0)
+        if (currentHp <= 0)
+            OnDie();
+    }
+
+    private void OnDie()
+    {
+        if (respawnOnDie)
         {
             if (RespawnHandler.Instance != null)
                 RespawnHandler.Instance.Respawn();
             else
                 Debug.LogWarning("RespawnManager가 씬에 존재하지 않음");
+            return;
+        }
+        else
+        {
+            GameManager.Instance.GameOver();
         }
     }
 }

@@ -91,7 +91,7 @@ public class MapManager : MonoBehaviour
         return cnt;
     }
 
-    private void Start()
+    public void Start()
     {
         // 새로하기 상황일 경우
         if (SaveLoadManager.Instance.IsNewGame)
@@ -310,7 +310,7 @@ public class MapManager : MonoBehaviour
         return sceneLoadOperation;
     }
 
-    private AsyncOperation StartUnloadOldScene(Scene scene)
+    public AsyncOperation StartUnloadOldScene(Scene scene)
     {
         // 기존 씬 있다면 언로드
         Debug.Log($"[MapManager] 기존 방 언로드 시작");

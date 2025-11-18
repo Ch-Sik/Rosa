@@ -77,6 +77,7 @@ public class FadeoutPanel : MonoBehaviour
             .Append(_imageComponent.DOFade(fadeOutToBlack ? 1 : 0, _fadeDuration))
             .AppendCallback(() => { 
                 _isTweening = false;
-            });
+            })
+            .SetUpdate(true);   // UnscaledTime 사용
     }
 }

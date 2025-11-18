@@ -39,7 +39,7 @@ public class SaveLoadManager : MonoBehaviour
         _isNewGame = value;
     }
 
-    // SaveLoadManager.Start()는 TestScene01 씬 로드시에 한번만 호출되어야 함.
+    // SaveLoadManager.Start()는 MainScene 씬 로드시에 한번만 호출되어야 함.
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -53,6 +53,13 @@ public class SaveLoadManager : MonoBehaviour
 
         MakeDirectoryHierarchy();
         Debug.Log($"세이브 위치: {GetPath(flagPathName)}");
+    }
+
+    public void SavePlayData()
+    {
+        SaveFlag();
+        SavePlayerPosition();
+        _isNewGame = false;     // 사망 후 최근 세이브로 돌아갈 시에 완전 처음으로 되돌아가는 것 방지 
     }
 
 

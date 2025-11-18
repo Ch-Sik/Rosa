@@ -40,7 +40,7 @@ public class FlagManager : MonoBehaviour
         Init();
     }
 
-    private void Init()
+    public void Init()
     {
         if (SaveLoadManager.Instance.IsNewGame)
         {
@@ -61,8 +61,7 @@ public class FlagManager : MonoBehaviour
             }
         }
     }
-
-    #region Utiles
+    
     [Button]
     public void SetFlag(string flag, int value)
     {
@@ -89,5 +88,4 @@ public class FlagManager : MonoBehaviour
 
         return _flags[key];
     }
-    #endregion
 }

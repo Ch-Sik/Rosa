@@ -312,7 +312,7 @@ public class PlayerMovement : MonoBehaviour
         defaultMoveSpeed = moveSpeed;
     }
 
-    void LoadFlags()
+    public void LoadFlags()
     {
         dashEnabled = FlagManager.Instance?.GetFlag("dashEnabled") == 1 ? true : false;
         mushJumpEnabled = FlagManager.Instance?.GetFlag("mushJumpEnabled") == 1 ? true : false;
