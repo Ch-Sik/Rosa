@@ -21,8 +21,7 @@ public class SaveLoadManager : MonoBehaviour
     }
     #endregion
 
-    public bool useSaveLoad = true;
-    public bool useProjectSave = true;      //컴퓨터에 저장할지 프로젝트에 저장할지
+    [SerializeField] private SaveUI saveUI;
     public bool IsNewGame { get  { return _isNewGame; } }
     private bool _isNewGame = true;           // 새 게임인지 아닌지를 표시
 
@@ -34,18 +33,10 @@ public class SaveLoadManager : MonoBehaviour
     // 25.04.29) newtonsoft json으로 변경된 것으로 인해 발생한 self-loop문제 처리
     private JsonSerializerSettings serializeSetting;
 
-    public void SetNewGameFlag(bool value)
-    {
-        _isNewGame = value;
-    }
-
-    // SaveLoadManager.Start()는 MainScene 씬 로드시에 한번만 호출되어야 함.
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
-
-        Debug.Log($"세이브 사용이 {useSaveLoad}로 설정되어 있습니다.");
-
+        
         // 25.04.29) newtonsoft json으로 변경된 것으로 인해 발생한 self-loop문제 처리
         serializeSetting = new JsonSerializerSettings();
         serializeSetting.Formatting = Formatting.Indented;
@@ -54,39 +45,37 @@ public class SaveLoadManager : MonoBehaviour
         MakeDirectoryHierarchy();
         Debug.Log($"세이브 위치: {GetPath(flagPathName)}");
     }
+    
+    public void SetNewGameFlag(bool value)
+    {
+        _isNewGame = value;
+    }
 
+    [Button]
     public void SavePlayData()
     {
         SaveFlag();
         SavePlayerPosition();
+        saveUI.ShowSaveUI();
         _isNewGame = false;     // 사망 후 최근 세이브로 돌아갈 시에 완전 처음으로 되돌아가는 것 방지 
     }
 
-
+    [Button]
+    public void TestSaveUI()
+    {
+        saveUI.ShowSaveUI();
+    }
+    
     #region Utils
     //Path 병합해서 전달
     private string GetPath(string path)
     {
-#if UNITY_EDITOR
-        if (useProjectSave)
-            return $"{Application.dataPath}/{pathName}/{path}";
-        else
-            return $"{Application.persistentDataPath}/{pathName}/{path}";
-#else
-            return $"{Application.persistentDataPath}/{pathName}/{path}";
-#endif
+        return $"{Application.persistentDataPath}/{pathName}/{path}";
     }
 
     private void MakeDirectoryHierarchy()
     {
-#if UNITY_EDITOR
-        if (useProjectSave)
-            MakeDirectory($"{Application.dataPath}/{pathName}");
-        else
-            MakeDirectory($"{Application.persistentDataPath}/{pathName}");
-#else
-            MakeDirectory($"{Application.persistentDataPath}/{pathName}");
-#endif
+        MakeDirectory($"{Application.persistentDataPath}/{pathName}");
         MakeDirectory(GetPath(flagPathName));
         MakeDirectory(GetPath(playerPathName));
         MakeDirectory(GetPath(optionPathName));
