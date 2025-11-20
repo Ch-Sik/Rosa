@@ -47076,6 +47076,66 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1001 &1196286116
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -18
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2901179336586955603, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_Name
+      value: SaveChair_p2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3942624519273354955, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+  m_SourcePrefab: {fileID: 100100000, guid: dcc904b00026b1648b671e636d83c356, type: 3}
 --- !u!21 &1201832890
 Material:
   serializedVersion: 8
@@ -65255,3 +65315,4 @@ SceneRoots:
   - {fileID: 2905549473213100883}
   - {fileID: 536187078}
   - {fileID: 1596229175}
+  - {fileID: 1196286116}

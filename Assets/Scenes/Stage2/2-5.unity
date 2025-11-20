@@ -653,6 +653,66 @@ Material:
     m_Colors:
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_BuildTextureStacks: []
+--- !u!1001 &27525971
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 110
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466164764639481530, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2901179336586955603, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      propertyPath: m_Name
+      value: SaveChair_p2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3942624519273354955, guid: dcc904b00026b1648b671e636d83c356, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+  m_SourcePrefab: {fileID: 100100000, guid: dcc904b00026b1648b671e636d83c356, type: 3}
 --- !u!43 &28317208
 Mesh:
   m_ObjectHideFlags: 0
@@ -67767,3 +67827,4 @@ SceneRoots:
   - {fileID: 1291290966}
   - {fileID: 165523347}
   - {fileID: 930840304}
+  - {fileID: 27525971}
