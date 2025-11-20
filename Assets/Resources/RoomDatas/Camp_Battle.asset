@@ -20,18 +20,17 @@ MonoBehaviour:
   title: 
   subTitle: 
   defaultBGM: {fileID: 0}
-  size: {x: 123, y: 42}
-  offset: {x: 68, y: 35}
+  size: {x: 73, y: 82}
+  offset: {x: 1, y: -5}
   topPorts: []
   botPorts: []
-  rigPorts:
+  rigPorts: []
+  lefPorts:
   - flag: 
     index: 0
-    direction: 2
+    direction: 3
     ports:
-    - {x: 190, y: 35}
-    - {x: 190, y: 36}
-    - {x: 190, y: 37}
-    - {x: 190, y: 38}
+    - {x: 1, y: -5}
+    - {x: 1, y: -4}
+    - {x: 1, y: -3}
     connectedPorts: []
-  lefPorts: []

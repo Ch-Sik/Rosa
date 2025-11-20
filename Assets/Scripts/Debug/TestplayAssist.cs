@@ -19,7 +19,7 @@ public class TestplayAssist : MonoBehaviour
             List<TMP_Dropdown.OptionData> dropDownList = new List<TMP_Dropdown.OptionData>();
             foreach (SORoom room in rooms)
             {
-                dropDownList.Add(new TMP_Dropdown.OptionData(room.name));
+                dropDownList.Add(new TMP_Dropdown.OptionData(room.scene.SceneName));
             }
             roomSelectDropdown.ClearOptions();
             roomSelectDropdown.AddOptions(dropDownList);
