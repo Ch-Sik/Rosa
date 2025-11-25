@@ -1494,7 +1494,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &204481087
 Transform:
@@ -5938,7 +5938,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!156049354 &353077797
 Grid:
@@ -8330,7 +8330,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &496957676
 Transform:
@@ -15659,12 +15659,12 @@ GameObject:
   - component: {fileID: 983665663}
   - component: {fileID: 983665661}
   - component: {fileID: 983665660}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Water Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &983665659
 Transform:
@@ -23275,7 +23275,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1350064471
 Transform:
@@ -47270,7 +47270,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1657261517
 Transform:
@@ -48859,6 +48859,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 353077798}
     m_Modifications:
+    - target: {fileID: 1529425674113723753, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 1740112074270076679, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
       propertyPath: m_Points.Array.data[0].x
       value: -0.05
@@ -48875,13 +48879,45 @@ PrefabInstance:
       propertyPath: m_Points.Array.data[1].y
       value: -7
       objectReference: {fileID: 0}
+    - target: {fileID: 3284183485195506759, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847209961384327362, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 4990997790893516628, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
       propertyPath: m_Size.y
       value: 6.83
       objectReference: {fileID: 0}
+    - target: {fileID: 6214186068935210317, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6988487854365423752, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 7506277341668890328, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
       propertyPath: m_Name
       value: Ivy
+      objectReference: {fileID: 0}
+    - target: {fileID: 7506277341668890328, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7560000373233683653, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7975079613714601279, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8547417208979319243, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 8684300753331362018, guid: d05dcfbeb1c36f74284b17332214b1fa, type: 3}
       propertyPath: m_LocalPosition.x

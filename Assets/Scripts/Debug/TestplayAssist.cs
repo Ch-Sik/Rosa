@@ -88,4 +88,9 @@ public class TestplayAssist : MonoBehaviour
     {
         PlayerRef.Instance.movement.EnableGliding();
     }
+
+    public void GetAttackItem()
+    {
+        InventoryController.Instance.AddItem(ItemCode.AttackItem, 1);
+    }
 }
