@@ -16,9 +16,12 @@ public class PlayerStateUI : MonoBehaviour
 
     // 25.05.16) 선택된 마법 관련 UI 삭제
     // [SerializeField] TMP_Text text_selectedMagic;
-    [SerializeField] GameObject heart;
-    [SerializeField] GameObject heartContainer;
-    [SerializeField] List<HeartIcon> heartUiList = new List<HeartIcon>();
+    [SerializeField] private GameObject heart;
+    [SerializeField] private GameObject heartContainer;
+    [SerializeField] private List<HeartIcon> heartUiList = new List<HeartIcon>();
+    [SerializeField] private GameObject attackItemUI;
+    [SerializeField] private Animator attackItemUiAnim;
+    
     float curHp = 0;
 
     private void Awake()
@@ -30,13 +33,21 @@ public class PlayerStateUI : MonoBehaviour
     {
         PlayerRef.Instance.state.OnHpChanged += OnHpChanged;
 
+        InventoryController.Instance.OnItemAdded += OnAttackItemAdded;
+        InventoryController.Instance.OnItemRemoved += OnAttackItemConsumed;
+
         Initialize();
     }
 
     [Button("강제 초기화 진행")]
     private void Initialize()
     {
-        Debug.Log($"PlayerStateUI 초기화 수행");
+        InitHpUi();
+        InitAttackItemUi();
+    }
+
+    private void InitHpUi()
+    {
         // 필드값 설정
         curHp = PlayerRef.Instance.state.CurrentHP;
 
@@ -59,9 +70,27 @@ public class PlayerStateUI : MonoBehaviour
         }
     }
 
-    //// TODO: 아이콘과 스프라이트 기반으로 기능 재구현
-    //public void UpdateSelectedMagic(SO_Magic selectedMagic)
-    //{
-    //    text_selectedMagic.text = selectedMagic.skillName;
-    //}
+    private void InitAttackItemUi()
+    {
+        int attackItemQuantity = InventoryController.Instance.GetQuantity(ItemCode.AttackItem);
+        if(attackItemQuantity > 0)
+            attackItemUI?.SetActive(true);
+        else
+            attackItemUI?.SetActive(false);
+    }
+
+    private void OnAttackItemAdded(ItemCode itemCode, int quantity)
+    {
+        if (itemCode != ItemCode.AttackItem)
+            return;
+        attackItemUI?.SetActive(true);
+        attackItemUiAnim.SetTrigger("In");
+    }
+
+    private void OnAttackItemConsumed(ItemCode itemCode, int quantity)
+    {
+        if (itemCode != ItemCode.AttackItem)
+            return;
+        attackItemUiAnim.SetTrigger("Out");
+    }
 }
