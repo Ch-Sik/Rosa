@@ -2,7 +2,9 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -15,6 +17,8 @@ public class PauseMenuUI : MonoBehaviour
     public static PauseMenuUI Instance;
     [SerializeField, ReadOnly] bool _isPaused = false;
 
+    private InputAction pauseInput;
+
     private void Awake()
     {
         Instance = this;
@@ -22,11 +26,13 @@ public class PauseMenuUI : MonoBehaviour
 
     private void Start()
     {
-        InputManager.Instance.AM_UiInGame.FindAction("Pause").performed += OnPerformedPauseButton;
+        pauseInput = InputManager.Instance.AM_UiInGame.FindAction("Pause");
+        pauseInput.performed += OnPerformedPauseButton;
 
         ClosePauseMenu();
     }
 
+    [Button]
     private void OnPerformedPauseButton(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if(_isPaused)
@@ -106,5 +112,10 @@ public class PauseMenuUI : MonoBehaviour
             }
 
         }
+    }
+    
+    private void OnDestroy()
+    {
+        pauseInput.performed -= OnPerformedPauseButton;
     }
 }

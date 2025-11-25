@@ -955,7 +955,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2281701119
 --- !u!114 &204790926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7194,8 +7194,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7687175820226039062, guid: 3357f9a7de29b0d43af1c20c64240ff6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4518625668286609039}
   m_SourcePrefab: {fileID: 100100000, guid: 3357f9a7de29b0d43af1c20c64240ff6, type: 3}
+--- !u!1 &4518625668286609038 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7687175820226039062, guid: 3357f9a7de29b0d43af1c20c64240ff6, type: 3}
+  m_PrefabInstance: {fileID: 4518625668286609037}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &4518625668286609039
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4518625668286609038}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

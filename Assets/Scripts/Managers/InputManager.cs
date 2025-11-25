@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -12,25 +13,8 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     // 싱글톤
-    private static InputManager instance;
-    //public static InputManager Instance { get { return _instance; } }
-
-    public static InputManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<InputManager>();
-                if (instance == null)
-                {
-                    GameObject obj = new GameObject();
-                    instance = obj.AddComponent<InputManager>();
-                }
-            }
-            return instance;
-        }
-    }
+    private static InputManager _instance;
+    public static InputManager Instance => _instance;
 
     // InputAction Asset
     public InputActionAsset _inputAsset;
@@ -52,7 +36,7 @@ public class InputManager : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        _instance = this;
         InitInput();
     }
 
@@ -188,6 +172,12 @@ public class InputManager : MonoBehaviour
                 break;
         }
         _uiState = newUiState;
+    }
+    
+    private void OnDestroy()
+    {
+        if(_instance == this)
+            _instance = null;
     }
 }
 

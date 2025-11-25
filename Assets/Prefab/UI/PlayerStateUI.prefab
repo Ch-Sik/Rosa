@@ -130,7 +130,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1884796897744692640}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
@@ -154,9 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heart: {fileID: 6028797462179889781, guid: 1065f44ed965162479353c7919d3fcf1, type: 3}
   heartContainer: {fileID: 4888545471563243280}
-  filled: {fileID: 21300000, guid: 1df1795708316f642b96c2c5091f7703, type: 3}
-  empty: {fileID: 21300000, guid: 913c120aa9d2ab343b5b0b3225f35a08, type: 3}
-  hearts: []
+  heartUiList: []
 --- !u!1 &4249746896020835799
 GameObject:
   m_ObjectHideFlags: 0

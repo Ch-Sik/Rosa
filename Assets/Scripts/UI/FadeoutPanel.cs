@@ -24,7 +24,7 @@ public class FadeoutPanel : MonoBehaviour
                 Debug.LogError("FadeoutPanel의 인스턴스가 없음");
                 return false;
             }
-            return instance._imageComponent.color.a > 0f;
+            return instance._isTweening || instance._imageComponent.color.a > 0f;
         } }
 
     [SerializeField] private Image _imageComponent;
