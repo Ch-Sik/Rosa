@@ -45,7 +45,6 @@ public class PlayerState : MonoBehaviour
     {
         if (amount <= 0) return;
 
-        Debug.Log($"체력 회복: {amount}");
         currentHp = Mathf.Min(currentHp + amount, maxHp);
         OnHpChanged?.Invoke(currentHp);
     }
@@ -55,7 +54,6 @@ public class PlayerState : MonoBehaviour
     {
         if (amount <= 0) return;
 
-        Debug.Log("피해 입음 : " + amount);
         currentHp = Mathf.Max(currentHp - amount, 0);
         OnHpChanged?.Invoke(currentHp);
 

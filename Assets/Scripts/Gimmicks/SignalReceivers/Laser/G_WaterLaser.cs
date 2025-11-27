@@ -120,7 +120,6 @@ public class G_WaterLaser : GimmickSignalReceiver
                 // 레이캐스트가 어떤 콜라이더와 충돌했을 때
                 if (hit.collider.CompareTag("Player"))
                 {
-                    Debug.Log("플레이어 충돌");
                     //hit.collider.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
                     DoDamageIfItsPlayer(hit.collider.gameObject);
                     //RespawnManager.Instance?.Respawn(); //WaterLaser는 리스폰 시키지 않음

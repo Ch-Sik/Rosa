@@ -35,6 +35,7 @@ public class PlayerRef : MonoBehaviour
 
     public Rigidbody2D rb;
     public BoxCollider2D col;
+    public PlayerDamageReceiver damageReceiver;
 
     private void Awake()
     {
@@ -54,5 +55,6 @@ public class PlayerRef : MonoBehaviour
 
         if(rb == null) rb = GetComponent<Rigidbody2D>();
         if(col == null) col = GetComponent<BoxCollider2D>();
+        if(damageReceiver == null)  damageReceiver = GetComponent<PlayerDamageReceiver>();
     }
 }

@@ -4,66 +4,67 @@ using UnityEngine;
 
 public class PlayerDamageReceiver : MonoBehaviour
 {
-    [SerializeField] float defaultNoDmgTime = 2f;
-    public bool ignoreDamage = false;
+    [SerializeField] float defaultInvincibleTime = 2f;
 
-    PlayerRef playerRef;
-    bool isJustEndedIgnoreTime = false; // 해당 트리거 켜져있는 동안 플레이어는 '밟기' 수행할 수 없음.
+    public bool IsInvincible => _ignoreDamage;
+    
+    private bool _ignoreDamage = false;
+    private PlayerRef _playerRef;
 
     public void Start()
     {
-        playerRef = PlayerRef.Instance;
+        _playerRef = PlayerRef.Instance;
     }
 
-    public void GetDamage(GameObject target, int damage)
+    public void GetDamage(GameObject source, int damage)
     {
-        GetDamage(target, damage, defaultNoDmgTime);
+        GetDamage(source, damage, defaultInvincibleTime);
     }
 
-    public void GetDamage(GameObject target, int damage, float ignoreDur)
+    public void GetDamage(GameObject source, int damage, float ignoreDur)
     {
-        if (ignoreDamage) return;
+        if (_ignoreDamage) return;
 
-        Debug.Log("플레이어 피격 from:" + target.name);
+        Debug.Log("플레이어 피격 from:" + source.name);
 
-        playerRef.animation.BlinkEffect();
-        playerRef.animation.SetTrigger("Hit");
+        GetDamageInternal(source, damage);
+        GetKnockbackInternal(source);
+        
+        StartCoroutine(SetInvincibleAndIgnoreCollision(source.layer, ignoreDur));
+    }
+    
+    public void GetDamageIgnoreInvincible(GameObject source, int damage)
+    {
+        GetDamageInternal(source, damage);
+        GetKnockbackInternal(source);
+    }
+
+    private void GetDamageInternal(GameObject source, int damage)
+    {
+        _playerRef.state.TakeDamage(damage);
+        _playerRef.animation.BlinkEffect();
+        _playerRef.animation.SetTrigger("Hit");
         CameraShake.ShakeCamera(CameraShakePreset.PlayerHit);
-
-        Vector2 knockbackOrigin = new Vector2(target.transform.position.x,
-                    target.transform.position.y - (target.transform.localScale.y / 2));
-        playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
-        playerRef.state.TakeDamage(damage);
-
-        StartCoroutine(IgnoreCollisionForAWhile(target.layer, ignoreDur));
     }
 
-    IEnumerator IgnoreCollisionForAWhile(int originalLayer, float delay)
+    private void GetKnockbackInternal(GameObject source)
     {
+        Vector2 knockbackOrigin = new Vector2(source.transform.position.x,
+            source.transform.position.y - (source.transform.localScale.y / 2));
+        _playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
+    }
+
+    IEnumerator SetInvincibleAndIgnoreCollision(int originalLayer, float delay)
+    {
+        // 무적 플래그 ON & 충돌 무시 설정 (몬스터와 피격 시 몬스터 통과하여 지나갈 수 있게)
         int collisionLayer = gameObject.layer;
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
-
+        _ignoreDamage = true;
+        
         yield return new WaitForSeconds(delay);
-
-        // 충돌 무시 해제
-        Debug.Log("플레이어 무적 종료");
+        
+        // 무적 해제
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, false);
-
-        // 트리거 설정
-        isJustEndedIgnoreTime = true;
-        yield return new WaitForFixedUpdate();  // 확실하게 FixedUpdate 한번이 끝날 떄까지 기다림
-        isJustEndedIgnoreTime = false;
-    }
-
-    public void SetNoDmgForSeconds(float duration)
-    {
-        ignoreDamage = true;
-        StartCoroutine(Co_RestoreInvincible());
-        IEnumerator Co_RestoreInvincible()
-        {
-            yield return new WaitForSeconds(duration);
-            ignoreDamage = false;
-        }
-
+        _ignoreDamage = false;
     }
 }
