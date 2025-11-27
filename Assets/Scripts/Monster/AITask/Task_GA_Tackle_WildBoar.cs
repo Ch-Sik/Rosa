@@ -13,7 +13,7 @@ public class Task_GA_Tackle_WildBoar : Task_GA_Tackle
     [SerializeField] private GameObject attackItemPrefab;
 
     [SerializeField] private Transform attackItemSpawnPos;
-    [SerializeField] private float attackItemPopVertical = 1f;
+    [SerializeField] private float attackItemPopVertical = 100f;
     [SerializeField] private float attackItemPopHorizontal = 1f;
     [SerializeField] private float attackItemSpawnDelay = 0.1f;
     

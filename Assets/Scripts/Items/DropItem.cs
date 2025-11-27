@@ -10,9 +10,11 @@ using UnityEngine;
 /// </summary>
 public class DropItem : FieldItem
 {
-    [SerializeField] private bool hasLifetime = false;
-    [SerializeField, ShowIf("hasLifetime")] private float lifetime = 5f;
     [SerializeField] private Collider2D interactTrigger;
+    
+    [SerializeField] private bool hasLifetime = false;
+    [SerializeField, ShowIf("hasLifetime")] 
+    private float lifetime = 5f;
 
     private void Start()
     {
@@ -28,7 +30,10 @@ public class DropItem : FieldItem
     {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
+        {
             rb.isKinematic = true;
+            rb.velocity = Vector2.zero;
+        }
 
         if (interactTrigger)
             interactTrigger.enabled = true;
