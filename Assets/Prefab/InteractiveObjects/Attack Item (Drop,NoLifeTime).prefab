@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 332277820188796365, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: m_Layer
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130796494483565660, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: m_Layer
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 1533546291947379953, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 19.66
@@ -60,9 +68,17 @@ PrefabInstance:
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: FieldItem, Assembly-CSharp
       objectReference: {fileID: 0}
+    - target: {fileID: 7633514647639658921, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: m_Layer
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
       propertyPath: m_Name
       value: Attack Item (Drop,NoLifeTime)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8203244285188480584, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}
+      propertyPath: m_Layer
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 407120747010238472, guid: b5ca1dfe75c42204ebf9cc1e0f600ab0, type: 3}

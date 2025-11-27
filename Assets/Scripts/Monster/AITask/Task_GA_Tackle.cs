@@ -110,6 +110,7 @@ public class Task_GA_Tackle : Task_A_Base
             if (stunTimer == null)
             {
                 stunTimer = Timer.StartTimer();
+                OnStunStarted();
                 blackboard.Set(BBK.isStunned, true); // 애니메이션을 위한 블랙보드 설정
                 Debug.Log("벽에다 대가리 꽁!!!");
             }
@@ -151,6 +152,8 @@ public class Task_GA_Tackle : Task_A_Base
         // 실제 돌진 수행
         DoTackle();
     }
+
+    protected virtual void OnStunStarted() { }
 
     protected override void OnRecoveryBegin()
     {

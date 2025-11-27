@@ -53,6 +53,7 @@ GameObject:
   - component: {fileID: 1974551417765626279}
   - component: {fileID: 3168922545191321803}
   - component: {fileID: 4701538046763245896}
+  - component: {fileID: 215078509305885131}
   m_Layer: 23
   m_Name: WildBoar Main Body
   m_TagString: Monster
@@ -237,7 +238,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1211401455400287239}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3773cba7e66561b4592bf5bb8fe5b3eb, type: 3}
+  m_Script: {fileID: 11500000, guid: 08f5102cbcf90e6418548e7cd4ca1b99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
@@ -257,10 +258,16 @@ MonoBehaviour:
   tackleMaxSpeed: 5
   tackleAccel: 2000
   allowUturn: 0
+  lookBackDelay: 0
   recoveryDrag: 1.1
   wallStunEnabled: 1
   wallStunDuration: 1.2
   cliffStopEnabled: 0
+  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
+  attackItemSpawnPos: {fileID: 4595503129037539248}
+  attackItemPopVertical: 1
+  attackItemPopHorizontal: 1
+  attackItemSpawnDelay: 0.1
 --- !u!50 &3168922545191321803
 Rigidbody2D:
   serializedVersion: 4
@@ -333,6 +340,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.4, y: 1.5}
   m_EdgeRadius: 0
+--- !u!114 &215078509305885131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211401455400287239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c73e49a441fac647a1bed049d4f2974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
+  spawnPoint: {fileID: 0}
+  popVertical: 1
+  popRandomHorizontal: 1
 --- !u!1 &1579812743261685080
 GameObject:
   m_ObjectHideFlags: 0
@@ -759,7 +782,7 @@ Transform:
   m_GameObject: {fileID: 8904309866845662249}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.29, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -838,7 +861,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 12, y: 6}
+  m_Size: {x: 12, y: 0.8}
   m_EdgeRadius: 0
 --- !u!1773428102 &6250437384453665890
 ParentConstraint:
@@ -850,10 +873,10 @@ ParentConstraint:
   m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
-  m_TranslationAtRest: {x: 0, y: 0, z: 0}
+  m_TranslationAtRest: {x: 0, y: -0.29, z: 0}
   m_RotationAtRest: {x: 0, y: 0, z: 0}
   m_TranslationOffsets:
-  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: -0.28999996, z: 0}
   m_RotationOffsets:
   - {x: 0, y: 0, z: 0}
   m_AffectTranslationX: 1
