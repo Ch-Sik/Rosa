@@ -724,7 +724,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5016981803741829629}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3773cba7e66561b4592bf5bb8fe5b3eb, type: 3}
+  m_Script: {fileID: 11500000, guid: 281a4c2a19f9cdd4abef5daf7592aea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
@@ -741,7 +741,7 @@ MonoBehaviour:
   rigidbody: {fileID: 0}
   damageComponent: {fileID: 0}
   tackleAttackPower: 2
-  tackleSpeed: 8
+  tackleMaxSpeed: 5
   tackleAccel: 1000
   allowUturn: 1
   lookBackDelay: 1
@@ -749,6 +749,11 @@ MonoBehaviour:
   wallStunEnabled: 0
   wallStunDuration: 0
   cliffStopEnabled: 1
+  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
+  attackItemSpawnPos: {fileID: 3876960987601475311}
+  attackItemPopVertical: 100
+  attackItemPopHorizontal: 1
+  attackItemSpawnDelay: 0.1
 --- !u!50 &8508132543111365271
 Rigidbody2D:
   serializedVersion: 4
