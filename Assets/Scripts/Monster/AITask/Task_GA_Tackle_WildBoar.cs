@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class Task_GA_Tackle_WildBoar : Task_GA_Tackle
 {
+    [Title("이펙트 관련")] 
+    [SerializeField] private VfxPoolEntity wallCrashParticle;
+    [SerializeField] private Transform wallCrashParticleSpawnPos;
+    
     [Title("공격 아이템 스폰 관련")]
     [SerializeField] private GameObject attackItemPrefab;
 
@@ -15,7 +19,13 @@ public class Task_GA_Tackle_WildBoar : Task_GA_Tackle
     
     protected override void OnStunStarted()
     {
+        SpawnWallCrashParticle();
         StartCoroutine(SpawnAttackItem());
+    }
+
+    private void SpawnWallCrashParticle()
+    {
+        VfxManager.Instance.SpawnVfxObject(wallCrashParticle, wallCrashParticleSpawnPos.position);
     }
 
     private IEnumerator SpawnAttackItem()

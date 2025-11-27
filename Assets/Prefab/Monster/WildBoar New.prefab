@@ -53,7 +53,6 @@ GameObject:
   - component: {fileID: 1974551417765626279}
   - component: {fileID: 3168922545191321803}
   - component: {fileID: 4701538046763245896}
-  - component: {fileID: 215078509305885131}
   m_Layer: 23
   m_Name: WildBoar Main Body
   m_TagString: Monster
@@ -263,6 +262,8 @@ MonoBehaviour:
   wallStunEnabled: 1
   wallStunDuration: 1.2
   cliffStopEnabled: 0
+  wallCrashParticle: {fileID: 4896395462058329319, guid: 2f2babd0c0aced74b9cec608a4549dda, type: 3}
+  wallCrashParticleSpawnPos: {fileID: 1936404291916346817}
   attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
   attackItemSpawnPos: {fileID: 4595503129037539248}
   attackItemPopVertical: 1
@@ -340,22 +341,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.4, y: 1.5}
   m_EdgeRadius: 0
---- !u!114 &215078509305885131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1211401455400287239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c73e49a441fac647a1bed049d4f2974, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
-  spawnPoint: {fileID: 0}
-  popVertical: 1
-  popRandomHorizontal: 1
 --- !u!1 &1579812743261685080
 GameObject:
   m_ObjectHideFlags: 0
