@@ -257,7 +257,6 @@ MonoBehaviour:
   maxHP: 1
   currentHP: 0
   blackboard: {fileID: 0}
-  mobCounter: {fileID: 0}
 --- !u!114 &8810492094596928646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,7 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 0
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &6319452935122673705
 MonoBehaviour:
@@ -326,9 +325,11 @@ MonoBehaviour:
   rigidbody: {fileID: 0}
   portrait: {fileID: 0}
   pandaBT: {fileID: 0}
+  monsterAttackComponent: {fileID: 0}
   isSuperArmour: 0
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 0
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -371,7 +372,12 @@ MonoBehaviour:
   recoveryDuration: 1
   superArmourOnRecovery: 1
   currentState: 0
+  useVariousProjectiles: 1
   projectilePrefab: {fileID: 431060034737850338, guid: 0a1b8dc1817d29848945f4acbaef2b81, type: 3}
+  projectilePrefabs:
+  - {fileID: 431060034737850338, guid: 0a1b8dc1817d29848945f4acbaef2b81, type: 3}
+  - {fileID: 431060034737850338, guid: 0a1b8dc1817d29848945f4acbaef2b81, type: 3}
+  - {fileID: 431060034737850338, guid: 67bbc1d40e91e4b45a89d84e7a465d82, type: 3}
   muzzle: {fileID: 653838375159494413}
   projectileSpeed: 4.3
   projectileDirOption: 0

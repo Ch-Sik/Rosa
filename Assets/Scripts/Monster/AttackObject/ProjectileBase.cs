@@ -1,9 +1,11 @@
+using System;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 // TODO: 투사체 회전 옵션 만들기
 public class ProjectileBase : MonoBehaviour
@@ -58,6 +60,8 @@ public class ProjectileBase : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     [SerializeField]
     private VfxPoolEntity hitEffect;
+
+    public Action OnDisappear;
 
     public virtual void InitProjectile(Vector2 direction)
     {
@@ -198,6 +202,7 @@ public class ProjectileBase : MonoBehaviour
 
     public void Disappear()
     {
+        OnDisappear?.Invoke();
         if(animator != null)
         {
             animator.SetTrigger("disappear");

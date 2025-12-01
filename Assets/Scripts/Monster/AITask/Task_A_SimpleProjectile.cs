@@ -13,9 +13,12 @@ public enum ProjectileDirOption {
 
 public class Task_A_SimpleProjectile : Task_A_Base
 {
-    [Header("공격 관련 기본 요소")]
-    [SerializeField, Tooltip("투사체 프리팹")]
+    [Header("공격 관련 기본 요소")] [SerializeField]
+    private bool useVariousProjectiles;
+    [SerializeField, Tooltip("투사체 프리팹"), HideIf("useVariousProjectiles")]
     private GameObject projectilePrefab;
+    [SerializeField, ShowIf("useVariousProjectiles")]
+    private GameObject[] projectilePrefabs;
     [SerializeField, Tooltip("투사체가 생성되어야 할 위치")]
     private Transform muzzle;
     [SerializeField, Tooltip("투사체 진행 속도")]
@@ -35,6 +38,8 @@ public class Task_A_SimpleProjectile : Task_A_Base
 
     protected Vector2 enemyPosition;
     protected Vector2 attackDir;
+
+    private int _projIndex = -1;
 
     protected void Start()
     {
@@ -119,8 +124,19 @@ public class Task_A_SimpleProjectile : Task_A_Base
         }
 
         // 공격 시전
-        GameObject projectile = Instantiate(projectilePrefab, muzzle.position, Quaternion.identity);
+        GameObject projectile = Instantiate(GetProjectilePrefab(), muzzle.position, Quaternion.identity);
         projectile.GetComponent<ProjectileBase>().InitProjectile(attackDir * projectileSpeed);
+    }
+
+    private GameObject GetProjectilePrefab()
+    {
+        if (!useVariousProjectiles)
+            return projectilePrefab;
+        else
+        {
+            _projIndex = (_projIndex + 1) % projectilePrefabs.Length;
+            return projectilePrefabs[_projIndex];
+        }
     }
 
     private void UpdateAttackDir(GameObject enemy)
