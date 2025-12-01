@@ -5,13 +5,12 @@ using UnityEngine;
 
 public class Task_GA_Tackle_WildBoar : Task_GA_Tackle
 {
-    [Title("이펙트 관련")] 
+    [Header("이펙트 관련")] 
     [SerializeField] private VfxPoolEntity wallCrashParticle;
     [SerializeField] private Transform wallCrashParticleSpawnPos;
     
-    [Title("공격 아이템 스폰 관련")]
+    [Header("공격 아이템 스폰 관련")]
     [SerializeField] private GameObject attackItemPrefab;
-
     [SerializeField] private Transform attackItemSpawnPos;
     [SerializeField] private float attackItemPopVertical = 150f;
     [SerializeField] private float attackItemPopHorizontal = 100f;
