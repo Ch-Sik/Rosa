@@ -9,15 +9,22 @@ public class FallingPlatform : MonoBehaviour
     public float moveSpeed = 1f;
 
     // 기즈모 그리기용
-    Vector3 endPoint;
-
+    private Vector3 endPoint;
+    private Tween _tween;
+    
     // Start is called before the first frame update
     void Start()
     {
         Destroy(gameObject, lifeTime);
-        gameObject.GetComponent<Rigidbody2D>().DOMoveY(transform.position.y - moveSpeed * lifeTime, lifeTime);
+        _tween = gameObject.GetComponent<Rigidbody2D>().DOMoveY(transform.position.y - moveSpeed * lifeTime, lifeTime);
 
         endPoint = transform.position + Vector3.down * lifeTime * moveSpeed;
+    }
+
+    private void OnDestroy()
+    {
+        if(_tween != null)
+            _tween.Kill();
     }
 
     private void OnDrawGizmosSelected()

@@ -10,13 +10,15 @@ public class FallingPlatformFactory : MonoBehaviour
     [SerializeField] float spawnInterval = 3f;
     [SerializeField] GameObject preview;
 
+    private Sequence _spawnSequence;
+    
     // Start is called before the first frame update
     void Start()
     {
         Destroy(preview);
-        DOTween.Sequence().AppendInterval(startDelay).AppendCallback(
+        _spawnSequence = DOTween.Sequence().AppendInterval(startDelay).AppendCallback(
             () => {
-            DOTween.Sequence()
+            _spawnSequence = DOTween.Sequence()
                 .AppendCallback(() =>
                 {
                     Instantiate(prefab, transform.position, Quaternion.identity);
@@ -25,5 +27,11 @@ public class FallingPlatformFactory : MonoBehaviour
                 .SetLoops(-1);
             }
         );
+    }
+
+    void OnDestroy()
+    {
+        if(_spawnSequence != null)
+            _spawnSequence.Kill();
     }
 }

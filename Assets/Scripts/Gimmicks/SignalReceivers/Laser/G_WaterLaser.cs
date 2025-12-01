@@ -25,9 +25,11 @@ public class G_WaterLaser : GimmickSignalReceiver
     private SpriteRenderer sr1;
     private SpriteRenderer sr2;
 
-    RaycastHit hit;
-    Coroutine cor;
-    Sequence seq;
+    private RaycastHit _hit;
+    private Coroutine _cor;
+    private Sequence _seq;
+    private Tween _sr1tween;
+    private Tween _sr2tween;
 
     public bool overrideInvincibleDuration = false;
     public float ignoreDuration = 2f;
@@ -62,9 +64,9 @@ public class G_WaterLaser : GimmickSignalReceiver
     public void ActivateLaser()
     {
         isActivate = true;
-        if (cor != null)
-            StopCoroutine(cor);
-        cor = StartCoroutine(Laser());
+        if (_cor != null)
+            StopCoroutine(_cor);
+        _cor = StartCoroutine(Laser());
     }
 
     [Button]
@@ -72,8 +74,10 @@ public class G_WaterLaser : GimmickSignalReceiver
     {
         isActivate = false;
         lasing = false;
-        StopCoroutine(cor);
-        seq.Kill();
+        if(_cor != null)
+            StopCoroutine(_cor);
+        if(_seq != null)
+            _seq.Kill();
     }
 
     IEnumerator Laser()
@@ -81,33 +85,44 @@ public class G_WaterLaser : GimmickSignalReceiver
         lasing = true;
         yield return new WaitForSeconds(onTime);
 
-        seq = DOTween.Sequence()
+        _seq = DOTween.Sequence()
         .AppendCallback(() =>
         {
             show1.localPosition = new Vector3(0.5f, 0, 0);
             show2.localPosition = new Vector3(-0.5f, 0, 0);
         })
-        .Append(show1.DOLocalMoveX(0, offTime).SetEase(Ease.Linear))
-        .Join(show2.DOLocalMoveX(0, offTime).SetEase(Ease.Linear))
-        .Join(sr1.DOFade(100f / 255f, offTime))
-        .Join(sr2.DOFade(100f / 255f, offTime))
         .AppendCallback(() =>
         {
-            sr1.DOFade(0, 0);
-            sr2.DOFade(0, 0);
+            // 25.12.02)
+            // Destroy 시에 Kill될 경우 고려, null check 추가
+            if(sr1)
+                _sr1tween = sr1.DOFade(100f / 255f, offTime);
+            if(sr2)
+                _sr2tween = sr2.DOFade(100f / 255f, offTime);
+        })
+        .Join(show1.DOLocalMoveX(0, offTime).SetEase(Ease.Linear))
+        .Join(show2.DOLocalMoveX(0, offTime).SetEase(Ease.Linear))
+        .AppendCallback(() =>
+        {
+            if(sr1)
+                _sr1tween = sr1.DOFade(0, 0);
+            if(sr2)
+                _sr2tween = sr2.DOFade(0, 0);
         })
         .OnKill(() =>
         {
-            sr1.DOFade(0, 0);
-            sr2.DOFade(0, 0);
+            if(sr1)
+                _sr1tween = sr1.DOFade(0, 0);
+            if(sr2)
+                _sr2tween = sr2.DOFade(0, 0);
         });
 
         lasing = false;
         yield return new WaitForSeconds(offTime);
 
-        if (cor != null)
-            StopCoroutine(cor);
-        cor = StartCoroutine(Laser());
+        if (_cor != null)
+            StopCoroutine(_cor);
+        _cor = StartCoroutine(Laser());
     }
 
     public void Detect()
@@ -188,7 +203,10 @@ public class G_WaterLaser : GimmickSignalReceiver
 
     private void OnDestroy()
     {
-        if (isActivate)
-            InactivateLaser();
+        InactivateLaser();
+        if(_sr1tween != null)
+            _sr1tween.Kill();
+        if(_sr2tween != null)
+            _sr2tween.Kill();
     }
 }

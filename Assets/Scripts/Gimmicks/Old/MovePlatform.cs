@@ -49,6 +49,8 @@ public class MovePlatform : MonoBehaviour
     ProCamera2DCinematics cinematics;
     public List<cinematicsSetting> cinematicsSettings = new List<cinematicsSetting>();
 
+    private Sequence _seq;
+    
     bool ShowCinematicOption()
     {
         switch (type)
@@ -305,15 +307,15 @@ public class MovePlatform : MonoBehaviour
             }
         }
     }
-
+    
     public void Bounce()
     {
         Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
         float originHeight = transform.position.y;
-        DOTween.Sequence().AppendInterval(startDelay).AppendCallback(
+        _seq = DOTween.Sequence().AppendInterval(startDelay).AppendCallback(
             () =>
             {
-                DOTween.Sequence()
+                _seq = DOTween.Sequence()
                 .Append(
                     rigidbody.DOMoveY(transform.position.y + breachHeight, breachUpTime)
                         .SetEase(Ease.OutCubic))
@@ -327,6 +329,12 @@ public class MovePlatform : MonoBehaviour
                 .SetLoops(-1);
             }
         );
+    }
+
+    private void OnDestroy()
+    {
+        if(_seq != null)
+            _seq.Kill();
     }
 
     public void OnDrawGizmos()
