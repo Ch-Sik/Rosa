@@ -26,7 +26,7 @@ public class Task_GA_Leap : Task_A_Base
 
     [Header("씨앗 생성")] 
     [SerializeField] private GameObject attackItemPrefab;
-
+    [SerializeField] private float attackItemSpawnProbability = 0.3f;
     [SerializeField] private Transform attackItemSpawnPos;
     [SerializeField] private float attackItemPopVertical = 150f;
     [SerializeField] private float attackItemPopHorizontal = 100f;
@@ -109,7 +109,8 @@ public class Task_GA_Leap : Task_A_Base
 
     private void OnLanded()
     {
-        SpawnAttackItem();
+        if(Random.Range(0, 1f) <= attackItemSpawnProbability)
+            SpawnAttackItem();
     }
     
     private void SpawnAttackItem()

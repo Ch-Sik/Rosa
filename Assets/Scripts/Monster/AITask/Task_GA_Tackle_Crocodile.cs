@@ -17,7 +17,7 @@ public class Task_GA_Tackle_Crocodile : Task_GA_Tackle
     {
         base.OnActiveBegin();
         
-        if(Random.Range(0, 1f) < attackItemSpawnProbability)
+        if(Random.Range(0, 1f) <= attackItemSpawnProbability)
             StartCoroutine(SpawnAttackItem());
     }
 
