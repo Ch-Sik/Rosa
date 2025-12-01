@@ -24,27 +24,35 @@ public class PlayerDamageReceiver : MonoBehaviour
     public void GetDamage(GameObject source, int damage, float ignoreDur)
     {
         if (_ignoreDamage) return;
-
-        Debug.Log("플레이어 피격 from:" + source.name);
-
-        GetDamageInternal(source, damage);
+        
+        GetDamageInternal(damage);
         GetKnockbackInternal(source);
         
         StartCoroutine(SetInvincibleAndIgnoreCollision(source.layer, ignoreDur));
     }
+
+    public void GetDamageAndRespawn(int damage)
+    {
+        // _ignoreDamage 무시함
+        bool isDead = GetDamageInternal(damage);
+        // 어차피 리스폰할거니 넉백 필요 없음
+        
+        if(!isDead)
+            RespawnHandler.Instance.Respawn();
+    }
     
     public void GetDamageIgnoreInvincible(GameObject source, int damage)
     {
-        GetDamageInternal(source, damage);
+        GetDamageInternal(damage);
         GetKnockbackInternal(source);
     }
 
-    private void GetDamageInternal(GameObject source, int damage)
+    private bool GetDamageInternal(int damage)
     {
-        _playerRef.state.TakeDamage(damage);
         _playerRef.animation.BlinkEffect();
         _playerRef.animation.SetTrigger("Hit");
         CameraShake.ShakeCamera(CameraShakePreset.PlayerHit);
+        return _playerRef.state.TakeDamage(damage);
     }
 
     private void GetKnockbackInternal(GameObject source)

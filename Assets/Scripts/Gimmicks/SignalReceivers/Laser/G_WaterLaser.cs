@@ -185,4 +185,10 @@ public class G_WaterLaser : GimmickSignalReceiver
 
         }
     }
+
+    private void OnDestroy()
+    {
+        if (isActivate)
+            InactivateLaser();
+    }
 }

@@ -72,8 +72,6 @@ public class RespawnHandler : MonoBehaviour
     {
         FadeoutPanel.Fadeout();
         yield return new WaitForSeconds(FadeoutPanel.fadeDuration);
-        if (PlayerRef.Instance.state.CurrentHP <= 0)
-            PlayerRef.Instance.state.Heal(healAmount);
 
         if (PlayerRef.Instance.movement.isGrabCube)
             PlayerRef.Instance.grabCube.UnGrab(true);

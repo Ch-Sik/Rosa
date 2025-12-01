@@ -83,6 +83,6 @@ public class PlayerCrushDetector : MonoBehaviour
         { 
             RespawnHandler.Instance.Respawn();
         }
-        PlayerRef.Instance.state.TakeDamage(damageOnCrush);
+        PlayerRef.Instance.damageReceiver.GetDamageAndRespawn(damageOnCrush);
     }
 }

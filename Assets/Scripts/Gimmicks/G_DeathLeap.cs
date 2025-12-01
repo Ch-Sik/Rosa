@@ -10,8 +10,8 @@ public class G_DeathLeap : MonoBehaviour
     {
         if(collision.tag == "Player")
         {
-            PlayerRef.Instance.damageReceiver.GetDamageIgnoreInvincible(gameObject, damage);
-            RespawnHandler.Instance.Respawn();
+            bool requireRespawn = PlayerRef.Instance.state.CurrentHP <= damage;
+            PlayerRef.Instance.damageReceiver.GetDamageAndRespawn(damage);
         }
     }
 }

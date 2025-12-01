@@ -48,27 +48,33 @@ public class PlayerState : MonoBehaviour
         currentHp = Mathf.Min(currentHp + amount, maxHp);
         OnHpChanged?.Invoke(currentHp);
     }
-
-    // 정수 단위로 데미지
-    public void TakeDamage(int amount) 
+    
+    /// <returns>사망 여부</returns>
+    public bool TakeDamage(int amount) 
     {
-        if (amount <= 0) return;
+        if (amount <= 0) return false;
 
         currentHp = Mathf.Max(currentHp - amount, 0);
         OnHpChanged?.Invoke(currentHp);
 
         if (currentHp <= 0)
+        {
             OnDie();
+            return true;
+        }
+
+        return false;
     }
 
     private void OnDie()
     {
         if (respawnOnDie)
         {
+            Heal(2);
             if (RespawnHandler.Instance != null)
                 RespawnHandler.Instance.Respawn();
             else
-                Debug.LogWarning("RespawnManager가 씬에 존재하지 않음");
+                Debug.LogError("RespawnManager가 씬에 존재하지 않음");
             return;
         }
         else
