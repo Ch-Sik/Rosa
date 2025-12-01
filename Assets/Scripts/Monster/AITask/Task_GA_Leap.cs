@@ -24,6 +24,12 @@ public class Task_GA_Leap : Task_A_Base
     protected int defaultCollideDamage;    // 몸체 충돌 판정이 기본적으로 가지고 있던 데미지 보관
     protected Timer attackTimer;        // 점프 시작 후 시간 측정하는 타이머
 
+    [Header("씨앗 생성")] 
+    [SerializeField] private GameObject attackItemPrefab;
+
+    [SerializeField] private Transform attackItemSpawnPos;
+    [SerializeField] private float attackItemPopVertical = 150f;
+    [SerializeField] private float attackItemPopHorizontal = 100f;
 
 
     private void Start()
@@ -95,9 +101,28 @@ public class Task_GA_Leap : Task_A_Base
         if (attackTimer.duration > minAttackDuration && isGrounded)
         {
             base.SkipToRecovery();
+            OnLanded();
             Debug.Log("땅에 발 디딤, 패턴 강제 완료");
             return;
         }
+    }
+
+    private void OnLanded()
+    {
+        SpawnAttackItem();
+    }
+    
+    private void SpawnAttackItem()
+    {
+        if (!attackItemPrefab)
+            return;
+        
+        var instance = Instantiate(attackItemPrefab, attackItemSpawnPos.position, Quaternion.identity);
+        
+        // 공격 아이템에 살짝 튀어오르는 연출
+        var popVector = new Vector2(Random.Range(-attackItemPopHorizontal, attackItemPopHorizontal),
+                                    attackItemPopVertical);
+        instance.GetComponent<Rigidbody2D>().AddForce(popVector);
     }
 
     protected override void OnRecoveryBegin()

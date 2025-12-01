@@ -671,7 +671,6 @@ MonoBehaviour:
   maxHP: 1
   currentHP: 0
   blackboard: {fileID: 0}
-  mobCounter: {fileID: 0}
 --- !u!114 &5029347292236209596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -686,7 +685,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &5775155619006939703
 MonoBehaviour:
@@ -705,9 +704,11 @@ MonoBehaviour:
   rigidbody: {fileID: 0}
   portrait: {fileID: 0}
   pandaBT: {fileID: 0}
+  monsterAttackComponent: {fileID: 0}
   isSuperArmour: 0
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 5
   ignoreKnockbackOnSuperArmour: 1
   useRagdoll: 0
@@ -817,6 +818,10 @@ MonoBehaviour:
   attackDmg: 2
   JumpVector: {x: 4, y: 10}
   minAttackDuration: 0.5
+  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
+  attackItemSpawnPos: {fileID: 6184502765849093718}
+  attackItemPopVertical: 150
+  attackItemPopHorizontal: 100
 --- !u!114 &6373490938759068858
 MonoBehaviour:
   m_ObjectHideFlags: 0

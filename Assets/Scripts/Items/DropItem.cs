@@ -31,8 +31,9 @@ public class DropItem : FieldItem
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            rb.isKinematic = true;
-            rb.velocity = Vector2.zero;
+            var newVelocity = rb.velocity;
+            newVelocity.x = 0;
+            rb.velocity = newVelocity;
         }
 
         if (interactTrigger)

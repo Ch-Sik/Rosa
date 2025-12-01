@@ -13,8 +13,8 @@ public class Task_GA_Tackle_WildBoar : Task_GA_Tackle
     [SerializeField] private GameObject attackItemPrefab;
 
     [SerializeField] private Transform attackItemSpawnPos;
-    [SerializeField] private float attackItemPopVertical = 100f;
-    [SerializeField] private float attackItemPopHorizontal = 1f;
+    [SerializeField] private float attackItemPopVertical = 150f;
+    [SerializeField] private float attackItemPopHorizontal = 100f;
     [SerializeField] private float attackItemSpawnDelay = 0.1f;
     
     protected override void OnStunStarted()
@@ -34,8 +34,8 @@ public class Task_GA_Tackle_WildBoar : Task_GA_Tackle
         var instance = Instantiate(attackItemPrefab, attackItemSpawnPos.position, Quaternion.identity);
         
         // 공격 아이템에 살짝 튀어오르는 연출
-        var popVector = new Vector2(attackItemPopVertical,
-            Random.Range(-attackItemPopHorizontal, attackItemPopHorizontal));
+        var popVector = new Vector2(Random.Range(-attackItemPopHorizontal, attackItemPopHorizontal),
+                                                attackItemPopVertical);
         instance.GetComponent<Rigidbody2D>().AddForce(popVector);
     }
 }
