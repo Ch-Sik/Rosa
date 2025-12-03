@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Com.LuisPedroFonseca.ProCamera2D;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -39,6 +40,13 @@ public class GameManager : MonoBehaviour
     }
     #endregion
     
+    private ProCamera2DNumericBoundaries _cameraBounds;
+
+    private void Start()
+    {
+        _cameraBounds = Camera.main.GetComponent<ProCamera2DNumericBoundaries>();
+    }
+
     public void GameOver()
     {
         StartCoroutine(GameOverCoroutine());
@@ -57,6 +65,12 @@ public class GameManager : MonoBehaviour
         PlayerRef.Instance.state.Init();            // 체력 상태 초기화
         PlayerRef.Instance.movement.LoadFlags();    // 액션 획득 상태 초기화
         MapManager.Instance.Start();                // 맵 재로드
+        _cameraBounds.UseTopBoundary = false;
+        _cameraBounds.UseBottomBoundary = false;
+        _cameraBounds.UseLeftBoundary = false;
+        _cameraBounds.UseRightBoundary = false;
+        
+        Debug.Log("[RespawnHandler] reset camera bounds");
         // 4. 추가로 숨고르기
         Time.timeScale = 1f;
         yield return new WaitForSecondsRealtime(2f);

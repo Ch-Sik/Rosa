@@ -1,9 +1,7 @@
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class RespawnHandler : MonoBehaviour
 {
@@ -17,12 +15,12 @@ public class RespawnHandler : MonoBehaviour
     
     [SerializeField, ReadOnly] private int enemyCount = 0;
     private Vector2Int _lastAddedRespawnPoint;
-    private int platformLayer;
+    private int _platformLayer;
 
     private void Awake()
     {
         _instance = this; 
-        platformLayer = LayerMask.NameToLayer("Platform");
+        _platformLayer = LayerMask.NameToLayer("Platform");
     }
 
     private void Start()
@@ -41,7 +39,7 @@ public class RespawnHandler : MonoBehaviour
         var rayHit = Physics2D.Raycast(PlayerRef.Instance.transform.position, Vector2.down, 1.0f, 1 << LayerMask.NameToLayer("Ground"));
         if (rayHit.collider == null) return;
 
-        if (PlayerRef.Instance.movement.platformBelow.layer == platformLayer)
+        if (PlayerRef.Instance.movement.platformBelow.layer == _platformLayer)
             return;
         
         if (enemyCount > 0)
@@ -81,6 +79,7 @@ public class RespawnHandler : MonoBehaviour
 
         Vector2Int respawnPoint = respawnPoints.GetLastNth(5);
         _player.transform.position = new Vector3(respawnPoint.x + 0.5f, respawnPoint.y + 1.0f, _player.transform.position.z);
+        
         yield return new WaitForSeconds(0.5f);
         FadeoutPanel.FadeIn();
     }

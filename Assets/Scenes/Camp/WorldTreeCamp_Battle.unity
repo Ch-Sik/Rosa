@@ -9959,6 +9959,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e43e7170fb45b4b81dcd16d0ff55d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &765663491 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 245620119312496127, guid: 893fee509f174304ba961a041670647e, type: 3}
+  m_PrefabInstance: {fileID: 765663489}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b3ad9f2e397194baf2d5658d9bd26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &769760592
 GameObject:
   m_ObjectHideFlags: 0
@@ -23138,7 +23149,7 @@ PrefabInstance:
     - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: bossBlackboard
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 765663491}
     - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: disableWallRenderer
       value: 1
