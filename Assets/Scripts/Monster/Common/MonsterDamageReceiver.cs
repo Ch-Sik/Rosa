@@ -130,7 +130,7 @@ public class MonsterDamageReceiver : DamageReceiver
         }
 
         // 슈퍼아머일 경우
-        if(isSuperArmour || !tempSuperArmour)
+        if(isSuperArmour || tempSuperArmour)
         {
             // 넉백 무시 옵션이 꺼져있고 넉백 계수가 0보다 크다면 넉백 수행
             if (!ignoreKnockbackOnSuperArmour && knockbackCoeff > float.Epsilon)

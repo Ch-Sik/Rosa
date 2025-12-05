@@ -286,7 +286,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 0
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!114 &7205516486366806556
 MonoBehaviour:
@@ -309,6 +309,7 @@ MonoBehaviour:
   isSuperArmour: 0
   tempSuperArmour: 0
   isInvincible: 0
+  tempInvincible: 0
   knockbackCoeff: 0
   ignoreKnockbackOnSuperArmour: 0
   useRagdoll: 0
@@ -589,10 +590,8 @@ MonoBehaviour:
   currentState: 0
   _platforms:
   - {fileID: 3420014534239567564}
-  - {fileID: 0}
   - {fileID: 8050184671908653897}
   - {fileID: 4745311183451227684}
-  - {fileID: 0}
   platformRelocationDelay: 1
   platformRelocationRangeMin: -7
   platformRelocationRangeMax: 7
