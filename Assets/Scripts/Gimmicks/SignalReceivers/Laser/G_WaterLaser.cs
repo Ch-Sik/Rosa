@@ -1,157 +1,145 @@
-using DG.Tweening;
 using Sirenix.OdinInspector;
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class G_WaterLaser : GimmickSignalReceiver
 {
     public bool showGizmos = true;
     public Transform point;
-    public SpriteRenderer sp;
+    public SpriteRenderer laserSprite;
     public LayerMask playerLayerMask;
     public LayerMask obstaclesLayerMask;
     public float startDelay = 0.0f;
-    public float laserMaxLength;
-    public bool isActivate = true;      //작동 여부 Activate일 때만 사이클이 작동
+    [FormerlySerializedAs("laserMaxLength")] 
+    public float activeLength;
+    public float inactiveLength;
+    /// 전체 레이저 On/Off 사이클의 동작 여부
+    public bool isActivate = true;
     public float onTime = 1.0f;
     public float offTime = 1.0f;        //OFF Time이 0일 시 무한
+    
+    [SerializeField] private ParticleSystem[] onReadyParticles;
+    [SerializeField] private ParticleSystem[] onActiveParticles;
+    [SerializeField] private Animator topAnim;
+    [SerializeField] private Animator midAnim;
+    [SerializeField] private Animator botAnim;
 
-    public bool lasing = false;
-    public float length = 0.00f;
-
-    public Transform show1;
-    public Transform show2;
-    private SpriteRenderer sr1;
-    private SpriteRenderer sr2;
+    /// 실제 데미지를 가하는 레이저가 동작하고 있는지 여부
+    [SerializeField, ReadOnly] private bool lasing = false;
+    /// 레이저의 실제 길이
+    [SerializeField, ReadOnly] private float length = 0.00f;
 
     private RaycastHit _hit;
-    private Coroutine _cor;
-    private Sequence _seq;
-    private Tween _sr1tween;
-    private Tween _sr2tween;
 
     public bool overrideInvincibleDuration = false;
+    [ShowIf("overrideInvincibleDuration")]
     public float ignoreDuration = 2f;
+
+    private CancellationTokenSource _cts = new();
 
     private void Start()
     {
-        sr1 = show1.GetComponent<SpriteRenderer>();
-        sr2 = show2.GetComponent<SpriteRenderer>();
-
-        Invoke("ActivateLaser", startDelay);
+        Invoke(nameof(ActivateLaser), startDelay);
     }
 
     private void Update()
     {
-        Vector2 size = new Vector2(sp.size.x, length);
-
-        sp.size = size;
-        sr1.size = size;
-        sr2.size = size;
-
-        Detect();
-
-        if (!lasing)
+        if (lasing)
         {
-            sp.enabled = false;
-            return;
+            var detected = Detect();
+            if (detected)
+            {
+                DoDamageIfItsPlayer(detected);
+            }
         }
-        sp.enabled = true;
+        
+        var spriteSize = new Vector2(laserSprite.size.x, length);
+        laserSprite.size = spriteSize;
+        topAnim.transform.localPosition = Vector3.up * length;
+    }
+    
+    public GameObject Detect()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(point.position, point.up, 
+                                            activeLength, playerLayerMask | obstaclesLayerMask);
+        
+        if (hit.collider && hit.collider.CompareTag("Player"))
+        {
+            return hit.collider.gameObject;
+        }
+        return null;
+    }
+    
+    private void DoDamageIfItsPlayer(GameObject go)
+    {
+        if (!go.CompareTag("Player")) return;
+
+        if (!overrideInvincibleDuration)
+            go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
+        else
+            go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1, ignoreDuration);
     }
 
     [Button]
     public void ActivateLaser()
     {
         isActivate = true;
-        if (_cor != null)
-            StopCoroutine(_cor);
-        _cor = StartCoroutine(Laser());
+        
+        _cts.Cancel();
+        _cts.Dispose();
+        _cts = new CancellationTokenSource();
+        Laser(_cts.Token).Forget();
     }
 
     [Button]
     public void InactivateLaser()
     {
+        lasing = false;
         isActivate = false;
-        lasing = false;
-        if(_cor != null)
-            StopCoroutine(_cor);
-        if(_seq != null)
-            _seq.Kill();
+        
+        _cts.Cancel();
     }
 
-    IEnumerator Laser()
+    private async UniTaskVoid Laser(CancellationToken ctk)
     {
-        lasing = true;
-        yield return new WaitForSeconds(onTime);
-
-        _seq = DOTween.Sequence()
-        .AppendCallback(() =>
+        while (true)
         {
-            show1.localPosition = new Vector3(0.5f, 0, 0);
-            show2.localPosition = new Vector3(-0.5f, 0, 0);
-        })
-        .AppendCallback(() =>
-        {
-            // 25.12.02)
-            // Destroy 시에 Kill될 경우 고려, null check 추가
-            if(sr1)
-                _sr1tween = sr1.DOFade(100f / 255f, offTime);
-            if(sr2)
-                _sr2tween = sr2.DOFade(100f / 255f, offTime);
-        })
-        .Join(show1.DOLocalMoveX(0, offTime).SetEase(Ease.Linear))
-        .Join(show2.DOLocalMoveX(0, offTime).SetEase(Ease.Linear))
-        .AppendCallback(() =>
-        {
-            if(sr1)
-                _sr1tween = sr1.DOFade(0, 0);
-            if(sr2)
-                _sr2tween = sr2.DOFade(0, 0);
-        })
-        .OnKill(() =>
-        {
-            if(sr1)
-                _sr1tween = sr1.DOFade(0, 0);
-            if(sr2)
-                _sr2tween = sr2.DOFade(0, 0);
-        });
-
-        lasing = false;
-        yield return new WaitForSeconds(offTime);
-
-        if (_cor != null)
-            StopCoroutine(_cor);
-        _cor = StartCoroutine(Laser());
-    }
-
-    public void Detect()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(point.position, point.up, laserMaxLength, obstaclesLayerMask);
-        if (hit.collider != null && (obstaclesLayerMask & (1 << hit.collider.gameObject.layer)) != 0)
-        {
-            if (lasing)
-            {
-                // 레이캐스트가 어떤 콜라이더와 충돌했을 때
-                if (hit.collider.CompareTag("Player"))
-                {
-                    //hit.collider.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
-                    DoDamageIfItsPlayer(hit.collider.gameObject);
-                    //RespawnManager.Instance?.Respawn(); //WaterLaser는 리스폰 시키지 않음
-                }
-                if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("Cube"))
-                {
-                    //Debug.Log("벽과 충돌");
-                }
-            }
+            // 비활성화 상태
+            lasing = false;
+            SetAnimatorsState(0);
+            
+            await UniTask.WaitForSeconds(offTime - 0.2f, cancellationToken: ctk);
+            
+            // 레이저 발사 시작
+            SetAnimatorsState(1);
+            DOTween.To(() => length,
+                (x) => { length = x; }, activeLength, 0.1f);
+            foreach(var p in onReadyParticles)
+                p.Stop();
+            foreach(var p in onActiveParticles)
+                p.Play();
+            
+            await UniTask.WaitForSeconds(0.1f, cancellationToken: ctk);
+            
+            // 레이저 활성화
+            lasing = true;
+            SetAnimatorsState(2);
+            
+            await UniTask.WaitForSeconds(onTime, cancellationToken: ctk);
+            
+            // 레이저 발사 종료 
+            SetAnimatorsState(1);
+            DOTween.To(() => length,
+                (x) => { length = x; }, inactiveLength, 0.1f);
+            foreach(var p in onReadyParticles)
+                p.Play();
+            foreach(var p in onActiveParticles)
+                p.Stop();
+            await UniTask.WaitForSeconds(0.1f, cancellationToken: ctk);
         }
-
-        // Debug.Log(hit.collider != null ? hit.collider.gameObject.name : "");
-
-        if (hit.collider == null)
-            length = laserMaxLength;
-        else
-            length = Vector2.Distance(point.position, hit.point);
     }
 
     public override void OffAct()
@@ -181,32 +169,19 @@ public class G_WaterLaser : GimmickSignalReceiver
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(point.position, 0.3f);
-        Debug.DrawRay(point.position, point.up * laserMaxLength, Color.red);
+        Debug.DrawRay(point.position, point.up * activeLength, Color.red);
     }
 
-    private void DoDamageIfItsPlayer(GameObject go)
+    private void SetAnimatorsState(int state)
     {
-        if (go.CompareTag("Player"))
-        {
-            // Debug.Log("damaged");
-            if (!overrideInvincibleDuration)
-            {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
-            }
-            else
-            {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1, ignoreDuration);
-            }
-
-        }
+        var hash = Animator.StringToHash("State");
+        topAnim.SetInteger(hash, state);
+        midAnim.SetInteger(hash, state);
+        botAnim.SetInteger(hash, state);
     }
 
     private void OnDestroy()
     {
         InactivateLaser();
-        if(_sr1tween != null)
-            _sr1tween.Kill();
-        if(_sr2tween != null)
-            _sr2tween.Kill();
     }
 }
