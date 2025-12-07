@@ -33,7 +33,11 @@ public class PlayerDamageReceiver : MonoBehaviour
 
     public void GetDamageAndRespawn(int damage)
     {
-        // _ignoreDamage 무시함
+        // 낙사 등의 상황 고려, _ignoreDamage 무시함
+        // _ignoreDamage 대신 리스폰 시퀀스 중인지 여부로 무한 데미지 입는 상황 방지
+        if (RespawnHandler.Instance.IsDoingRespawn)
+            return;
+        
         bool isDead = GetDamageInternal(damage);
         // 어차피 리스폰할거니 넉백 필요 없음
         

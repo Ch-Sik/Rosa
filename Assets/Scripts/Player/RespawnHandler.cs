@@ -17,6 +17,9 @@ public class RespawnHandler : MonoBehaviour
     private Vector2Int _lastAddedRespawnPoint;
     private int _platformLayer;
 
+    public bool IsDoingRespawn => _isDoingRespawn;
+    private bool _isDoingRespawn = false;
+
     private void Awake()
     {
         _instance = this; 
@@ -68,6 +71,8 @@ public class RespawnHandler : MonoBehaviour
 
     private IEnumerator RespawnSequence()
     {
+        _isDoingRespawn = true;
+        
         FadeoutPanel.Fadeout();
         yield return new WaitForSeconds(FadeoutPanel.fadeDuration);
 
@@ -81,6 +86,7 @@ public class RespawnHandler : MonoBehaviour
         _player.transform.position = new Vector3(respawnPoint.x + 0.5f, respawnPoint.y + 1.0f, _player.transform.position.z);
         
         yield return new WaitForSeconds(0.5f);
+        _isDoingRespawn = false;
         FadeoutPanel.FadeIn();
     }
 

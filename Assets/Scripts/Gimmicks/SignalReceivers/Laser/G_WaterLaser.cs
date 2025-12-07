@@ -7,37 +7,39 @@ using UnityEngine.Serialization;
 
 public class G_WaterLaser : GimmickSignalReceiver
 {
-    public bool showGizmos = true;
+    [Title("레퍼런스")]
     public Transform point;
     public SpriteRenderer laserSprite;
     public LayerMask playerLayerMask;
     public LayerMask obstaclesLayerMask;
-    public float startDelay = 0.0f;
-    [FormerlySerializedAs("laserMaxLength")] 
-    public float activeLength;
-    public float inactiveLength;
-    /// 전체 레이저 On/Off 사이클의 동작 여부
-    public bool isActivate = true;
-    public float onTime = 1.0f;
-    public float offTime = 1.0f;        //OFF Time이 0일 시 무한
-    
     [SerializeField] private ParticleSystem[] onReadyParticles;
     [SerializeField] private ParticleSystem[] onActiveParticles;
     [SerializeField] private Animator topAnim;
     [SerializeField] private Animator midAnim;
     [SerializeField] private Animator botAnim;
-
+    
+    [Title("타이밍 & 길이")]
+    public float startDelay = 0.0f;
+    public float onTime = 1.0f;
+    public float offTime = 1.0f;        //OFF Time이 0일 시 무한
+    [FormerlySerializedAs("laserMaxLength")] 
+    public float activeLength;
+    public float inactiveLength;
+    
+    [Title("데미지")]
+    [SerializeField] private int damage = 1;
+    [SerializeField] private bool respawnOnDamage = false;
+    
+    [Title("디버깅")]
+    public bool showGizmos = true;
+    /// 전체 레이저 On/Off 사이클의 동작 여부
+    public bool isActivate = true;
     /// 실제 데미지를 가하는 레이저가 동작하고 있는지 여부
     [SerializeField, ReadOnly] private bool lasing = false;
     /// 레이저의 실제 길이
     [SerializeField, ReadOnly] private float length = 0.00f;
 
     private RaycastHit _hit;
-
-    public bool overrideInvincibleDuration = false;
-    [ShowIf("overrideInvincibleDuration")]
-    public float ignoreDuration = 2f;
-
     private CancellationTokenSource _cts = new();
 
     private void Start()
@@ -77,10 +79,10 @@ public class G_WaterLaser : GimmickSignalReceiver
     {
         if (!go.CompareTag("Player")) return;
 
-        if (!overrideInvincibleDuration)
-            go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
+        if (respawnOnDamage)
+            go.GetComponent<PlayerDamageReceiver>().GetDamageAndRespawn(damage);
         else
-            go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1, ignoreDuration);
+            go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, damage);
     }
 
     [Button]

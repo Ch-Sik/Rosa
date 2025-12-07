@@ -15004,7 +15004,6 @@ MonoBehaviour:
     easeInDur: 0
     holdDur: 0
     zoomAmount: 0
-  showGizmos: 1
   point: {fileID: 5103424231692196410}
   laserSprite: {fileID: 9159839656080548251}
   playerLayerMask:
@@ -15013,12 +15012,6 @@ MonoBehaviour:
   obstaclesLayerMask:
     serializedVersion: 2
     m_Bits: 132096
-  startDelay: 0
-  activeLength: 30
-  inactiveLength: 2.5
-  isActivate: 1
-  onTime: 1
-  offTime: 1
   onReadyParticles:
   - {fileID: 4687224155575156955}
   onActiveParticles:
@@ -15027,10 +15020,17 @@ MonoBehaviour:
   topAnim: {fileID: 7559682235248407979}
   midAnim: {fileID: 1620872019010691180}
   botAnim: {fileID: 2405316620868389669}
+  startDelay: 0
+  onTime: 1
+  offTime: 1
+  activeLength: 30
+  inactiveLength: 2.5
+  damage: 1
+  respawnOnDamage: 1
+  showGizmos: 1
+  isActivate: 1
   lasing: 0
   length: 0
-  overrideInvincibleDuration: 0
-  ignoreDuration: 2
 --- !u!1 &8817665885465278926
 GameObject:
   m_ObjectHideFlags: 0
