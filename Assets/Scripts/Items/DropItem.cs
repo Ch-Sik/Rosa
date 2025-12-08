@@ -45,10 +45,6 @@ public class DropItem : FieldItem
     
     private void Disappear()
     {
-        DOVirtual.DelayedCall(lifetime, () =>
-        {
-            if(gameObject)
-                Destroy(gameObject);
-        });
+        Destroy(gameObject, lifetime);
     }
 }
