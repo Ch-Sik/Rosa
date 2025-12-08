@@ -54,7 +54,12 @@ MonoBehaviour:
   startRotationMode: 2
   randomRotationOnStart: 0
   useRandomAngularVelocity: 0
-  randomRotationRange: 30
+  randomAngularVelocityRange: 30
+  angularVelocity: 0
+  flipRotationWhenLookingLeft: 0
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
   blockingLayers:
     serializedVersion: 2
     m_Bits: 656384
@@ -62,10 +67,13 @@ MonoBehaviour:
   onWallHit: 3
   useLifetime: 0
   lifetime: 0
+  disappearDelay: 1
   rigidbody: {fileID: 3905194349331104663}
   colliders:
   - {fileID: 8302385115658067482}
   animator: {fileID: 6297934210235680986}
+  spriteRenderer: {fileID: 0}
+  hitEffect: {fileID: 0}
 --- !u!58 &8302385115658067482
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -168,7 +176,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 101
   m_Sprite: {fileID: -1948728175, guid: 22b7336ef4e3e2942a7cfa0621d38442, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -194,7 +202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!95 &6297934210235680986
 Animator:
