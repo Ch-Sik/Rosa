@@ -68,6 +68,17 @@ public class PauseMenuUI : MonoBehaviour
         InputManager.Instance.SetUiInputState(UiState.IN_GAME);
     }
 
+    public void OpenOptions()
+    {
+        if (!OptionUI.Instance)
+        {
+            Debug.LogError("[PauseMenuUI] 옵션 UI를 찾을 수 없음");
+            return;
+        }
+        
+        OptionUI.Instance.Open();
+    }
+
     public void ToTitleScene()
     {
         StartCoroutine(Co_ToTitleScene());

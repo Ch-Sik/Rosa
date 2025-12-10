@@ -6,20 +6,6 @@ public class SaveUI : MonoBehaviour
 {
     [SerializeField] private float uiShowDuration = 1f;
     [SerializeField] private Animator anim;
-    
-    private static SaveUI _instance;
-    
-    private void Awake()
-    {
-        if (_instance)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        _instance = this;
-        DontDestroyOnLoad(gameObject);       
-    }
 
     private void Start()
     {

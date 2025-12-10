@@ -170,10 +170,8 @@ public class SaveLoadManager : MonoBehaviour
 
     public void SaveOptionData(OptionSetting option)
     {
-        OptionSaveData Data = new OptionSaveData(option);
-
         string filePath = GetPath(optionPathName) + "/option.json";
-        string json = JsonConvert.SerializeObject(Data, serializeSetting);
+        string json = JsonConvert.SerializeObject(option, serializeSetting);
         File.WriteAllText(filePath, json);
     }
 
@@ -188,9 +186,9 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(filePath);
-        OptionSaveData Data = JsonConvert.DeserializeObject<OptionSaveData>(json);
+        var data = JsonConvert.DeserializeObject<OptionSetting>(json);
 
-        return Data.GetOptionSetting();
+        return data;
     }
     #endregion
 }
@@ -238,35 +236,4 @@ public class FlagSaveData
     public int value;
 
     public FlagSaveData(string k, int v) { key = k; value = v; }
-}
-
-[Serializable]
-public class OptionSaveData
-{
-    public int Window;
-    public int Resolution;
-    public float VOL;
-    public float BGM;
-    public float SFX;
-
-    public OptionSaveData(OptionSetting option)
-    {
-        Window = option.window;
-        Resolution = option.resolution;
-        VOL = option.vol;
-        BGM = option.bgm;
-        SFX = option.sfx;
-    }
-
-    public OptionSetting GetOptionSetting()
-    {
-        return new OptionSetting()
-        {
-            window = this.Window,
-            resolution = this.Resolution,
-            vol = this.VOL,
-            bgm = this.BGM,
-            sfx = this.SFX
-        };
-    }
 }

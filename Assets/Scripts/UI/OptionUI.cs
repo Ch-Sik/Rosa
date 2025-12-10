@@ -1,16 +1,22 @@
 using Sirenix.OdinInspector;
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class OptionUI : MonoBehaviour
 {
+    public static OptionUI Instance { get; private set; }
+
     public GameObject UI;
+    public CanvasGroup uiGroup;
+    public float fadeDuration = 0.2f;
 
     public OptionSetting defaultOption = new OptionSetting();
-    public OptionSetting savedOption;           //저장된 옵션
-    public OptionSetting currentOption;         //현재 적용된 옵션
+    public OptionSetting savedOption; //저장된 옵션
+    public OptionSetting currentOption; //현재 적용된 옵션
 
     public TextChoiceButtonController Window;
     public TextChoiceButtonController Resolution;
@@ -21,31 +27,31 @@ public class OptionUI : MonoBehaviour
     public Vector2Int[] resolutions = new Vector2Int[3];
     public FullScreenMode[] screenModes = new FullScreenMode[2];
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
         Load();
     }
 
     #region Environment
-    public void Apply()
+    public void ApplyAndClose()
     {
-        SetByCurrentOption();
         Save();
+        Close();
     }
 
-    public void Reset_()
+    public void ResetAndClose()
     {
         currentOption = savedOption.MakeCopy();
         SetByCurrentOption();
+        Close();
     }
 
-    public void SetDefault()
-    {
-        currentOption = defaultOption.MakeCopy();
-        SetByCurrentOption();
-    }
-
-    public void Default()
+    public void ToDefaultOption()
     {
         currentOption = defaultOption.MakeCopy();
         SetByCurrentOption();
@@ -90,14 +96,10 @@ public class OptionUI : MonoBehaviour
             return;
 
         OptionSetting loadedOption = SaveLoadManager.Instance.LoadOptionData();
-        if (loadedOption == null)
-        {
+        if (loadedOption != null)
+            savedOption = loadedOption.MakeCopy();
+        else
             savedOption = defaultOption.MakeCopy();
-            currentOption = savedOption.MakeCopy();
-            return;
-        }
-
-        savedOption = loadedOption.MakeCopy();
         currentOption = savedOption.MakeCopy();
 
         SetByCurrentOption();
@@ -123,9 +125,31 @@ public class OptionUI : MonoBehaviour
     #endregion
 
     #region UI Set
-    public void Open() { Load(); UI.SetActive(true); }
 
-    public void Close() {  UI.SetActive(false); }
+    public void Open()
+    {
+        Load();
+        OpenInternal().Forget();
+    }
+
+    private async UniTaskVoid OpenInternal()
+    {
+        UI.SetActive(true);
+        uiGroup.DOFade(1, fadeDuration).SetUpdate(true);
+    }
+
+    public void Close()
+    {
+        CloseInternal().Forget();
+    }
+
+    private async UniTaskVoid CloseInternal()
+    {
+        await uiGroup.DOFade(0, fadeDuration).SetUpdate(true)
+                    .AsyncWaitForCompletion();
+        await UniTask.SwitchToMainThread();
+        UI.SetActive(false); 
+    }
 
     public void OpenClose()
     {
@@ -159,49 +183,4 @@ public class OptionUI : MonoBehaviour
         SetSoundEnvironmentByCurrentOption();
     }
     #endregion
-}
-
-//Struct 써도 되는데, 비교 함수랑 저장 편의를 위해 클래스 사용
-[Serializable]
-public class OptionSetting
-{
-    public int window;
-    public int resolution;
-    public float vol;
-    public float bgm;
-    public float sfx;
-
-    public OptionSetting MakeCopy()
-    {
-        return new OptionSetting()
-        {
-            window = window,
-            resolution = resolution,
-            vol = vol,
-            bgm = bgm,
-            sfx = sfx
-        };
-    }
-
-    public bool isEqual(OptionSetting another)
-    {
-        if (window != another.window ||
-            resolution != another.resolution ||
-            vol != another.resolution ||
-            bgm != another.bgm ||
-            sfx != another.sfx)
-            return false;
-
-        return true;
-    }
-
-    //생성자로 Default Option 생성
-    public OptionSetting()
-    {
-        window = 1;
-        resolution = 1;
-        vol = 0.5f;
-        bgm = 0.5f;
-        sfx = 0.5f;
-    }
 }
