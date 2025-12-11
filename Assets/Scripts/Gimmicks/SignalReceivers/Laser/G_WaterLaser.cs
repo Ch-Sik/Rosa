@@ -45,6 +45,17 @@ public class G_WaterLaser : GimmickSignalReceiver
     private void Start()
     {
         Invoke(nameof(ActivateLaser), startDelay);
+        UpdateActiveLength();
+    }
+
+    private void UpdateActiveLength()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(point.position, point.up, 
+            activeLength, obstaclesLayerMask);
+        if (hit.collider && ((1 << hit.collider.gameObject.layer) & obstaclesLayerMask) != 0)
+        {
+            activeLength = hit.distance;
+        }
     }
 
     private void Update()
@@ -177,9 +188,9 @@ public class G_WaterLaser : GimmickSignalReceiver
     private void SetAnimatorsState(int state)
     {
         var hash = Animator.StringToHash("State");
-        topAnim.SetInteger(hash, state);
-        midAnim.SetInteger(hash, state);
-        botAnim.SetInteger(hash, state);
+        topAnim?.SetInteger(hash, state);
+        midAnim?.SetInteger(hash, state);
+        botAnim?.SetInteger(hash, state);
     }
 
     private void OnDestroy()
