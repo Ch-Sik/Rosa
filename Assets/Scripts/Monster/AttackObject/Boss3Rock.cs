@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Boss3Rock : ProjectileBase
 {
-    protected override void HandleHitWall()
+    protected override void HandleProjMoveOnHit(ProjectileWallHitOption option)
     {
         CameraShake.ShakeCamera(CameraShakePreset.Large, true);
-        base.HandleHitWall();
+        base.HandleProjMoveOnHit(option);
     }
 }

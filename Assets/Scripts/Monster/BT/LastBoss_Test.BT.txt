@@ -1,7 +1,7 @@
 tree("Root")
     sequence
-        // FollowingBallAttack()
-        // CrossBladeAttack()
+        CrossBladeAttack()
         // IvyAttack()
-        LaserAttack()
-        Wait(10.0)
+        // LaserAttack()
+        // RandomSphereAttack()
+        Wait(5.0)

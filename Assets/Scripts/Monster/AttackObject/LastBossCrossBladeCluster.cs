@@ -10,14 +10,14 @@ public class LastBossCrossBladeCluster : MonoBehaviour
     [SerializeField] ProjectileBase projUp;
     [SerializeField] ProjectileBase projLeft;
     [SerializeField] ProjectileBase projDown;
+    [SerializeField] private ParticleSystem particleRight;
+    [SerializeField] private ParticleSystem particleUp;
+    [SerializeField] private ParticleSystem particleLeft;
+    [SerializeField] private ParticleSystem particleDown;
 
     private void Start()
     {
-        // TODO: 나타나는 애니메이션 추가
-        if(animator != null)
-        {
-            animator.SetTrigger("appear");
-        }
+        SetProjParticleEmission(false);
     }
 
     public void LaunchProjectiles(float projSpeed)
@@ -33,9 +33,25 @@ public class LastBossCrossBladeCluster : MonoBehaviour
         projUp.InitProjectile(Vector2.up * projSpeed);
         projLeft.InitProjectile(Vector2.left * projSpeed);
         projDown.InitProjectile(Vector2.down * projSpeed);
+        
+
+        // 자탄의 파티클 활성화
+        SetProjParticleEmission(true);
 
         // 클러스터 본체는 소멸
         Disappear(clusterLifetime);
+    }
+
+    private void SetProjParticleEmission(bool value)
+    {
+        var particleRightEmission = particleRight.emission;
+        particleRightEmission.enabled = value;
+        var particleUpEmission = particleUp.emission;
+        particleUpEmission.enabled = value;
+        var particleLeftEmission = particleLeft.emission;
+        particleLeftEmission.enabled = value;
+        var particleDownEmission = particleDown.emission;
+        particleDownEmission.enabled = value;
     }
 
     public void Disappear(float delay)
@@ -43,7 +59,7 @@ public class LastBossCrossBladeCluster : MonoBehaviour
         // TODO: 사라지는 애니메이션 추가
         if (animator != null)
         {
-            animator.SetTrigger("disappear");
+            animator.SetTrigger("Disappear");
         }
         Invoke("DoDestroy", delay);
     }

@@ -6,11 +6,11 @@ using Panda;
 public class Task_A_LastBossCrossBlade : Task_A_Base
 {
     [Tooltip("동시에 몇뭉치 소환할건지")]
-    [SerializeField] int clusterCount = 1;
-    [SerializeField] GameObject prefab;
-    [SerializeField] Vector2 spawnAreaSize;  // 맵의 임의 지점을 선정할 때 사용될 "범위"
-    [SerializeField] float projSpeed = 3f;
-
+    [SerializeField] private int clusterCount = 1;
+    [SerializeField] private GameObject prefab;
+    [SerializeField] private Vector2 spawnAreaSize;  // 맵의 임의 지점을 선정할 때 사용될 "범위"
+    [SerializeField] private float projSpeed = 3f;
+    [SerializeField] private bool clearProjectilesOnTerminated;
 #if UNITY_EDITOR
     [SerializeField] bool drawGizmo;
 #endif
@@ -56,6 +56,8 @@ public class Task_A_LastBossCrossBlade : Task_A_Base
     protected override void ClearOnTerminated()
     {
         base.ClearOnTerminated();
+
+        if (!clearProjectilesOnTerminated) return;
         // 생성된 칼날 있다면 삭제
         if(instances != null)
         {

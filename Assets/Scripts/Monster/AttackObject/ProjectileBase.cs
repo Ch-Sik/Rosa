@@ -40,6 +40,8 @@ public class ProjectileBase : MonoBehaviour
     protected bool canDestroyMushroom = false;
     [SerializeField, Tooltip("투사체가 벽에 닿았을 때 행동 설정")]
     protected ProjectileWallHitOption onWallHit = ProjectileWallHitOption.Destroy;
+    [SerializeField, Tooltip("투사체가 타겟(플레이어)에 닿았을 때 행동 설정")]
+    protected ProjectileWallHitOption onTargetHit = ProjectileWallHitOption.Destroy;
 
     [Space(10)]
     [SerializeField, Tooltip("수명 사용")]
@@ -134,27 +136,19 @@ public class ProjectileBase : MonoBehaviour
     protected virtual void OnTriggerEnter2D(Collider2D collider)
     {
         if (((1 << collider.gameObject.layer) & targetLayers) != 0)
-            HandleHitTarget();
+        // 데미지 주는 것은 MonsterDamageInflictor에서 하므로 여기서는 사라지기/반사 등의 처리만 처리하면 됨.
+            HandleProjMoveOnHit(onTargetHit);
 
         if (((1 << collider.gameObject.layer) & blockingLayers) != 0)
-            HandleHitWall();
+            HandleProjMoveOnHit(onWallHit);
         
         if (canDestroyMushroom && (collider.tag == "Mushroom"))
             HandleHitMushroom(collider);
     }
 
-    private void HandleHitTarget()
+    protected virtual void HandleProjMoveOnHit(ProjectileWallHitOption option)
     {
-        // 데미지 주는 것은 MonsterDamageInflictor에서 하므로 여기서는 사라지기만 처리하면 됨.
-        rigidbody.velocity = Vector2.zero;
-        foreach (var c in colliders)
-            c.enabled = false;
-        Disappear();
-    }
-
-    protected virtual void HandleHitWall()
-    {
-        switch (onWallHit)
+        switch (option)
         {
             case ProjectileWallHitOption.Ignore:
                 // Do nothing
