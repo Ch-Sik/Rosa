@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50127c7c13e781e4890c86fbf6e88d50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  segmentPrefab: {fileID: 5765049174542725003, guid: 7e91d90bb8e0dda41bc305a4a136f8fe, type: 3}
+  segmentPrefab: {fileID: 286456696453307554, guid: 7e91d90bb8e0dda41bc305a4a136f8fe, type: 3}
   growHeight: 20
   growPerSec: 3
   unitPerSegment: 0.3
@@ -67,7 +67,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
 --- !u!50 &6285939761920867557
 Rigidbody2D:

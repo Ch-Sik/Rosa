@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class LastBossIvy : MonoBehaviour
 {
-    [SerializeField] GameObject segmentPrefab;
+    [SerializeField] LastBossIvySegment segmentPrefab;
     [SerializeField] float growHeight;
     [SerializeField] float growPerSec;
     [SerializeField] float unitPerSegment;
@@ -14,7 +14,7 @@ public class LastBossIvy : MonoBehaviour
     [SerializeField] float frequency;
     [SerializeField] float amplitude;
 
-    List<GameObject> segments = new List<GameObject>();
+    List<LastBossIvySegment> segments = new List<LastBossIvySegment>();
 
     // Start is called before the first frame update
     void Start()
@@ -22,8 +22,8 @@ public class LastBossIvy : MonoBehaviour
         int segmentCount = Mathf.CeilToInt(growHeight / unitPerSegment);
         for (int i = 0; i < segmentCount; i++)
         {
-            GameObject instance = Instantiate(segmentPrefab, transform);
-            instance.SetActive(false);
+            var instance = Instantiate(segmentPrefab, transform);
+            instance.gameObject.SetActive(false);
             segments.Add(instance);
         }
     }
@@ -34,7 +34,7 @@ public class LastBossIvy : MonoBehaviour
         StopAllCoroutines();
         foreach(var o in segments)
         {
-            o.SetActive(false);
+            o.gameObject.SetActive(false);
         }
     }
 
@@ -56,7 +56,7 @@ public class LastBossIvy : MonoBehaviour
                 float x = transform.position.x + Mathf.Sin(growth * frequency + vias) * amplitude;
                 float y = transform.position.y + growth;
                 // 알맹이 위치 지정 & 활성
-                segments[i].SetActive(true);
+                segments[i].gameObject.SetActive(true);
                 segments[i].transform.position = new Vector3(x, y, transform.position.z);
                 // 딜레이 부여
                 yield return new WaitForSeconds(secPerSegment);
@@ -68,7 +68,8 @@ public class LastBossIvy : MonoBehaviour
     {
         // 덩굴 자라는 도중이었다면 해당 코루틴 중단
         StopAllCoroutines();
-        // TODO: 덩굴 삭제되는 연출 구현
+        foreach(var seg in segments)
+            seg.Disappear();
         Destroy(gameObject, 0.5f);
         // 덩굴 자라는 도중에 삭제 호출되면 Invoke로 인해 Disappear 두번째 호출되는 것 방지
         CancelInvoke();

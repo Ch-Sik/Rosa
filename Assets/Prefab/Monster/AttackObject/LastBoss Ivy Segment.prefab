@@ -9,8 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 39607876208219579}
+  - component: {fileID: 286456696453307554}
   - component: {fileID: 1396873457314168722}
   - component: {fileID: 5670384144341224246}
+  - component: {fileID: 2184079476278922934}
   m_Layer: 0
   m_Name: LastBoss Ivy Segment
   m_TagString: Untagged
@@ -33,6 +35,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &286456696453307554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5765049174542725003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22275cf68779f24459c15ceb1c9aa1bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 21300000, guid: 01677957e5169a74b9d4afe448671f35, type: 3}
+  - {fileID: 21300000, guid: e8cd54cb717c8894aac6d3cbcb018911, type: 3}
+  - {fileID: 21300000, guid: 9fbc29b6e5fa2064a8f9eedfae9f7724, type: 3}
+  spriteRenderer: {fileID: 1396873457314168722}
+  anim: {fileID: 2184079476278922934}
 --- !u!212 &1396873457314168722
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -120,3 +140,24 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.49999997
+--- !u!95 &2184079476278922934
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5765049174542725003}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6afd1724f85ebe24eb28066e154deee7, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
