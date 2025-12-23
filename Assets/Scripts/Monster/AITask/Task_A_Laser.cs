@@ -2,24 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Panda;
+using Random = System.Random;
 
 public class Task_A_Laser : Task_A_Base
 {
-    [SerializeField, Tooltip("레이저 발사될 위치")]
-    protected Transform muzzle;
     [SerializeField]
-    protected GameObject laserPrefab;
+    protected MonsterLaser laserPrefab;
 
+    [SerializeField] private Vector2 spawnAreaOffset;
+    [SerializeField] private Vector2 spawnAreaSize;
+
+    [SerializeField] private int spawnCount;
+    
     [SerializeField]
     protected int damage;
+    
     [SerializeField, ReadOnly]
-    protected MonsterLaser instance = null;
+    protected List<MonsterLaser> instanceList = null;
+
+    
+    private const int MaxAttempts = 30;
+    private float minDistOfOrbs;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Assert(muzzle != null);
         Debug.Assert(laserPrefab != null);
     }
 
@@ -35,10 +43,9 @@ public class Task_A_Laser : Task_A_Base
         GameObject enemy;
         if(blackboard.TryGet(BBK.Enemy, out enemy))
         {
-            Vector2 toTarget = enemy.transform.position - muzzle.position;
-            GameObject spawned = Instantiate(laserPrefab, muzzle.position, Quaternion.identity);
-            instance = spawned.GetComponent<MonsterLaser>();
-            instance.Initalize(toTarget.normalized);
+            var points = GetNextSpawnPositions(spawnCount);
+            foreach(var p in points)
+                SpawnLaserOrb(p, enemy.transform.position);
         }
         else
         {
@@ -48,20 +55,75 @@ public class Task_A_Laser : Task_A_Base
         }
     }
 
+    private List<Vector2> GetNextSpawnPositions(int count)
+    {
+        Vector2 spawnPos;
+        Vector2 spawnAreaCenter = (Vector2)(transform.position) + spawnAreaOffset;
+        List<Vector2> result = new();
+        int attempts = 0;
+        
+        while (result.Count < count && attempts < MaxAttempts)
+        {
+            attempts++;
+            
+            spawnPos = new Vector2(
+                spawnAreaCenter.x + UnityEngine.Random.Range(-spawnAreaSize.x / 2, spawnAreaSize.x / 2),
+                spawnAreaCenter.y + UnityEngine.Random.Range(-spawnAreaSize.y / 2, spawnAreaSize.y / 2)
+            );
+
+            bool isValid = true;
+            foreach (var p in result)
+            {
+                if (Vector2.SqrMagnitude(p - spawnPos) <= minDistOfOrbs * minDistOfOrbs)
+                {
+                    isValid = false;
+                    continue;
+                }
+            }
+            
+            if(isValid)
+                result.Add(spawnPos);
+        }
+
+        return result;
+    }
+
+    private MonsterLaser SpawnLaserOrb(Vector2 spawnPos, Vector2 targetPos)
+    {
+        var instance = Instantiate(laserPrefab, spawnPos, Quaternion.identity);
+        instance.Initalize((targetPos - spawnPos).normalized);
+        
+        instanceList.Add(instance);
+        return instance;
+    }
+
     protected override void OnActiveBegin()
     {
-        instance.Activate(damage);
+        foreach(var instance in instanceList)
+            instance.Activate(damage);
     }
 
     protected override void OnRecoveryBegin()
     {
-        instance.Terminate();
+        TerminateLaser();
     }
 
     protected override void ClearOnTerminated()
     {
         base.ClearOnTerminated();
         // 발사중인 레이저 중단
-        instance.Terminate();
+        TerminateLaser();
+    }
+
+    private void TerminateLaser()
+    {
+        foreach(var instance in instanceList)
+            instance.Terminate();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(transform.position + (Vector3)spawnAreaOffset, spawnAreaSize);
     }
 }
