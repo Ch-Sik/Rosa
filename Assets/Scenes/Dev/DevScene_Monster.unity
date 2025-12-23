@@ -12450,52 +12450,6 @@ Material:
     m_Colors:
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_BuildTextureStacks: []
---- !u!1 &316019694 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2353456446456302032, guid: 893fee509f174304ba961a041670647e, type: 3}
-  m_PrefabInstance: {fileID: 1253318598518817667}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &316019695 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 245620119312496127, guid: 893fee509f174304ba961a041670647e, type: 3}
-  m_PrefabInstance: {fileID: 1253318598518817667}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 316019694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06b3ad9f2e397194baf2d5658d9bd26f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &316019713
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 316019694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7619f1ed400803b4d803a69e393fa1e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blackboard: {fileID: 316019695}
-  writeStateOnBlackboard: 1
-  usePatternID: 0
-  patternID: 0
-  startupDuration: 1.5
-  superArmourOnStartup: 1
-  activeDuration: 0
-  superArmourOnActive: 1
-  recoveryDuration: 1
-  superArmourOnRecovery: 1
-  currentState: 0
-  attackPrefab: {fileID: 2343508304068933760, guid: d0a017be579c28847a3ad0ffd4311608, type: 3}
-  spawnCount: 10
-  attackRadius: 1
-  overlapFactor: 0.7
-  areaCenter: {x: 0, y: 3}
-  areaSize: {x: 20, y: 13}
-  spawnTerm: 0
 --- !u!4 &318411567 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 34563689161419886, guid: 4f1128f4c2ca0f243926fcaad7038f87, type: 3}
@@ -94787,10 +94741,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2353456446456302032, guid: 893fee509f174304ba961a041670647e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 316019713}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 893fee509f174304ba961a041670647e, type: 3}
 --- !u!1001 &1781765939634670100
 PrefabInstance:
