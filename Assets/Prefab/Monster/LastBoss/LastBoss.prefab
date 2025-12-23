@@ -198,6 +198,7 @@ GameObject:
   - component: {fileID: 6161028656079869558}
   - component: {fileID: 5366884633108451846}
   - component: {fileID: 7538435774592040902}
+  - component: {fileID: 7764212301334203387}
   m_Layer: 23
   m_Name: LastBoss body
   m_TagString: Untagged
@@ -508,6 +509,7 @@ MonoBehaviour:
   prefab: {fileID: 7058335693094710194, guid: 5475ec07fa1a2c543af2badeb762521f, type: 3}
   spawnAreaSize: {x: 11, y: 9}
   projSpeed: 3
+  clearProjectilesOnTerminated: 0
   drawGizmo: 0
 --- !u!114 &6161028656079869558
 MonoBehaviour:
@@ -596,6 +598,36 @@ MonoBehaviour:
   platformRelocationRangeMin: -7
   platformRelocationRangeMax: 7
   enemyKnockbackPow: 1
+--- !u!114 &7764212301334203387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2353456446456302032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7619f1ed400803b4d803a69e393fa1e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blackboard: {fileID: 245620119312496127}
+  writeStateOnBlackboard: 1
+  usePatternID: 0
+  patternID: 0
+  startupDuration: 1.5
+  superArmourOnStartup: 1
+  activeDuration: 0
+  superArmourOnActive: 1
+  recoveryDuration: 1
+  superArmourOnRecovery: 1
+  currentState: 0
+  attackPrefab: {fileID: 2343508304068933760, guid: d0a017be579c28847a3ad0ffd4311608, type: 3}
+  spawnCount: 10
+  attackRadius: 1
+  overlapFactor: 0.7
+  areaCenter: {x: 0, y: 3}
+  areaSize: {x: 20, y: 13}
+  spawnTerm: 0
 --- !u!1 &2528727932114450568
 GameObject:
   m_ObjectHideFlags: 0

@@ -12482,7 +12482,7 @@ MonoBehaviour:
   writeStateOnBlackboard: 1
   usePatternID: 0
   patternID: 0
-  startupDuration: 1
+  startupDuration: 1.5
   superArmourOnStartup: 1
   activeDuration: 0
   superArmourOnActive: 1
@@ -17219,6 +17219,7 @@ MonoBehaviour:
   col: {fileID: 423208284}
   anim: {fileID: 423208285}
   activeDuration: 0.3
+  particles: []
 --- !u!58 &423208284
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -58189,6 +58190,7 @@ MonoBehaviour:
   col: {fileID: 1356197349}
   anim: {fileID: 1356197350}
   activeDuration: 0.3
+  particles: []
 --- !u!58 &1356197349
 CircleCollider2D:
   m_ObjectHideFlags: 0
