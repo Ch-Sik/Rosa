@@ -119,6 +119,7 @@ public class Task_A_Laser : Task_A_Base
     {
         foreach(var instance in instanceList)
             instance.Terminate();
+        instanceList.Clear();
     }
 
     private void OnDrawGizmosSelected()

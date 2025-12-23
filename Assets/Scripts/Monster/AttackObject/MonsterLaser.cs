@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class MonsterLaser : MonoBehaviour
@@ -29,7 +30,6 @@ public class MonsterLaser : MonoBehaviour
     [SerializeField, Tooltip("레이저 뻗어나가는 속도")]
     private float laserSpeed = 1f;
 
-    private SpriteRenderer _beamSprite;
     private bool collideWithTerrain;
     private float laserLength;
 
@@ -46,8 +46,6 @@ public class MonsterLaser : MonoBehaviour
 
     public void Initalize(Vector2 dir)
     {
-        _beamSprite = beamMid.GetComponent<SpriteRenderer>();
-        
         // 레이저 방향에 맞게 회전
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         angle -= 90;   // 스프라이트가 오른쪽 기준이 아니라 위쪽 기준인 것 고려
@@ -85,9 +83,9 @@ public class MonsterLaser : MonoBehaviour
         beamMid.SetActive(true);
         beamEnd?.SetActive(true);
 
-        // TODO: 레이저가 활성화될때 자연스러운 느낌 나도록 트위닝 적용하기
-        SetLaserSize(laserWidth, laserLength);
-
+        beamMid.transform.DOScale(new Vector3(laserWidth, laserLength, 1), laserLength / laserSpeed);
+        beamMid.transform.DOLocalMoveY(laserLength / 2, laserLength / laserSpeed);
+        
         // 데미지 값 설정하고 콜라이더 활성화하기
         damageInflictor.damage = damage;
         laserCollider.enabled = true;
@@ -100,26 +98,24 @@ public class MonsterLaser : MonoBehaviour
             beamStart.transform.localScale = new Vector3(width, width, 1);
         }
         beamMid.transform.localPosition = new Vector3(0, length / 2, 0);
-        _beamSprite.size = new Vector2(width, length);
-        if(beamEnd != null)
-        {
-            beamEnd.transform.localPosition = new Vector3(0, length, 0);
-            // 빔 끝점의 스케일은 건드리지 않음
-            // beamEnd.transform.localScale = new Vector3(1.0f, width, 1.0f);
-        }
+        beamMid.transform.localScale = new Vector3(width, length, 0);
     }
 
     public void Terminate()
     {
         // TODO: 레이저 비활성화되기 전에 자연스러운 느낌 나도록 트윈 적용
-
+        beamMid.transform.DOScale(new Vector3(0, laserLength, 1), 0.3f);
+        beamEnd.transform.DOScale(new Vector3(0, 0, 1), 0.3f);
+        
         // 불필요한 오브젝트 비활성화
-        beamStart?.SetActive(false);
-        beamMid.SetActive(false);
-        beamEnd?.SetActive(false);
-        gameObject.SetActive(false);
+        // beamStart?.SetActive(false);
+        // beamMid.SetActive(false);
+        // beamEnd?.SetActive(false);
+        // gameObject.SetActive(false);
 
         // 레이저 공격 판정 비활성화
         laserCollider.enabled = false;
+        
+        Destroy(gameObject, 1f);
     }
 }
