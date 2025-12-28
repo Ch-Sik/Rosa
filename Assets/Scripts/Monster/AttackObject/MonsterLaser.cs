@@ -19,6 +19,8 @@ public class MonsterLaser : MonoBehaviour
     private Collider2D laserCollider;
     [SerializeField, Tooltip("레이저 공격 처리 컴포넌트")]
     private MonsterDamageInflictor damageInflictor;
+    [SerializeField]
+    private Animator animator;
 
     [Title("레이저 형태 관련 파라미터")]
     [SerializeField, Range(0.01f, 20.0f)]
@@ -104,8 +106,9 @@ public class MonsterLaser : MonoBehaviour
     public void Terminate()
     {
         // TODO: 레이저 비활성화되기 전에 자연스러운 느낌 나도록 트윈 적용
-        beamMid.transform.DOScale(new Vector3(0, laserLength, 1), 0.3f);
-        beamEnd.transform.DOScale(new Vector3(0, 0, 1), 0.3f);
+        animator.SetTrigger("Disappear");
+        beamMid.transform.DOScale(new Vector3(0, laserLength, 1), 0.1f);
+        beamEnd.transform.DOScale(new Vector3(0, 0, 1), 0.1f);
         
         // 불필요한 오브젝트 비활성화
         // beamStart?.SetActive(false);
