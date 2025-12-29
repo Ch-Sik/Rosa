@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerDamageReceiver : MonoBehaviour
@@ -28,7 +29,7 @@ public class PlayerDamageReceiver : MonoBehaviour
         GetDamageInternal(damage);
         GetKnockbackInternal(source);
         
-        StartCoroutine(SetInvincibleAndIgnoreCollision(source.layer, ignoreDur));
+        SetInvincibleAndIgnoreCollision(source.layer, ignoreDur).Forget();
     }
 
     public void GetDamageAndRespawn(int damage)
@@ -66,14 +67,14 @@ public class PlayerDamageReceiver : MonoBehaviour
         _playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
     }
 
-    IEnumerator SetInvincibleAndIgnoreCollision(int originalLayer, float delay)
+    private async UniTaskVoid SetInvincibleAndIgnoreCollision(int originalLayer, float delay)
     {
         // 무적 플래그 ON & 충돌 무시 설정 (몬스터와 피격 시 몬스터 통과하여 지나갈 수 있게)
         int collisionLayer = gameObject.layer;
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
         _ignoreDamage = true;
         
-        yield return new WaitForSeconds(delay);
+        await UniTask.WaitForSeconds(delay);
         
         // 무적 해제
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, false);

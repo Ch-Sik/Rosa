@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
@@ -138,63 +139,115 @@ public class MapManager : MonoBehaviour
 
     public void Enter(SORoom room, Vector2 position)
     {
-        StartCoroutine(EnterCoroutine());
-        IEnumerator EnterCoroutine()
+        if (CheckRoomLoaded(room))
+            ReloadCurrentRoom(room, position).Forget();
+        else
+            StartCoroutine(EnterCoroutine(room, position));
+    }
+
+    private async UniTaskVoid ReloadCurrentRoom(SORoom room, Vector2 position)
+    {
+        bool wasClimbing;
+        AsyncOperation loadOp;
+        float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
+        bool hasOldSceneToUnload = false;
+        Scene oldScene = SceneManager.GetActiveScene(); // Scene이 notNullable이라서 일단 아무 값이나 집어넣기;
+        if (currentRoom != null)
         {
-            bool wasClimbing;
-            AsyncOperation loadOp;
-            float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
-            bool hasOldSceneToUnload = false;
-            Scene oldScene = SceneManager.GetActiveScene(); // Scene이 notNullable이라서 일단 아무 값이나 집어넣기;
-            if (currentRoom != null)
-            {
-                hasOldSceneToUnload = true;
-                oldScene = SceneManager.GetSceneByName(currentRoom.scene);
-            }
+            hasOldSceneToUnload = true;
+            oldScene = SceneManager.GetSceneByName(currentRoom.scene);
+        }
 
-            // 다음 씬 로드 시작
-            loadOp = StartLoadNextScene(room);
+        if (!FadeoutPanel.isFadeOutActivated)
+        {
+            FadeoutPanel.Fadeout();
+            await UniTask.WaitForSeconds(fadeTime);      // 최소한 페이드 효과 시간만큼은 기다리고
+        }
+        else
+        {
+            Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
+        }
+        // 플레이어 치워두기
+        StorePlayer(out wasClimbing);
+        
+        // 언로드 
+        await StartUnloadOldScene(oldScene);
+        // 기존 씬 다시 로드
+        loadOp = StartLoadNextScene(room);
+        loadOp.allowSceneActivation = true;
+        await loadOp;
 
-            if (!FadeoutPanel.isFadeOutActivated)
-            {
-                FadeoutPanel.Fadeout();
-                yield return new WaitForSeconds(fadeTime);      // 최소한 페이드 효과 시간만큼은 기다리고
-            }
-            else
-            {
-                Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
-            }
+        // 이쯤 되면 씬 전환 완료로 취급
+        currentRoom = room;
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentRoom.scene.SceneName));
 
-            StorePlayer(out wasClimbing);
+        // 플레이어 상태 복구 & 위치 설정
+        UnstorePlayer(wasClimbing);
+        player.position = position;
+        await UniTask.WaitForSeconds(0.7f);  // 플레이어 착지 모션 숨기기
 
-            // 페이드아웃과 플레이어 치워두기가 끝난 후에만 다음 씬 활성화 허용
+        OnNextRoomLoaded?.Invoke();
+        FadeoutPanel.FadeIn();
+    }
+    
+    private IEnumerator EnterCoroutine(SORoom room, Vector2 position)
+    {
+        bool wasClimbing;
+        AsyncOperation loadOp;
+        float fadeTime = FadeoutPanel.fadeDuration + 0.1f;
+        bool hasOldSceneToUnload = false;
+        Scene oldScene = SceneManager.GetActiveScene(); // Scene이 notNullable이라서 일단 아무 값이나 집어넣기;
+        if (currentRoom != null)
+        {
+            hasOldSceneToUnload = true;
+            oldScene = SceneManager.GetSceneByName(currentRoom.scene);
+        }
+
+        // 다음 씬 로드 시작
+        loadOp = StartLoadNextScene(room);
+
+        if (!FadeoutPanel.isFadeOutActivated)
+        {
+            FadeoutPanel.Fadeout();
+            yield return new WaitForSeconds(fadeTime);      // 최소한 페이드 효과 시간만큼은 기다리고
+        }
+        else
+        {
+            Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
+        }
+
+        StorePlayer(out wasClimbing);
+
+        // 페이드아웃과 플레이어 치워두기가 끝난 후에만 다음 씬 활성화 허용
+        if (loadOp != null)
+        {
             loadOp.allowSceneActivation = true;
             yield return loadOp;
-
-            // 기존 씬 완전히 Unload
-            // 참고: Unity에서 제공하는 SceneManagement의 한계로 load와 unload는 동시에 수행 불가능
-            //      그래서 다음 씬이 Activate된 이후에나 unload를 수행해야 함. 
-            if (hasOldSceneToUnload)
-            {
-                StartUnloadOldScene(oldScene);
-                while (oldScene.isLoaded)
-                {
-                    yield return 0;
-                }
-            }
-
-            // 이쯤 되면 씬 전환 완료로 취급
-            currentRoom = room;
-            SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentRoom.scene.SceneName));
-
-            // 플레이어 상태 복구 & 위치 설정
-            UnstorePlayer(wasClimbing);
-            player.position = position;
-            yield return new WaitForSeconds(0.7f);  // 플레이어 착지 모션 숨기기
-
-            OnNextRoomLoaded?.Invoke();
-            FadeoutPanel.FadeIn();
         }
+
+        // 기존 씬 완전히 Unload
+        // 참고: Unity에서 제공하는 SceneManagement의 한계로 load와 unload는 동시에 수행 불가능
+        //      그래서 다음 씬이 Activate된 이후에나 unload를 수행해야 함. 
+        if (hasOldSceneToUnload)
+        {
+            StartUnloadOldScene(oldScene);
+            while (oldScene.isLoaded)
+            {
+                yield return 0;
+            }
+        }
+
+        // 이쯤 되면 씬 전환 완료로 취급
+        currentRoom = room;
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentRoom.scene.SceneName));
+
+        // 플레이어 상태 복구 & 위치 설정
+        UnstorePlayer(wasClimbing);
+        player.position = position;
+        yield return new WaitForSeconds(0.7f);  // 플레이어 착지 모션 숨기기
+
+        OnNextRoomLoaded?.Invoke();
+        FadeoutPanel.FadeIn();
     }
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
@@ -256,6 +309,12 @@ public class MapManager : MonoBehaviour
     #endregion
 
     #region Scene Methods
+
+    private bool CheckRoomLoaded(SORoom room)
+    {
+        SceneField sceneF = room.scene;
+        return SceneManager.GetSceneByName(sceneF).isLoaded;
+    }
     
     private void StorePlayer(out bool wasClimbing)
     {
