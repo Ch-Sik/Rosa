@@ -977,6 +977,8 @@ public class PlayerMovement : MonoBehaviour
 
         // 설치 수행
         mushroomInstance = Instantiate(mushroomPrefab, rayhit.point, Quaternion.identity);
+        if(platformBelow != null)
+            mushroomInstance.transform.parent = platformBelow.transform;
     }
 
     #endregion

@@ -50,6 +50,14 @@ public class MagicMushroom : MonoBehaviour
         MapManager.Instance.OnNextRoomLoaded -= DestroyMushroom;
     }
 
+    // Disable되는 상황은 부모 오브젝트(설치된 플랫폼)이 사라지는 케이스밖에 없다고 전제
+    private void OnDisable()
+    {
+        gameObject.transform.SetParent(null);
+        gameObject.SetActive(true); // 사라지는 모습 보여줘야하니까 다시 활성화
+        Disappear();
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.CompareTag("Player"))
@@ -66,6 +74,5 @@ public class MagicMushroom : MonoBehaviour
             else dir = 1;
             collision.gameObject.GetComponent<G_Cube>().MushJump(dir);
         }
-        
     }
 }
