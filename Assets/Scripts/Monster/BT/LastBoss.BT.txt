@@ -27,17 +27,20 @@ tree("Phase0")
                     HittReaction()
                 fallback                    // 여기서부터 실제 패턴 등장 
                     random
+                        // 패턴1
+                        sequence
+                            // 조건 1
+                            tree("CrossBlade")
                         // 패턴 2
                         sequence
                             // 조건 2
-                            tree("CrossBlade")
+                            tree("Laser")
                         // 패턴 3
                         sequence
-                            // 조건 1
-                            tree("Laser")
+                            tree("Ivy")
                         // 패턴 4
                         sequence
-                            tree("Ivy")
+                            tree("Sphere")
 
 // 2페이즈
 tree("Phase1")
@@ -51,17 +54,20 @@ tree("Phase1")
                     HittReaction()
                 fallback                    // 여기서부터 실제 패턴 등장    
                     random
+                        // 패턴1
+                        sequence
+                            // 조건 1
+                            tree("CrossBlade")
                         // 패턴 2
                         sequence
                             // 조건 2
-                            tree("CrossBlade")
+                            tree("Laser")
                         // 패턴 3
                         sequence
-                            // 조건 1
-                            tree("Laser")
+                            tree("Ivy")
                         // 패턴 4
                         sequence
-                            tree("Ivy")
+                            tree("Sphere")
 
 // 3페이즈 (마지막)
 tree("Phase2")
@@ -73,17 +79,20 @@ tree("Phase2")
                 HittReaction()
             fallback                    // 여기서부터 실제 패턴 등장    
                 random
+                    // 패턴1
+                    sequence
+                        // 조건 1
+                        tree("CrossBlade")
                     // 패턴 2
                     sequence
                         // 조건 2
-                        tree("CrossBlade")
+                        tree("Laser")
                     // 패턴 3
                     sequence
-                        // 조건 1
-                        tree("Laser")
+                        tree("Ivy")
                     // 패턴 4
                     sequence
-                        tree("Ivy")
+                        tree("Sphere")
 
 
 // 페이즈 전환 시
@@ -95,13 +104,14 @@ tree("PhaseChange")
 tree("EnergyBall")
     EnergyBallAttack()
 
-
 tree("CrossBlade")
     CrossBladeAttack()
-
 
 tree("Laser")
     LaserAttack()
 
 tree("Ivy")
     IvyAttack()
+    
+tree("Sphere")
+    RandomSphereAttack()

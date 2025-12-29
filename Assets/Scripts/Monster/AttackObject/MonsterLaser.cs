@@ -31,7 +31,12 @@ public class MonsterLaser : MonoBehaviour
     LayerMask terrainLayers;
     [SerializeField, Tooltip("레이저 뻗어나가는 속도")]
     private float laserSpeed = 1f;
+    
+    [Title("공격 아이템 스폰 관련")]
+    [SerializeField]
+    private GameObject attackItemPrefab;
 
+    [ReadOnly] public bool isItemSpawner = false;
     private bool collideWithTerrain;
     private float laserLength;
 
@@ -85,12 +90,25 @@ public class MonsterLaser : MonoBehaviour
         beamMid.SetActive(true);
         beamEnd?.SetActive(true);
 
-        beamMid.transform.DOScale(new Vector3(laserWidth, laserLength, 1), laserLength / laserSpeed);
-        beamMid.transform.DOLocalMoveY(laserLength / 2, laserLength / laserSpeed);
+        DOTween.Sequence()
+            .Append(beamMid.transform.DOScale(
+                new Vector3(laserWidth, laserLength, 1), laserLength / laserSpeed))
+            .Insert(0, beamMid.transform.DOLocalMoveY(
+                laserLength / 2, laserLength / laserSpeed))
+            .AppendCallback(() =>
+            {
+                if (isItemSpawner)
+                    SpawnAttackItem();
+            });
         
         // 데미지 값 설정하고 콜라이더 활성화하기
         damageInflictor.damage = damage;
         laserCollider.enabled = true;
+    }
+
+    private void SpawnAttackItem()
+    {
+        Instantiate(attackItemPrefab, beamEnd.transform.position, Quaternion.identity);
     }
 
     private void SetLaserSize(float width, float length)

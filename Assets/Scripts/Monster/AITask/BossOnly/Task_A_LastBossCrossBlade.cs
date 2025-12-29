@@ -10,6 +10,7 @@ public class Task_A_LastBossCrossBlade : Task_A_Base
     [SerializeField] private GameObject prefab;
     [SerializeField] private Vector2 spawnAreaSize;  // 맵의 임의 지점을 선정할 때 사용될 "범위"
     [SerializeField] private float projSpeed = 3f;
+    [SerializeField] private bool clearProjectilesOnCanceled;
     [SerializeField] private bool clearProjectilesOnTerminated;
 #if UNITY_EDITOR
     [SerializeField] bool drawGizmo;
@@ -57,8 +58,22 @@ public class Task_A_LastBossCrossBlade : Task_A_Base
     {
         base.ClearOnTerminated();
 
-        if (!clearProjectilesOnTerminated) return;
-        // 생성된 칼날 있다면 삭제
+        blackboard.TryGet(BBK.isHitt, out bool isHitt);
+        if (clearProjectilesOnCanceled && isHitt)       // 피격으로 인한 공격 종료
+        {
+            RemoveAllCluster();
+            return;
+        }
+
+        if (!isHitt && clearProjectilesOnTerminated)    // 시간으로 인한 공격 종료
+        {
+            RemoveAllCluster();
+            return;
+        }
+    }
+
+    private void RemoveAllCluster()
+    {
         if(instances != null)
         {
             foreach(GameObject cluster in instances)

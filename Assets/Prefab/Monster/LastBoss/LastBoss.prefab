@@ -240,7 +240,7 @@ MonoBehaviour:
   autoReset: 1
   tickOn: 0
   sourceInfos:
-  - isFoldout: 1
+  - isFoldout: 0
     breakPoints: 
     breakPointStatuses: 
     collapsedLines: 
@@ -369,7 +369,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
   bossState: {fileID: 0}
-  phaseMinHP: 0300000000000000
+  phaseMinHP: 040000000200000000000000
   currentPhase: 0
 --- !u!114 &6973601484821553449
 MonoBehaviour:
@@ -509,6 +509,7 @@ MonoBehaviour:
   prefab: {fileID: 7058335693094710194, guid: 5475ec07fa1a2c543af2badeb762521f, type: 3}
   spawnAreaSize: {x: 11, y: 9}
   projSpeed: 3
+  clearProjectilesOnCanceled: 1
   clearProjectilesOnTerminated: 0
   drawGizmo: 0
 --- !u!114 &6161028656079869558
@@ -549,7 +550,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2353456446456302032}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a01366ec246b08f45bad47cbc9ab7798, type: 3}
+  m_Script: {fileID: 11500000, guid: a4b2024a51c66294189aed1c8e4c3601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   blackboard: {fileID: 245620119312496127}
@@ -558,15 +559,17 @@ MonoBehaviour:
   patternID: 0
   startupDuration: 1
   superArmourOnStartup: 0
-  activeDuration: 0.5
+  activeDuration: 1
   superArmourOnActive: 0
   recoveryDuration: 1
   superArmourOnRecovery: 0
   currentState: 0
-  muzzle: {fileID: 8902981254913031581}
-  laserPrefab: {fileID: 7601855062109172638, guid: 17baa8dbafae6424d8ed4da0aa51757b, type: 3}
+  laserPrefab: {fileID: 7703953071554832128, guid: 17baa8dbafae6424d8ed4da0aa51757b, type: 3}
+  spawnAreaOffset: {x: 0, y: 0.75}
+  spawnAreaSize: {x: 20, y: 5}
+  spawnCount: 3
   damage: 1
-  instance: {fileID: 0}
+  instanceList: []
 --- !u!114 &7538435774592040902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,6 +1374,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3589665444066415083}
     m_Modifications:
+    - target: {fileID: 470533390231934035, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 579523315080614179, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2006169393373978327, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2579755443971372462, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3204204770791809640, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3687662849167163860, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4991448987758198007, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6252656131433710104, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1410,6 +1441,14 @@ PrefabInstance:
     - target: {fileID: 6252656131433710104, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6546126541902233424, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235421001843591508, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7455771564365320334, guid: 611fc699e83db6a4bbf14b15da4e38a9, type: 3}
       propertyPath: m_Name

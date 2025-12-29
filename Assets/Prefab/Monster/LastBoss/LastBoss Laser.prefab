@@ -872,11 +872,13 @@ MonoBehaviour:
   damageInflictor: {fileID: 4296367247510041999}
   animator: {fileID: 8529042682600056959}
   laserWidth: 0.4
-  laserMaxLength: 20
+  laserMaxLength: 50
   terrainLayers:
     serializedVersion: 2
     m_Bits: 27648
   laserSpeed: 30
+  attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
+  isItemSpawner: 0
 --- !u!212 &7941460129978643497
 SpriteRenderer:
   m_ObjectHideFlags: 0

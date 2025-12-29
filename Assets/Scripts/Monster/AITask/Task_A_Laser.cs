@@ -12,7 +12,7 @@ public class Task_A_Laser : Task_A_Base
     [SerializeField] private Vector2 spawnAreaOffset;
     [SerializeField] private Vector2 spawnAreaSize;
 
-    [SerializeField] private int spawnCount;
+    [SerializeField] protected int spawnCount;
     
     [SerializeField]
     protected int damage;
@@ -32,7 +32,7 @@ public class Task_A_Laser : Task_A_Base
     }
 
     [Task]
-    void LaserAttack()
+    protected virtual void LaserAttack()
     {
         ExecuteAttack();
     }
@@ -44,8 +44,8 @@ public class Task_A_Laser : Task_A_Base
         if(blackboard.TryGet(BBK.Enemy, out enemy))
         {
             var points = GetNextSpawnPositions(spawnCount);
-            foreach(var p in points)
-                SpawnLaserOrb(p, enemy.transform.position);
+            foreach (var p in points)
+                instanceList.Add(SpawnLaserOrb(p, enemy.transform.position));
         }
         else
         {
@@ -55,7 +55,7 @@ public class Task_A_Laser : Task_A_Base
         }
     }
 
-    private List<Vector2> GetNextSpawnPositions(int count)
+    protected List<Vector2> GetNextSpawnPositions(int count)
     {
         Vector2 spawnPos;
         Vector2 spawnAreaCenter = (Vector2)(transform.position) + spawnAreaOffset;
@@ -88,12 +88,11 @@ public class Task_A_Laser : Task_A_Base
         return result;
     }
 
-    private MonsterLaser SpawnLaserOrb(Vector2 spawnPos, Vector2 targetPos)
+    protected MonsterLaser SpawnLaserOrb(Vector2 spawnPos, Vector2 targetPos)
     {
         var instance = Instantiate(laserPrefab, spawnPos, Quaternion.identity);
         instance.Initalize((targetPos - spawnPos).normalized);
         
-        instanceList.Add(instance);
         return instance;
     }
 

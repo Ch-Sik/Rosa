@@ -61,17 +61,12 @@ public class LastBossCrossBladeCluster : MonoBehaviour
         {
             animator.SetTrigger("Disappear");
         }
-        Invoke("DoDestroy", delay);
-    }
-
-    void DoDestroy()
-    {
-        Destroy(gameObject);
-        CancelInvoke();     // DoDestroy 두번 호출되는 것 방지
+        Destroy(gameObject, delay);
     }
 
     public void DisappearAllClusterImmediatly()
     {
+        Debug.Log("[LastBossCrossBladeCluster] DisappearAllClusterImmediatly");
         // 자탄 삭제
         if(projRight != null)
             projRight.Disappear();
