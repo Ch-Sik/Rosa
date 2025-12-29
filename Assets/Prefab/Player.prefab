@@ -786,6 +786,7 @@ MonoBehaviour:
   sound: {fileID: 0}
   rb: {fileID: 0}
   col: {fileID: 0}
+  damageReceiver: {fileID: 0}
 --- !u!114 &1684912345544643784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -798,8 +799,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0e3e5c4656a734aa1ad619b01a85b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHP: 5
-  _currentHP: 5
+  maxHp: 5
+  currentHp: 0
+  respawnOnDie: 0
 --- !u!114 &7834158099626650541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -869,7 +871,6 @@ MonoBehaviour:
   attackStartupDuration: 0.55
   attackRecoveryDuration: 0.3
   moveSpeedMultiplierWhileAttack: 0.3
-  knockbackStrength: 0.001
   grabSpeedCoef: 0.5
   glidingEnabled: 0
   glidingGravityScale: 0.1
@@ -882,11 +883,8 @@ MonoBehaviour:
   isOnLedge: 0
   isDoingLedgeClimb: 0
   isWallJumping: 0
-  isDoingMagic: 0
   isKnockbacked: 0
   isSlidingOnWall: 0
-  isDoingHooking: 0
-  isHitHookingTarget: 0
   isDoingAttack: 0
   isDoingSuperDash: 0
   isNotMoveable: 0
@@ -894,6 +892,8 @@ MonoBehaviour:
   isGliding: 0
   isMushJumping: 0
   isDashing: 0
+  isSitting: 0
+  isJustSit: 0
   detectWallTop: {x: 0, y: 0.5}
   detectWallBot: {x: 0.6, y: 0.3}
   detectWallEndTop: {x: 0, y: 0.5}
@@ -903,7 +903,6 @@ MonoBehaviour:
   playerRef: {fileID: 0}
   playerControl: {fileID: 0}
   platformBelow: {fileID: 0}
-  hangingIvy: {fileID: 0}
   moveVector: {x: 0, y: 0}
   facingDirection: 0
 --- !u!114 &7376123347842105714
@@ -918,8 +917,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80f58155b60392a47bc67509cfd46185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultNoDmgTime: 2
-  ignoreDamage: 0
+  defaultInvincibleTime: 2
+  defaultKnockbackStrength: 0.001
 --- !u!114 &4348864029274202990
 MonoBehaviour:
   m_ObjectHideFlags: 0

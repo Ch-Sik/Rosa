@@ -11,6 +11,10 @@ public class PlayerDamageReceiver : MonoBehaviour
     
     private bool _ignoreDamage = false;
     private PlayerRef _playerRef;
+    
+    // 넉백 관련
+    [Tooltip("넉백 계수")]
+    [SerializeField] private float defaultKnockbackStrength = 1f;
 
     public void Start()
     {
@@ -24,13 +28,19 @@ public class PlayerDamageReceiver : MonoBehaviour
 
     public void GetDamage(GameObject source, int damage, float ignoreDur)
     {
+        GetDamage(source, damage, ignoreDur, defaultKnockbackStrength);
+    }
+    
+    public void GetDamage(GameObject source, int damage, float ignoreDur, float knockbackPow)
+    {
         if (_ignoreDamage) return;
         
         GetDamageInternal(damage);
-        GetKnockbackInternal(source);
+        GetKnockbackInternal(source, knockbackPow);
         
         SetInvincibleAndIgnoreCollision(source.layer, ignoreDur).Forget();
     }
+    
 
     public void GetDamageAndRespawn(int damage)
     {
@@ -49,7 +59,7 @@ public class PlayerDamageReceiver : MonoBehaviour
     public void GetDamageIgnoreInvincible(GameObject source, int damage)
     {
         GetDamageInternal(damage);
-        GetKnockbackInternal(source);
+        GetKnockbackInternal(source, defaultKnockbackStrength);
     }
 
     private bool GetDamageInternal(int damage)
@@ -60,11 +70,11 @@ public class PlayerDamageReceiver : MonoBehaviour
         return _playerRef.state.TakeDamage(damage);
     }
 
-    private void GetKnockbackInternal(GameObject source)
+    private void GetKnockbackInternal(GameObject source, float knockbackPow)
     {
         Vector2 knockbackOrigin = new Vector2(source.transform.position.x,
             source.transform.position.y - (source.transform.localScale.y / 2));
-        _playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin);
+        _playerRef.movement.Knockback((Vector2)(transform.position) - knockbackOrigin, knockbackPow);
     }
 
     private async UniTaskVoid SetInvincibleAndIgnoreCollision(int originalLayer, float delay)

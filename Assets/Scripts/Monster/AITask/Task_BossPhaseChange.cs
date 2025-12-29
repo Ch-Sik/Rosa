@@ -41,8 +41,11 @@ public class Task_BossPhaseChange : Task_Base
         }
         else
         {
-            currentPhase = phaseNum + 1;
-            blackboard.Set(BBK.CurrentPhase, currentPhase);
+            if (currentPhase < phaseNum + 1)
+            {
+                currentPhase = phaseNum + 1;
+                blackboard.Set(BBK.CurrentPhase, currentPhase);
+            }
             return false;
         }
     }

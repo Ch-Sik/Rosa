@@ -10,6 +10,7 @@ public class Task_LastBossHitReaction : Task_A_Base
     [SerializeField] float platformRelocationRangeMin = -7f;
     [SerializeField] float platformRelocationRangeMax = 7f;
     [SerializeField] float enemyKnockbackPow = 5f;
+    [SerializeField] private bool knockbackPlayerOnHitt = true;
 
     [Task]
     public void IsHitt()
@@ -42,7 +43,8 @@ public class Task_LastBossHitReaction : Task_A_Base
         // 피격 당하면 일단 플랫폼 없애버리기
         HidePlatforms();
         // 적(플레이어)를 밀쳐내기
-        KnockBackEnemy();
+        if(knockbackPlayerOnHitt)
+            KnockBackEnemy();
     }
 
     protected override void OnRecoveryBegin()

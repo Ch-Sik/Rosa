@@ -37538,6 +37538,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!43 &854237209
 Mesh:
   m_ObjectHideFlags: 0
@@ -49435,6 +49437,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!43 &1149264661
 Mesh:
   m_ObjectHideFlags: 0
@@ -94246,10 +94250,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 173115069}
-    - target: {fileID: 7117666812009707317, guid: 893fee509f174304ba961a041670647e, type: 3}
-      propertyPath: clearProjectilesOnCanceled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7160403960860893792, guid: 893fee509f174304ba961a041670647e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

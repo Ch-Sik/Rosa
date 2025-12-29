@@ -169,11 +169,6 @@ public class PlayerMovement : MonoBehaviour
     //[Tooltip("오이대쉬 속도")]
     //[SerializeField] float superDashSpeed = 3f;
 
-    // 넉백 관련
-    [FoldoutGroup("넉백 관련")]
-    [Tooltip("넉백 계수")]
-    [SerializeField] float knockbackStrength = 1f;
-
     [FoldoutGroup("큐브 관련")]
     [SerializeField] float grabSpeedCoef = 0.5f;
 
@@ -263,7 +258,7 @@ public class PlayerMovement : MonoBehaviour
 
     [BoxGroup("Debug/Vertical/General")]
     [ReadOnly, SerializeField] public LR facingDirection;                 // 플레이어 바라보는 방향
-
+    
     // 타이머 (non-serializable)
     private Timer jumpTimer;                 // 최소 점프 시간을 위한 타이머
     private Timer jumpBufferTimer;           // 점프 선입력 타이머
@@ -1173,14 +1168,9 @@ public class PlayerMovement : MonoBehaviour
         //aimLine.transform.localScale = theScale;
     }
 
-    public void Knockback(Vector2 normalizedDir, float customKnockbackPow)
+    public void Knockback(Vector2 normalizedDir, float knockbackPow)
     {
-        DoKnockback(normalizedDir.normalized * customKnockbackPow);
-    }
-
-    public void Knockback(Vector2 normalizedDir)
-    {
-        DoKnockback(normalizedDir.normalized * knockbackStrength);
+        DoKnockback(normalizedDir.normalized * knockbackPow);
     }
 
     private void DoKnockback(Vector2 knockbackVector)
@@ -1194,7 +1184,7 @@ public class PlayerMovement : MonoBehaviour
             knockbackVector.x = Mathf.Abs(knockbackVector.x) * (facingDirection.isRIGHT() ? -1 : 1);
         }
         rb.velocity = Vector2.zero;
-        rb.AddForce(knockbackVector * knockbackStrength, ForceMode2D.Impulse);
+        rb.AddForce(knockbackVector, ForceMode2D.Impulse);
 
         StartCoroutine(Knockback());
 

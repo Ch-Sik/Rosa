@@ -44,8 +44,9 @@ tree("Phase0")
 
 // 2페이즈
 tree("Phase1")
-  repeat                                
-    sequence
+  not                           // Phase 종료 조건 달성했을 때 Fail 대신 Succeed 반환하도록 not 게이트 사용
+    repeat                                
+      sequence
         isHpOverPhaseLimit(1)
         mute                                // 패턴 하나의 실패로 발생한 fail 때문에 페이즈 바뀌는 거 방지
             fallback
