@@ -217,6 +217,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!96 &1666058200588283532
 TrailRenderer:
   serializedVersion: 3
@@ -371,7 +373,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 104
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -5477,6 +5479,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!96 &8000826541882638043
 TrailRenderer:
   serializedVersion: 3
@@ -5631,7 +5635,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 104
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -10604,6 +10608,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!96 &2024596030722583870
 TrailRenderer:
   serializedVersion: 3
@@ -10758,7 +10764,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 104
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -15731,6 +15737,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!96 &2138743213085259410
 TrailRenderer:
   serializedVersion: 3
@@ -20608,7 +20616,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 104
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0

@@ -15345,6 +15345,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 70415370637131227, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: BottomBoundary
+      value: -8.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 70415370637131227, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: NumericBoundaries
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 532132167021875603, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
