@@ -82,7 +82,10 @@ public class MovePlatform : MonoBehaviour
             case MovePlatformType.EndPoint:
                 if (!isReverse)
                     return;
-
+                
+                currentIndex = points.Count - 1;
+                transform.position = points[currentIndex].position;
+                
                 canMove = true;
                 isArrive = false;
                 isReverse = false;
@@ -107,6 +110,9 @@ public class MovePlatform : MonoBehaviour
                 if (isReverse)
                     return;
 
+                currentIndex = 0;
+                transform.position = points[currentIndex].position;
+                
                 canMove = true;
                 isArrive = false;
                 isReverse = true;

@@ -1,17 +1,41 @@
 using Panda;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 
 public class Task_LastBossHitReaction : Task_A_Base
 {
-    [SerializeField] GameObject[] _platforms;
+    [SerializeField] private G_MovePlatform[] _platforms;
     [SerializeField] float platformRelocationDelay = 1f;
     [SerializeField] float platformRelocationRangeMin = -7f;
     [SerializeField] float platformRelocationRangeMax = 7f;
     [SerializeField] float enemyKnockbackPow = 5f;
     [SerializeField] private bool knockbackPlayerOnHitt = true;
 
+    private void Start()
+    {
+        RelocatePlatformsImmediately();
+    }
+    
+    void RelocatePlatformsImmediately()
+    {
+        foreach(var p in _platforms)
+        {
+            if (p == null) continue;
+            Vector3 pos = p.transform.localPosition;
+            pos.x = Random.Range(platformRelocationRangeMin, platformRelocationRangeMax);
+            p.transform.localPosition = pos;
+        }
+
+        foreach (var p in _platforms)
+        {
+            if (p == null) continue;
+            p.ImmediateOnAct();
+        }
+    }
+    
     [Task]
     public void IsHitt()
     {
@@ -70,20 +94,10 @@ public class Task_LastBossHitReaction : Task_A_Base
         foreach(var p in _platforms)
         {
             if (p == null) continue;
-            p.SetActive(false);
+            TogglePlatformWithRandomDelay(p, false).Forget();
         }
     }
-
-    void ShowPlatforms()
-    {
-        Debug.Log("플랫폼 보이기");
-        foreach (var p in _platforms)
-        {
-            if (p == null) continue;
-            p.SetActive(true);
-        }
-    }
-
+    
     void RelocatePlatforms()
     {
         foreach(var p in _platforms)
@@ -93,8 +107,33 @@ public class Task_LastBossHitReaction : Task_A_Base
             pos.x = Random.Range(platformRelocationRangeMin, platformRelocationRangeMax);
             p.transform.localPosition = pos;
         }
-        // TODO: 플랫폼을 랜덤한 x좌표로 설정
 
         ShowPlatforms();
+    }
+
+    void ShowPlatforms()
+    {
+        Debug.Log("플랫폼 보이기");
+        foreach (var p in _platforms)
+        {
+            if (p == null) continue;
+            TogglePlatformWithRandomDelay(p, true).Forget();
+        }
+    }
+    
+    private async UniTaskVoid TogglePlatformWithRandomDelay(G_MovePlatform platform, bool actOn)
+    {
+        float waitTime = Random.Range(0, 1f);
+        // 플랫폼 숨기기 일때는 쉐이크 효과를 먼저 적용
+        if(!actOn)
+            platform.transform.DOShakePosition(waitTime, 0.3f);
+        await UniTask.WaitForSeconds(waitTime);
+        if(actOn)
+            platform.OnAct();
+        else
+            platform.OffAct();
+        // 플랫폼 보이기 일때는 쉐이크 효과를 나중에 적용
+        if (actOn)
+            platform.transform.DOShakePosition(1f, 0.3f);
     }
 }
