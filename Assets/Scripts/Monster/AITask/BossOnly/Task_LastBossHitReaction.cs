@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Task_LastBossHitReaction : Task_A_Base
 {
-    [SerializeField] private G_MovePlatform[] _platforms;
+    [SerializeField] private LastBossVfx_RockFrag fragVfx;
+    [FormerlySerializedAs("_platforms")]
+    [SerializeField] private G_MovePlatform[] platforms;
     [SerializeField] float platformRelocationDelay = 1f;
     [SerializeField] float platformRelocationRangeMin = -7f;
     [SerializeField] float platformRelocationRangeMax = 7f;
@@ -21,7 +24,7 @@ public class Task_LastBossHitReaction : Task_A_Base
     
     void RelocatePlatformsImmediately()
     {
-        foreach(var p in _platforms)
+        foreach(var p in platforms)
         {
             if (p == null) continue;
             Vector3 pos = p.transform.localPosition;
@@ -29,7 +32,7 @@ public class Task_LastBossHitReaction : Task_A_Base
             p.transform.localPosition = pos;
         }
 
-        foreach (var p in _platforms)
+        foreach (var p in platforms)
         {
             if (p == null) continue;
             p.ImmediateOnAct();
@@ -66,6 +69,8 @@ public class Task_LastBossHitReaction : Task_A_Base
         base.OnStartupBegin();
         // 피격 당하면 일단 플랫폼 없애버리기
         HidePlatforms();
+        // 뒤쪽 파편 연출 숨기기
+        fragVfx.FallFrags();
         // 적(플레이어)를 밀쳐내기
         if(knockbackPlayerOnHitt)
             KnockBackEnemy();
@@ -76,6 +81,12 @@ public class Task_LastBossHitReaction : Task_A_Base
         base.OnRecoveryBegin();
         // 플랫폼 재생성
         RelocatePlatforms();
+    }
+
+    protected override void OnEnd()
+    {
+        base.OnEnd();
+        fragVfx.RiseFrags();
     }
 
     private void KnockBackEnemy()
@@ -91,7 +102,7 @@ public class Task_LastBossHitReaction : Task_A_Base
     void HidePlatforms()
     {
         Debug.Log("플랫폼 숨기기");
-        foreach(var p in _platforms)
+        foreach(var p in platforms)
         {
             if (p == null) continue;
             TogglePlatformWithRandomDelay(p, false).Forget();
@@ -100,7 +111,7 @@ public class Task_LastBossHitReaction : Task_A_Base
     
     void RelocatePlatforms()
     {
-        foreach(var p in _platforms)
+        foreach(var p in platforms)
         {
             if (p == null) continue;
             Vector3 pos = p.transform.localPosition;
@@ -114,7 +125,7 @@ public class Task_LastBossHitReaction : Task_A_Base
     void ShowPlatforms()
     {
         Debug.Log("플랫폼 보이기");
-        foreach (var p in _platforms)
+        foreach (var p in platforms)
         {
             if (p == null) continue;
             TogglePlatformWithRandomDelay(p, true).Forget();
