@@ -9,6 +9,8 @@ public class MonsterLaser : MonoBehaviour
     [Title("게임오브젝트/컴포넌트 레퍼런스")] 
     [SerializeField, Tooltip("레이저 공격 이펙트 묶음")]
     private GameObject beamRoot;
+    [SerializeField, Tooltip("레이저 공격 방향 미리보기")]
+    private GameObject beamPreview;
     [SerializeField, Tooltip("레이저 공격 이펙트의 시작부분")]
     private GameObject beamStart;
     [SerializeField, Tooltip("레이저 공격 이펙트의 길쭉한 부분")]
@@ -60,6 +62,7 @@ public class MonsterLaser : MonoBehaviour
 
         // 필요한 오브젝트/컴포넌트만 활성화하고 나머지는 비활성화
         gameObject.SetActive(true);
+        beamPreview?.SetActive(true);
         beamStart?.SetActive(true);
         beamMid.SetActive(false);
         beamEnd?.SetActive(false);
@@ -86,7 +89,9 @@ public class MonsterLaser : MonoBehaviour
 
     public void Activate(int damage)
     {
-        // 오브젝트/컴포넌트 모두 활성화
+        // 미리보기 끄기
+        beamPreview?.SetActive(false);
+        // 빔 본체 활성화
         beamMid.SetActive(true);
         beamEnd?.SetActive(true);
 

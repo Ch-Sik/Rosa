@@ -115,4 +115,14 @@ public class Task_A_RandomSphere : Task_A_Base
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(areaCenter, areaSize);
     }
+
+    protected override void ClearOnTerminated()
+    {
+        base.ClearOnTerminated();
+        foreach (var instance in _attackInstances)
+        {
+            instance.CancelAOE();
+        }
+        _attackInstances.Clear();
+    }
 }

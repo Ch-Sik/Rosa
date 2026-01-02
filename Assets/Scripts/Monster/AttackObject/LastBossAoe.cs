@@ -43,4 +43,9 @@ public class LastBossAoe : MonoBehaviour
         await UniTask.WaitForSeconds(2f);
         Destroy(gameObject);
     }
+
+    public void CancelAOE()
+    {
+        anim.SetInteger(_stateNameHash, -1);
+    }
 }

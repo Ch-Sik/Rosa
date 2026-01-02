@@ -6255,6 +6255,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 249703702161069702, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: scripts.Array.data[0]
+      value: 
+      objectReference: {fileID: 4900000, guid: 9a37cbb409a4e3042aceb60a6daa4390, type: 3}
     - target: {fileID: 392324430495096075, guid: 893fee509f174304ba961a041670647e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6298,6 +6302,10 @@ PrefabInstance:
     - target: {fileID: 1017914053216276494, guid: 893fee509f174304ba961a041670647e, type: 3}
       propertyPath: m_Name
       value: LastBoss
+      objectReference: {fileID: 0}
+    - target: {fileID: 7764212301334203387, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: attackRadius
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
