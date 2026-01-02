@@ -47,5 +47,6 @@ public class LastBossAoe : MonoBehaviour
     public void CancelAOE()
     {
         anim.SetInteger(_stateNameHash, -1);
+        Destroy(gameObject, 2f);
     }
 }

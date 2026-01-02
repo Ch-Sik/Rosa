@@ -688,7 +688,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b20cb10af2dc08c4bb164d108091d559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 6
+  maxHP: 7
   currentHP: 0
   blackboard: {fileID: 0}
 --- !u!114 &245620119312496127
@@ -802,7 +802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
   bossState: {fileID: 0}
-  phaseMinHP: 040000000200000000000000
+  phaseMinHP: 050000000200000000000000
   currentPhase: 0
 --- !u!114 &6973601484821553449
 MonoBehaviour:
@@ -965,14 +965,15 @@ MonoBehaviour:
   superArmourOnStartup: 0
   activeDuration: 0
   superArmourOnActive: 0
-  recoveryDuration: 3
+  recoveryDuration: 1
   superArmourOnRecovery: 0
   currentState: 0
   prefab: {fileID: 8202664296628776000, guid: 6bbfeb4e3ef5c464588fb682f183071a, type: 3}
   spawnCount: 3
   spawnableAreaWidth: 14
-  spawnPositionY: -5.5
+  spawnPositionY: -7
   randomOffsetX: 2
+  clearOnTerminate: 0
   drawGizmos: 1
 --- !u!114 &5366884633108451846
 MonoBehaviour:
@@ -1059,9 +1060,9 @@ MonoBehaviour:
   recoveryDuration: 1
   superArmourOnRecovery: 0
   currentState: 0
-  attackPrefab: {fileID: 2343508304068933760, guid: d0a017be579c28847a3ad0ffd4311608, type: 3}
+  attackPrefab: {fileID: 6944083203915024175, guid: d0a017be579c28847a3ad0ffd4311608, type: 3}
   spawnCount: 10
-  attackRadius: 1
+  attackRadius: 2
   overlapFactor: 0.7
   areaCenter: {x: 0, y: 3}
   areaSize: {x: 20, y: 13}
