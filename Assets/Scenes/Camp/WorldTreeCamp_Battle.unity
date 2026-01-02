@@ -6258,7 +6258,7 @@ PrefabInstance:
     - target: {fileID: 249703702161069702, guid: 893fee509f174304ba961a041670647e, type: 3}
       propertyPath: scripts.Array.data[0]
       value: 
-      objectReference: {fileID: 4900000, guid: 9a37cbb409a4e3042aceb60a6daa4390, type: 3}
+      objectReference: {fileID: 4900000, guid: d0f8471b6af3f3c4b9252bed7e79977c, type: 3}
     - target: {fileID: 392324430495096075, guid: 893fee509f174304ba961a041670647e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6303,9 +6303,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: LastBoss
       objectReference: {fileID: 0}
+    - target: {fileID: 6161028656079869558, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: drawGizmos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6161028656079869558, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: spawnPositionY
+      value: -7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6161028656079869558, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: recoveryDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7360027459575895951, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: maxHP
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 7764212301334203387, guid: 893fee509f174304ba961a041670647e, type: 3}
       propertyPath: attackRadius
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8075675641539460723, guid: 893fee509f174304ba961a041670647e, type: 3}
+      propertyPath: phaseMinHP.Array.data[0]
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

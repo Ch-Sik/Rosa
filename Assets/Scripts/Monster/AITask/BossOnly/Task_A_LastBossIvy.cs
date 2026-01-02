@@ -15,6 +15,8 @@ public class Task_A_LastBossIvy : Task_A_Base
     float spawnPositionY;
     [SerializeField]
     float randomOffsetX;
+    [SerializeField]
+    private bool clearOnTerminate;
 #if UNITY_EDITOR
     [SerializeField]
     bool drawGizmos;
@@ -59,6 +61,9 @@ public class Task_A_LastBossIvy : Task_A_Base
     protected override void ClearOnTerminated()
     {
         base.ClearOnTerminated();
+
+        if (!clearOnTerminate) return;
+        
         // 덩굴 자라던 중인 거 삭제
         if(instances != null)
         {

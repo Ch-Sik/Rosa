@@ -48,9 +48,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   segmentPrefab: {fileID: 286456696453307554, guid: 7e91d90bb8e0dda41bc305a4a136f8fe, type: 3}
   growHeight: 20
-  growPerSec: 3
+  growPerSec: 4
   unitPerSegment: 0.3
-  lifetime: 5
+  lifetime: 6
   frequency: 0.8
   amplitude: 1
 --- !u!114 &2953727757836587900
@@ -69,6 +69,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!50 &6285939761920867557
 Rigidbody2D:
   serializedVersion: 4
