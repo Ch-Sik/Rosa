@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using AnyPortrait;
+using Cysharp.Threading.Tasks;
+
 /// <summary>
 /// 플레이어 애니메이션을 담당
 /// </summary>
@@ -130,7 +132,7 @@ public class PlayerAnimation : MonoBehaviour
         return result;
     }
 
-    public void BlinkEffect()
+    public async UniTaskVoid BlinkEffect()
     {
         if (portrait == null)
             return;         // 아직 애니메이션이 적용되지 않은 녀석들 예외 처리
@@ -140,20 +142,15 @@ public class PlayerAnimation : MonoBehaviour
         const int blinkCount = 8;
         Color blinkColor = Color.gray * reactionBrightness;
         blinkColor.a = 1;
-
-        blinkCoroutine = StartCoroutine(DoBlink());
-
-        IEnumerator DoBlink()
+        
+        for (int i = 0; i < blinkCount; i++)
         {
-            for (int i = 0; i < blinkCount; i++)
-            {
-                portrait.SetMeshColorAll(blinkColor);
-                yield return new WaitForSeconds(timePerBlink / 2);
-                portrait.ResetMeshMaterialToBatchAll();
-                yield return new WaitForSeconds(timePerBlink / 2);
-            }
-            blinkCoroutine = null;
+            portrait.SetMeshColorAll(blinkColor);
+            await UniTask.WaitForSeconds(timePerBlink / 2);
+            portrait.ResetMeshMaterialToBatchAll();
+            await UniTask.WaitForSeconds(timePerBlink / 2);
         }
+        blinkCoroutine = null;
     }
 
     public void SetJumpTrigger()

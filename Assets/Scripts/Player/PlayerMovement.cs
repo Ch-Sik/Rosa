@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.Tilemaps;
@@ -1177,6 +1178,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void DoKnockback(Vector2 knockbackVector)
     {
+        KnockbackInternal(knockbackVector).Forget();
+    }
+
+    private async UniTaskVoid KnockbackInternal(Vector2 knockbackVector)
+    {
         // 만약 담쟁이에 매달린 상태라면
         if (playerControl.currentMoveState == PlayerMoveState.CLIMBING)
         {
@@ -1188,21 +1194,16 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = Vector2.zero;
         rb.AddForce(knockbackVector, ForceMode2D.Impulse);
 
-        StartCoroutine(Knockback());
+        playerControl.SetMoveState(PlayerMoveState.NO_MOVE);
+        LookAt2DLocal(-knockbackVector);     // 넉백되는 방향의 반대편 바라보기
+        // 피격 애니메이션 관련은 PlayerDamageReceiver.GetDamage()로 옮김
+        // 보스 패턴 등에서 '밀쳐내기'를 하면서도 데미지는 없는 경우가 있기 때문.
+        // playerRef.animation.SetTrigger("Hit");
+        isKnockbacked = true;
+        await UniTask.WaitForSeconds(0.3f);
 
-        IEnumerator Knockback()
-        {
-            playerControl.SetMoveState(PlayerMoveState.NO_MOVE);
-            LookAt2DLocal(-knockbackVector);     // 넉백되는 방향의 반대편 바라보기
-            // 피격 애니메이션 관련은 PlayerDamageReceiver.GetDamage()로 옮김
-            // 보스 패턴 등에서 '밀쳐내기'를 하면서도 데미지는 없는 경우가 있기 때문.
-            // playerRef.animation.SetTrigger("Hit");
-            isKnockbacked = true;
-            yield return new WaitForSeconds(0.3f);
-
-            playerControl.SetMoveState(PlayerMoveState.DEFAULT);
-            isKnockbacked = false;
-        }
+        playerControl.SetMoveState(PlayerMoveState.DEFAULT);
+        isKnockbacked = false;
     }
 
     private void OnDrawGizmosSelected()

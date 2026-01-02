@@ -64,7 +64,7 @@ public class PlayerDamageReceiver : MonoBehaviour
 
     private bool GetDamageInternal(int damage)
     {
-        _playerRef.animation.BlinkEffect();
+        _playerRef.animation.BlinkEffect().Forget();
         _playerRef.animation.SetTrigger("Hit");
         CameraShake.ShakeCamera(CameraShakePreset.PlayerHit);
         return _playerRef.state.TakeDamage(damage);
