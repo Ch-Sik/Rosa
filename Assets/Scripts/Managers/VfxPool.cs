@@ -35,6 +35,11 @@ public class VfxPool : Object
         pool.Release(target);
     }
 
+    public void Clear()
+    {
+        pool.Clear();
+    }
+
     VfxPoolEntity CreatePooledItem()
     {
         VfxPoolEntity newPoolItem = Instantiate(prefab);
@@ -56,6 +61,7 @@ public class VfxPool : Object
 
     void OnDestroyPoolObject(VfxPoolEntity item)
     {
-        GameObject.Destroy(item.gameObject);
+        if (item != null) 
+            Destroy(item.gameObject);
     }
 }

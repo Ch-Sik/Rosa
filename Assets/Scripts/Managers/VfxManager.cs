@@ -15,6 +15,11 @@ public class VfxManager : MonoBehaviour
         _vfxDict = new();
     }
 
+    private void Start()
+    {
+        MapManager.Instance.OnNextRoomLoaded += ClearAllVfxPools;
+    }
+
     public VfxPoolEntity SpawnVfxObject(VfxPoolEntity prefab, Vector2 position)
     {
         if (prefab == null) return null;
@@ -25,5 +30,14 @@ public class VfxManager : MonoBehaviour
         VfxPoolEntity vfxObject = _vfxDict[prefab].Get();
         vfxObject.transform.position = position;
         return vfxObject;
+    }
+
+    public void ClearAllVfxPools()
+    {
+        Debug.Log("[VfxManager] Clearing all vfx pools");
+        foreach (var vfxPool in _vfxDict.Values)
+        {
+            vfxPool.Clear();
+        }
     }
 }
