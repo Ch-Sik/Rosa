@@ -2,19 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Animancer;
+using Cysharp.Threading.Tasks;
 
 public class MagicMushroom : MonoBehaviour
 {
     [SerializeField] float jumpPower; // 점프력
-    [Space(10)]
-    [SerializeField] Collider2D trigger;
+    [SerializeField] private float lifeTime;
+    [Space(10)] [SerializeField] Collider2D trigger;
     [SerializeField] AnimancerComponent animancer;
     [SerializeField] AnimationClip spawnAnim;
     [SerializeField] AnimationClip disappearAnim;
-    [Space(10)]
-    [SerializeField] VfxPoolEntity spawnVfx;
+    [Space(10)] [SerializeField] VfxPoolEntity spawnVfx;
     [SerializeField] VfxPoolEntity disappearVfx;
 
+    private bool _disappeared = false;
+    
     private void Start()
     {
         MapManager.Instance.OnNextRoomLoaded += DestroyMushroom;
@@ -22,11 +24,22 @@ public class MagicMushroom : MonoBehaviour
             animancer.Play(spawnAnim);
         if (spawnVfx)
             VfxManager.Instance.SpawnVfxObject(spawnVfx, transform.position);
+        ReserveDisappear(lifeTime);
     }
 
-    // 사라지는 연출 후에 삭제
+    private async UniTaskVoid ReserveDisappear(float time)
+    {
+        await UniTask.WaitForSeconds(time);
+        Disappear();
+    }
+
+// 사라지는 연출 후에 삭제
     public void Disappear()
     {
+        // 소멸 시퀀스 중복 실행 방지
+        if (_disappeared) return;
+        _disappeared = true;
+        
         trigger.enabled = false;
 
         if (animancer && disappearAnim)
