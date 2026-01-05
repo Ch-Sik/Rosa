@@ -95,16 +95,11 @@ public class InteractiveObject : MonoBehaviour
             return;
 
         OnActive();
-        if (autoInteract)
-        {
-            // auto interact라면 function 바로 실행
+        if (autoInteract && !RespawnHandler.Instance.IsDoingRespawn)
             function.Invoke();
-        }
         else
-        {
-            // 아니면 플레이어 '상호작용' 입력 이벤트에 function 예약
+            // autoInteract가 아니면 플레이어 '상호작용' 입력 이벤트에 function 예약
             SetEvent();
-        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
