@@ -84,6 +84,51 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &6290211748043890727
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4922381033229645212}
+  - component: {fileID: 3466636436716642587}
+  m_Layer: 0
+  m_Name: VfxPlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4922381033229645212
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6290211748043890727}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.172, y: -0.603, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6937738248555810738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3466636436716642587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6290211748043890727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e13b7f467215549a52b880a5c47e0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPrefab: {fileID: 6157649139355877581, guid: 6af93d2fd9b86bb4385a82b5cf96ad4d, type: 3}
 --- !u!1001 &7742991822573131188
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -145,9 +190,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3187592524825510879, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3187592524825510879, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3187592524825510879, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 61084818977128055}
+    - target: {fileID: 3187592524825510879, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3187592524825510879, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: StartWalking
@@ -156,9 +213,13 @@ PrefabInstance:
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: WalkToInteraction, Assembly-CSharp
       objectReference: {fileID: 0}
+    - target: {fileID: 3187592524825510879, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: WalkToInteraction, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 3974633437901971439, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       propertyPath: m_Name
-      value: SaveChair
+      value: SaveChair_p1
       objectReference: {fileID: 0}
     - target: {fileID: 8340302489896048619, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       propertyPath: m_Radius
@@ -176,6 +237,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 807109859982350854, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       insertIndex: -1
       addedObject: {fileID: 80133887212595028}
+    - targetCorrespondingSourceObject: {fileID: 807109859982350854, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4922381033229645212}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3974633437901971439, guid: 524eb03ee9afeb74d903b29238030983, type: 3}
       insertIndex: -1
@@ -202,6 +266,7 @@ MonoBehaviour:
   WalkToTransform: {fileID: 7579109022487126079}
   lookThisAfterWalk: 0
   afterLookAtDir: 0
+  vfxPlayer: {fileID: 3466636436716642587}
 --- !u!4 &6937738248555810738 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 807109859982350854, guid: 524eb03ee9afeb74d903b29238030983, type: 3}

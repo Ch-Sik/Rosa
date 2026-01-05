@@ -2,17 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 자기 위치에 Vfx 오브젝트를 스폰하는 단순 유틸 컴포넌트
 public class VfxPlayer : MonoBehaviour
 {
-    [SerializeField] Animator animator;
-    [SerializeField] string animStateName;
-    [SerializeField] AudioSource audioSource;
+    public VfxPoolEntity vfxPrefab;
 
-    public void PlayVFX()
+    public void PlayVfx()
     {
-        if(animator)
-            animator.Play(animStateName, -1, 0);
-        if(audioSource)
-            audioSource.Play();
+        if (vfxPrefab == null)
+        {
+            Debug.LogWarning("[VfxPlayer] vfxPrefab is null]");
+            return;
+        }
+        VfxManager.Instance.SpawnVfxObject(vfxPrefab, transform.position);
     }
 }

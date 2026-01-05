@@ -104,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, ReadOnly] float dashLeftCooldown;
 
     [FoldoutGroup("대시 관련")]
-    [SerializeField] VfxPlayer dashVfx;
+    [SerializeField] PlayerMoveEffect dashVfx;
 
     // 버섯점프 관련
     [FoldoutGroup("버섯 점프 관련")]
@@ -134,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float mushJumpPower = 20f;
 
     [FoldoutGroup("버섯 점프 관련")]
-    [SerializeField] VfxPlayer mushJumpVfx;
+    [SerializeField] PlayerMoveEffect mushJumpVfx;
 
     // 공격 관련
     [FoldoutGroup("공격 관련")]
