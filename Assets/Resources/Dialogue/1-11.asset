@@ -62,9 +62,9 @@ MonoBehaviour:
   - type: 5
     target: 0
     emotion: 0
-    text: "\uADF8\uB7EC\uB2C8\uAE4C, \uC774 \uC8FC\uBCC0\uC5D0 \uD070 \uACF0\uC774
-      \uC788\uACE0, \uADF8 \uACF0\uC774 \uC0BC\uD0A8 \uAD6C\uC2AC\uC744 \uB418\uCC3E\uC544\uC57C
-      \uD55C\uB2E4\uB294 \uAC70\uC8E0?"
+    text: "\uC544\uC2DC\uACA0\uC8E0 \uC544\uB9AC\uC5D8\uC528? \uACF0\uC744 \uBCF4\uB354\uB77C\uB3C4
+      \uC808\uB300 \uD765\uBD84\uD574\uC11C \uB3C4\uB9DD\uAC00\uB824\uD558\uAC70\uB098
+      \uD558\uBA74 \uC548\uB3FC\uC694?"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -72,23 +72,10 @@ MonoBehaviour:
     key: 
     flagValue: 0
     room: {fileID: 0}
-  - type: 3
-    target: 1
-    emotion: 3
-    text: 
-    location: 0
-    position: {x: 0, y: 0}
-    delay: 0
-    sfx: {fileID: 0}
-    key: 
-    flagValue: 0
-    room: {fileID: 0}
-  - type: 5
-    target: 0
+  - type: 4
+    target: 2
     emotion: 0
-    text: "\uC5B4\uB5BB\uAC8C \uD558\uC9C0\u2026 \uACF0\uC774 \uC798 \uB54C \uBAB0\uB798
-      \uC785\uC548\uC73C\uB85C \uC190\uC744 \uC9D1\uC5B4\uB123\uC5B4\uBD10\uC57C
-      \uD558\uB098\u2026"
+    text: "\uC54C\uACA0\uC5B4\uC694."
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -110,7 +97,32 @@ MonoBehaviour:
   - type: 4
     target: 2
     emotion: 0
-    text: "\uC5D0\uD53C \uC591, \uACF0\uC774 \uAE68\uC5B4\uC788\uC73C\uBA74 \uC5B4\uB5BB\uD558\uC8E0?"
+    text: "\uADFC\uB370 \uC5D0\uD53C\uC591, \uACF0\uC774 \uC800\uD76C\uB97C \uB178\uB824\uBCF4\uACE0
+      \uC788\uB2E4\uBA74 \uC5B4\uB5BB\uAC8C \uD558\uC8E0?"
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 3
+    target: 1
+    emotion: 3
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 4
+    target: 2
+    emotion: 0
+    text: "\uADF8\uB7F0 \uC77C\uC774 \uC788\uC5B4\uC11C\uB294 \uC548\uB418\uACA0\uC9C0\uB9CC,
+      \uB9CC\uC57D \uADF8\uB807\uB2E4\uBA74 \uACF0\uC744 \uB9C8\uC8FC\uBCF4\uBA74\uC11C
+      \uCC9C\uCC9C\uD788 \uB4A4\uB85C..."
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -122,17 +134,6 @@ MonoBehaviour:
     target: 1
     emotion: 0
     text: 
-    location: 0
-    position: {x: 0, y: 0}
-    delay: 0
-    sfx: {fileID: 0}
-    key: 
-    flagValue: 0
-    room: {fileID: 0}
-  - type: 5
-    target: 0
-    emotion: 0
-    text: "\uACF0\uC774 \uC7A0\uB4E4 \uB54C\uAE4C\uC9C0 \uAE30\uB2E4\uB824\uC57C\uACA0\uC8E0?"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -151,11 +152,21 @@ MonoBehaviour:
     key: 
     flagValue: 0
     room: {fileID: 0}
+  - type: 3
+    target: 2
+    emotion: 3
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
   - type: 4
     target: 2
     emotion: 0
-    text: "\uADFC\uB370 \uADF8 \uACF0\uC774 \uC6B0\uB9AC\uB97C \uBC14\uB77C\uBCF4\uACE0
-      \uC788\uB2E4\uBA74\uC694?"
+    text: "\uACE0,,, \uACF0\uC774 \uB2EC\uB824\uB4E4 \uAC83 \uAC19\uB2E4\uBA74\uC694?"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -175,9 +186,20 @@ MonoBehaviour:
     flagValue: 0
     room: {fileID: 0}
   - type: 5
-    target: 0
+    target: 4
     emotion: 0
     text: "\uB124?"
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 4
+    target: 9
+    emotion: 0
+    text: "\uD06C\uC6CC\uC5B4\uC5B4\uC5B4\uC5B4\uC5B4\uC5C9"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
