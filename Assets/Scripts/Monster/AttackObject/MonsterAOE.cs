@@ -15,10 +15,9 @@ public class MonsterAOE : MonoBehaviour
     private bool destroyOnAttackEnd = true;
 
     // 위 것들은 에러 방지용으로 남겨뒀음. 240906 시연회 끝나면 아래만 남기고 위는 삭제할 것.
-    [SerializeField]
-    private GameObject startupSprite;
-    [SerializeField]
-    private GameObject activatedSprite;
+    [SerializeField] private GameObject startupSprite;
+    [SerializeField] private GameObject activatedSprite;
+    [SerializeField] private Animator animator;
 
     public void Init()
     {
@@ -36,13 +35,25 @@ public class MonsterAOE : MonoBehaviour
     }
 
     public void ExecuteAttack()
-     {
+    {
         // Debug.Log("범위 공격 수행");
         collider.enabled = true;
-        if (startupSprite != null)
-            startupSprite.SetActive(false);
-        if (activatedSprite != null)
-            activatedSprite.SetActive(true);
+
+        if (animator != null)
+        {
+            // Animator 리셋
+            animator.Rebind();
+            animator.Update(0f);
+            // 애니메이션 수행
+            animator.SetTrigger("Activate");
+        }
+        else
+        {
+            if (startupSprite != null)
+                startupSprite.SetActive(false);
+            if (activatedSprite != null)
+                activatedSprite.SetActive(true);
+        }
 
         if (destroyOnAttackEnd)
             Destroy(gameObject, 1f);

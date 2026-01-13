@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class PlayVFXOnEnabled : MonoBehaviour
 {
-    Animator animator;
-    string animStateName;
-    AudioSource audioSource;
+    [SerializeField] Animator animator;
+    [SerializeField] string animStateName;
 
     // Start is called before the first frame update
     void Start()

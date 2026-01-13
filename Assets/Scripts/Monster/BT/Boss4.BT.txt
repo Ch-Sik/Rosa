@@ -28,10 +28,11 @@ tree("Phase0")
                     tree("OrbAttack")                       // 약필살기 '구슬 동시 공격' 사용
                 // 이하 평타 패턴
                 sequence
+                    isEnemyCloserThan(15.0)                 // 기본 3 + 전진거리 12
+                    tree("MeleeCombo")
+                sequence
                     isEnemyCloserThan(7.0)                  // 적이 가까울 경우 근접 공격
-                    random(0.5, 0.5)                        // 근접 공격은 랜덤으로 두가지 중에 선택
-                        tree("MeleeSingleAttack")
-                        tree("MeleeCombo")
+                    tree("MeleeSingleAttack")
                 sequence
                     random(0.5, 0.5)                        // 아니면 원거리 공격
                         tree("BlinkAttack")                 // 원거리도 역시 랜덤으로 두가지 중에 선택
@@ -62,10 +63,11 @@ tree("Phase1")
                 tree("OrbAttack")                       // 약필살기 '구슬 동시 공격' 사용
             // 이하 평타 패턴
             sequence
+                isEnemyCloserThan(15.0)                 // 기본 3 + 전진거리 12
+                tree("MeleeCombo")
+            sequence
                 isEnemyCloserThan(7.0)                  // 적이 가까울 경우 근접 공격
-                random(0.5, 0.5)                        // 근접 공격은 랜덤으로 두가지 중에 선택
-                    tree("MeleeSingleAttack")
-                    tree("MeleeCombo")
+                tree("MeleeSingleAttack")
             sequence
                 random(0.5, 0.5)                        // 아니면 원거리 공격
                     tree("BlinkAttack")                 // 원거리도 역시 랜덤으로 두가지 중에 선택
