@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 커뮤니케이션을 담당하는 싱글턴 함수부
@@ -300,6 +301,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.WalkTo: WalkTo(target, curData.position); break;        // 25.04.19 추가
             case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(curData.key); break;
             case CommunicationType.DisappearNPC: DisappearNPC(target); break;
+            case CommunicationType.ActivavteObjectWithTag: ActivateChildrenOfObjectWithTag(curData.key); break;
         }
     }
 
@@ -341,7 +343,9 @@ public class CommunicationManager : MonoBehaviour
         //사라지게 하는 시간을 리턴받고,
         float time = UI.HideTarget(target);
         //딜레이를 제공한다.
-        DelayAndGoNext(time);
+        // 26.01.13) Hide 직후 Show 시에 트윈 끝단이 겹쳐서
+        // Image 컴포넌트가 inactive되는 문제로 딜레이에 0.1초 추가
+        DelayAndGoNext(time + 0.1f);
     }
 
     //SetEmotion 처리
@@ -487,6 +491,20 @@ public class CommunicationManager : MonoBehaviour
             default:
                 Debug.LogError("CommunicationManager.UnlockPlayerAction) 잘못된 키값 들어옴");
                 break;
+        }
+        Next();
+    }
+
+    // 26.01.13) 챕터3 연출용으로 추가
+    public void ActivateChildrenOfObjectWithTag(string key)
+    {
+        var objects = GameObject.FindGameObjectsWithTag(key);
+        foreach (var obj in objects)
+        {
+            for(int i=0; i<obj.transform.childCount; i++)
+            {
+                obj.transform.GetChild(i).gameObject.SetActive(true);
+            }
         }
         Next();
     }

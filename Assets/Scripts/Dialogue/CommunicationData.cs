@@ -28,7 +28,9 @@ public class CommunicationData
     public float delay;
     [ShowIf("@type == CommunicationType.Sfx")]
     public AudioClip sfx;
-    [ShowIf("@type == CommunicationType.Flag || type == CommunicationType.UnlockPlayerAction")]
+    [ShowIf("@type == CommunicationType.Flag " +
+            "|| type == CommunicationType.UnlockPlayerAction " +
+            "|| type == CommunicationType.ActivavteObjectWithTag")]
     public string key;
     [ShowIf("@type == CommunicationType.Flag")]
     public int flagValue;
@@ -74,6 +76,7 @@ public enum CommunicationType
     WalkTo,                     // 25.04.19) 캐릭터를 설정한 x좌표까지 걷게 한다.
     UnlockPlayerAction,         // 25.05.12) 캐릭터의 특정 액션을 해금한다.
     DisappearNPC,
+    ActivavteObjectWithTag,     // 26.01.13) 챕터3 보스전 연출 전용. 특정 오브젝트를 활성화한다.
 }
 
 public enum CommunicationTarget
