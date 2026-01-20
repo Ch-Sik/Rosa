@@ -32,18 +32,16 @@ public class MonsterDamageInflictor : MonoBehaviour
     {
         if (go.CompareTag("Player"))
         {
-            float knockback = overrideKnockbackPower ? knockbackPower : DefaultKnockbackCoef;
+            var dmgReceiver = go.GetComponent<PlayerDamageReceiver>();
+            
             // Debug.Log("damaged");
             if(!overrideInvincibleDuration)
-            {
-                go.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, damage, knockback);
-            }
+                dmgReceiver.GetDamage(gameObject, damage);
             else
-            {
-                go.GetComponent<PlayerDamageReceiver>()
-                    .GetDamage(gameObject, damage, ignoreDuration, knockback);
-            }
+                dmgReceiver.GetDamage(gameObject, damage, ignoreDuration);
            
+            float knockbackPow = overrideKnockbackPower ? knockbackPower : DefaultKnockbackCoef;
+            dmgReceiver.GetKnockBack(gameObject, knockbackPow);
         }
     }
 

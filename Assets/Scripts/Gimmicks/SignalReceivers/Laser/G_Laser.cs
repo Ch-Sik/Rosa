@@ -117,9 +117,8 @@ public class G_Laser : GimmickSignalReceiver
                 // 레이캐스트가 어떤 콜라이더와 충돌했을 때
                 if (hit.collider.CompareTag("Player"))
                 {
-                    Debug.Log("플레이어 충돌");
-                    hit.collider.GetComponent<PlayerDamageReceiver>().GetDamage(gameObject, 1);
-                    RespawnHandler.Instance?.Respawn();
+                    // Debug.Log("플레이어 충돌");
+                    hit.collider.GetComponent<PlayerDamageReceiver>().GetDamageAndRespawn(1);
                 }
                 if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("Cube"))
                 {

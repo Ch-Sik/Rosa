@@ -25,20 +25,20 @@ public class PlayerDamageReceiver : MonoBehaviour
     {
         GetDamage(source, damage, defaultInvincibleTime);
     }
-
-    public void GetDamage(GameObject source, int damage, float ignoreDur)
-    {
-        GetDamage(source, damage, ignoreDur, defaultKnockbackStrength);
-    }
     
-    public void GetDamage(GameObject source, int damage, float ignoreDur, float knockbackPow)
+    public void GetDamage(GameObject source, int damage, float ignoreDur)
     {
         if (_ignoreDamage) return;
         
         GetDamageInternal(damage);
-        GetKnockbackInternal(source, knockbackPow);
-        
         SetInvincibleAndIgnoreCollision(source.layer, ignoreDur).Forget();
+    }
+
+    public void GetKnockBack(GameObject source, float knockbackPow = -1)
+    {
+        if(knockbackPow < 0)
+            knockbackPow = defaultKnockbackStrength;
+        GetKnockbackInternal(source, knockbackPow);
     }
     
 
