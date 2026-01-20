@@ -22,6 +22,7 @@ public class G_WaterLaser : GimmickSignalReceiver
     public float startDelay = 0.0f;
     public float onTime = 1.0f;
     public float offTime = 1.0f;        //OFF Time이 0일 시 무한
+    public bool autoLaserLength = false;
     [FormerlySerializedAs("laserMaxLength")] 
     public float activeLength;
     public float inactiveLength;
@@ -45,7 +46,8 @@ public class G_WaterLaser : GimmickSignalReceiver
     private void Start()
     {
         Invoke(nameof(ActivateLaser), startDelay);
-        UpdateActiveLength();
+        if(autoLaserLength)
+            UpdateActiveLength();
     }
 
     private void UpdateActiveLength()
