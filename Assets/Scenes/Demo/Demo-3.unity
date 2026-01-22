@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -7653,11 +7652,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   map: {fileID: 11400000, guid: 5b04adb3897b80946b4b67a819695b8c, type: 2}
   player: {fileID: 858487567}
-  cam: {fileID: 617854217}
   currentRoomManager: {fileID: 0}
   drawStartpointGizmo: 0
   startPoint: {x: 0, y: 0, z: 0}
   startRoom: {fileID: 11400000, guid: 8a42244a2d2c80f4fa9ee79fa8318dac, type: 2}
+  oldRooms: []
+  chapterDebugUI: {fileID: 0}
 --- !u!1001 &525041305
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10282,11 +10282,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dff6c20f5540f3843828c629df070725, type: 3}
---- !u!1 &858487566 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6606165383981438929, guid: dff6c20f5540f3843828c629df070725, type: 3}
-  m_PrefabInstance: {fileID: 858487565}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &858487567 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5262888439632956338, guid: dff6c20f5540f3843828c629df070725, type: 3}
@@ -14917,7 +14912,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8816401838858550196, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 349370627491054538, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
@@ -148179,9 +148174,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showGizmos: 0
-  respawnPoint: {x: 0, y: 0}
-  player: {fileID: 858487566}
   healAmount: 2
+  enemyCount: 0
 --- !u!1001 &1527686026
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -148670,7 +148664,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8816401838858550196, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 349370627491054538, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8d87259be2613594c985c49218eaea0c, type: 3}

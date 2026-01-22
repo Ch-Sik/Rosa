@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -104,7 +103,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -117,7 +116,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -147,6 +146,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7136755}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -18}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -154,7 +154,6 @@ Transform:
   m_Children:
   - {fileID: 1103797275}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7136757
 MonoBehaviour:
@@ -209,6 +208,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -217,6 +218,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -236,7 +238,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: sideHair_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -383,6 +385,7 @@ Mesh:
     m_Center: {x: -264.4495, y: 452.0923, z: 0}
     m_Extent: {x: 57.5, y: 146.92308, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -402,6 +405,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -410,6 +415,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -446,13 +452,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 32010695}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 23
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &32010697
 MonoBehaviour:
@@ -1010,13 +1016,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 37328704}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 397.5, y: -454, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 489816482}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &37328706
 MeshRenderer:
@@ -1582,7 +1588,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -1608,6 +1613,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -1619,6 +1626,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &39969473
@@ -1645,13 +1653,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 39969473}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &39969475
 MonoBehaviour:
@@ -2090,6 +2098,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -2098,6 +2108,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -2134,13 +2145,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 61848731}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &61848733
 MonoBehaviour:
@@ -2186,13 +2197,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 67740256}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &67740258
 MonoBehaviour:
@@ -2449,6 +2460,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 77513818}
     _chainUnits: []
@@ -2480,6 +2494,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77513817}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2487,7 +2502,6 @@ Transform:
   m_Children:
   - {fileID: 1142475728}
   m_Father: {fileID: 1946564221}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &82945414
 Mesh:
@@ -2496,7 +2510,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: antenna_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -2643,6 +2657,7 @@ Mesh:
     m_Center: {x: -388.3333, y: 858, z: 0}
     m_Extent: {x: 35.66667, y: 31.666626, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -2677,13 +2692,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 95955326}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &95955328
 MonoBehaviour:
@@ -3050,6 +3065,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 96705257}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -3057,7 +3073,6 @@ Transform:
   m_Children:
   - {fileID: 733026394}
   m_Father: {fileID: 1291645082}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &96705259
 MonoBehaviour:
@@ -3099,6 +3114,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -3147,13 +3165,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 120834888}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &120834890
 MonoBehaviour:
@@ -3197,6 +3215,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 90761459
     _transformUniqueID: 14966528
     _nickName: lhand
@@ -3223,6 +3243,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 5480896
     _transformUniqueID: 40838451
     _nickName: lLowerArm
@@ -3249,6 +3271,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 16348253
     _transformUniqueID: 82657389
     _nickName: lCollar
@@ -3275,6 +3299,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 73204781
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -3302,6 +3328,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &121348853
 GameObject:
   m_ObjectHideFlags: 0
@@ -3342,9 +3369,17 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -3378,6 +3413,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121348853}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -41.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -3385,7 +3421,6 @@ Transform:
   m_Children:
   - {fileID: 2081674915}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &127074244
 GameObject:
@@ -3411,13 +3446,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 127074244}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 24
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &127074246
 MonoBehaviour:
@@ -24494,6 +24529,8 @@ MonoBehaviour:
       _position: 230
       _color: {r: 0, g: 1, b: 0.5, a: 0.9}
       _thickness: 1
+  _controlParamSnapShot:
+    _snapShots: []
   _optRootUnitList:
   - {fileID: 1419275030}
   _optTransforms:
@@ -24640,6 +24677,7 @@ MonoBehaviour:
         _props_Vector: []
         _props_Texture: []
         _props_Color: []
+        _props_Keywords: []
         _isMergable: 0
   _optAnimEventListener: {fileID: 0}
   _animEventCallMode: 0
@@ -24649,13 +24687,13 @@ MonoBehaviour:
   _subObjectGroup_Mesh: {fileID: 1025674869}
   _subObjectGroup_MeshGroup: {fileID: 1815808296}
   _subObjectGroup_Modifier: {fileID: 233110031}
+  _isImportant: 1
   _FPS: 30
   _bakeScale: 0.01
   _bakeZSize: 1
   _imageFilePath_Thumbnail: 
   _isPhysicsPlay_Editor: 1
   _bakeUnlinkedGroup: {fileID: 0}
-  _isImportant: 1
   _autoPlayAnimClipID: 87380899
   _isOptimizedPortrait: 0
   _bakeTargetOptPortrait: {fileID: 0}
@@ -25434,11 +25472,16 @@ MonoBehaviour:
     _bakeScale100: 100
   _bakedPsdSecondarySet: []
   _billboardType: 0
+  _billboardParentRotation: 0
+  _isForceCamSortModeToOrthographic: 1
   _vrSupportMode: 0
   _vrRenderTextureSize: 0
-  _isForceCamSortModeToOrthographic: 1
+  _cameraCheckMode: 0
+  _renderPipelineOption: 0
   _meshShadowCastingMode: 0
   _meshReceiveShadow: 0
+  _meshLightProbeUsage: 0
+  _meshReflectionProbeUsage: 0
   _timelineTrackSets: []
   _objectOrders:
     _orderSets_RootUnit:
@@ -25665,6 +25708,7 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
@@ -25677,6 +25721,7 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
@@ -25692,6 +25737,7 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
@@ -25707,11 +25753,15 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
       _imageTexturePairs: []
     _isNeedToSetBlackColoredAmbient: 1
+    _referenceMat: {fileID: 0}
+    _referenceMaterialPath: 
+    _descTags: 
   _flippedMeshOption: 0
   _rootBoneScaleMethod: 0
   _unspecifiedAnimControlParamOption: 0
@@ -25719,6 +25769,23 @@ MonoBehaviour:
   _srcPrefabAssetForRestore: {fileID: 0}
   _isTeleportCorrectionOption: 0
   _teleportMovementDist: 10
+  _teleportRotationOffset: 30
+  _teleportScaleOffset: 0.2
+  _teleportPositionEnabled: 1
+  _teleportRotationEnabled: 1
+  _teleportScaleEnabled: 1
+  _meshRefreshRateOption: 0
+  _meshRefreshFPSScaleOption: 0
+  _meshRefreshRateFPS: 24
+  _mainProcessEvent: 0
+  _rootMotionModeOption: 0
+  _rootMotionAxisOption_X: 2
+  _rootMotionAxisOption_Y: 2
+  _rootMotionTargetTransformType: 0
+  _rootMotionSpecifiedParentTransform: {fileID: 0}
+  _IKMethod: 1
+  _invisibleMeshUpdate: 0
+  _clippingMeshUpdate: 0
 --- !u!4 &132305163
 Transform:
   m_ObjectHideFlags: 0
@@ -25726,6 +25793,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 132305161}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -25734,11 +25802,10 @@ Transform:
   - {fileID: 1720723854}
   - {fileID: 1419275029}
   m_Father: {fileID: 1382763516}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &132305164
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -25755,7 +25822,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &134666800
 GameObject:
   m_ObjectHideFlags: 0
@@ -25832,7 +25900,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -25851,7 +25921,6 @@ RectTransform:
   - {fileID: 1335508963}
   - {fileID: 1774730234}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -25865,7 +25934,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: leftEyeball_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -26012,6 +26081,7 @@ Mesh:
     m_Center: {x: -498.00287, y: 558.87195, z: 0}
     m_Extent: {x: 21.234558, y: 26.90503, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -26029,7 +26099,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: front-midHair_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -26176,6 +26246,7 @@ Mesh:
     m_Center: {x: -124.25, y: 645.3333, z: 0}
     m_Extent: {x: 58.25, y: 103.33331, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -26212,13 +26283,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 156215107}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 468.5, y: -422, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2068994782}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &156215109
 MeshRenderer:
@@ -26904,7 +26975,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -26930,6 +27000,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -26941,6 +27013,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &168165738
@@ -26967,6 +27040,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 168165738}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -16}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -26974,7 +27048,6 @@ Transform:
   m_Children:
   - {fileID: 1674690401}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &168165740
 MonoBehaviour:
@@ -27077,6 +27150,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -27108,6 +27184,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 189047565}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27115,7 +27192,6 @@ Transform:
   m_Children:
   - {fileID: 189111299}
   m_Father: {fileID: 1821682758}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &189111297
 GameObject:
@@ -27174,6 +27250,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -1.6981201
   _IKAngleRange_Upper: 178.30188
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 189111298}
     _chainUnits: []
@@ -27205,6 +27284,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 189111297}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27212,7 +27292,6 @@ Transform:
   m_Children:
   - {fileID: 2137637899}
   m_Father: {fileID: 189047567}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &195181064
 Mesh:
@@ -27221,7 +27300,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rightEyeball_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -27368,6 +27447,7 @@ Mesh:
     m_Center: {x: -235.61111, y: 217.38889, z: 0}
     m_Extent: {x: 21.055565, y: 25.833336, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -27402,6 +27482,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 201235268}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -17}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27409,7 +27490,6 @@ Transform:
   m_Children:
   - {fileID: 357798825}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &201235270
 MonoBehaviour:
@@ -27512,6 +27592,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -30
   _IKAngleRange_Upper: 30
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 213067867}
     _chainUnits:
@@ -27529,6 +27612,9 @@ MonoBehaviour:
       _angleLocal_Prev: -5.4388733
       _angleLocal_Delta: 0
       _isAngleContraint: 1
+      _isSoftLimit: 0
+      _initPose: 0
+      _angleParentToBase_Offset: 0
       _angleDir_Preferred: -5.4388733
       _angleDir_Lower: -5.4388733
       _angleDir_Upper: -5.4388733
@@ -27561,6 +27647,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 213067866}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27568,7 +27655,6 @@ Transform:
   m_Children:
   - {fileID: 1028521721}
   m_Father: {fileID: 1242002123}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &224603577
 GameObject:
@@ -27594,6 +27680,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 224603577}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27601,7 +27688,6 @@ Transform:
   m_Children:
   - {fileID: 1873845835}
   m_Father: {fileID: 1716170898}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &224603579
 MonoBehaviour:
@@ -27656,6 +27742,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -27664,6 +27752,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -27699,6 +27788,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233110031}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27712,7 +27802,6 @@ Transform:
   - {fileID: 516463479}
   - {fileID: 640222331}
   m_Father: {fileID: 1720723854}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &261751283
 Mesh:
@@ -27721,7 +27810,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lUpperArm_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -27868,6 +27957,7 @@ Mesh:
     m_Center: {x: 17.820587, y: -126.974945, z: 0}
     m_Extent: {x: 43.75, y: 71.03143, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -27902,6 +27992,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 265527115}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -41}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -27912,7 +28003,6 @@ Transform:
   - {fileID: 1716120473}
   - {fileID: 515362555}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &265527117
 MonoBehaviour:
@@ -27971,6 +28061,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -27979,6 +28071,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -28015,6 +28108,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 270258788}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -28022,7 +28116,6 @@ Transform:
   m_Children:
   - {fileID: 1363039321}
   m_Father: {fileID: 866441388}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &270258790
 MonoBehaviour:
@@ -28092,13 +28185,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284347675}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &284347677
 MonoBehaviour:
@@ -28244,6 +28337,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 287221625}
     _chainUnits: []
@@ -28275,13 +28371,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287221624}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1014725018}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &294180853
 GameObject:
@@ -28307,13 +28403,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 294180853}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -99.5, y: -110, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1094939862}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &294180855
 MonoBehaviour:
@@ -28352,13 +28448,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 297806004}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &297806006
 MonoBehaviour:
@@ -28639,6 +28735,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -28647,6 +28745,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -28682,6 +28781,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 302021860}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -28689,7 +28789,6 @@ Transform:
   m_Children:
   - {fileID: 1623104794}
   m_Father: {fileID: 828251656}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &357798824
 GameObject:
@@ -28717,13 +28816,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 357798824}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 325, y: -268.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 201235269}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &357798826
 MeshRenderer:
@@ -29609,7 +29708,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -29635,6 +29733,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -29646,6 +29746,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &363797778
@@ -29657,6 +29758,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -29665,6 +29768,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -29701,13 +29805,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 366514696}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &366514698
 MonoBehaviour:
@@ -30035,6 +30139,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 369549283}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -30042,7 +30147,6 @@ Transform:
   m_Children:
   - {fileID: 1786118513}
   m_Father: {fileID: 1770579187}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &369549285
 MonoBehaviour:
@@ -30112,13 +30216,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 373964281}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &373964283
 MonoBehaviour:
@@ -30162,6 +30266,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 38201145
     _transformUniqueID: 62200957
     _nickName: skirt
@@ -30188,6 +30294,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 27740372
     _transformUniqueID: 10580841
     _nickName: upperBody
@@ -30214,6 +30322,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 44833996
     _transformUniqueID: 62945497
     _nickName: tie
@@ -30240,6 +30350,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 73204781
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -30267,6 +30379,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!43 &403818489
 Mesh:
   m_ObjectHideFlags: 0
@@ -30274,7 +30387,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lLowerArm_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -30421,6 +30534,7 @@ Mesh:
     m_Center: {x: 114.40579, y: -222.91122, z: 0}
     m_Extent: {x: 58.239136, y: 62.755463, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -30455,13 +30569,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 413277239}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &413277241
 MonoBehaviour:
@@ -30688,13 +30802,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 414014638}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -196.5, y: 179.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1756170740}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &414014640
 MeshRenderer:
@@ -31260,7 +31374,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -31286,6 +31399,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -31297,6 +31412,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!43 &415197377
@@ -31306,7 +31422,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rLowerArm_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -31453,6 +31569,7 @@ Mesh:
     m_Center: {x: 270.0909, y: -92.86363, z: 0}
     m_Extent: {x: 60, y: 72.045456, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -31489,13 +31606,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446128228}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.5, y: 38, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1094939862}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &446128230
 MeshRenderer:
@@ -31941,7 +32058,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -31967,6 +32083,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -31978,6 +32096,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &462885057
@@ -32004,13 +32123,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 462885057}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 29
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &462885059
 MonoBehaviour:
@@ -32503,6 +32622,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 474928415}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32510,7 +32630,6 @@ Transform:
   m_Children:
   - {fileID: 1364663276}
   m_Father: {fileID: 2080575468}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &474928417
 MonoBehaviour:
@@ -32565,6 +32684,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -32573,6 +32694,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -32609,6 +32731,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 489798123}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32616,7 +32739,6 @@ Transform:
   m_Children:
   - {fileID: 1101407017}
   m_Father: {fileID: 866441388}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &489798125
 MonoBehaviour:
@@ -32686,6 +32808,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 489816481}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32693,7 +32816,6 @@ Transform:
   m_Children:
   - {fileID: 37328705}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &489816483
 MonoBehaviour:
@@ -32769,6 +32891,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -32798,13 +32921,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 506077335}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &515362554
 GameObject:
@@ -32830,6 +32953,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 515362554}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32837,7 +32961,6 @@ Transform:
   m_Children:
   - {fileID: 1290220894}
   m_Father: {fileID: 265527116}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &515362556
 MonoBehaviour:
@@ -32907,13 +33030,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 516463478}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &516463480
 MonoBehaviour:
@@ -66199,6 +66322,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -66207,6 +66332,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -66243,13 +66369,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 545877203}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 32
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &545877205
 MonoBehaviour:
@@ -66618,13 +66744,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 556044670}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 331, y: -451, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1719369137}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &556044672
 MeshRenderer:
@@ -67310,7 +67436,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -67336,6 +67461,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -67347,6 +67474,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &571941523
@@ -67373,13 +67501,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 571941523}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &571941525
 MonoBehaviour:
@@ -67604,13 +67732,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582281339}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &582281341
 MonoBehaviour:
@@ -68063,6 +68191,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -68071,6 +68201,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -68090,7 +68221,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: skirt_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -68237,6 +68368,7 @@ Mesh:
     m_Center: {x: 322.46103, y: -234.94806, z: 0}
     m_Extent: {x: 91.629875, y: 97.402596, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -68271,6 +68403,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 601841952}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -68278,7 +68411,6 @@ Transform:
   m_Children:
   - {fileID: 839754202}
   m_Father: {fileID: 2080575468}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &601841954
 MonoBehaviour:
@@ -68331,7 +68463,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: flower_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -68478,6 +68610,7 @@ Mesh:
     m_Center: {x: -149.33334, y: 739, z: 0}
     m_Extent: {x: 55.000008, y: 62, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -68512,13 +68645,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 640222330}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &640222332
 MonoBehaviour:
@@ -81596,13 +81729,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 651104887}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 358.5, y: 372.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 954588913}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &651104889
 MeshRenderer:
@@ -82448,7 +82581,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -82474,6 +82606,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -82485,6 +82619,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &656314912
@@ -82496,6 +82631,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -82504,6 +82641,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -82523,7 +82661,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ponytail_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -82670,6 +82808,7 @@ Mesh:
     m_Center: {x: -185.27274, y: 161.90909, z: 0}
     m_Extent: {x: 60, y: 174.09091, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -82704,6 +82843,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 680439936}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -17}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -82725,7 +82865,6 @@ Transform:
   - {fileID: 1856316328}
   - {fileID: 1535210563}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &680439938
 MonoBehaviour:
@@ -82810,13 +82949,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 697426195}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.9999958, w: 0.0028924828}
   m_LocalPosition: {x: 1, y: 33, z: -3}
   m_LocalScale: {x: 99.99998, y: 99.99998, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1142475728}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -179.669}
 --- !u!61 &697426197
 BoxCollider2D:
@@ -82828,6 +82967,25 @@ BoxCollider2D:
   m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -82851,7 +83009,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: front-leftHair_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -82998,6 +83156,7 @@ Mesh:
     m_Center: {x: 23.200981, y: -95.17209, z: 0}
     m_Extent: {x: 75.04269, y: 111.53848, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -83032,6 +83191,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730953433}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -83039,7 +83199,6 @@ Transform:
   m_Children:
   - {fileID: 2000337105}
   m_Father: {fileID: 265527116}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &730953435
 MonoBehaviour:
@@ -83109,6 +83268,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 733026393}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -83116,7 +83276,6 @@ Transform:
   m_Children:
   - {fileID: 1462933171}
   m_Father: {fileID: 96705258}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &733026395
 MonoBehaviour:
@@ -83158,6 +83317,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -181.69812
   _IKAngleRange_Upper: -1.6981201
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 733026395}
     _chainUnits: []
@@ -83206,13 +83368,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 736604253}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &736604255
 MonoBehaviour:
@@ -83718,13 +83880,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 750531010}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &750531012
 MonoBehaviour:
@@ -83905,6 +84067,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 753037085}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -83912,7 +84075,6 @@ Transform:
   m_Children:
   - {fileID: 1285632467}
   m_Father: {fileID: 1770579187}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &753037087
 MonoBehaviour:
@@ -83967,6 +84129,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -83975,6 +84139,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -84011,13 +84176,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 780467702}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &780467704
 MonoBehaviour:
@@ -84455,13 +84620,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 793801524}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &793801526
 MonoBehaviour:
@@ -84773,6 +84938,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 798035530}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -84780,7 +84946,6 @@ Transform:
   m_Children:
   - {fileID: 904255297}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &798035532
 MonoBehaviour:
@@ -84852,13 +85017,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 809654362}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 220, y: 114.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1821674090}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &809654364
 MeshRenderer:
@@ -85664,7 +85829,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -85690,6 +85854,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -85701,6 +85867,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &816378030
@@ -85729,13 +85896,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 816378030}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 232.5, y: -90, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1058629870}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &816378032
 MeshRenderer:
@@ -86181,7 +86348,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -86207,6 +86373,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -86218,6 +86386,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &825045384
@@ -86244,13 +86413,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 825045384}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 22
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &825045386
 MonoBehaviour:
@@ -86616,6 +86785,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 828251655}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -86625,7 +86795,6 @@ Transform:
   - {fileID: 1984801804}
   - {fileID: 302021861}
   m_Father: {fileID: 1633618193}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &839754201
 GameObject:
@@ -86653,13 +86822,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 839754201}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 356, y: -494.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 601841953}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &839754203
 MeshRenderer:
@@ -87105,7 +87274,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -87131,6 +87299,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -87142,6 +87312,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &843075853
@@ -87153,6 +87324,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -87161,6 +87334,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -87197,13 +87371,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 845907909}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &845907911
 MonoBehaviour:
@@ -87356,7 +87530,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ear_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -87503,6 +87677,7 @@ Mesh:
     m_Center: {x: -319.3205, y: 628, z: 0}
     m_Extent: {x: 25.388885, y: 32.333374, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -88046,7 +88221,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -88072,6 +88246,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -88083,6 +88259,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!4 &853687428
@@ -88092,13 +88269,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 853687426}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -466, y: 171, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1535210563}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &853687429
 MeshRenderer:
@@ -88174,6 +88351,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866441387}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -88184,7 +88362,6 @@ Transform:
   - {fileID: 489798124}
   - {fileID: 1782903079}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &866441389
 MonoBehaviour:
@@ -88243,6 +88420,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -88251,6 +88430,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -88272,6 +88452,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -88280,6 +88462,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -88318,13 +88501,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 886412079}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 87, y: 393, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1050391137}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &886412081
 MeshRenderer:
@@ -90610,7 +90793,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -90636,6 +90818,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -90647,6 +90831,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &896014887
@@ -90673,13 +90858,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 896014887}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &896014889
 MonoBehaviour:
@@ -90875,13 +91060,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 904255296}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 89, y: 235, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 798035531}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &904255298
 MeshRenderer:
@@ -90967,7 +91152,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -90993,6 +91177,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -91004,6 +91190,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &911375941
@@ -91030,13 +91217,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911375941}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 33
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &911375943
 MonoBehaviour:
@@ -91261,13 +91448,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 944424368}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &944424370
 MonoBehaviour:
@@ -92758,6 +92945,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 954588912}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -92765,7 +92953,6 @@ Transform:
   m_Children:
   - {fileID: 651104888}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &954588914
 MonoBehaviour:
@@ -92837,13 +93024,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 979774587}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -352, y: 411, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1254384846}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &979774589
 MeshRenderer:
@@ -93649,7 +93836,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -93675,6 +93861,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -93686,6 +93874,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &989418043
@@ -93712,6 +93901,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 989418043}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -93719,7 +93909,6 @@ Transform:
   m_Children:
   - {fileID: 1618393306}
   m_Father: {fileID: 1872532942}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &989418045
 MonoBehaviour:
@@ -93789,13 +93978,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 989757782}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &989757784
 MonoBehaviour:
@@ -93839,6 +94028,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 95294333
     _transformUniqueID: 44233059
     _nickName: rightEyelid
@@ -93865,6 +94056,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 9570398
     _transformUniqueID: 94826855
     _nickName: rightEyeball
@@ -93891,6 +94084,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 68475531
     _transformUniqueID: 17304813
     _nickName: rightUpper
@@ -93917,6 +94112,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 91025610
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -93944,6 +94141,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1014142492
 GameObject:
   m_ObjectHideFlags: 0
@@ -93968,6 +94166,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1014142492}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -93975,7 +94174,6 @@ Transform:
   m_Children:
   - {fileID: 1212400161}
   m_Father: {fileID: 1770579187}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1014142494
 MonoBehaviour:
@@ -94078,6 +94276,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 1014725017}
     _chainUnits: []
@@ -94109,6 +94310,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1014725016}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -94116,7 +94318,6 @@ Transform:
   m_Children:
   - {fileID: 287221626}
   m_Father: {fileID: 1320541764}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1025674869
 GameObject:
@@ -94141,6 +94342,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1025674869}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -94184,7 +94386,6 @@ Transform:
   - {fileID: 1667401874}
   - {fileID: 1036349702}
   m_Father: {fileID: 1720723854}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1028521719
 GameObject:
@@ -94242,6 +94443,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 1028521720}
     _chainUnits:
@@ -94259,6 +94463,9 @@ MonoBehaviour:
       _angleLocal_Prev: 0
       _angleLocal_Delta: 0
       _isAngleContraint: 0
+      _isSoftLimit: 0
+      _initPose: 0
+      _angleParentToBase_Offset: 0
       _angleDir_Preferred: 0
       _angleDir_Lower: 0
       _angleDir_Upper: 0
@@ -94277,6 +94484,9 @@ MonoBehaviour:
       _angleLocal_Prev: 0
       _angleLocal_Delta: 0
       _isAngleContraint: 0
+      _isSoftLimit: 0
+      _initPose: 0
+      _angleParentToBase_Offset: 0
       _angleDir_Preferred: 0
       _angleDir_Lower: 0
       _angleDir_Upper: 0
@@ -94309,13 +94519,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1028521719}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 213067868}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1028760772
 Material:
@@ -94326,6 +94536,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -94334,6 +94546,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -94370,13 +94583,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1036349701}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 36
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1036349703
 MonoBehaviour:
@@ -94672,13 +94885,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1049817344}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 30
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1049817346
 MonoBehaviour:
@@ -95116,6 +95329,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1050391136}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -95123,7 +95337,6 @@ Transform:
   m_Children:
   - {fileID: 886412080}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1050391138
 MonoBehaviour:
@@ -95193,6 +95406,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1058629869}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -95200,7 +95414,6 @@ Transform:
   m_Children:
   - {fileID: 816378031}
   m_Father: {fileID: 1770579187}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1058629871
 MonoBehaviour:
@@ -95270,6 +95483,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1061480668}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -6}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -95278,7 +95492,6 @@ Transform:
   - {fileID: 1173481629}
   - {fileID: 1821674090}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1061480670
 MonoBehaviour:
@@ -95350,6 +95563,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1073305064}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -95357,7 +95571,6 @@ Transform:
   m_Children:
   - {fileID: 2016740761}
   m_Father: {fileID: 1716170898}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1073305066
 MonoBehaviour:
@@ -95427,13 +95640,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079090082}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1079090084
 MonoBehaviour:
@@ -95480,6 +95693,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95528,6 +95744,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95576,6 +95795,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: 0
     _IKAngleRange_Upper: 0
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95624,6 +95846,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -30
     _IKAngleRange_Upper: 30
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95672,6 +95897,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95720,6 +95948,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95768,6 +95999,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -178.30188
     _IKAngleRange_Upper: 1.6981201
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95816,6 +96050,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 1
     _IKController:
@@ -95864,6 +96101,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95912,6 +96152,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -181.69812
     _IKAngleRange_Upper: -1.6981201
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -95960,6 +96203,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96008,6 +96254,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96056,6 +96305,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -1.6981201
     _IKAngleRange_Upper: 178.30188
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96104,6 +96356,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96152,6 +96407,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96200,6 +96458,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96248,6 +96509,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96296,6 +96560,9 @@ MonoBehaviour:
     _IKAngleRange_Lower: -90
     _IKAngleRange_Upper: 90
     _IKAnglePreferred: 0
+    _IKDepth: 0
+    _isIKSoftAngleLimit: 1
+    _IKInitPoseType: 0
     _isRigTestPosing: 0
     _isSocketEnabled: 0
     _IKController:
@@ -96413,6 +96680,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!43 &1081671056
 Mesh:
   m_ObjectHideFlags: 0
@@ -96420,7 +96688,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rightLower_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -96567,6 +96835,7 @@ Mesh:
     m_Center: {x: 490.3734, y: -319.4742, z: 0}
     m_Extent: {x: 11.6666565, y: 7.5, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -96601,6 +96870,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1094939861}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -96609,7 +96879,6 @@ Transform:
   - {fileID: 446128229}
   - {fileID: 294180854}
   m_Father: {fileID: 1872532942}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1094939863
 MonoBehaviour:
@@ -96662,7 +96931,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: upperBody_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -96809,6 +97078,7 @@ Mesh:
     m_Center: {x: 303.9091, y: 39.363632, z: 0}
     m_Extent: {x: 56.818176, y: 66.36363, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -96828,6 +97098,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -96836,6 +97108,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -96872,13 +97145,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1098365266}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1098365268
 MonoBehaviour:
@@ -96994,13 +97267,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101407016}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 235.5, y: -32, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 489798124}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1101407018
 MeshRenderer:
@@ -97686,7 +97959,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -97712,6 +97984,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -97723,6 +97997,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1103797274
@@ -97751,13 +98026,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1103797274}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -142.5, y: 377, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7136756}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1103797276
 MeshRenderer:
@@ -98563,7 +98838,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -98589,6 +98863,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -98600,6 +98876,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &1109145441
@@ -98611,6 +98888,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -98619,6 +98898,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -98638,7 +98918,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: leftLower_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -98785,6 +99065,7 @@ Mesh:
     m_Center: {x: -467.05554, y: 654.2222, z: 0}
     m_Extent: {x: 10.388901, y: 8.888855, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -98819,6 +99100,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1142475727}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.99933326, w: 0.036512084}
   m_LocalPosition: {x: -100.44757, y: -94.105644, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -98826,7 +99108,6 @@ Transform:
   m_Children:
   - {fileID: 697426196}
   m_Father: {fileID: 77513819}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1142475729
 MonoBehaviour:
@@ -98865,13 +99146,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1148186821}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1148186823
 MonoBehaviour:
@@ -98968,7 +99249,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: "\uB808\uC774\uC5B4 35 \uBCF5\uC0AC_Mesh_Mesh"
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -99115,6 +99396,7 @@ Mesh:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -99166,13 +99448,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173328616}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.3706426, y: 0.534057, z: 0.049955457}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1173481628
 GameObject:
@@ -99198,6 +99480,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173481628}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -99205,7 +99488,6 @@ Transform:
   m_Children:
   - {fileID: 1312202538}
   m_Father: {fileID: 1061480669}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1173481630
 MonoBehaviour:
@@ -99275,13 +99557,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1190458651}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1190458653
 MonoBehaviour:
@@ -99435,13 +99717,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1207239254}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1207239256
 MonoBehaviour:
@@ -100468,13 +100750,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1212400160}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -316, y: 44.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1014142493}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1212400162
 MeshRenderer:
@@ -101280,7 +101562,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -101306,6 +101587,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -101317,6 +101600,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &1219252020
@@ -101328,6 +101612,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -101336,6 +101622,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -101357,6 +101644,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -101365,6 +101654,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -101401,6 +101691,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1242002122}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -101408,7 +101699,6 @@ Transform:
   m_Children:
   - {fileID: 213067868}
   m_Father: {fileID: 1291645082}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1242002124
 MonoBehaviour:
@@ -101450,6 +101740,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: 0
   _IKAngleRange_Upper: 0
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -101483,6 +101776,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -101491,6 +101786,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -101527,6 +101823,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1254384845}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -19}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -101534,7 +101831,6 @@ Transform:
   m_Children:
   - {fileID: 979774588}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1254384847
 MonoBehaviour:
@@ -101604,6 +101900,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1258022396}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -101611,7 +101908,6 @@ Transform:
   m_Children:
   - {fileID: 1690469878}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1258022398
 MonoBehaviour:
@@ -101664,7 +101960,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lCollar_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -101811,6 +102107,7 @@ Mesh:
     m_Center: {x: 367.08112, y: 10.783142, z: 0}
     m_Extent: {x: 41.16667, y: 34.83333, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -101828,7 +102125,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rUpperLeg_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -101975,6 +102272,7 @@ Mesh:
     m_Center: {x: -94.79167, y: -216.58334, z: 0}
     m_Extent: {x: 63.125004, y: 114.58334, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -102009,13 +102307,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1285528919}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 26
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1285528921
 MonoBehaviour:
@@ -102384,13 +102682,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1285632466}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 446.5, y: -57, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 753037086}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1285632468
 MeshRenderer:
@@ -102956,7 +103254,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -102982,6 +103279,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -102993,6 +103292,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1287795720
@@ -103019,13 +103319,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1287795720}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1503195301}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1287795722
 MonoBehaviour:
@@ -103066,6 +103366,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -103116,13 +103419,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1290220893}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -471.5, y: 247, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 515362555}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1290220895
 MeshRenderer:
@@ -103528,7 +103831,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -103554,6 +103856,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -103565,6 +103869,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1291645081
@@ -103591,6 +103896,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1291645081}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -103600,7 +103906,6 @@ Transform:
   - {fileID: 96705258}
   - {fileID: 1242002123}
   m_Father: {fileID: 1821682758}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1291645083
 MonoBehaviour:
@@ -103644,6 +103949,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -103691,6 +103999,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1293911007}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -103704,7 +104013,6 @@ Transform:
   - {fileID: 1207239255}
   - {fileID: 284347676}
   m_Father: {fileID: 828251656}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1301430630
 Material:
@@ -103715,6 +104023,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -103723,6 +104033,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -103759,13 +104070,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1307155236}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1307155238
 MonoBehaviour:
@@ -104423,7 +104734,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rLowerLeg_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -104570,6 +104881,7 @@ Mesh:
     m_Center: {x: -146.95834, y: -48.583374, z: 0}
     m_Extent: {x: 68.125, y: 121.66669, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -104606,13 +104918,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312202537}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 67, y: -144.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1173481629}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1312202539
 MeshRenderer:
@@ -105418,7 +105730,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -105444,6 +105755,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -105455,6 +105768,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &1317674785
@@ -105466,6 +105780,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -105474,6 +105790,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -105543,6 +105860,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -105574,6 +105894,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1320541762}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -105581,7 +105902,6 @@ Transform:
   m_Children:
   - {fileID: 1014725018}
   m_Father: {fileID: 1821682758}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1330790296
 Material:
@@ -105592,6 +105912,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -105600,6 +105922,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -105636,6 +105959,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1332631013}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -105643,7 +105967,6 @@ Transform:
   m_Children:
   - {fileID: 1837000199}
   m_Father: {fileID: 866441388}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1332631015
 MonoBehaviour:
@@ -105713,13 +106036,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1334693025}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1334693027
 MonoBehaviour:
@@ -106256,7 +106579,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 134666804}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -106369,6 +106691,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -106377,6 +106701,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -106398,6 +106723,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -106406,6 +106733,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -106427,6 +106755,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -106435,6 +106765,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -106473,13 +106804,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1363039320}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -467, y: 483, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 270258789}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1363039322
 MeshRenderer:
@@ -106925,7 +107256,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -106951,6 +107281,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -106962,6 +107294,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1364663275
@@ -106990,13 +107323,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1364663275}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -472, y: 290.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 474928416}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1364663277
 MeshRenderer:
@@ -107962,7 +108295,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -107988,6 +108320,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -107999,6 +108333,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1382763515
@@ -108025,6 +108360,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1382763515}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -108032,7 +108368,6 @@ Transform:
   m_Children:
   - {fileID: 132305163}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1382763517
 MonoBehaviour:
@@ -108056,7 +108391,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: leftUpper_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -108203,6 +108538,7 @@ Mesh:
     m_Center: {x: 367.22223, y: -94.66666, z: 0}
     m_Extent: {x: 33.33333, y: 15, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -108222,6 +108558,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -108230,6 +108568,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -108268,13 +108607,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1409226448}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -426, y: 96, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1782903079}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1409226450
 MeshRenderer:
@@ -109160,7 +109499,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -109186,6 +109524,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -109197,6 +109537,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1419275028
@@ -109223,6 +109564,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1419275028}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
@@ -109230,7 +109572,6 @@ Transform:
   m_Children:
   - {fileID: 2059946015}
   m_Father: {fileID: 132305163}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1419275030
 MonoBehaviour:
@@ -110149,6 +110490,7 @@ MonoBehaviour:
     _ZPerDepth: 1
     _sortingOrderOption: 0
     _sortingOrderPerDepth: 1
+  _rootMotionBoneID: -1
 --- !u!43 &1447265497
 Mesh:
   m_ObjectHideFlags: 0
@@ -110156,7 +110498,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: head_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -110303,6 +110645,7 @@ Mesh:
     m_Center: {x: -115.375, y: -162.25, z: 0}
     m_Extent: {x: 118.125, y: 118.125, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -110337,13 +110680,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1458649299}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1458649301
 MonoBehaviour:
@@ -110870,6 +111213,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -110878,6 +111223,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -110914,13 +111260,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1462933170}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 733026394}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1462933172
 MonoBehaviour:
@@ -110961,6 +111307,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 1462933172}
     _chainUnits: []
@@ -111009,13 +111358,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1465409107}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1465409109
 MonoBehaviour:
@@ -111436,7 +111785,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lLowerLeg_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -111583,6 +111932,7 @@ Mesh:
     m_Center: {x: -120.88095, y: -144.82738, z: 0}
     m_Extent: {x: 56.19048, y: 112.82738, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -111617,13 +111967,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484836667}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1484836669
 MonoBehaviour:
@@ -111667,6 +112017,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 21257968
     _transformUniqueID: 5238807
     _nickName: lUpperLeg
@@ -111693,6 +112045,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 73204781
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -111720,6 +112074,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1488235446
 GameObject:
   m_ObjectHideFlags: 3
@@ -111744,13 +112099,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1488235446}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1488235448
 MonoBehaviour:
@@ -111794,6 +112149,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 76833034
     _transformUniqueID: 52025911
     _nickName: rUpperLeg
@@ -111820,6 +112177,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 73204781
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -111847,6 +112206,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1492181888
 GameObject:
   m_ObjectHideFlags: 3
@@ -111871,13 +112231,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1492181888}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1492181890
 MonoBehaviour:
@@ -111921,6 +112281,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 90403103
     _transformUniqueID: 92485610
     _nickName: rHand
@@ -111947,6 +112309,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 75040169
     _transformUniqueID: 62003024
     _nickName: rLowerArm
@@ -111973,6 +112337,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 83395967
     _transformUniqueID: 85066952
     _nickName: rCollar
@@ -111999,6 +112365,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 73204781
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -112026,6 +112394,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1503195300
 GameObject:
   m_ObjectHideFlags: 0
@@ -112050,6 +112419,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1503195300}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -112058,7 +112428,6 @@ Transform:
   - {fileID: 1821682758}
   - {fileID: 1287795721}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1503195302
 MonoBehaviour:
@@ -112082,6 +112451,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -112090,6 +112461,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -112109,7 +112481,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: leftEyelid_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -112256,6 +112628,7 @@ Mesh:
     m_Center: {x: -273.05078, y: 270.78094, z: 0}
     m_Extent: {x: 23.222229, y: 20.888885, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -112290,13 +112663,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533099647}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1533099649
 MonoBehaviour:
@@ -112592,6 +112965,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1535210562}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -23}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -112599,7 +112973,6 @@ Transform:
   m_Children:
   - {fileID: 853687428}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1535210564
 MonoBehaviour:
@@ -112654,6 +113027,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -112662,6 +113037,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -112698,6 +113074,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1576908420}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -112705,7 +113082,6 @@ Transform:
   m_Children:
   - {fileID: 1866468322}
   m_Father: {fileID: 2080575468}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1576908422
 MonoBehaviour:
@@ -112775,13 +113151,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1585151190}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1293911008}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1585151192
 MonoBehaviour:
@@ -113558,7 +113934,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: front-rightHair_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -113705,6 +114081,7 @@ Mesh:
     m_Center: {x: 377.52567, y: -115, z: 0}
     m_Extent: {x: 99.5, y: 103, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -113722,7 +114099,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rightUpper_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -113869,6 +114246,7 @@ Mesh:
     m_Center: {x: 435.36798, y: 101.33009, z: 0}
     m_Extent: {x: 49.04982, y: 16.140915, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -113903,6 +114281,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1605569468}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -113910,7 +114289,6 @@ Transform:
   m_Children:
   - {fileID: 2000031202}
   m_Father: {fileID: 1872532942}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1605569470
 MonoBehaviour:
@@ -113982,13 +114360,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1618393305}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -69, y: 168.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 989418044}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1618393307
 MeshRenderer:
@@ -114554,7 +114932,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -114580,6 +114957,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -114591,6 +114970,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1622350175
@@ -114617,13 +114997,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622350175}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1622350177
 MonoBehaviour:
@@ -114683,13 +115063,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1623104793}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 302021861}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1623104795
 MonoBehaviour:
@@ -120066,6 +120446,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -120074,6 +120456,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -121536,6 +121919,8 @@ MonoBehaviour:
     _rules: []
   _guideLines:
     _lineInfos: []
+  _controlParamSnapShot:
+    _snapShots: []
   _optRootUnitList: []
   _optTransforms: []
   _optMeshes: []
@@ -121550,13 +121935,13 @@ MonoBehaviour:
   _subObjectGroup_Mesh: {fileID: 1293911007}
   _subObjectGroup_MeshGroup: {fileID: 1984801803}
   _subObjectGroup_Modifier: {fileID: 302021860}
+  _isImportant: 1
   _FPS: 30
   _bakeScale: 0.01
   _bakeZSize: 1
   _imageFilePath_Thumbnail: 
   _isPhysicsPlay_Editor: 1
   _bakeUnlinkedGroup: {fileID: 0}
-  _isImportant: 1
   _autoPlayAnimClipID: -1
   _isOptimizedPortrait: 0
   _bakeTargetOptPortrait: {fileID: 0}
@@ -121866,11 +122251,16 @@ MonoBehaviour:
     _bakeScale100: 100
   _bakedPsdSecondarySet: []
   _billboardType: 0
+  _billboardParentRotation: 0
+  _isForceCamSortModeToOrthographic: 1
   _vrSupportMode: 0
   _vrRenderTextureSize: 0
-  _isForceCamSortModeToOrthographic: 1
+  _cameraCheckMode: 0
+  _renderPipelineOption: 0
   _meshShadowCastingMode: 0
   _meshReceiveShadow: 0
+  _meshLightProbeUsage: 0
+  _meshReflectionProbeUsage: 0
   _timelineTrackSets: []
   _objectOrders:
     _orderSets_RootUnit:
@@ -121995,6 +122385,7 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
@@ -122007,6 +122398,7 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
@@ -122025,6 +122417,7 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
@@ -122043,11 +122436,15 @@ MonoBehaviour:
       _value_Int: 0
       _value_Vector: {x: 0, y: 0, z: 0, w: 0}
       _value_Color: {r: 0, g: 0, b: 0, a: 1}
+      _value_Bool: 1
       _isCommonTexture: 1
       _commonTexturePath: 
       _value_CommonTexture: {fileID: 0}
       _imageTexturePairs: []
     _isNeedToSetBlackColoredAmbient: 1
+    _referenceMat: {fileID: 0}
+    _referenceMaterialPath: 
+    _descTags: 
   _flippedMeshOption: 0
   _rootBoneScaleMethod: 0
   _unspecifiedAnimControlParamOption: 0
@@ -122055,6 +122452,23 @@ MonoBehaviour:
   _srcPrefabAssetForRestore: {fileID: 0}
   _isTeleportCorrectionOption: 0
   _teleportMovementDist: 10
+  _teleportRotationOffset: 30
+  _teleportScaleOffset: 0.2
+  _teleportPositionEnabled: 1
+  _teleportRotationEnabled: 1
+  _teleportScaleEnabled: 1
+  _meshRefreshRateOption: 0
+  _meshRefreshFPSScaleOption: 0
+  _meshRefreshRateFPS: 24
+  _mainProcessEvent: 0
+  _rootMotionModeOption: 0
+  _rootMotionAxisOption_X: 2
+  _rootMotionAxisOption_Y: 2
+  _rootMotionTargetTransformType: 0
+  _rootMotionSpecifiedParentTransform: {fileID: 0}
+  _IKMethod: 1
+  _invisibleMeshUpdate: 0
+  _clippingMeshUpdate: 0
 --- !u!4 &1633618193
 Transform:
   m_ObjectHideFlags: 0
@@ -122062,6 +122476,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1633618191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -122069,7 +122484,6 @@ Transform:
   m_Children:
   - {fileID: 828251656}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1644899443
 GameObject:
@@ -122095,6 +122509,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1644899443}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -122102,7 +122517,6 @@ Transform:
   m_Children:
   - {fileID: 1966021951}
   m_Father: {fileID: 2080575468}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1644899445
 MonoBehaviour:
@@ -122157,6 +122571,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -122165,6 +122581,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -122203,13 +122620,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1665503612}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -469.5, y: 502.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1856316328}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1665503614
 MeshRenderer:
@@ -122775,7 +123192,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -122801,6 +123217,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -122812,6 +123230,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1667401873
@@ -122838,13 +123257,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1667401873}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 35
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1667401875
 MonoBehaviour:
@@ -123140,13 +123559,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1670751410}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1670751412
 MonoBehaviour:
@@ -123190,6 +123609,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 3694558
     _transformUniqueID: 20335367
     _nickName: leftEyelid
@@ -123216,6 +123637,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 73119791
     _transformUniqueID: 45929968
     _nickName: leftEyeball
@@ -123242,6 +123665,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 15027606
     _transformUniqueID: 70471230
     _nickName: leftUpper
@@ -123268,6 +123693,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 91025610
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -123297,6 +123724,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1674690400
 GameObject:
   m_ObjectHideFlags: 0
@@ -123323,13 +123751,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1674690400}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 218.5, y: -421, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 168165739}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1674690402
 MeshRenderer:
@@ -123775,7 +124203,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -123801,6 +124228,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -123812,6 +124241,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1690469877
@@ -123840,13 +124270,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1690469877}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 65.5, y: -358, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1258022397}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1690469879
 MeshRenderer:
@@ -124532,7 +124962,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -124558,6 +124987,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -124569,6 +125000,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1693508133
@@ -124595,13 +125027,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1693508133}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1693508135
 MonoBehaviour:
@@ -130483,13 +130915,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1705802259}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1705802261
 MonoBehaviour:
@@ -130989,6 +131421,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1716120472}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -130996,7 +131429,6 @@ Transform:
   m_Children:
   - {fileID: 1796165037}
   m_Father: {fileID: 265527116}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1716120474
 MonoBehaviour:
@@ -131066,6 +131498,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1716170897}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -131074,7 +131507,6 @@ Transform:
   - {fileID: 224603578}
   - {fileID: 1073305065}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1716170899
 MonoBehaviour:
@@ -131146,6 +131578,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1719369136}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -21}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -131153,7 +131586,6 @@ Transform:
   m_Children:
   - {fileID: 556044671}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1719369138
 MonoBehaviour:
@@ -131222,6 +131654,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1720723853}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -131231,7 +131664,6 @@ Transform:
   - {fileID: 1815808297}
   - {fileID: 233110032}
   m_Father: {fileID: 132305163}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1726431025
 GameObject:
@@ -131259,13 +131691,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1726431025}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 321.5, y: 57, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2001672176}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1726431027
 MeshRenderer:
@@ -132471,7 +132903,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -132497,6 +132928,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -132508,6 +132941,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1756170739
@@ -132534,6 +132968,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1756170739}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -132541,7 +132976,6 @@ Transform:
   m_Children:
   - {fileID: 414014639}
   m_Father: {fileID: 1872532942}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1756170741
 MonoBehaviour:
@@ -132611,6 +133045,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1770579186}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -12}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -132621,7 +133056,6 @@ Transform:
   - {fileID: 1014142493}
   - {fileID: 1058629870}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1770579188
 MonoBehaviour:
@@ -132702,7 +133136,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 134666804}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -132830,6 +133263,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1782903078}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -132837,7 +133271,6 @@ Transform:
   m_Children:
   - {fileID: 1409226449}
   m_Father: {fileID: 866441388}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1782903080
 MonoBehaviour:
@@ -132890,7 +133323,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rightEyelid_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -133037,6 +133470,7 @@ Mesh:
     m_Center: {x: 456.16666, y: 15.222221, z: 0}
     m_Extent: {x: 28.5, y: 17.111107, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -133073,13 +133507,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786118512}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -345, y: 212, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 369549284}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1786118514
 MeshRenderer:
@@ -134085,7 +134519,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -134111,6 +134544,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -134122,6 +134557,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1796165036
@@ -134150,13 +134586,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1796165036}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -198, y: 43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1716120473}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1796165038
 MeshRenderer:
@@ -134722,7 +135158,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -134748,6 +135183,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -134759,6 +135196,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!43 &1806578043
@@ -134768,7 +135206,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lUpperLeg_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -134915,6 +135353,7 @@ Mesh:
     m_Center: {x: -274.4167, y: -252, z: 0}
     m_Extent: {x: 39.16667, y: 116.25, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -134949,13 +135388,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1810318575}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1810318577
 MonoBehaviour:
@@ -135555,6 +135994,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1815808296}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -135570,7 +136010,6 @@ Transform:
   - {fileID: 1670751411}
   - {fileID: 989757783}
   m_Father: {fileID: 1720723854}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1821674089
 GameObject:
@@ -135596,6 +136035,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1821674089}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -135603,7 +136043,6 @@ Transform:
   m_Children:
   - {fileID: 809654363}
   m_Father: {fileID: 1061480669}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1821674091
 MonoBehaviour:
@@ -135708,6 +136147,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -135739,6 +136181,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1821682756}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -135748,7 +136191,6 @@ Transform:
   - {fileID: 1320541764}
   - {fileID: 1291645082}
   m_Father: {fileID: 1503195301}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1825627033
 Material:
@@ -135759,6 +136201,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -135767,6 +136211,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -135805,13 +136250,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1837000198}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -467.5, y: 201, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1332631014}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1837000200
 MeshRenderer:
@@ -136377,7 +136822,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -136403,6 +136847,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -136414,6 +136860,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!21 &1843358227
@@ -136425,6 +136872,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -136433,6 +136882,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -136454,6 +136904,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -136462,6 +136914,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -136481,7 +136934,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: leftEyebrow_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -136628,6 +137081,7 @@ Mesh:
     m_Center: {x: 364.05237, y: -263.7968, z: 0}
     m_Extent: {x: 14.944443, y: 6.777771, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -136662,6 +137116,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1856316327}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -22}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -136669,7 +137124,6 @@ Transform:
   m_Children:
   - {fileID: 1665503613}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1856316329
 MonoBehaviour:
@@ -136739,13 +137193,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1859210230}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1984801804}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1859210232
 MonoBehaviour:
@@ -136789,6 +137243,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 35802159
     _transformUniqueID: 49933041
     _nickName: Ring_b
@@ -136815,6 +137271,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 54607843
     _transformUniqueID: 38863964
     _nickName: Root_s_m
@@ -136841,6 +137299,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 94589077
     _transformUniqueID: 20879170
     _nickName: Root_s_t
@@ -136867,6 +137327,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 6370307
     _transformUniqueID: 14427211
     _nickName: Root_s_b
@@ -136893,6 +137355,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 20955176
     _transformUniqueID: 23988516
     _nickName: Root_b
@@ -136919,6 +137383,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 92812473
     _transformUniqueID: 40184186
     _nickName: Seed
@@ -136945,6 +137411,8 @@ MonoBehaviour:
     _materialSetID: 40865
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: -1
   _boneList_All: []
   _childMeshGroupTransforms: []
@@ -136973,6 +137441,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1865260317
 GameObject:
   m_ObjectHideFlags: 3
@@ -136997,13 +137466,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1865260317}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 25
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1865260319
 MonoBehaviour:
@@ -137301,13 +137770,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1866468321}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 177.5, y: -59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1576908421}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1866468323
 MeshRenderer:
@@ -137793,7 +138262,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -137819,6 +138287,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -137830,6 +138300,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!43 &1872458666
@@ -137839,7 +138310,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rCollar_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -137986,6 +138457,7 @@ Mesh:
     m_Center: {x: 509.85712, y: -203.23929, z: 0}
     m_Extent: {x: 35.5, y: 26.158325, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -138020,6 +138492,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872532941}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -138030,7 +138503,6 @@ Transform:
   - {fileID: 1756170740}
   - {fileID: 1605569469}
   m_Father: {fileID: 2059946015}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1872532943
 MonoBehaviour:
@@ -138106,13 +138578,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873845834}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 196, y: -238, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 224603578}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1873845836
 MeshRenderer:
@@ -139038,7 +139510,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -139064,6 +139535,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -139075,6 +139548,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1886692044
@@ -139101,13 +139575,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1886692044}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1886692046
 MonoBehaviour:
@@ -139332,13 +139806,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1888684180}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 28
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1888684182
 MonoBehaviour:
@@ -139617,7 +140091,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rUpperArm_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -139764,6 +140238,7 @@ Mesh:
     m_Center: {x: -431.04547, y: 468.2273, z: 0}
     m_Extent: {x: 45.681824, y: 73.86365, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -139798,13 +140273,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1928219472}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815808297}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1928219474
 MonoBehaviour:
@@ -139848,6 +140323,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 56877382
     _transformUniqueID: 95367627
     _nickName: backhead
@@ -139874,6 +140351,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 84292996
     _transformUniqueID: 22972846
     _nickName: head
@@ -139900,6 +140379,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 48667018
     _transformUniqueID: 42940434
     _nickName: "\uB808\uC774\uC5B4 35 \uBCF5\uC0AC"
@@ -139926,6 +140407,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 42342188
     _transformUniqueID: 80116580
     _nickName: ear
@@ -139952,6 +140435,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 1118586
     _transformUniqueID: 24804230
     _nickName: sideHair
@@ -139978,6 +140463,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 10616350
     _transformUniqueID: 86391313
     _nickName: front-leftHair
@@ -140004,6 +140491,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 52853048
     _transformUniqueID: 89348599
     _nickName: front-rightHair
@@ -140030,6 +140519,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 95214065
     _transformUniqueID: 80483090
     _nickName: front-midHair
@@ -140056,6 +140547,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 49945137
     _transformUniqueID: 24549118
     _nickName: flower
@@ -140082,6 +140575,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 9837536
     _transformUniqueID: 93752424
     _nickName: antenna
@@ -140108,6 +140603,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 66242187
     _transformUniqueID: 58478841
     _nickName: leftEyebrow
@@ -140134,6 +140631,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   - _meshUniqueID: 68964760
     _transformUniqueID: 60548729
     _nickName: rightEyebrow
@@ -140160,6 +140659,8 @@ MonoBehaviour:
     _materialSetID: 68977
     _isUseDefaultMaterialSet: 1
     _customMaterialProperties: []
+    _sendMaskDataList: []
+    _isMaskOnlyMesh: 0
   _parentMeshGroupID: 73204781
   _boneList_All: []
   _childMeshGroupTransforms:
@@ -140209,6 +140710,7 @@ MonoBehaviour:
     _modifiers_AnimatedFFD: []
     _modifiers_ColorOnly: []
     _modifiers_AnimatedColorOnly: []
+  _rootMotionBoneID: -1
 --- !u!1 &1946564219
 GameObject:
   m_ObjectHideFlags: 0
@@ -140266,6 +140768,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -178.30188
   _IKAngleRange_Upper: 1.6981201
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 1946564220}
     _chainUnits: []
@@ -140297,6 +140802,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1946564219}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -140304,7 +140810,6 @@ Transform:
   m_Children:
   - {fileID: 77513819}
   m_Father: {fileID: 2134898637}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1955472151
 Mesh:
@@ -140313,7 +140818,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lowerBody_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -140460,6 +140965,7 @@ Mesh:
     m_Center: {x: -468.60654, y: 52.31732, z: 0}
     m_Extent: {x: 67.272736, y: 81.36363, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -140494,13 +141000,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1961226629}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1961226631
 MonoBehaviour:
@@ -144898,13 +145404,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1966021950}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 402.5, y: -375, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1644899444}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1966021952
 MeshRenderer:
@@ -145590,7 +146096,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -145616,6 +146121,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -145627,6 +146134,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &1984801803
@@ -145652,6 +146160,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1984801803}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -145659,7 +146168,6 @@ Transform:
   m_Children:
   - {fileID: 1859210231}
   m_Father: {fileID: 828251656}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1991117483
 Mesh:
@@ -145668,7 +146176,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: tie_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -145815,6 +146323,7 @@ Mesh:
     m_Center: {x: -272, y: 173.16666, z: 0}
     m_Extent: {x: 26.111115, y: 24.499992, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -145851,13 +146360,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2000031201}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -416.5, y: 43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1605569469}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2000031203
 MeshRenderer:
@@ -146183,7 +146692,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -146209,6 +146717,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -146220,6 +146730,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &2000337104
@@ -146248,13 +146759,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2000337104}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -85.5, y: 42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 730953434}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2000337106
 MeshRenderer:
@@ -146700,7 +147211,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -146726,6 +147236,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -146737,6 +147249,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &2001672175
@@ -146763,6 +147276,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2001672175}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -146770,7 +147284,6 @@ Transform:
   m_Children:
   - {fileID: 1726431026}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2001672177
 MonoBehaviour:
@@ -146842,13 +147355,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2016740760}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 115, y: 81, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1073305065}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2016740762
 MeshRenderer:
@@ -147774,7 +148287,6 @@ MonoBehaviour:
   _isMaskChild: 0
   _clipParentID: -1
   _parentOptMesh: {fileID: 0}
-  _clipChildIDs: 
   _matrix_Vert2Mesh:
     _m00: 1
     _m01: -0
@@ -147800,6 +148312,8 @@ MonoBehaviour:
   _shaderClipping: {fileID: 0}
   _shader_AlphaMask: {fileID: 4800000, guid: 3adb65fbb7d85b24ea4d2427a796b9e2, type: 3}
   _clippingRenderTextureSize: 256
+  _sendMaskDataList: []
+  _isMaskOnlyMesh: 0
   _isAlways2Side: 0
   _materialInfo:
   - _isBaked: 1
@@ -147811,6 +148325,7 @@ MonoBehaviour:
     _props_Vector: []
     _props_Texture: []
     _props_Color: []
+    _props_Keywords: []
     _isMergable: 0
   _isUseSRP: 0
 --- !u!1 &2022203429
@@ -147837,13 +148352,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2022203429}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 233110032}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2022203431
 MonoBehaviour:
@@ -147889,13 +148404,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2053621456}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2053621458
 MonoBehaviour:
@@ -148387,7 +148902,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: backhead_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -148534,6 +149049,7 @@ Mesh:
     m_Center: {x: -379.86804, y: -112.49933, z: 0}
     m_Extent: {x: 156.93457, y: 144.58453, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -148568,13 +149084,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2056418878}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 34
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2056418880
 MonoBehaviour:
@@ -148941,6 +149457,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2059946014}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -148954,7 +149471,6 @@ Transform:
   - {fileID: 265527116}
   - {fileID: 680439937}
   m_Father: {fileID: 1419275029}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2059946016
 MonoBehaviour:
@@ -180794,6 +181310,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2068994781}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -180801,7 +181318,6 @@ Transform:
   m_Children:
   - {fileID: 156215108}
   m_Father: {fileID: 265527116}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2068994783
 MonoBehaviour:
@@ -180854,7 +181370,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rHand_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -181001,6 +181517,7 @@ Mesh:
     m_Center: {x: 183.22726, y: -161.54546, z: 0}
     m_Extent: {x: 45.681816, y: 53.636368, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -181035,6 +181552,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2080575467}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -181045,7 +181563,6 @@ Transform:
   - {fileID: 1644899444}
   - {fileID: 474928416}
   m_Father: {fileID: 680439937}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2080575469
 MonoBehaviour:
@@ -181211,13 +181728,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2081674913}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.3706665, y: 0.5340576, z: 40.239956}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 121348856}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &2088242382
 Material:
@@ -181228,6 +181745,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AnyPortrait/Transparent/Colored Texture (2X) AlphaBlend
   m_Shader: {fileID: 4800000, guid: b3aee9f90da5b3247adc84e67cadd725, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -181236,6 +181755,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -181255,7 +181775,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: lhand_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -181402,6 +181922,7 @@ Mesh:
     m_Center: {x: -107, y: -145.33334, z: 0}
     m_Extent: {x: 45, y: 55.969704, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -181419,7 +181940,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: rightEyebrow_Mesh_Mesh
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -181566,6 +182087,7 @@ Mesh:
     m_Center: {x: 454, y: 68.72222, z: 0}
     m_Extent: {x: 28, y: 6.388893, z: 0}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 1
@@ -181633,6 +182155,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 0}
     _chainUnits: []
@@ -181664,6 +182189,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134898635}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -181671,7 +182197,6 @@ Transform:
   m_Children:
   - {fileID: 1946564221}
   m_Father: {fileID: 1291645082}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2137637897
 GameObject:
@@ -181729,6 +182254,9 @@ MonoBehaviour:
   _IKAngleRange_Lower: -90
   _IKAngleRange_Upper: 90
   _IKAnglePreferred: 0
+  _IKDepth: 0
+  _isIKSoftAngleLimit: 1
+  _IKInitPoseType: 0
   _IKChainSet:
     _bone: {fileID: 2137637898}
     _chainUnits: []
@@ -181760,13 +182288,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2137637897}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 189111299}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2140479191
 GameObject:
@@ -181792,13 +182320,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2140479191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1025674870}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2140479193
 MonoBehaviour:
@@ -182283,3 +182811,13 @@ MonoBehaviour:
   _isNeedToAskRemoveVertByPSDImport: 0
   _pinGroup:
     _pins_All: []
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 121348856}
+  - {fileID: 1382763516}
+  - {fileID: 134666804}
+  - {fileID: 506077338}
+  - {fileID: 1633618193}
+  - {fileID: 1173328618}

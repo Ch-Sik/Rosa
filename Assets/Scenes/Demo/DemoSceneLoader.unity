@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.23944432, g: 0.28491014, b: 0.33044663, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1481,11 +1480,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d44a580d2f4e87439f547f96a0f7db9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1625799283 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6606165383981438929, guid: dff6c20f5540f3843828c629df070725, type: 3}
-  m_PrefabInstance: {fileID: 390781060}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1693723319
 GameObject:
   m_ObjectHideFlags: 0
@@ -1517,14 +1511,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   map: {fileID: 11400000, guid: 5b04adb3897b80946b4b67a819695b8c, type: 2}
   player: {fileID: 5262888440015344438}
-  cam: {fileID: 210034125}
-  room: {fileID: 0}
-  startPoint: {fileID: 2061483551}
+  currentRoomManager: {fileID: 0}
+  drawStartpointGizmo: 0
+  startPoint: {x: 0, y: 0, z: 0}
   startRoom: {fileID: 0}
-  currentRoom: {fileID: 0}
   oldRooms: []
-  chapter: {fileID: 1838996231}
-  position: {fileID: 805628655}
+  chapterDebugUI: {fileID: 0}
 --- !u!4 &1693723321
 Transform:
   m_ObjectHideFlags: 0
@@ -1586,9 +1578,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showGizmos: 0
-  respawnPoint: {x: 0, y: 0}
-  player: {fileID: 1625799283}
   healAmount: 2
+  enemyCount: 0
 --- !u!1 &1838996230
 GameObject:
   m_ObjectHideFlags: 0
@@ -2043,9 +2034,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0999ca526f4d124bb2acf245e06b09d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilemap: {fileID: 0}
+  tilemaps: []
   tilemapManager: {fileID: 0}
+  refreshTileDataInTilemapManager: 0
   pixelPerTile: 16
+  addMarginOnTop: 0
+  addMarginOnBottom: 0
+  addMarginOnLeft: 0
+  addMarginOnRight: 0
   folderPath: Assets/TilemapSprite
   useCustomFilename: 0
   fileName: 

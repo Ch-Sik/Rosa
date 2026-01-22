@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -82309,6 +82308,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4902754967620637482, guid: 766334ef67f3eea4e9d1511fe41d55a5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: bb8a0e12823bb404fb78547c962268e7, type: 3}
     - target: {fileID: 8634840467621293719, guid: 766334ef67f3eea4e9d1511fe41d55a5, type: 3}
       propertyPath: m_Name
       value: Thorn
@@ -90834,7 +90837,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8816401838858550196, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 349370627491054538, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
@@ -91100,6 +91103,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4902754967620637482, guid: 766334ef67f3eea4e9d1511fe41d55a5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 395b09668dd7d2a42b56848b89b29e5c, type: 3}
     - target: {fileID: 8634840467621293719, guid: 766334ef67f3eea4e9d1511fe41d55a5, type: 3}
       propertyPath: m_Name
       value: Thorn
@@ -91477,7 +91484,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8816401838858550196, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 349370627491054538, guid: 8d87259be2613594c985c49218eaea0c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8d87259be2613594c985c49218eaea0c, type: 3}

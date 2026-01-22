@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -23063,6 +23062,20 @@ MonoBehaviour:
   bgmClip:
   - {fileID: 8300000, guid: 803b2206d578cd9478602d190a79aa00, type: 3}
   - {fileID: 8300000, guid: 2eef0d024c253b0449386e687f904fde, type: 3}
+  bgmReturnDelay: 3
+  useIntroCommunication: 0
+  bossAI: {fileID: 0}
+  IntroCommunication_ID: 0
+  IntroCommunication_BossActivateDelay: 0
+  useOutroCommunication: 0
+  OutroCommunication_ID: 0
+  OutroCommunication_StartDelay: 0
+  requireWallActivation: 0
+  disableWallRenderer: 0
+  bossRoomWall: {fileID: 0}
+  bossRoomCameraTrigger: {fileID: 0}
+  resetCameraTrigger: {fileID: 0}
+  roomManager: {fileID: 0}
 --- !u!43 &1130047812
 Mesh:
   m_ObjectHideFlags: 0
