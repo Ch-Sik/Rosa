@@ -49,11 +49,14 @@ public class PlayerDamageReceiver : MonoBehaviour
         if (RespawnHandler.Instance.IsDoingRespawn)
             return;
         
+        // isDead인 경우 리스폰은 GetDamageInternal -> TakeDamage -> OnDie가 처리
         bool isDead = GetDamageInternal(damage);
-        // 어차피 리스폰할거니 넉백 필요 없음
         
+        // 그 외에 경우에는 여기서 수동으로 리스폰 처리
         if(!isDead)
             RespawnHandler.Instance.Respawn();
+        
+        // 어차피 리스폰할거니 넉백 필요 없음
     }
     
     public void GetDamageIgnoreInvincible(GameObject source, int damage)

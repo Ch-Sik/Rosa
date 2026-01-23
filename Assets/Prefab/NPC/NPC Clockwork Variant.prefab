@@ -167,6 +167,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1972231775842772626}
   m_SourcePrefab: {fileID: 100100000, guid: 72c05d1241ffccd4583f06d7ab01b587, type: 3}
+--- !u!95 &1780622604629128582 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9122991151668297334, guid: 72c05d1241ffccd4583f06d7ab01b587, type: 3}
+  m_PrefabInstance: {fileID: 7362658402168425456}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4874986875664921584 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2704979417477265408, guid: 72c05d1241ffccd4583f06d7ab01b587, type: 3}
@@ -207,8 +212,9 @@ MonoBehaviour:
   _goalPositionX: 0
   _moveSpeed: 3
   rb: {fileID: 1972231775842772626}
-  anim: {fileID: 0}
+  anim: {fileID: 1780622604629128582}
   disappearVfx: {fileID: 6127854823537551600, guid: e6347ac206a2192448e1535b29cdb06d, type: 3}
+  npcDisappearSaveKey: 3-5_Watchmaker
 --- !u!50 &1972231775842772626
 Rigidbody2D:
   serializedVersion: 4

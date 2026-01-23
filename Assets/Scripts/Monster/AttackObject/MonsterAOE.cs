@@ -13,12 +13,18 @@ public class MonsterAOE : MonoBehaviour
     private new Collider2D collider;
     [SerializeField, Tooltip("공격이 완료/취소되었을 때 참이면 오브젝트 삭제, 거짓이면 오브젝트 비활성화")]
     private bool destroyOnAttackEnd = true;
+    [SerializeField] private float finishDelay = 1f;
 
-    // 위 것들은 에러 방지용으로 남겨뒀음. 240906 시연회 끝나면 아래만 남기고 위는 삭제할 것.
     [SerializeField] private GameObject startupSprite;
     [SerializeField] private GameObject activatedSprite;
     [SerializeField] private Animator animator;
 
+
+    private void Start()
+    {
+        gameObject.SetActive(false);
+    }
+    
     public void Init()
     {
         gameObject.SetActive(true);
@@ -54,11 +60,6 @@ public class MonsterAOE : MonoBehaviour
             if (activatedSprite != null)
                 activatedSprite.SetActive(true);
         }
-
-        if (destroyOnAttackEnd)
-            Destroy(gameObject, 1f);
-        else
-            StartCoroutine(SetActiveWithDelay(false, 1f));
     }
 
     public void CancelAttack()
@@ -68,6 +69,16 @@ public class MonsterAOE : MonoBehaviour
             Destroy(gameObject);
         else
             gameObject.SetActive(false);
+    }
+
+    public void FinishAttack()
+    {
+        collider.enabled = false;
+        
+        if(destroyOnAttackEnd)
+            Destroy(gameObject, finishDelay);
+        else
+            StartCoroutine(SetActiveWithDelay(false, finishDelay));
     }
 
     private IEnumerator SetActiveWithDelay(bool value, float delay)

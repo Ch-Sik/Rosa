@@ -51,6 +51,6 @@ public class Task_A_Melee : Task_A_Base
 
     protected override void OnRecoveryBegin()
     {
-        attackInstance.gameObject.SetActive(false);
+        attackInstance.FinishAttack();
     }
 }

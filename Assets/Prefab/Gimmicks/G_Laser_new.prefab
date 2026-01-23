@@ -5116,14 +5116,16 @@ MonoBehaviour:
   startDelay: 0
   onTime: 1
   offTime: 1
+  autoLaserLength: 1
   activeLength: 30
   inactiveLength: 0
+  shutByTerrain: 1
   damage: 1
   respawnOnDamage: 1
   showGizmos: 1
   isActivate: 1
   lasing: 0
-  length: 0
+  curLength: 0
 --- !u!1 &3936284840859044566
 GameObject:
   m_ObjectHideFlags: 0

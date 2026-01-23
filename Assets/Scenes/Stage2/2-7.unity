@@ -3634,7 +3634,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
       propertyPath: startDelay
-      value: 2
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
+      propertyPath: activeLength
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
       propertyPath: laserMaxLength
@@ -9646,6 +9650,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
+      propertyPath: activeLength
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
       propertyPath: laserMaxLength
       value: 15
       objectReference: {fileID: 0}
@@ -15500,6 +15508,10 @@ PrefabInstance:
     - target: {fileID: 4478779846015214675, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
+      propertyPath: activeLength
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 6019067886001250444, guid: d6cc1c81c40b09c43adf1cc9a150cb8c, type: 3}
       propertyPath: laserMaxLength

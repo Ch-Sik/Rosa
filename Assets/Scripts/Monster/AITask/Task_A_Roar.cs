@@ -35,20 +35,17 @@ public class Task_A_Roar : Task_A_Base
 
     protected override void OnStartupBegin()
     {
-        Debug.Log("공격 대기");
         attackInstance.Init();
     }
 
     protected override void OnActiveBegin()
     {
         // 공격 범위 미리보기를 실제 공격으로 변환
-        Debug.Log("공격 수행");
         attackInstance.ExecuteAttack();
     }
 
     protected override void OnRecoveryBegin()
     {
-        Debug.Log("공격 종료");
-        attackInstance.gameObject.SetActive(false);
+        attackInstance.FinishAttack();
     }
 }

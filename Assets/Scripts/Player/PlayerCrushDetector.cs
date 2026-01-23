@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -15,6 +16,8 @@ public class PlayerCrushDetector : MonoBehaviour
     private bool isCollidingRight = false;
     private bool isCollidingTop = false;
     private bool isCollidingBottom = false;
+    
+    private bool _isDying = false;
 
     void FixedUpdate()
     {
@@ -24,20 +27,23 @@ public class PlayerCrushDetector : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Platform") return;
-        
+        // 플랫폼 오르는 도중에 압사판정되는 것 방지를 위해 Platform이 '아래 방향'일 때에만 압사 판정에 산입
         foreach (ContactPoint2D contact in collision.contacts)
         {
-            // 수평 충돌 확인
-            if (Mathf.Abs(contact.normal.y) < 0.1f)
+            if (!collision.gameObject.CompareTag("Platform"))
             {
-                if (contact.normal.x > 0.9f) // 오른쪽 면
+                // 수평 충돌 확인
+                if (Mathf.Abs(contact.normal.y) < 0.1f)
                 {
-                    isCollidingRight = true;
-                }
-                if (contact.normal.x < -0.9f) // 왼쪽 면
-                {
-                    isCollidingLeft = true;
+                    if (contact.normal.x > 0.9f) // 오른쪽 면
+                    {
+                        isCollidingRight = true;
+                    }
+
+                    if (contact.normal.x < -0.9f) // 왼쪽 면
+                    {
+                        isCollidingLeft = true;
+                    }
                 }
             }
 
@@ -48,9 +54,13 @@ public class PlayerCrushDetector : MonoBehaviour
                 {
                     isCollidingTop = true;
                 }
-                if (contact.normal.y < -0.9f) // 아래쪽 면
+
+                if (!collision.gameObject.CompareTag("Platform"))
                 {
-                    isCollidingBottom = true;
+                    if (contact.normal.y < -0.9f) // 아래쪽 면
+                    {
+                        isCollidingBottom = true;
+                    }
                 }
             }
         }
@@ -77,12 +87,24 @@ public class PlayerCrushDetector : MonoBehaviour
 
     private void DieByCrush()
     {
+        // 이미 리스폰중일 때에는 리턴
+        if (RespawnHandler.Instance.IsDoingRespawn) return;
+        
+        // 압사 도중에 지형 뚫기 방지
+        IgnoreCollisionForSeconds(1f).Forget();
+        
         Debug.Log("플레이어 압사");
-        // 압사 리스폰 + 사망 리스폰으로 리스폰이 2번 연속 발생하는 것을 방지하기 위해 플레이어 현재 체력 검사
-        if(PlayerRef.Instance.state.CurrentHP > damageOnCrush)
-        { 
-            RespawnHandler.Instance.Respawn();
-        }
         PlayerRef.Instance.damageReceiver.GetDamageAndRespawn(damageOnCrush);
+    }
+
+    private async UniTaskVoid IgnoreCollisionForSeconds(float seconds)
+    {
+        var groundMask = LayerMask.GetMask("Ground");
+
+        PlayerRef.Instance.rb.isKinematic = true;
+        // PlayerRef.Instance.col.excludeLayers |= groundMask;
+        await UniTask.WaitForSeconds(seconds);
+        PlayerRef.Instance.rb.isKinematic = false;
+        // PlayerRef.Instance.col.excludeLayers &= groundMask;
     }
 }

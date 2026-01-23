@@ -36,7 +36,7 @@ public class CharacterEmotion
             case Emotion.Special: ret = Special; break;
             default: return Normal;
         }
-        Debug.Assert(ret != null, "CharacterEmotion: 해당 표정 스프라이트가 지정되어있지 않음");
+        Debug.Assert(ret != null, $"CharacterEmotion: {emotion} 표정 스프라이트가 지정되어있지 않음");
         return ret;
     }
 

@@ -298,7 +298,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.Flag: SetFlag(curData.key, curData.flagValue); break;
             case CommunicationType.HideAll: HideAll(); break;
             case CommunicationType.MoveRoom: MoveRoom(curData.room, curData.position); break;
-            case CommunicationType.WalkTo: WalkTo(target, curData.position); break;        // 25.04.19 추가
+            case CommunicationType.WalkTo: WalkTo(target, curData.position); break;
             case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(curData.key); break;
             case CommunicationType.DisappearNPC: DisappearNPC(target); break;
             case CommunicationType.ActivavteObjectWithTag: ActivateChildrenOfObjectWithTag(curData.key); break;

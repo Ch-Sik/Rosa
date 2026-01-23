@@ -11,7 +11,7 @@ public class AIPerception : MonoBehaviour
 {
     [SerializeField] Blackboard blackboard;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         if (blackboard == null)
         {
@@ -23,7 +23,7 @@ public class AIPerception : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D col)
+    protected virtual void OnTriggerEnter2D(Collider2D col)
     {
         if (col.CompareTag("Player"))
         {
@@ -31,7 +31,7 @@ public class AIPerception : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D col)
+    protected virtual void OnTriggerExit2D(Collider2D col)
     {
         if (col.CompareTag("Player"))
         {
