@@ -174,6 +174,11 @@ public class Task_GA_Tackle_Boss1 : Task_GA_Tackle
     private void ThrowPlayer()
     {
         Vector2 knockbackVector = GetCurrentDir().opposite().toVector2();
+        
+        // 26.01.25) 넉백 최소화. 딱 벽에서 떨어질 만큼만.
+        // 어차피 대시 있으니 넉백없이도 곰을 넘어갈 수 있음.
+        knockbackVector *= 0.0001f;
+        
         if(PlayerRef.Instance.movement.isWallClimbing)
             PlayerRef.Instance.movement.Knockback(
                 knockbackVector.normalized, knockbackVector.magnitude

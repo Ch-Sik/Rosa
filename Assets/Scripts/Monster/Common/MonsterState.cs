@@ -13,6 +13,7 @@ public class MonsterState : MonoBehaviour
     [SerializeField] private int maxHP = 5;
     [SerializeField] private int currentHP;
     [SerializeField] private Blackboard blackboard;
+    [SerializeField] private VfxPoolEntity vfxOnDisappear;
 
     // 몬스터 사망했을 때 이벤트 발생시키기. 몬스터 리스폰 등에서 사용
     public delegate void MonsterEvent(GameObject go);
@@ -69,6 +70,9 @@ public class MonsterState : MonoBehaviour
 
             // AI Sensor들과 Empty Parent로 묶여있는 것 고려, 부모 삭제
             Destroy(gameObject.transform.parent.gameObject);
+            
+            if (vfxOnDisappear != null)
+                VfxManager.Instance.SpawnVfxObject(vfxOnDisappear, transform.position);
         }
     }
 }

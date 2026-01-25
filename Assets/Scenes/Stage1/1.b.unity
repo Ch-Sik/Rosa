@@ -24161,6 +24161,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 695063276}
+    - target: {fileID: 695624479191446078, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 785988449818557332, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -24221,6 +24225,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1283974301}
+    - target: {fileID: 2845207218368040406, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2881586196306034203, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -24280,6 +24288,18 @@ PrefabInstance:
     - target: {fileID: 3659263110564341233, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3738385931094898314, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_Color.b
+      value: 0.67724276
+      objectReference: {fileID: 0}
+    - target: {fileID: 3738385931094898314, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_Color.g
+      value: 0.77276033
+      objectReference: {fileID: 0}
+    - target: {fileID: 3738385931094898314, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: m_Color.r
+      value: 0.8396226
       objectReference: {fileID: 0}
     - target: {fileID: 3740108354710253453, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -24449,6 +24469,10 @@ PrefabInstance:
       propertyPath: currentHP
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 9219775852463663520, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
+      propertyPath: vfxOnDisappear
+      value: 
+      objectReference: {fileID: 8849755972545359957, guid: 16d869dc477da4e45b1ba758e039e198, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
