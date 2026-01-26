@@ -33,6 +33,7 @@ public class Task_A_Boss3ThrowRock : Task_A_Base
         if (throwed) return;
         if (activeTimer.duration > throwDelay)
         {
+            rockInstance.transform.SetParent(null);
             ProjectileBase projectileComponent = rockInstance.GetComponent<ProjectileBase>();
             projectileComponent.InitProjectile(GetCurrentDir().toVector2() * throwSpeed);
             throwed = true;

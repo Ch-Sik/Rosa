@@ -7,19 +7,21 @@ using Sirenix.OdinInspector;
 
 public class Task_A_Boss3PheonixRise : Task_A_Base
 {
-    [SerializeField] GameObject previewObject;      // 공격 범위 미리보기 오브젝트
+    [SerializeField] private GameObject previewObject;      // 공격 범위 미리보기 오브젝트
     [InfoBox("공격 데미지나 판정 범위 등은 공격 오브젝트 쪽으로 가서 수정할 것.")]
-    [SerializeField] GameObject attackObject;       // 공격 오브젝트
+    [SerializeField] private GameObject attackObject;       // 공격 오브젝트
     [InfoBox("보스방의 아래, 정가운데에 위치시킬 것")]
-    [SerializeField] Transform bossroomCenter;
-    [Tooltip("지면에 착지하기까지 걸리는 시간")]
-    [SerializeField] float landingTime = 1f;
-    [SerializeField] GameObject attackItemPrefab;
+    [SerializeField] private Transform bossroomCenter;
 
-    Rigidbody2D _rigidbody;
-    MonsterDamageInflictor _bodyDamageComponent;
-    GameObject _target;
-    Vector3 _startPosition;      // 패턴 후 복귀 등에 사용할 '기준 위치'
+    [SerializeField] private float attackDelay = 1f;
+    [Tooltip("지면에 착지하기까지 걸리는 시간")]
+    [SerializeField] private float landingTime = 1f;
+    [SerializeField] private GameObject attackItemPrefab;
+
+    private Rigidbody2D _rigidbody;
+    private MonsterDamageInflictor _bodyDamageComponent;
+    private GameObject _target;
+    private Vector3 _startPosition;      // 패턴 후 복귀 등에 사용할 '기준 위치'
 
     private void Start()
     {
@@ -75,7 +77,7 @@ public class Task_A_Boss3PheonixRise : Task_A_Base
     {
         DOTween.Sequence()
             // 6. 플레이어가 피할 수 있도록 약간의 여유 시간 주기
-            // .AppendInterval(1f)
+            .AppendInterval(attackDelay)
             // 7. 미리보기 오브젝트 비활성화
             .AppendCallback(() => {
                 previewObject.SetActive(false);

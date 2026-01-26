@@ -117,6 +117,7 @@ MonoBehaviour:
     m_Bits: 656384
   canDestroyMushroom: 1
   onWallHit: 3
+  onTargetHit: 3
   useLifetime: 0
   lifetime: 0
   disappearDelay: 1
@@ -126,12 +127,6 @@ MonoBehaviour:
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
   hitEffect: {fileID: 0}
-  mushroomLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  returnPosition: {x: 0, y: 0, z: 0}
-  damageReceiver: {fileID: 0}
-  returnTime: 1.8
 --- !u!114 &-7660184339708960641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,10 +139,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7e361b8e5ec339439677f0f6e371dba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0
+  damage: 2
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!61 &1564339269941484740
 BoxCollider2D:
   m_ObjectHideFlags: 0
