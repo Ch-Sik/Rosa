@@ -27,7 +27,9 @@ public class VfxPool : Object
 
     public VfxPoolEntity Get()
     {
-        return pool.Get();
+        var entity = pool.Get();
+        entity.OnGet();
+        return entity;
     }
 
     public void Release(VfxPoolEntity target)
@@ -44,7 +46,7 @@ public class VfxPool : Object
     {
         VfxPoolEntity newPoolItem = Instantiate(prefab);
         newPoolItem.transform.SetParent(vfxParent);
-        newPoolItem.SetPoolToRelease(pool);
+        newPoolItem.Init(pool);
         newPoolItem.gameObject.SetActive(false);
         return newPoolItem;
     }

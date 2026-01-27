@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -15,13 +16,15 @@ public class VfxPoolEntity : MonoBehaviour
     public int MaxPoolSize { get => maxPoolSize; }
     IObjectPool<VfxPoolEntity> _poolToReturn;
     float _releaseTime;
+    private bool _initialized = false;
 
-    public void SetPoolToRelease(IObjectPool<VfxPoolEntity> pool)
+    public void Init(IObjectPool<VfxPoolEntity> pool)
     {
         _poolToReturn = pool;
+        UpdateReleaseTime();
     }
-
-    void Awake()
+    
+    private void UpdateReleaseTime()
     {
         _releaseTime = minReleaseTime;
 
@@ -35,6 +38,11 @@ public class VfxPoolEntity : MonoBehaviour
         {
             ParticleSystem.Burst[] bursts = new ParticleSystem.Burst[p.emission.burstCount];
             p.emission.GetBursts(bursts);
+            
+            // 26.01.27) burst 없이 rate over time만 있는 파티클 예외 처리
+            if (bursts.Length <= 0)
+                continue;
+            
             float lastBurstTime = bursts.Max((e) => { return e.time; });
             float particleLifetime = 1f;
             switch (p.main.startLifetime.mode)
@@ -55,14 +63,19 @@ public class VfxPoolEntity : MonoBehaviour
 
             _releaseTime = Mathf.Max(_releaseTime, lastBurstTime + particleLifetime);
         }
+
+        _initialized = true;
         Debug.Log($"[VfxPoolEntity] {gameObject.name}의 releaseTime을 {_releaseTime}으로 설정");
     }
 
-    void OnEnable()
+    public void OnGet()
     {
-        DOVirtual.DelayedCall(_releaseTime, () =>
-        {
-            _poolToReturn.Release(this);
-        });
+        DelayAndRelease(_releaseTime);
+    }
+
+    private async UniTaskVoid DelayAndRelease(float delay)
+    {
+        await UniTask.WaitForSeconds(delay);
+        _poolToReturn.Release(this);
     }
 }
