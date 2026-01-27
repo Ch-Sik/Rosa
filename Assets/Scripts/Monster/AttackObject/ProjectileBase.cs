@@ -60,8 +60,8 @@ public class ProjectileBase : MonoBehaviour
     private Animator animator;
     [SerializeField]
     private SpriteRenderer spriteRenderer;
-    [SerializeField]
-    private VfxPoolEntity hitEffect;
+    [FormerlySerializedAs("hitEffect")] [SerializeField]
+    private VfxPoolEntity disappearEffect;
 
     public Action OnDisappear;
 
@@ -201,13 +201,13 @@ public class ProjectileBase : MonoBehaviour
         {
             animator.SetTrigger("disappear");
         }
-        if(hitEffect != null)
+        if(disappearEffect != null)
         {
             if(!animator && spriteRenderer)
             {
                 spriteRenderer.enabled = false;
             }
-            VfxManager.Instance.SpawnVfxObject(hitEffect, transform.position);
+            VfxManager.Instance.SpawnVfxObject(disappearEffect, transform.position);
         }
         Invoke("DoDestroy", disappearDelay);
     }

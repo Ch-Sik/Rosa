@@ -2174,6 +2174,18 @@ PrefabInstance:
       propertyPath: downOffset
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3727406117379393501, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3727406117379393501, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3763298872803454070, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 667698056}
     - target: {fileID: 5632949816028896593, guid: e4db85c9022104641ac05a4a77400067, type: 3}
       propertyPath: maxHP
       value: 10
@@ -2249,6 +2261,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e43e7170fb45b4b81dcd16d0ff55d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &667698056 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8112978679455242451, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+  m_PrefabInstance: {fileID: 667698053}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &700376481
 GameObject:
   m_ObjectHideFlags: 0

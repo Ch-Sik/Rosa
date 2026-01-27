@@ -55,20 +55,30 @@ MonoBehaviour:
   startRotationMode: 3
   randomRotationOnStart: 0
   useRandomAngularVelocity: 0
-  randomRotationRange: 30
+  randomAngularVelocityRange: 30
+  angularVelocity: 0
+  flipRotationWhenLookingLeft: 0
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
   blockingLayers:
     serializedVersion: 2
     m_Bits: 656384
   canDestroyMushroom: 1
   onWallHit: 3
+  onTargetHit: 3
   useLifetime: 0
   lifetime: 0
+  disappearDelay: 1
   rigidbody: {fileID: 4235773989891266188}
   colliders:
   - {fileID: 7275079935186561576}
   - {fileID: 5906954456914614077}
   animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  disappearEffect: {fileID: 0}
   isStuck: 0
+  vfxOnHit: {fileID: 8930515632509511041, guid: d3d12d58bdebb5849a3cb3b94ab76a29, type: 3}
 --- !u!114 &3223711293380084518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,8 +93,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   attackEnabled: 1
-  isUseIgnoreDuration: 0
+  overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!58 &7275079935186561576
 CircleCollider2D:
   m_ObjectHideFlags: 0

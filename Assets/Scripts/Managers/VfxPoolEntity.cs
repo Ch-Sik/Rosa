@@ -35,7 +35,7 @@ public class VfxPoolEntity : MonoBehaviour
         //    두 키프레임에서의 evaluate 결과보다 큰 케이스까지는 고려하지 않음. (귀찮)
         var allParticleSystems = GetComponentsInChildren<ParticleSystem>();
         foreach (var p in allParticleSystems)
-        {
+        {   
             ParticleSystem.Burst[] bursts = new ParticleSystem.Burst[p.emission.burstCount];
             p.emission.GetBursts(bursts);
             
