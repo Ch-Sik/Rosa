@@ -2170,25 +2170,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2600800588767404363, guid: e4db85c9022104641ac05a4a77400067, type: 3}
-      propertyPath: downOffset
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3727406117379393501, guid: e4db85c9022104641ac05a4a77400067, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3727406117379393501, guid: e4db85c9022104641ac05a4a77400067, type: 3}
-      propertyPath: m_WasSpriteAssigned
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3763298872803454070, guid: e4db85c9022104641ac05a4a77400067, type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 667698056}
-    - target: {fileID: 5632949816028896593, guid: e4db85c9022104641ac05a4a77400067, type: 3}
-      propertyPath: maxHP
-      value: 10
+    - target: {fileID: 5033614369771432787, guid: e4db85c9022104641ac05a4a77400067, type: 3}
+      propertyPath: startupDuration
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7216432769639158722, guid: e4db85c9022104641ac05a4a77400067, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2261,11 +2245,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e43e7170fb45b4b81dcd16d0ff55d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!95 &667698056 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8112978679455242451, guid: e4db85c9022104641ac05a4a77400067, type: 3}
-  m_PrefabInstance: {fileID: 667698053}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &700376481
 GameObject:
   m_ObjectHideFlags: 0
@@ -8538,7 +8517,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 51
+  m_SortingOrder: 50
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16

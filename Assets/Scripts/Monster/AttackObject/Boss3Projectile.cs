@@ -36,6 +36,12 @@ public class Boss3Projectile : ProjectileBase
         }
     }
 
+    // 투사체 회수되기 전에 부들부들떨려서 '뭔가 있다'는 느낌 표현
+    public void DoShake(float time)
+    {
+        transform.DOShakePosition(time, 0.2f);
+    }
+
     // 투사체 회수 기믹
     public void RetrieveProjectile(Vector3 returnPosition)
     {

@@ -1195,6 +1195,7 @@ GameObject:
   - component: {fileID: 3454486423672897086}
   - component: {fileID: 3633779845231739065}
   - component: {fileID: 6970875635733842128}
+  - component: {fileID: 8982148699982650250}
   - component: {fileID: 5033614369771432787}
   - component: {fileID: 1334640921038766992}
   - component: {fileID: 2527458485628120216}
@@ -1221,6 +1222,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6835660389506234191}
+  - {fileID: 1770428540770497651}
   - {fileID: 3782475982777500754}
   - {fileID: 3490724626858261200}
   - {fileID: 4116804685755463490}
@@ -1517,7 +1519,35 @@ MonoBehaviour:
   projectileSpeed: 15
   aimOffset: 3
   muzzle: {fileID: 6835660389506234191}
-  featherInstances: []
+--- !u!114 &8982148699982650250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3620706282070566678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91df64340f81b0c409501bf7cd3782a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blackboard: {fileID: 0}
+  writeStateOnBlackboard: 1
+  usePatternID: 1
+  patternID: 3
+  startupDuration: 1
+  superArmourOnStartup: 1
+  activeDuration: 0
+  superArmourOnActive: 1
+  recoveryDuration: 1.5
+  superArmourOnRecovery: 1
+  currentState: 0
+  projectilePrefab: {fileID: 279553577587184933, guid: 57d9b79218fd14b40883751b210fb42e, type: 3}
+  projectileSpeed: 15
+  aimOffset: 1
+  muzzle: {fileID: 6835660389506234191}
+  launchTransform: {fileID: 1770428540770497651}
+  launchDelay: 0.8
 --- !u!114 &5033614369771432787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1747,6 +1777,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4202176275033838177
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1770428540770497651}
+  m_Layer: 23
+  m_Name: rangeAttack2 pos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1770428540770497651
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4202176275033838177}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.26, y: 1.608, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7593921135908934500}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4205635430313775488
 GameObject:
   m_ObjectHideFlags: 0
