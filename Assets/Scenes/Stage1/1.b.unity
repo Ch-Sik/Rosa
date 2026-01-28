@@ -24161,22 +24161,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 695063276}
-    - target: {fileID: 695624479191446078, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 785988449818557332, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 623632159}
-    - target: {fileID: 878127836212732119, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_TranslationOffsets.Array.data[0].x
-      value: -1.3999996
-      objectReference: {fileID: 0}
-    - target: {fileID: 878127836212732119, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_TranslationOffsets.Array.data[0].y
-      value: 0.25999832
-      objectReference: {fileID: 0}
     - target: {fileID: 1236347669613151455, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -24225,10 +24213,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1283974301}
-    - target: {fileID: 2845207218368040406, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2881586196306034203, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -24289,18 +24273,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3738385931094898314, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_Color.b
-      value: 0.67724276
-      objectReference: {fileID: 0}
-    - target: {fileID: 3738385931094898314, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_Color.g
-      value: 0.77276033
-      objectReference: {fileID: 0}
-    - target: {fileID: 3738385931094898314, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_Color.r
-      value: 0.8396226
-      objectReference: {fileID: 0}
     - target: {fileID: 3740108354710253453, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -24341,10 +24313,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1924519393}
-    - target: {fileID: 5014228560854930113, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5209647455033362308, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -24353,10 +24321,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 2110527183}
-    - target: {fileID: 6087270141199805073, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: phaseMinHP.Array.data[0]
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 6156352897782296993, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -24461,18 +24425,6 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 1801584897}
-    - target: {fileID: 9219775852463663520, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: maxHP
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 9219775852463663520, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: currentHP
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 9219775852463663520, guid: 1b452d61714e6264481613fe05da3eb0, type: 3}
-      propertyPath: vfxOnDisappear
-      value: 
-      objectReference: {fileID: 8849755972545359957, guid: 16d869dc477da4e45b1ba758e039e198, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -394,7 +394,7 @@ AnimatorController:
   m_Name: IronCrane-AnimController
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: OnDead
+  - m_Name: isDead
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -488,7 +488,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: OnDead
+    m_ConditionEvent: isDead
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 9011142291670945053}

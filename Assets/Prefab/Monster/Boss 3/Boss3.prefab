@@ -1268,7 +1268,7 @@ MonoBehaviour:
   maxHP: 10
   currentHP: 0
   blackboard: {fileID: 0}
-  vfxOnDisappear: {fileID: 0}
+  vfxOnDisappear: {fileID: 8849755972545359957, guid: 16d869dc477da4e45b1ba758e039e198, type: 3}
 --- !u!114 &8302710365595097917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1564,7 +1564,7 @@ MonoBehaviour:
   writeStateOnBlackboard: 1
   usePatternID: 1
   patternID: 4
-  startupDuration: 0.1
+  startupDuration: 1
   superArmourOnStartup: 1
   activeDuration: 0
   superArmourOnActive: 1

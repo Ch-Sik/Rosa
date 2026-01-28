@@ -344,7 +344,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: b7e78ea7a94c7df429c22ae0c0d6ff9f, type: 3}
-  m_Color: {r: 1, g: 0.58765715, b: 0, a: 0.3882353}
+  m_Color: {r: 0.8396226, g: 0.77276033, b: 0.67724276, a: 0.3882353}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -787,9 +787,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b20cb10af2dc08c4bb164d108091d559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 40
-  currentHP: 20
+  maxHP: 8
+  currentHP: 8
   blackboard: {fileID: 0}
+  vfxOnDisappear: {fileID: 8849755972545359957, guid: 16d869dc477da4e45b1ba758e039e198, type: 3}
 --- !u!114 &7408543541413976975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -819,6 +820,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!114 &5219790609965822853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -860,7 +863,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
   bossState: {fileID: 9219775852463663520}
-  phaseMinHP: 1400000000000000
+  phaseMinHP: 0400000000000000
   currentPhase: 0
 --- !u!114 &6442984638114297431
 MonoBehaviour:
@@ -885,7 +888,9 @@ MonoBehaviour:
   recoveryDuration: 3
   superArmourOnRecovery: 1
   currentState: 0
+  useVariousProjectiles: 0
   projectilePrefab: {fileID: 431060034737850338, guid: 7809fde36544ddb4881a69b158659eb1, type: 3}
+  projectilePrefabs: []
   muzzle: {fileID: 5287971927491016774}
   projectileSpeed: 0
   projectileDirOption: 0
@@ -919,6 +924,7 @@ MonoBehaviour:
   tackleMaxSpeed: 7
   tackleAccel: 2000
   allowUturn: 0
+  lookBackDelay: 0
   recoveryDrag: 3
   wallStunEnabled: 1
   wallStunDuration: 5
@@ -1448,6 +1454,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!114 &8813828089931754115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1462,8 +1470,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collider: {fileID: 8534114361893034127}
   destroyOnAttackEnd: 0
+  finishDelay: 1
   startupSprite: {fileID: 695624479191446078}
   activatedSprite: {fileID: 6340368601856942078}
+  animator: {fileID: 0}
 --- !u!58 &8534114361893034127
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1806,6 +1816,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!114 &8544246837178488126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1820,8 +1832,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collider: {fileID: 0}
   destroyOnAttackEnd: 0
+  finishDelay: 1
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 8254188707243180256}
+  animator: {fileID: 0}
 --- !u!1773428102 &1785131484344043299
 ParentConstraint:
   m_ObjectHideFlags: 0
@@ -2859,6 +2873,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!114 &3808763436598356551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2873,8 +2889,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collider: {fileID: 0}
   destroyOnAttackEnd: 0
+  finishDelay: 1
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!212 &8182394743246902476
 SpriteRenderer:
   m_ObjectHideFlags: 0
