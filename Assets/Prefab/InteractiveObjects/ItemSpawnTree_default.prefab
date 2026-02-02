@@ -167,6 +167,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 896505735572748633, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
+      propertyPath: m_text
+      value: "\u2191"
+      objectReference: {fileID: 0}
     - target: {fileID: 2503579700913220947, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
       propertyPath: coolDown
       value: 0.3
@@ -263,6 +267,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7288478218203368210, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: cad4d1627b01e3b4cbf0c0fa5d45392e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

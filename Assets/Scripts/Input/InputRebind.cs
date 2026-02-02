@@ -12,22 +12,22 @@ public class InputRebind : MonoBehaviour
     
     private InputActionRebindingExtensions.RebindingOperation _rebindOperation;
 
-    private static bool initialized = false;
-
     private string bindingBackupJson = "";
+    public static InputRebind Instance = null; 
 
-    private void Start()
+    private void Awake()
     {
-        if (initialized)
+        if (Instance)
         {
-            Debug.LogError("InputRebind가 2개째 존재함");
+            Destroy(gameObject);
             return;
         }
-        
-        // UI Singleton으로 인해 게임 시작 후 1번만 호출되어야 함.
+        Instance = this;
+    }
+    
+    private void Start()
+    {
         LoadBinding();
-        initialized = true;
-        
         OptionUI.Instance.OnOptionUiOpen += BackupInputBinding;
     }
 
@@ -141,6 +141,12 @@ public class InputRebind : MonoBehaviour
         
         if(save)
             SaveBinding();
+    }
+
+    public string GetInputControl(string inputActionName)
+    {
+        (var inputAction, int index) = FindInputAction(inputActionName);
+        return InputActionRebindingExtensions.GetBindingDisplayString(inputAction, index);
     }
 
     private (InputAction, int) FindInputAction(string actionName)
