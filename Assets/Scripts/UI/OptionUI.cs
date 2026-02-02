@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +30,10 @@ public class OptionUI : MonoBehaviour
     public Vector2Int[] resolutions = new Vector2Int[3];
     public FullScreenMode[] screenModes = new FullScreenMode[2];
 
+    public Action OnOptionUiOpen;
+    /// true면 저장하고 닫기, false면 취소하고 닫기
+    public Action<bool> OnOptionUiClose;
+
     private void Awake()
     {
         if (Instance != null)
@@ -49,6 +54,7 @@ public class OptionUI : MonoBehaviour
     {
         Save();
         Close();
+        OnOptionUiClose?.Invoke(true);
     }
 
     public void ResetAndClose()
@@ -56,6 +62,7 @@ public class OptionUI : MonoBehaviour
         currentOption = savedOption.MakeCopy();
         SetByCurrentOption();
         Close();
+        OnOptionUiClose?.Invoke(false);
     }
 
     public void ToDefaultOption()
@@ -137,6 +144,7 @@ public class OptionUI : MonoBehaviour
     {
         Load();
         OpenInternal().Forget();
+        OnOptionUiOpen?.Invoke();
     }
 
     private async UniTaskVoid OpenInternal()

@@ -14,6 +14,8 @@ public class InputRebind : MonoBehaviour
 
     private static bool initialized = false;
 
+    private string bindingBackupJson = "";
+
     private void Start()
     {
         if (initialized)
@@ -25,19 +27,47 @@ public class InputRebind : MonoBehaviour
         // UI Singleton으로 인해 게임 시작 후 1번만 호출되어야 함.
         LoadBinding();
         initialized = true;
+        
+        OptionUI.Instance.OnOptionUiOpen += BackupInputBinding;
     }
 
-    public void SaveBinding()
+    private void BackupInputBinding()
+    {
+        bindingBackupJson = inputActionAsset.SaveBindingOverridesAsJson();
+        Debug.Log("[InputRebind] 바인딩맵 백업");
+        OptionUI.Instance.OnOptionUiClose += HandleRollbackChanges;
+    }
+
+    private void HandleRollbackChanges(bool saveOnClose)
+    {
+        OptionUI.Instance.OnOptionUiClose -= HandleRollbackChanges;
+        if (saveOnClose)
+            return;
+        RollbackInputBindingChanges();
+    }
+
+    public void RollbackInputBindingChanges()
+    {
+        inputActionAsset.LoadBindingOverridesFromJson(bindingBackupJson);
+        UpdateAllBindingDisplay();
+        Debug.Log("[InputRebind] 바인딩맵 롤백");
+    }
+
+    private void SaveBinding()
     {
         string json = inputActionAsset.SaveBindingOverridesAsJson();
         SaveLoadManager.Instance.SaveInputBinding(json);
     }
 
-    public void LoadBinding()
+    private void LoadBinding()
     {
         string json = SaveLoadManager.Instance.LoadInputBinding();
         inputActionAsset.LoadBindingOverridesFromJson(json);
-        
+        UpdateAllBindingDisplay();
+    }
+
+    private void UpdateAllBindingDisplay()
+    {
         string[] inputs = {"up", "down", "left", "right", "Jump", "Dash", "Attack", "SuperJump"};
 
         foreach (string input in inputs)
@@ -47,7 +77,7 @@ public class InputRebind : MonoBehaviour
             inputKeyDisplayHandler.UpdateLabel(input, keyName);
         }
     }
-    
+
     public void StartInteractiveRebind(string inputActionName)
     {
         (InputAction actionToRebind, int index) = FindInputAction(inputActionName);
