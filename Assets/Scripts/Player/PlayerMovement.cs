@@ -480,7 +480,7 @@ public class PlayerMovement : MonoBehaviour
 
         isJumpingUp = false;
         // 최소 점프 시간에 도달했는지 체크
-        if (jumpTimer.duration > minJumpUpDuration)
+        if (IsPassedMinJumpDuration())
         {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y < 0 ? rb.velocity.y : 0);
         }
@@ -493,6 +493,13 @@ public class PlayerMovement : MonoBehaviour
             yield return new WaitForSeconds(minJumpUpDuration - jumpTimer.duration);
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y < 0 ? rb.velocity.y : 0);
         }
+    }
+
+    public bool IsPassedMinJumpDuration()
+    {
+        if (jumpTimer == null)
+            return false;
+        return jumpTimer.duration > minJumpUpDuration;
     }
 
     /// <summary>
@@ -854,7 +861,7 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = glidingGravityScale;
     }
 
-    internal void CancleGliding()
+    internal void CancelGliding()
     {
         isGliding = false;
         rb.gravityScale = originGravityScale;
@@ -1103,7 +1110,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (isGliding)
         {
-            CancleGliding();
+            CancelGliding();
         }
         if(isMushJumping)
         {

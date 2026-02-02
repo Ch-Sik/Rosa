@@ -107,7 +107,18 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        playerMove.OnJump(moveVector.y < -float.Epsilon);
+        if(!playerMove.isGrounded && playerMove.IsPassedMinJumpDuration())
+            playerMove.StartGliding();
+        else
+            playerMove.OnJump(moveVector.y < -float.Epsilon);
+    }
+    
+    public void OnCancelJump(InputAction.CallbackContext context)
+    {
+        if(playerMove.isGliding)
+            playerMove.CancelGliding();
+        else
+            playerMove.FinishJumpUp();        // 점프 종료
     }
 
     public void OnInteract(InputAction.CallbackContext context)
@@ -120,12 +131,12 @@ public class PlayerController : MonoBehaviour
 
     public void OnGliding(InputAction.CallbackContext context)
     {
-        playerMove.StartGliding();
+        // playerMove.StartGliding();
     }
 
     public void OnCancleGliding(InputAction.CallbackContext context)
     {
-        playerMove.CancleGliding();
+        // playerMove.CancelGliding();
     }
 
     public void OnDash(InputAction.CallbackContext context)
@@ -158,11 +169,6 @@ public class PlayerController : MonoBehaviour
         moveVector = context.ReadValue<Vector2>();
         // 무브 캔슬
         playerMove.StopClimb(moveVector);
-    }
-
-    public void OnCancelJump(InputAction.CallbackContext context)
-    {
-        playerMove.FinishJumpUp();        // 점프 종료
     }
 
     public void OnClimbJump(InputAction.CallbackContext context)
