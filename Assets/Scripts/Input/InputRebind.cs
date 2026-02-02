@@ -66,6 +66,13 @@ public class InputRebind : MonoBehaviour
         UpdateAllBindingDisplay();
     }
 
+    public void ResetToDefault()
+    {
+        inputActionAsset.RemoveAllBindingOverrides();
+        UpdateAllBindingDisplay();
+        SaveBinding();
+    }
+
     private void UpdateAllBindingDisplay()
     {
         string[] inputs = {"up", "down", "left", "right", "Jump", "Dash", "Attack", "SuperJump"};
