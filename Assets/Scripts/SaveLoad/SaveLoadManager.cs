@@ -29,6 +29,8 @@ public class SaveLoadManager : MonoBehaviour
     [FoldoutGroup("Paths"), ReadOnly] public string flagPathName = "Flag";
     [FoldoutGroup("Paths"), ReadOnly] public string playerPathName = "Player";
     [FoldoutGroup("Paths"), ReadOnly] public string optionPathName = "Option";
+    [FoldoutGroup("Paths"), ReadOnly] public string inputPathName = "Input";
+
 
     // 25.04.29) newtonsoft json으로 변경된 것으로 인해 발생한 self-loop문제 처리
     private JsonSerializerSettings serializeSetting;
@@ -79,6 +81,7 @@ public class SaveLoadManager : MonoBehaviour
         MakeDirectory(GetPath(flagPathName));
         MakeDirectory(GetPath(playerPathName));
         MakeDirectory(GetPath(optionPathName));
+        MakeDirectory(GetPath(inputPathName));
     }
     private void MakeDirectory(string path)
     {
@@ -190,6 +193,34 @@ public class SaveLoadManager : MonoBehaviour
 
         return data;
     }
+    #endregion
+    
+    #region Input Binding
+
+    public void SaveInputBinding(string json)
+    {
+        string filePath = GetPath(inputPathName) + "/input.json";
+        File.WriteAllText(filePath, json);
+        Debug.Log($"[InputBinding Data] {filePath}에 저장 완료."
+                  + "\nJSON 파일 내용:\n"
+                  + json);
+    }
+
+    public string LoadInputBinding()
+    {
+        string filePath = GetPath(inputPathName) + "/input.json";
+        if (!File.Exists(filePath)) {
+            Debug.LogWarning($"[InputBinding Data] {filePath}를 찾을 수 없다.");
+            return null;
+        }
+
+        string json = File.ReadAllText(filePath);
+        Debug.Log($"[InputBinding Data] {filePath}에서 불러오기 완료"
+                  + "\nJSON 파일 내용:\n"
+                  + json);
+        return json;
+    }
+    
     #endregion
 }
 

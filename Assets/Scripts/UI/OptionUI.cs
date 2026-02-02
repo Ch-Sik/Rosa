@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class OptionUI : MonoBehaviour
 {
@@ -159,7 +161,23 @@ public class OptionUI : MonoBehaviour
             Open();
     }
     #endregion
+    
+    #region Key setting
 
+    public void OnKeySettingChangeButtonClick(string inputAction)
+    {
+        var inputRebinder = GetComponent<InputRebind>();
+        if (inputRebinder == null)
+        {
+            Debug.LogError("InputRebinder is null");
+            return;
+        }
+        
+        inputRebinder.StartInteractiveRebind(inputAction);
+    }
+    
+    #endregion
+    
     #region Event
     public void OnChoiceButtonChanged(TextChoiceButtonController cont)
     {
