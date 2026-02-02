@@ -11,7 +11,8 @@ using UnityEngine.UI;
 
 public class OptionUI : MonoBehaviour
 {
-    public static OptionUI Instance { get; private set; }
+    public static OptionUI Instance => _instance;
+    private static OptionUI _instance = null;
 
     public GameObject UI;
     public CanvasGroup uiGroup;
@@ -41,7 +42,8 @@ public class OptionUI : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
