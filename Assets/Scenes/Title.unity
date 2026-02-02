@@ -2639,9 +2639,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1568973357}
-        m_TargetAssemblyTypeName: OptionUI, Assembly-CSharp
-        m_MethodName: Open
+      - m_Target: {fileID: 204790929}
+        m_TargetAssemblyTypeName: TitleScreenUI, Assembly-CSharp
+        m_MethodName: OnClickOptionsButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7952,7 +7952,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1349880167
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9443,7 +9443,6 @@ GameObject:
   - component: {fileID: 1568973354}
   - component: {fileID: 1568973353}
   - component: {fileID: 1568973357}
-  - component: {fileID: 1568973358}
   - component: {fileID: 1568973359}
   m_Layer: 5
   m_Name: Option UI
@@ -9451,7 +9450,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1568973353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9578,19 +9577,6 @@ MonoBehaviour:
   - {x: 1920, y: 1080}
   - {x: 2560, y: 1440}
   screenModes: 0300000001000000
---- !u!114 &1568973358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1568973352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b2a54c0fd3a22d4d97d1ac2210f8e5e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: Option
 --- !u!114 &1568973359
 MonoBehaviour:
   m_ObjectHideFlags: 0

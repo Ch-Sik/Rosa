@@ -39,6 +39,11 @@ public class TitleScreenUI : MonoBehaviour
         DeactivateButtons();
     }
 
+    public void OnClickOptionsButton()
+    {
+        OptionUI.Instance.Open();
+    }
+
     private void StartEnterSequence()
     {
         float fadeTime = FadeoutPanel.fadeDuration;
