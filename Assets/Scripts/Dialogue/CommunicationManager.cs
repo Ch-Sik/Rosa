@@ -122,8 +122,8 @@ public class CommunicationManager : MonoBehaviour
         if (!isTalking)
             return;
 
-        //F를 입력받으면, 스킵한다.
-        if (Input.GetKeyDown(KeyCode.F))
+        // ESC 키로 스킵
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Skip();
             return;
