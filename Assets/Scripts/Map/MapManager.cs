@@ -137,15 +137,15 @@ public class MapManager : MonoBehaviour
         Enter(nextRoom, frontOfPortPosition);
     }
 
-    public void Enter(SORoom room, Vector2 position)
+    public async UniTask Enter(SORoom room, Vector2 position)
     {
         if (CheckRoomLoaded(room))
-            ReloadCurrentRoom(room, position).Forget();
+            await ReloadCurrentRoom(room, position);
         else
-            StartCoroutine(EnterCoroutine(room, position));
+            await EnterCoroutine(room, position);
     }
 
-    private async UniTaskVoid ReloadCurrentRoom(SORoom room, Vector2 position)
+    private async UniTask ReloadCurrentRoom(SORoom room, Vector2 position)
     {
         bool wasClimbing;
         AsyncOperation loadOp;

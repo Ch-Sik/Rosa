@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -297,7 +298,9 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.Sfx: Sfx(curData.sfx); break;
             case CommunicationType.Flag: SetFlag(curData.key, curData.flagValue); break;
             case CommunicationType.HideAll: HideAll(); break;
-            case CommunicationType.MoveRoom: MoveRoom(curData.room, curData.position); break;
+            case CommunicationType.MoveRoom: 
+                MoveRoomAndSave(curData.room, curData.position).Forget();
+                break;
             case CommunicationType.WalkTo: WalkTo(target, curData.position); break;
             case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(curData.key); break;
             case CommunicationType.DisappearNPC: DisappearNPC(target); break;
@@ -435,11 +438,17 @@ public class CommunicationManager : MonoBehaviour
         DelayAndGoNext(time);
     }
 
-    //룸의 특정 위치로 이동
-    public void MoveRoom(SORoom room, Vector3 pos)
+    public async UniTaskVoid MoveRoomAndSave(SORoom room, Vector3 pos)
     {
-        MapManager.Instance.Enter(room, pos);
+        await MoveRoom(room, pos);
+        SaveLoadManager.Instance.SavePlayData();
         Next();
+    }
+
+    //룸의 특정 위치로 이동
+    public async UniTask MoveRoom(SORoom room, Vector3 pos)
+    {
+        await MapManager.Instance.Enter(room, pos);
     }
 
     // 25.04.19) NPC가 특정 위치까지 걷기
