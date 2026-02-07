@@ -85,7 +85,8 @@ public class CommunicationManager : MonoBehaviour
     //CSV 파싱 뜰 데이터
     public List<Dictionary<string, object>> CSV = new List<Dictionary<string, object>>();
     public List<string> textData = new List<string>();                     //CSV 파싱 후 텍스트 데이터만 받음
-    int textCount;                                                  //text의 Count 파악
+    private int _textCount;                                                  //text의 Count 파악
+    private bool _isDoingSkipSequence = false;
 
 
     private void Start()
@@ -102,12 +103,14 @@ public class CommunicationManager : MonoBehaviour
 
     private void SetInputStateToCommunicationMode()
     {
+        Debug.Log("[CommunicationManager] SetInputStateToCommunicationMode");
         InputManager.Instance.SetMoveInputState(PlayerMoveState.NO_MOVE);
         InputManager.Instance.SetUiInputState(UiState.DIALOG);
     }
 
     private void ResetInputState()
     {
+        Debug.Log("[CommunicationManager] ResetInputState");
         InputManager.Instance.SetMoveInputState(PlayerMoveState.DEFAULT);
         InputManager.Instance.SetUiInputState(UiState.IN_GAME);
     }
@@ -164,23 +167,31 @@ public class CommunicationManager : MonoBehaviour
     public void ResetDatas()
     {
         data = null;
-        isCommunicating = false;
         curTarget = CommunicationTarget.None;
         isTalking = false;
         curIndex = 0;
         CSV.Clear();
         textData.Clear();
-        textCount = 0;
+        _textCount = 0;
     }
 
     [Button]
     //Communication 시작 전 작업
-    public bool StartCommunication(int ID)
+    public void StartCommunication(int ID)
     {
+        WaitAndStartCommunication(ID).Forget();
+    }
+
+    private async UniTaskVoid WaitAndStartCommunication(int ID)
+    {
+        // 대화가 겹칠 경우, 앞선 대화의 EndCommunication에서 '대화 모드'가 해제되어버리므로
+        // 다음 대화를 시작하기 전에 다시 세팅해줘야함.
+        ReadyForCommunication();
+        
         if (!communicationDatas.ContainsKey(ID))
         {
             communicationID = -1;
-            return false;
+            return;
         }
 
         communicationID = ID;
@@ -198,11 +209,11 @@ public class CommunicationManager : MonoBehaviour
         for (int i = 0; i < CSV.Count; i++)
             textData.Add(CSV[i][key].ToString());
         //Data에 있는 파일의 출력 개수 파악
-        textCount = GetTextCount();
+        _textCount = GetTextCount();
 
         //유효성 테스트에 false가 나오면 커뮤니케이션은 실행되지 않는다.
         if (!Validation())
-            return false;
+            return;
 
         //기본 UI의 제거
         //커뮤니케이션 UI의 생성
@@ -212,13 +223,12 @@ public class CommunicationManager : MonoBehaviour
         NpcLookatPlayer.EnableGlobally = false;
 
         //시작
-        Invoke("StartCommunication", time);
-
-        return true;
+        await UniTask.WaitForSeconds(time);
+        StartCommunicationInternal();
     }
 
     //커뮤니케이션을 실행시킨다.
-    private void StartCommunication()
+    private void StartCommunicationInternal()
     {
         // 25.04.22) 이벤트 관리 추가
         // 25.06.05) 이벤트 수행 타이밍을 대화를 위해 지정된 위치로 이동하기 시작하는 시점에서 
@@ -240,7 +250,7 @@ public class CommunicationManager : MonoBehaviour
         ProCamera2D.Instance.FollowHorizontal = true;
         ProCamera2D.Instance.FollowVertical = true;
 
-        ResetDatas();
+        //ResetDatas();
         UI.EndAnimation();
         //기존 UI의 생성
 
@@ -250,6 +260,7 @@ public class CommunicationManager : MonoBehaviour
         ResetInputState();
 
         OnCommunicationFinish?.Invoke(communicationID);
+        isCommunicating = false;
     }
 
     // 25.06.05) 함수 설명용 주석 수정
@@ -260,6 +271,12 @@ public class CommunicationManager : MonoBehaviour
     // 걍 냅두기로 함.
     public void Communication()
     {
+        if (data == null)
+        {
+            Debug.LogError("[CommunicationManager] data is null");
+            return;
+        }
+        
         // 24.12.22) CommunicationType이 None이면 무시하고 다음으로 넘김
         while (curIndex < data.Count && data[curIndex].type == CommunicationType.None)
             curIndex++;
@@ -309,26 +326,56 @@ public class CommunicationManager : MonoBehaviour
     }
 
     #region CommunicationFunction
-    //F를 입력받아 스킵할 때의 함수
-    public void Skip()
+
+    public async UniTaskVoid Skip()
     {
+        if (_isDoingSkipSequence)
+        {
+            Debug.Log("[CommunicationManager] 스킵 중복 실행 차단됨");
+            return;
+        }
+        _isDoingSkipSequence = true;
+        
+        // 26.02.07 페이드 아웃 연출 추가
+        FadeoutPanel.Fadeout();
+
+        await UniTask.WaitForSeconds(0.5f);
+        
+        bool movedRoom = false;
         // 25.10.12) 스킵시에도 방 이동이나 능력 획득은 정상적으로 되게 수정
         while (++curIndex < data.Count)
         {
             switch (data[curIndex].type)
             {
-                case CommunicationType.UnlockPlayerAction:
                 case CommunicationType.MoveRoom:
-                case CommunicationType.Flag:
-                case CommunicationType.WalkTo:
                     HandleCurCommunication(data[curIndex]);
+                    movedRoom = true;
+                    break;
+                case CommunicationType.UnlockPlayerAction:
+                case CommunicationType.Flag:
+                case CommunicationType.DisappearNPC:
+                case CommunicationType.ActivavteObjectWithTag:
+                    HandleCurCommunication(data[curIndex]);
+                    break;
+                case CommunicationType.WalkTo:
+                    var curData = data[curIndex];
+                    SkipWalkTo(curData.target, curData.position);
                     break;
             }
         }
         
+        // 방 이동이 있을 경우 이동된 방에서 다음 대화 자동진행될 것을 고려, await 생략
+        if(!movedRoom)
+            await UniTask.WaitForSeconds(1.0f);
         EndCommunication();
+        
         isTalking = false;
-        isCommunicating = false;
+        
+        // 방 이동이 있을 경우 FadeIn 두번 호출되어 너무 일찍 화면 표시되는 것 방지
+        if(!movedRoom)
+            FadeoutPanel.FadeIn();
+        
+        _isDoingSkipSequence = false;
     }
 
     //Show 처리
@@ -477,6 +524,18 @@ public class CommunicationManager : MonoBehaviour
         DelayAndGoNext(t);
     }
 
+    public void SkipWalkTo(CommunicationTarget targetCharacter, Vector2 pos)
+    {
+        if (targetCharacter == CommunicationTarget.Player)
+        {
+            PlayerRef.Instance.transform.position = pos;
+        }
+        else
+        {
+            npcMovements[targetCharacter].MoveTo(pos.x);
+        }
+    }
+
     public void DisappearNPC(CommunicationTarget targetCharacter)
     {
         npcMovements[targetCharacter].Disappear();
@@ -598,14 +657,14 @@ public class CommunicationManager : MonoBehaviour
             }
         }
 
-        if (index == textCount)
+        if (index == _textCount)
         {
             return true;
         }
         else
         {
             Debug.Log("[Communication Error] CSV 파일과 CommuncationSO의 매칭을 실패했습니다.");
-            Debug.Log("현재 언어 : " + language + " Data Text : " + textCount + "CSV Text : " + textData.Count);
+            Debug.Log("현재 언어 : " + language + " Data Text : " + _textCount + "CSV Text : " + textData.Count);
             isCommunicating = false;
             return false;
         }

@@ -87205,6 +87205,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3884723618922299561, guid: 7faa21c033fefff48bfc69ccc40712e8, type: 3}
   m_PrefabInstance: {fileID: 2026069670}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2027263127
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2027263128}
+  m_Layer: 0
+  m_Name: ww
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2027263128
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2027263127}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 18.48, y: -2.29, z: 0.055590305}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &2043488368
 Mesh:
   m_ObjectHideFlags: 0
@@ -89749,3 +89780,4 @@ SceneRoots:
   - {fileID: 328615746}
   - {fileID: 2133430197}
   - {fileID: 1297464730}
+  - {fileID: 2027263128}

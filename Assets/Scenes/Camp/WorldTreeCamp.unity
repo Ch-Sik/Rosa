@@ -18309,6 +18309,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1962487537}
+    - target: {fileID: 3247644840905722007, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
+      propertyPath: npcDisappearSaveKey
+      value: WorldTreeCamp_Healer
+      objectReference: {fileID: 0}
     - target: {fileID: 3331998996947543372, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -18773,6 +18777,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 456371722}
+    - target: {fileID: 8696751221422910613, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
+      propertyPath: m_Name
+      value: Healer visual WorldTree
+      objectReference: {fileID: 0}
     - target: {fileID: 8714697664094818964, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -18825,7 +18833,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2724901795125631743, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 1974748763623801352, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}

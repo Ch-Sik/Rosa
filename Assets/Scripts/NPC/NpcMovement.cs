@@ -24,8 +24,12 @@ public class NpcMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        npcDisappearSaveKey = GetNpcDisappearSaveKey();
         if (FlagManager.Instance.GetFlag(npcDisappearSaveKey) == 1)
+        {
+            Debug.Log($"[NpcMovement] Hide npc with key {npcDisappearSaveKey}");
             Destroy(gameObject);
+        }
         else
             Init();
     }
@@ -87,6 +91,13 @@ public class NpcMovement : MonoBehaviour
         return eta;
     }
 
+    public void TeleportTo(float destWorldPosX)
+    {
+        Vector3 pos = transform.position;
+        pos.x = destWorldPosX;
+        transform.position = pos;
+    }
+
     private void LookAtX(float destX)
     {
         LR dir = (destX - _startPositionX) > 0 ? LR.RIGHT : LR.LEFT;
@@ -99,6 +110,9 @@ public class NpcMovement : MonoBehaviour
 
     public void Disappear()
     {
+        npcDisappearSaveKey = GetNpcDisappearSaveKey();
+        Debug.Log($"[NpcMovement] Disappear npc with key {npcDisappearSaveKey}");
+        
         FlagManager.Instance.SetFlag(npcDisappearSaveKey, 1);
         StartCoroutine(CoDisappear());
 
@@ -112,13 +126,19 @@ public class NpcMovement : MonoBehaviour
     }
 
     #if UNITY_EDITOR
-    public void OnValidate()
+    [Button]
+    public void SetNpcDisappearSaveKey()
     {
         if (Application.isPlaying) return;
-        string sceneName = SceneManager.GetActiveScene().name;
-        string characterName = character.Count > 0 ? character[0].ToString() : "Anonymous";
-        npcDisappearSaveKey = sceneName + "_" + characterName;
-        
+        npcDisappearSaveKey = GetNpcDisappearSaveKey();
     }
     #endif
+
+    private string GetNpcDisappearSaveKey()
+    {
+        // string sceneName = SceneManager.GetActiveScene().name;
+        string sceneName = gameObject.scene.name;
+        string characterName = character.Count > 0 ? character[0].ToString() : "Anonymous";
+        return sceneName + "_" + characterName;
+    }
 }

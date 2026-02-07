@@ -38,6 +38,7 @@ public class CommunicationUI : MonoBehaviour
     public float StartAnimation()
     {
         ResetAll();
+        end?.Kill();
 
         start = DOTween.Sequence()
         .AppendCallback(() =>

@@ -26919,6 +26919,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3247644840905722007, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
+      propertyPath: npcDisappearSaveKey
+      value: 1.b_Healer
+      objectReference: {fileID: 0}
     - target: {fileID: 3705169774871522841, guid: a6e52d0ae05f4e9488bced57f053968e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 6.47
