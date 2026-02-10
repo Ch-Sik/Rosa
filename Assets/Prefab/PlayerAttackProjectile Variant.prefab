@@ -37,6 +37,10 @@ PrefabInstance:
       value: -360
       objectReference: {fileID: 0}
     - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: disappearEffect
+      value: 
+      objectReference: {fileID: -1845715186463036551, guid: d166f5db2c7a9ab4b814493a9e1afc49, type: 3}
+    - target: {fileID: 1458802229609378900, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: randomRotationRange
       value: 90
       objectReference: {fileID: 0}
@@ -107,6 +111,10 @@ PrefabInstance:
     - target: {fileID: 4521437318996962378, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
       propertyPath: m_Color.g
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4521437318996962378, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}
+      propertyPath: m_SortingOrder
+      value: 101
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2259351784067206909, guid: fc4534c178e78d3498064569ee9a6d66, type: 3}

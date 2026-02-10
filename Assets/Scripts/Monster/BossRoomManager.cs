@@ -51,6 +51,7 @@ public class BossRoomManager : MonoBehaviour
     RoomManager roomManager;
 
     BGMPlayer bgmPlayer;
+    private bool _enteredBossRoom = false;
 
     // Start is called before the first frame update
     void Start()
@@ -127,6 +128,9 @@ public class BossRoomManager : MonoBehaviour
 
     void OnPlayerEnteredBossRoom()
     {
+        if (_enteredBossRoom) return;
+        _enteredBossRoom = true;
+        
         // 브금 재생
         if(bgmPlayer == null)
         {

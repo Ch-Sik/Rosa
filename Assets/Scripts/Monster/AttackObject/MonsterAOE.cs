@@ -20,7 +20,7 @@ public class MonsterAOE : MonoBehaviour
     [SerializeField] private Animator animator;
 
 
-    private void Start()
+    protected virtual void Start()
     {
         gameObject.SetActive(false);
     }

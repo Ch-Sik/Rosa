@@ -188,7 +188,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 99
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1648,6 +1648,8 @@ MonoBehaviour:
   superArmourOnRecovery: 1
   currentState: 0
   downOffset: 10
+  sortingGroup: {fileID: 6535167284029176611}
+  orderInLayerWhenFlying: 0
 --- !u!114 &4185031067649235076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6541,6 +6543,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee0e4184d0bef0f46803f0410b6be7c8, type: 3}
+--- !u!210 &6535167284029176611 stripped
+SortingGroup:
+  m_CorrespondingSourceObject: {fileID: -3065840909809764715, guid: ee0e4184d0bef0f46803f0410b6be7c8, type: 3}
+  m_PrefabInstance: {fileID: 1135582113907445174}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9189156556735209713 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8089613753929887047, guid: ee0e4184d0bef0f46803f0410b6be7c8, type: 3}

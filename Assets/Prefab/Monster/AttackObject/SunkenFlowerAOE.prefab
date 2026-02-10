@@ -148,11 +148,20 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1399010015559436540, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1119964193091532222, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6191407788664638079}
   m_SourcePrefab: {fileID: 100100000, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
+--- !u!61 &3665032061440469178 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 6318427354827282082, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
+  m_PrefabInstance: {fileID: 7310291134004395544}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6514060531490289810 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4545759869769746058, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
@@ -163,3 +172,26 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4091298425336220037, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
   m_PrefabInstance: {fileID: 7310291134004395544}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7708392837785865126 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1119964193091532222, guid: 59040f296d2ff4940be4818b049b6e26, type: 3}
+  m_PrefabInstance: {fileID: 7310291134004395544}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6191407788664638079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7708392837785865126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fabe2a59bd4dcba4490272edde85f910, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 3665032061440469178}
+  destroyOnAttackEnd: 1
+  finishDelay: 0
+  startupSprite: {fileID: 6752137412442535837}
+  activatedSprite: {fileID: 6514060531490289810}
+  animator: {fileID: 0}
