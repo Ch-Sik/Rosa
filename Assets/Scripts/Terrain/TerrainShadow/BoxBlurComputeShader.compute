@@ -18,7 +18,7 @@ void ApplyBlur(uint3 id : SV_DispatchThreadID)
     float4 accumulatedColor = float4(0, 0, 0, 0);
     int sampleCount = 0;
 
-    // 블러를 위해 주변 픽셀 값을 평균화
+    // 주변 픽셀 값을 평균화
     for (int offsetY = -blurRadius; offsetY <= blurRadius; offsetY++)
     {
         for (int offsetX = -blurRadius; offsetX <= blurRadius; offsetX++)
@@ -31,8 +31,6 @@ void ApplyBlur(uint3 id : SV_DispatchThreadID)
             }
         }
     }
-
-    // 평균 색상을 사용하여 부드럽게 만듦
     accumulatedColor /= sampleCount;
     ResultTexture[pixelCoord] = accumulatedColor;
 }

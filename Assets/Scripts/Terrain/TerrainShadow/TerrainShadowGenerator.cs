@@ -45,19 +45,18 @@ public class TerrainShadowGenerator : MonoBehaviour
             resultTexture = new RenderTexture(sourceTexture.width, sourceTexture.height, 0, RenderTextureFormat.ARGB32);
             resultTexture.enableRandomWrite = true;
             resultTexture.Create();
-            // Debug.Log($"resultTexture Size: {resultTexture.width} x {resultTexture.height}");
 
             // 임시 텍스쳐에 소스 텍스쳐 복사
             tempTexture = new RenderTexture(sourceTexture.width, sourceTexture.height, 0, RenderTextureFormat.ARGB32);
             Graphics.Blit(sourceTexture, tempTexture);
 
-            // 최소값 필터를 반복적으로 적용
+            // 최소값 필터
             for (int i = 0; i < minFilterIterations; i++)
             {
                 ApplyMinimumFilter();
             }
 
-            // 그 다음 블러 필터를 적용
+            // 블러 필터
             for (int i = 0; i < blurIterations; i++)
             {
                 ApplyBlurFilter();
@@ -74,25 +73,22 @@ public class TerrainShadowGenerator : MonoBehaviour
         }
     }
 
-    void ApplyMinimumFilter()
+    private void ApplyMinimumFilter()
     {
         int kernelHandle = minFilterShader.FindKernel("MinimumFilter");
 
-        // 텍스처 크기와 관련된 변수를 컴퓨트 셰이더에 전달
+        // 컴퓨트 셰이더에 정보 전달
         minFilterShader.SetInts("textureSize", new int[] { tempTexture.width, tempTexture.height });
-
-        // 컴퓨트 셰이더에 입력 텍스처와 출력 텍스처 설정
         minFilterShader.SetTexture(kernelHandle, "SourceTexture", tempTexture);
         minFilterShader.SetTexture(kernelHandle, "ResultTexture", resultTexture);
 
-        // 컴퓨트 셰이더 실행 (8x8 스레드 그룹)
         minFilterShader.Dispatch(kernelHandle, tempTexture.width / 8, tempTexture.height / 8, 1);
 
         // 중간 결과를 다음 반복에서 입력으로 사용하기 위해 텍스처 교체
         Graphics.Blit(resultTexture, tempTexture);
     }
 
-    void ApplyBlurFilter()
+    private void ApplyBlurFilter()
     {
         int kernelHandle = blurShader.FindKernel("ApplyBlur");
 
