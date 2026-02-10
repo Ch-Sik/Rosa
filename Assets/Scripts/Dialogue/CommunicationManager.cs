@@ -341,15 +341,16 @@ public class CommunicationManager : MonoBehaviour
 
         await UniTask.WaitForSeconds(0.5f);
         
-        bool movedRoom = false;
+        CommunicationData moveRoom = null;
         // 25.10.12) 스킵시에도 방 이동이나 능력 획득은 정상적으로 되게 수정
         while (++curIndex < data.Count)
         {
             switch (data[curIndex].type)
             {
+                // moveRoom을 먼저해버리면 이동한 방에서의 다음 대화 시작이 현재 대화의 종료보다 먼저 시작되어서 문제 발생
+                // moveRoom은 나중에 하도록 잠시 데이터 보관
                 case CommunicationType.MoveRoom:
-                    HandleCurCommunication(data[curIndex]);
-                    movedRoom = true;
+                    moveRoom = data[curIndex];
                     break;
                 case CommunicationType.UnlockPlayerAction:
                 case CommunicationType.Flag:
@@ -364,16 +365,21 @@ public class CommunicationManager : MonoBehaviour
             }
         }
         
-        // 방 이동이 있을 경우 이동된 방에서 다음 대화 자동진행될 것을 고려, await 생략
-        if(!movedRoom)
-            await UniTask.WaitForSeconds(1.0f);
         EndCommunication();
-        
+        await UniTask.WaitForSeconds(1.0f);
         isTalking = false;
         
-        // 방 이동이 있을 경우 FadeIn 두번 호출되어 너무 일찍 화면 표시되는 것 방지
-        if(!movedRoom)
+        // 방 이동이 있을 경우 이동된 방에서 다음 대화 자동진행될 것을 고려, await 생략
+        if (moveRoom != null)
+        {
+            MoveRoomAndSave(moveRoom.room, moveRoom.position).Forget();
+        }
+        else
+        {
+            // 방 이동이 있을 경우 FadeIn 두번 호출되어 너무 일찍 화면 표시되는 것 방지,
+            // 방 이동이 없을 경우에만 FadeIn 호출
             FadeoutPanel.FadeIn();
+        }
         
         _isDoingSkipSequence = false;
     }
@@ -489,7 +495,7 @@ public class CommunicationManager : MonoBehaviour
     {
         await MoveRoom(room, pos);
         SaveLoadManager.Instance.SavePlayData();
-        Next();
+        // Next();
     }
 
     //룸의 특정 위치로 이동

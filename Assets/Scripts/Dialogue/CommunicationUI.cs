@@ -38,7 +38,11 @@ public class CommunicationUI : MonoBehaviour
     public float StartAnimation()
     {
         ResetAll();
-        end?.Kill();
+        if (end != null)
+        {
+            end.Kill();
+            Debug.Log("[CommunicationUI] end가 존재해서 Kill함");
+        }
 
         start = DOTween.Sequence()
         .AppendCallback(() =>
