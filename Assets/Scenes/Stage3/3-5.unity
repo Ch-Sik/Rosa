@@ -21504,7 +21504,7 @@ GameObject:
   m_Component:
   - component: {fileID: 914205122}
   m_Layer: 0
-  m_Name: Gimmic1
+  m_Name: MovePlatforms 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21518,7 +21518,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 914205121}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -21535,7 +21535,7 @@ Transform:
   - {fileID: 1907086425}
   - {fileID: 235013132}
   - {fileID: 1181120487}
-  m_Father: {fileID: 981965759}
+  m_Father: {fileID: 1892282787}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &918156951
 Mesh:
@@ -22879,7 +22879,7 @@ GameObject:
   m_Component:
   - component: {fileID: 981965759}
   m_Layer: 0
-  m_Name: MovedPlatforms
+  m_Name: MovePlatforms 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22906,7 +22906,6 @@ Transform:
   - {fileID: 452759157}
   - {fileID: 556825943}
   - {fileID: 1470220599}
-  - {fileID: 914205122}
   m_Father: {fileID: 1892282787}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &985667785
@@ -88790,7 +88789,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 6
-      m_TileSpriteIndex: 6
+      m_TileSpriteIndex: 9
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -89269,14 +89268,14 @@ Tilemap:
     m_Data: {fileID: -1633599710, guid: c9f07d2f1fa9db34aa5dd6cd5e3d4efe, type: 3}
   - m_RefCount: 3
     m_Data: {fileID: -98893175, guid: 5baf4966a2c3625488fdfac0b9112852, type: 3}
-  - m_RefCount: 1
-    m_Data: {fileID: -1387265254, guid: 5baf4966a2c3625488fdfac0b9112852, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: 1141243180, guid: 5baf4966a2c3625488fdfac0b9112852, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: -1387265254, guid: 5baf4966a2c3625488fdfac0b9112852, type: 3}
   - m_RefCount: 10
     m_Data: {fileID: -928609797, guid: c9f07d2f1fa9db34aa5dd6cd5e3d4efe, type: 3}
   - m_RefCount: 2
@@ -93754,6 +93753,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 981965759}
+  - {fileID: 914205122}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1893095754

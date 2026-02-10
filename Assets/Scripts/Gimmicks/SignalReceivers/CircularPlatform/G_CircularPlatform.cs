@@ -77,7 +77,9 @@ public class G_CircularPlatform : GimmickSignalReceiver
         if (tween != null)
             tween.Kill();
 
-        tween = movePlatform.DOPath(GetNearWaypoint(isInverted).ToArray(), time, PathType.Linear)
+        tween = movePlatform
+             .DOPath(GetNearWaypoint(isInverted).ToArray(), time, PathType.Linear)
+//             .DOPath(originWaypoints.ToArray(), time, PathType.Linear)
                             .SetOptions(true)                                       //닫힌 경계로 설정
                             .SetLoops(-1)                                           //무한한 반복 설정
                             .SetInverted(isInverted)                                //역방향 설정
