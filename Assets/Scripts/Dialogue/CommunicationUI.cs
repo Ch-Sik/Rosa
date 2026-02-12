@@ -27,6 +27,8 @@ public class CommunicationUI : MonoBehaviour
     Sequence show;
     Sequence talk;
 
+    private string key_jump, key_superJump, key_dash;
+
     private void Start()
     {
         //시작과 동시에 tweenTime 초기화
@@ -35,7 +37,7 @@ public class CommunicationUI : MonoBehaviour
     }
 
     //시작 애니메이션
-    public float StartAnimation()
+    public float Initialize()
     {
         ResetAll();
         if (end != null)
@@ -55,6 +57,12 @@ public class CommunicationUI : MonoBehaviour
         .Join(DialoguePanel.DOFade(1, tweenTime))
         .Join(charName.DOFade(1, tweenTime))
         .Join(Dialogue.DOFade(1, tweenTime));
+        
+                
+        // 대화 창에서 새로 얻은 능력의 입력키 보여주기 위해 텍스트 변환할 정보 미리 가져오기
+        key_jump = InputRebind.Instance.GetInputControl("Jump");
+        key_superJump = InputRebind.Instance.GetInputControl("SuperJump");
+        key_dash = InputRebind.Instance.GetInputControl("Dash");
 
         return tweenTime;
     }
@@ -183,6 +191,11 @@ public class CommunicationUI : MonoBehaviour
         // 24.12.22) 없다면 없는대로 진행하도록 수정
         if (index == -1)
             hasPortrait = false;
+        
+        // 26.02.12) 텍스트 대치 추가
+        text = text.Replace("KEY_DASH", key_dash);
+        text = text.Replace("KEY_JUMP", key_jump);
+        text = text.Replace("KEY_SUPERJUMP", key_superJump);
 
         TargetImage targetImage = null;
         if(hasPortrait)
@@ -246,21 +259,24 @@ public class TargetImage
 
     public void SetImage(CommunicationTarget target, Emotion emotion = Emotion.Normal)
     {
-        Sprite sprite;
-        try
-        {
-            sprite = CommunicationManager.Instance.characters[target]?.GetEmotionImage(emotion);
-        }
-        catch(Exception e)
-        {
-            Debug.LogError($"캐릭터 스프라이트가 설정되어있지 않음, target: {target}, emotion: {emotion}");
-            return;
-        }
-
         this.target = target;
-        image.sprite = sprite;
-        // 250401 추가: 1920*1080 캔버스 상에서 이미지 원본 크기를 사용하도록 설정
-        image.SetNativeSize();
+
+        if (target != CommunicationTarget.None)
+        {
+            Sprite sprite;
+            try
+            {
+                sprite = CommunicationManager.Instance.characters[target]?.GetEmotionImage(emotion);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"캐릭터 스프라이트가 설정되어있지 않음, target: {target}, emotion: {emotion}");
+                return;
+            }
+            image.sprite = sprite;
+            // 250401 추가: 1920*1080 캔버스 상에서 이미지 원본 크기를 사용하도록 설정
+            image.SetNativeSize();
+        }
     }
 
     public void Show(CommunicationTarget target)

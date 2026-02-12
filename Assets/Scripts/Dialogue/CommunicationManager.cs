@@ -217,7 +217,7 @@ public class CommunicationManager : MonoBehaviour
 
         //기본 UI의 제거
         //커뮤니케이션 UI의 생성
-        float time = UI.StartAnimation();
+        float time = UI.Initialize();
 
         // NPC가 자동으로 플레이어 바라보는 기능 비활성화
         NpcLookatPlayer.EnableGlobally = false;

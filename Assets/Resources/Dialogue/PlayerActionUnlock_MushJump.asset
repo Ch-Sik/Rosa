@@ -37,10 +37,77 @@ MonoBehaviour:
     key: MushJump
     flagValue: 0
     room: {fileID: 0}
-  - type: 4
-    target: 0
+  - type: 1
+    target: 1
     emotion: 0
-    text: "\uBE70\uBE60\uBC14\uBC24!"
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 3
+    target: 1
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 5
+    target: 1
+    emotion: 0
+    text: "\uC774\uC058\uAC8C \uC0DD\uAE34 \uBC84\uC12F\uC774\uB124"
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 3
+    target: 1
+    emotion: 1
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 5
+    target: 1
+    emotion: 0
+    text: "\uC6B0\uC640 \uB760\uC6A9\uB760\uC6A9\uAC70\uB824! \uC6C0\uC9C1\uC774\uB294
+      \uAC8C \uADC0\uC5FD\uB124."
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 3
+    target: 1
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 5
+    target: 1
+    emotion: 0
+    text: "\uADFC\uB370 \uBC84\uC12F\uC774 \uC2DD\uBB3C\uC774\uC5C8\uB358\uAC00?"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -51,7 +118,8 @@ MonoBehaviour:
   - type: 4
     target: 0
     emotion: 0
-    text: "\uBC84\uC12F\uC810\uD504\uB300\uB97C \uC2B5\uB4DD\uD588\uB2E4!"
+    text: "\uBC84\uC12F\uC810\uD504\uB300\uB97C \uC2B5\uB4DD\uD588\uB2E4!\n[KEY_SUPERJUMP]\uD0A4\uB97C
+      \uB20C\uB7EC \uB192\uC774\uB192\uC774 \uC810\uD504\uD560 \uC218 \uC788\uB2E4!"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -62,9 +130,7 @@ MonoBehaviour:
   - type: 4
     target: 0
     emotion: 0
-    text: "[x]\uD0A4\uB97C \uB20C\uB7EC \uBC84\uC12F\uC810\uD504\uB300\uB97C \uC0AC\uC6A9
-      \uAC00\uB2A5. \uBC84\uC12F\uC740 \uB3D9\uC2DC\uC5D0 1\uAC1C\uB9CC \uC720\uC9C0\uD560
-      \uC218 \uC788\uB2E4."
+    text: "\uCC38\uACE0\uB85C \uBC84\uC12F\uC740 \uC2DD\uBB3C\uC774 \uC544\uB2C8\uB2E4."
     location: 0
     position: {x: 0, y: 0}
     delay: 0

@@ -37,10 +37,44 @@ MonoBehaviour:
     key: Dash
     flagValue: 0
     room: {fileID: 0}
-  - type: 4
+  - type: 1
+    target: 1
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 3
+    target: 1
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 5
     target: 0
     emotion: 0
-    text: "\uBE70\uBE60\uBC14\uBC24!"
+    text: "\uC5B4 \uC774\uAC74 \uBFDC\uBFDC\uC624\uC774\uC796\uC544?"
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 5
+    target: 0
+    emotion: 0
+    text: "\uC774\uAC8C \uC788\uC73C\uBA74 \uC5B8\uC81C\uB4E0\uC9C0 \uCD94\uC9C4\uB825\uC744
+      \uC5BB\uC744 \uC218 \uC788\uC5B4!"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -51,18 +85,8 @@ MonoBehaviour:
   - type: 4
     target: 0
     emotion: 0
-    text: "\uB300\uC2DC\uB97C \uC2B5\uB4DD\uD588\uB2E4!"
-    location: 0
-    position: {x: 0, y: 0}
-    delay: 0
-    sfx: {fileID: 0}
-    key: 
-    flagValue: 0
-    room: {fileID: 0}
-  - type: 4
-    target: 0
-    emotion: 0
-    text: "[z]\uD0A4\uB97C \uB20C\uB7EC \uB300\uC2DC \uC0AC\uC6A9 \uAC00\uB2A5"
+    text: "\uB300\uC2DC\uB97C \uC2B5\uB4DD\uD588\uB2E4!\n[KEY_DASH]\uD0A4\uB97C \uB20C\uB7EC
+      \uC55E\uC73C\uB85C \uD280\uC5B4\uB098\uAC08 \uC218 \uC788\uB2E4!"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
