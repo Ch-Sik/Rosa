@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 4715240008415291046}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 17, y: -1, z: -0.29663122}
+  m_LocalPosition: {x: 17, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -51,6 +51,8 @@ MonoBehaviour:
   showGizmos: 0
   canInteract: 1
   autoInteract: 1
+  allowRepeatInteract: 1
+  coolDown: 0
   function:
     m_PersistentCalls:
       m_Calls:
@@ -110,6 +112,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7ef9d21d4530c214fb2c925862dd4e91, type: 3}
   spriteRenderer: {fileID: 6914485182074223976}
   spriteObject: {fileID: 8131466654967182720}
+  particle: {fileID: 0}
 --- !u!58 &6469520355662432656
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -217,7 +220,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 98
   m_Sprite: {fileID: 21300000, guid: 1146732c518c17343adfb4190074659b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
