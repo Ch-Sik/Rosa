@@ -20,7 +20,7 @@ public class G_Door : GimmickSignalReceiver
     [SerializeField] private Transform doorSprite;
     [SerializeField] private float openTime;
     [SerializeField] private float openDelay = 1.5f;                                      //Procam2dCinem은 기본 1초의 Easing 타임을 ㅏㄱ짐.
-    
+    [SerializeField] private SFXPlayer sfxPlayer;
 
     private void Start()
     {
@@ -45,6 +45,10 @@ public class G_Door : GimmickSignalReceiver
     {
         Sequence sq = DOTween.Sequence()
             .AppendInterval(openDelay)
+            .AppendCallback(() =>
+            {
+                sfxPlayer.PlaySfx();
+            })
             .Append(doorSprite.DOMoveY(1.5f, openTime * 0.6f).SetRelative(true))
             .AppendCallback(() =>
             {

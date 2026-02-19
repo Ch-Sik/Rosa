@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
@@ -50,6 +51,9 @@ public class MovePlatform : MonoBehaviour
     public List<cinematicsSetting> cinematicsSettings = new List<cinematicsSetting>();
 
     private Sequence _seq;
+
+    public Action OnBreachStart;
+    public Action OnBreachEnd;
     
     bool ShowCinematicOption()
     {
@@ -322,6 +326,7 @@ public class MovePlatform : MonoBehaviour
             () =>
             {
                 _seq = DOTween.Sequence()
+                .AppendCallback(() => {OnBreachStart?.Invoke();} )
                 .Append(
                     rigidbody.DOMoveY(transform.position.y + breachHeight, breachUpTime)
                         .SetEase(Ease.OutCubic))
@@ -331,6 +336,7 @@ public class MovePlatform : MonoBehaviour
                     rigidbody.DOMoveY(originHeight, breachDownTime)
                         .SetEase(Ease.InQuad))
                 .Insert(breachUpTime, transform.DORotate(new Vector3(0, 0, 0), 0.2f))
+                .AppendCallback(() => {OnBreachEnd?.Invoke();} )
                 .AppendInterval(timeBetweenBreach)
                 .SetLoops(-1);
             }

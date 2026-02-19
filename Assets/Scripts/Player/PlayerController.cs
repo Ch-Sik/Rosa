@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour
         if(!playerMove.isGrounded && playerMove.IsPassedMinJumpDuration())
             playerMove.StartGliding();
         else
-            playerMove.OnJump(moveVector.y < -float.Epsilon);
+            playerMove.Jump(moveVector.y < -float.Epsilon);
     }
     
     public void OnCancelJump(InputAction.CallbackContext context)

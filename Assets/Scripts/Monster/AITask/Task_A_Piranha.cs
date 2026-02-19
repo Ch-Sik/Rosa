@@ -17,6 +17,9 @@ public class Task_A_Piranha : MonoBehaviour
     [SerializeField] float timeBetweenBreach = 1.0f;
     [SerializeField] float startDelay = 0;       // 딜레이를 줘서 다른 피라냐들과 같이 파도타기 구현 가능
     
+    [SerializeField] private SFXPlayer breachStartSfx;
+    [SerializeField] private SFXPlayer breachEndSfx;
+    
     private float _originHeight;
 
     private Rigidbody2D _rigidbody;
@@ -50,6 +53,7 @@ public class Task_A_Piranha : MonoBehaviour
     private void OnBreachStart()
     {
         piranhaVisual.SetActive(true);
+        breachStartSfx?.PlaySfx();
         foreach(var p in waterSplashParticles)
         {
             if(p.isPlaying)
@@ -61,6 +65,7 @@ public class Task_A_Piranha : MonoBehaviour
     private void OnBreachEnd()
     {
         piranhaVisual.SetActive(false);
+        breachEndSfx?.PlaySfx();
         foreach(var p in waterSplashParticles)
         {
             if(p.isPlaying)

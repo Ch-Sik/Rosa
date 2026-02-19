@@ -8,6 +8,7 @@ public class G_Draft : GimmickSignalReceiver
     public float risingPower = 3.0f;
     public GameObject[] particles;
     public Animator[] fanAnimators;
+    [SerializeField] private SFXPlayer sfxPlayer;
 
     private void Start()
     {
@@ -40,6 +41,7 @@ public class G_Draft : GimmickSignalReceiver
         isActivated = true;
         ToggleParticles(true);
         ToggleSpriteAnimation(true);
+        ToggleSFX(true);
     }
 
     public override void OffAct()
@@ -47,6 +49,7 @@ public class G_Draft : GimmickSignalReceiver
         isActivated = false;
         ToggleParticles(false);
         ToggleSpriteAnimation(false);
+        ToggleSFX(false);
     }
 
     private void ToggleParticles(bool value)
@@ -71,11 +74,20 @@ public class G_Draft : GimmickSignalReceiver
         }
     }
 
+    private void ToggleSFX(bool value)
+    {
+        if (value)
+            sfxPlayer.PlaySfx();
+        else
+            sfxPlayer.StopSfx();
+    }
+
     public override void ImmediateOnAct()
     {
         isActivated = true;
         ToggleParticles(true);
         ToggleSpriteAnimation(true);
+        ToggleSFX(true);
     }
 
     public override void ImmediateOffAct()
@@ -83,5 +95,6 @@ public class G_Draft : GimmickSignalReceiver
         isActivated = false;
         ToggleParticles(false);
         ToggleSpriteAnimation(false);
+        ToggleSFX(false);
     }
 }

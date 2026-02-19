@@ -14,6 +14,7 @@ public class LastBossCrossBladeCluster : MonoBehaviour
     [SerializeField] private ParticleSystem particleUp;
     [SerializeField] private ParticleSystem particleLeft;
     [SerializeField] private ParticleSystem particleDown;
+    [SerializeField] private SFXPlayer launchSfx;
 
     private void Start()
     {
@@ -40,6 +41,8 @@ public class LastBossCrossBladeCluster : MonoBehaviour
 
         // 클러스터 본체는 소멸
         Disappear(clusterLifetime);
+        
+        launchSfx?.PlaySfx();
     }
 
     private void SetProjParticleEmission(bool value)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -259,6 +260,12 @@ public class PlayerMovement : MonoBehaviour
 
     [BoxGroup("Debug/Vertical/General")]
     [ReadOnly, SerializeField] public LR facingDirection;                 // 플레이어 바라보는 방향
+
+    public Action OnJump;
+    public Action OnDash;
+    public Action OnMushJump;
+    public Action OnGlideStart;
+    public Action OnGlideEnd;
     
     // 타이머 (non-serializable)
     private Timer jumpTimer;                 // 최소 점프 시간을 위한 타이머
@@ -435,7 +442,8 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region 점프 관련
-    internal void OnJump(bool pressedDown)
+    
+    internal void Jump(bool pressedDown)
     {
         //큐브를 옮기는 중이라면, 큐브를 놓아버림
         if (isGrabCube)
@@ -467,6 +475,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, jumpPower);
         jumpTimer = Timer.StartTimer();
         playerRef.animation.SetJumpTrigger();
+        OnJump?.Invoke();
     }
 
     /// <summary>
@@ -833,6 +842,7 @@ public class PlayerMovement : MonoBehaviour
         playerRef.animation.SetJumpTrigger();
         // 25.05.23) 강조선이펙트 추가
         mushJumpVfx.PlayVFX();
+        OnMushJump?.Invoke();
     }
 
     [Button, FoldoutGroup("버섯 점프 관련")]
@@ -859,12 +869,14 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, 0);
         isGliding = true;
         rb.gravityScale = glidingGravityScale;
+        OnGlideStart?.Invoke();
     }
 
     internal void CancelGliding()
     {
         isGliding = false;
         rb.gravityScale = originGravityScale;
+        OnGlideEnd?.Invoke();
     }
 
     public void Rising(float risingPower)
@@ -916,6 +928,7 @@ public class PlayerMovement : MonoBehaviour
 
             // 25.05.23) 강조선이펙트 추가
             dashVfx.PlayVFX();
+            OnDash?.Invoke();
         }).AppendInterval(dashDuration)
         .AppendCallback(() =>
         {

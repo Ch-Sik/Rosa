@@ -14,6 +14,7 @@ public class MonsterState : MonoBehaviour
     [SerializeField] private int currentHP;
     [SerializeField] private Blackboard blackboard;
     [SerializeField] private VfxPoolEntity vfxOnDisappear;
+    [SerializeField] private SFXPlayer dieSfx;
 
     // 몬스터 사망했을 때 이벤트 발생시키기. 몬스터 리스폰 등에서 사용
     public delegate void MonsterEvent(GameObject go);
@@ -62,6 +63,7 @@ public class MonsterState : MonoBehaviour
             float frameTime;
 
             pandaBT.enabled = false;
+            dieSfx?.PlaySfx();
             frameTime = Time.deltaTime;
             yield return new WaitForSeconds(3.0f - frameTime);
 

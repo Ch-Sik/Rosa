@@ -62,6 +62,8 @@ public class ProjectileBase : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     [FormerlySerializedAs("hitEffect")] [SerializeField]
     private VfxPoolEntity disappearEffect;
+    [SerializeField] 
+    private VfxPoolEntity reflectVfx;
 
     public Action OnDisappear;
 
@@ -181,6 +183,8 @@ public class ProjectileBase : MonoBehaviour
                     Vector2 normal = hit.normal;
                     Vector2 reflected = Vector2.Reflect(rigidbody.velocity, normal);
                     rigidbody.velocity = reflected;
+                    if(reflectVfx)
+                        VfxManager.Instance.SpawnVfxObject(reflectVfx, transform.position);
                 }
                 break;
             default:

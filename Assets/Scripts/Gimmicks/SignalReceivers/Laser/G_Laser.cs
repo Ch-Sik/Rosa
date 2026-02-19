@@ -18,6 +18,8 @@ public class G_Laser : GimmickSignalReceiver
     [SerializeField] private Animator topAnim;
     [SerializeField] private Animator midAnim;
     [SerializeField] private Animator botAnim;
+    [SerializeField] private SFXPlayer sfxPlayerActivate;
+    [SerializeField] private SFXPlayer sfxPlayerLoop;
     
     [Title("타이밍 & 길이")]
     public float startDelay = 0.0f;
@@ -167,6 +169,8 @@ public class G_Laser : GimmickSignalReceiver
             // 레이저 활성화
             lasing = true;
             SetAnimatorsState(2);
+            sfxPlayerActivate?.PlaySfx();
+            sfxPlayerLoop?.PlaySfx();
             
             await UniTask.WaitForSeconds(onTime, cancellationToken: ctk);
             
@@ -179,6 +183,7 @@ public class G_Laser : GimmickSignalReceiver
             
             // 레이저 발사 종료 
             SetAnimatorsState(1);
+            sfxPlayerLoop?.StopSfx();
             DOTween.To(() => curLength,
                 (x) => { curLength = x; }, inactiveLength, 0.1f);
             foreach(var p in onReadyParticles)

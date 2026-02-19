@@ -17,6 +17,8 @@ public class Task_LastBossHitReaction : Task_A_Base
     [SerializeField] float enemyKnockbackPow = 5f;
     [SerializeField] private bool knockbackPlayerOnHitt = true;
 
+    [SerializeField] private SFXPlayer hitReactionSfx;
+
     private void Start()
     {
         RelocatePlatformsImmediately();
@@ -74,6 +76,7 @@ public class Task_LastBossHitReaction : Task_A_Base
         // 적(플레이어)를 밀쳐내기
         if(knockbackPlayerOnHitt)
             KnockBackEnemy();
+        hitReactionSfx?.PlaySfx();
     }
 
     protected override void OnRecoveryBegin()

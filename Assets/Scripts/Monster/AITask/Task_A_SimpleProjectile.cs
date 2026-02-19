@@ -36,6 +36,9 @@ public class Task_A_SimpleProjectile : Task_A_Base
     [Tooltip("고정 방향일 때, 발사 방향")]
     private Transform fixedTarget;
 
+    [Header("사운드")] 
+    [SerializeField] private SFXPlayer launchSfx;
+
     protected Vector2 enemyPosition;
     protected Vector2 attackDir;
 
@@ -126,6 +129,8 @@ public class Task_A_SimpleProjectile : Task_A_Base
         // 공격 시전
         GameObject projectile = Instantiate(GetProjectilePrefab(), muzzle.position, Quaternion.identity);
         projectile.GetComponent<ProjectileBase>().InitProjectile(attackDir * projectileSpeed);
+        
+        launchSfx?.PlaySfx();
     }
 
     private GameObject GetProjectilePrefab()

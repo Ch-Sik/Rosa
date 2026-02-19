@@ -37,6 +37,9 @@ public class MonsterLaser : MonoBehaviour
     [Title("공격 아이템 스폰 관련")]
     [SerializeField]
     private GameObject attackItemPrefab;
+    
+    [Title("SFX")]
+    [SerializeField] private SFXPlayer launchSfx;
 
     [ReadOnly] public bool isItemSpawner = false;
     private bool collideWithTerrain;
@@ -94,6 +97,8 @@ public class MonsterLaser : MonoBehaviour
         // 빔 본체 활성화
         beamMid.SetActive(true);
         beamEnd?.SetActive(true);
+        // 효과음 재생
+        launchSfx?.PlaySfx();
 
         DOTween.Sequence()
             .Append(beamMid.transform.DOScale(

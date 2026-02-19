@@ -6,6 +6,7 @@ using Panda;
 public class Task_A_Boss3RetrieveFeather : Task_A_Base
 {
     public Transform retreivePos;
+    [SerializeField] private SFXPlayer retrieveSfx;
 
     private Task_A_Boss3FeatherAttack[] featherAttacks;
 
@@ -51,5 +52,6 @@ public class Task_A_Boss3RetrieveFeather : Task_A_Base
             instance.RetrieveProjectile(retreivePos.position);
         }
         featherInstances.Clear();
+        retrieveSfx?.PlaySfx();
     }
 }

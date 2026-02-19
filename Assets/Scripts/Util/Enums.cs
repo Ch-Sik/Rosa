@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public enum LR { LEFT, RIGHT }
-public enum AudioType { BGM, SFX }
+public enum AudioType { BGM, SFX, UI }
 public enum UiState
 {
     IN_GAME,    // 별도의 메뉴가 열리지 않은 경우

@@ -35,6 +35,8 @@ public class Task_A_Boss4SpecialAttack : Task_A_Base
     [Tooltip("본체의 충돌판정")]
     [SerializeField] new Collider2D collider;
 
+    [SerializeField] private SFXPlayer whooshSfx;
+
     new Rigidbody2D rigidbody;
     float _lowerLaneHeight;          // 아래쪽 라인 높이
     float _upperLaneHeight;          // 위쪽 라인 높이
@@ -108,6 +110,8 @@ public class Task_A_Boss4SpecialAttack : Task_A_Base
                 pos.y = isUpper ? _upperLaneHeight : _lowerLaneHeight;
                 transform.position = pos;
                 LookAt2D((bossroomLeftend.position + bossroomRightend.position) / 2);       // 보스방 가운데쪽 바라보기
+                
+                whooshSfx?.PlaySfx();
             });
             // 바라보고 있는 방향으로, 보스방 끝까지 돌진
             seq.Append(rigidbody.DOMoveX(

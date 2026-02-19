@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -15,6 +16,8 @@ public class PlayerDamageReceiver : MonoBehaviour
     // 넉백 관련
     [Tooltip("넉백 계수")]
     [SerializeField] private float defaultKnockbackStrength = 1f;
+
+    public Action OnDamaged;
 
     public void Start()
     {
@@ -70,6 +73,7 @@ public class PlayerDamageReceiver : MonoBehaviour
         _playerRef.animation.BlinkEffect().Forget();
         _playerRef.animation.SetTrigger("Hit");
         CameraShake.ShakeCamera(CameraShakePreset.PlayerHit);
+        OnDamaged?.Invoke();
         return _playerRef.state.TakeDamage(damage);
     }
 

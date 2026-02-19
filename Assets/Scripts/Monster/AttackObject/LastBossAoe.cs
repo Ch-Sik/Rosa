@@ -10,6 +10,7 @@ public class LastBossAoe : MonoBehaviour
     [SerializeField] private Animator anim;
     [SerializeField] private float activeDuration;
     [SerializeField] private ParticleSystem[] particles;
+    [SerializeField] private SFXPlayer activeSfx;
     
     private int _stateNameHash;
     private Sequence _colorTween = null;
@@ -34,6 +35,7 @@ public class LastBossAoe : MonoBehaviour
     {
         col.enabled = true;
         anim.SetInteger(_stateNameHash, 1);
+        activeSfx?.PlaySfx();
         foreach(var p in particles)
             p.Play();
         

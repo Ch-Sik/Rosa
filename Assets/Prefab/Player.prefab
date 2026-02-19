@@ -953,9 +953,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1561906219881309557}
-  footstep: {fileID: 8300000, guid: 5a0fbb62c7fcf324bb7e60ebf4659f5d, type: 3}
-  climb: {fileID: 8300000, guid: 722c2596689fb53429b89a6e44d15725, type: 3}
-  whoosh: {fileID: 0}
+  audioResource: {fileID: 0}
+  playOnAwake: 0
+  loop: 0
+  footstep: {fileID: 11400000, guid: eebb98a1f43a29541835578777fe834b, type: 2}
+  climb: {fileID: 11400000, guid: 421acd841544ca14fb037fc35445f2c1, type: 2}
+  jump: {fileID: 11400000, guid: 9fa2014bb39f0d9498b34f9edc060c72, type: 2}
+  dash: {fileID: 11400000, guid: d70fe383c337c4140a26718d2d5ddee1, type: 2}
+  mushJump: {fileID: 11400000, guid: 68000f70353ab7d4cae51edaf15a1db4, type: 2}
+  glideOn: {fileID: 11400000, guid: f1cbad5af10c80741a320d956b05b493, type: 2}
+  glideLoop: {fileID: 0}
+  damaged: {fileID: 11400000, guid: 25033af75364f5e4ea52eafdc76167e8, type: 2}
 --- !u!114 &1562384959795432479
 MonoBehaviour:
   m_ObjectHideFlags: 0

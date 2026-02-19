@@ -39,6 +39,9 @@ public class Task_GA_Tackle : Task_A_Base
     [Title("절벽 만났을 때 관련")] [SerializeField, Tooltip("돌진 중 절벽 만났을 때 멈춤")]
     protected bool cliffStopEnabled = false;
 
+    [Title("사운드 관련")] [SerializeField] 
+    protected SFXPlayer breakSfx;
+
     protected Timer stunTimer = null;
     protected Vector2 tackleDir;
     protected int defaultCollideDamage; // 몸체 충돌 판정이 기본적으로 가지고 있던 데미지
@@ -162,6 +165,8 @@ public class Task_GA_Tackle : Task_A_Base
 
         // 브레이크
         rigidbody.drag = recoveryDrag;
+        
+        breakSfx?.PlaySfx();
     }
 
     protected override void Succeed()

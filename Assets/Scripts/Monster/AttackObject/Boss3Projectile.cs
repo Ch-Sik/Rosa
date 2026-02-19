@@ -8,6 +8,7 @@ public class Boss3Projectile : ProjectileBase
     // 벽에 박혀있는지 여부
     [SerializeField] private bool isStuck = false;
     [SerializeField] private VfxPoolEntity vfxOnHit;
+    [SerializeField] private SFXPlayer sfxOnHitFloor;
 
     // 벽에 닿아도 사라지지 않고 남아있도록 함수 오버라이드
     protected override void OnTriggerEnter2D(Collider2D other)
@@ -27,6 +28,8 @@ public class Boss3Projectile : ProjectileBase
             // 26.01.27) 깃털은 회수하기 전까지 disappear하지 않으므로 여기서 이펙트 소환 코드 추가
             if(vfxOnHit != null)
                 VfxManager.Instance.SpawnVfxObject(vfxOnHit, transform.position);
+            
+            sfxOnHitFloor?.PlaySfx();
         }
 
         if(canDestroyMushroom && (other.tag == "Mushroom"))

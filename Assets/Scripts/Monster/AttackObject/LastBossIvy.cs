@@ -13,6 +13,8 @@ public class LastBossIvy : MonoBehaviour
     [Title("사인파 형태 조정")]
     [SerializeField] float frequency;
     [SerializeField] float amplitude;
+    [Title("사운드")]
+    [SerializeField] private SFXPlayer disappearSfx;
 
     List<LastBossIvySegment> segments = new List<LastBossIvySegment>();
 
@@ -66,6 +68,8 @@ public class LastBossIvy : MonoBehaviour
 
     public void Disappear()
     {
+        disappearSfx?.PlaySfx();
+        
         // 덩굴 자라는 도중이었다면 해당 코루틴 중단
         StopAllCoroutines();
         foreach(var seg in segments)

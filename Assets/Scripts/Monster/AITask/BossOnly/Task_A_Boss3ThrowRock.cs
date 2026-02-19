@@ -10,6 +10,7 @@ public class Task_A_Boss3ThrowRock : Task_A_Base
     [SerializeField] private Transform receiver;    // 바위가 버섯에 튕겨났을 때 회수할 위치
     [SerializeField] private float throwDelay;
     [SerializeField] private float throwSpeed = 3f;
+    [SerializeField] private SFXPlayer launchSfx;
 
     private GameObject rockInstance;
     private bool throwed;
@@ -37,6 +38,7 @@ public class Task_A_Boss3ThrowRock : Task_A_Base
             ProjectileBase projectileComponent = rockInstance.GetComponent<ProjectileBase>();
             projectileComponent.InitProjectile(GetCurrentDir().toVector2() * throwSpeed);
             throwed = true;
+            launchSfx?.PlaySfx();
         }
     }
 }

@@ -8,6 +8,7 @@ public class G_Lever : GimmickSignalSender
 {
     public bool isOnce = true;
     [SerializeField] Transform leverHandle;
+    [SerializeField] private SFXPlayer sfxPlayer;
 
     /// <summary> 레버가 작동하는 도중인지 여부 </summary>
     public bool isInteracting = false;      
@@ -97,6 +98,7 @@ public class G_Lever : GimmickSignalSender
 
     private IEnumerator ActivateLever()
     {
+        sfxPlayer.PlaySfx();
         DOTween.Sequence()
             .AppendCallback(() => isInteracting = true)
             .Append(leverHandle.DORotate(new Vector3(0, 0, -90), 0.4f, RotateMode.LocalAxisAdd).SetRelative(true))

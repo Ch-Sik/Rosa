@@ -18,6 +18,8 @@ public class Task_A_Boss4OrbAttack : Task_A_Base
     [Tooltip("발사할 투사체 3개")]
     GameObject[] Orbs;
 
+    [SerializeField] private SFXPlayer launchSfx;
+
     [Task]
     void OrbAttack()
     {
@@ -57,6 +59,7 @@ public class Task_A_Boss4OrbAttack : Task_A_Base
             Vector2 launchDir = (enemyPosition - (Vector2)orb.transform.position).normalized;
             orb.GetComponent<ProjectileBase>().InitProjectile(launchDir * projectileSpeed);
         }
+        launchSfx?.PlaySfx();
     }
 
     protected override void OnRecoveryBegin()

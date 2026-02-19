@@ -18,6 +18,7 @@ public class MonsterAOE : MonoBehaviour
     [SerializeField] private GameObject startupSprite;
     [SerializeField] private GameObject activatedSprite;
     [SerializeField] private Animator animator;
+    [SerializeField] private SFXPlayer activatedSfx;
 
 
     protected virtual void Start()
@@ -44,6 +45,7 @@ public class MonsterAOE : MonoBehaviour
     {
         // Debug.Log("범위 공격 수행");
         collider.enabled = true;
+        activatedSfx?.PlaySfx();
 
         if (animator != null)
         {

@@ -30,6 +30,7 @@ public class Task_GA_Leap : Task_A_Base
     [SerializeField] private Transform attackItemSpawnPos;
     [SerializeField] private float attackItemPopVertical = 150f;
     [SerializeField] private float attackItemPopHorizontal = 100f;
+    [SerializeField] private SFXPlayer jumpSfx;
 
 
     private void Start()
@@ -85,6 +86,7 @@ public class Task_GA_Leap : Task_A_Base
 
         // 공격 수행
         Leap();
+        jumpSfx?.PlaySfx();
     }
 
     protected void Leap()
