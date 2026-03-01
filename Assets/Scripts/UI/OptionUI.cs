@@ -62,7 +62,7 @@ public class OptionUI : MonoBehaviour
     public void ResetAndClose()
     {
         currentOption = savedOption.MakeCopy();
-        SetByCurrentOption();
+        ApplyCurrentOption();
         Close();
         OnOptionUiClose?.Invoke(false);
     }
@@ -70,16 +70,19 @@ public class OptionUI : MonoBehaviour
     public void ToDefaultOption()
     {
         currentOption = defaultOption.MakeCopy();
-        SetByCurrentOption();
+        ApplyCurrentOption();
+
     }
 
-    public void SetByCurrentOption()
+    public void ApplyCurrentOption()
     {
+        // 옵션창 UI에 옵션 반영
         SetWindow();
         SetResolution();
         SetMasterVolume();
-        SetBGM();
-        SetSFX();
+        SetBgmSlider();
+        SetSfxSlider();
+        // 옵션 반영
         SetScreenEnvironmentByCurrentOption();
         SetSoundEnvironmentByCurrentOption();
     }
@@ -93,7 +96,8 @@ public class OptionUI : MonoBehaviour
 
     public void SetSoundEnvironmentByCurrentOption()
     {
-        
+        AudioManager.Instance.SetSoundVolume(AudioType.BGM, currentOption.bgm);
+        AudioManager.Instance.SetSoundVolume(AudioType.SFX, currentOption.sfx);
     }
 
     #endregion
@@ -118,7 +122,7 @@ public class OptionUI : MonoBehaviour
             savedOption = defaultOption.MakeCopy();
         currentOption = savedOption.MakeCopy();
 
-        SetByCurrentOption();
+        ApplyCurrentOption();
     }
 
     #endregion
@@ -134,9 +138,9 @@ public class OptionUI : MonoBehaviour
 
     public void SetMasterVolume() { MasterVolume.SetValue(currentOption.vol); }
 
-    public void SetBGM() { BGM.SetValue(currentOption.bgm); }
+    public void SetBgmSlider() { BGM.SetValue(currentOption.bgm); }
 
-    public void SetSFX() { SFX.SetValue(currentOption.sfx); }
+    public void SetSfxSlider() { SFX.SetValue(currentOption.sfx); }
 
     #endregion
 
@@ -206,14 +210,21 @@ public class OptionUI : MonoBehaviour
 
     public void OnScrollChanged(ScrollbarUI scro)
     {
-        if (scro == MasterVolume)
-            currentOption.vol = scro.GetValue();
-        else if (scro == BGM)
+        // if (scro == MasterVolume)
+        // {
+        //     currentOption.vol = scro.GetValue();
+        // }
+        if (scro == BGM)
+        {
             currentOption.bgm = scro.GetValue();
+            AudioManager.Instance.SetSoundVolume(AudioType.BGM, currentOption.bgm);
+        }
         else if (scro == SFX)
+        {
             currentOption.sfx = scro.GetValue();
+            AudioManager.Instance.SetSoundVolume(AudioType.SFX, currentOption.sfx);
+        }
 
-        SetSoundEnvironmentByCurrentOption();
     }
     #endregion
 }

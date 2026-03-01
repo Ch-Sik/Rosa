@@ -34,7 +34,7 @@ public class AudioManager : SingletonBehaviour<AudioManager>
     }
 
     [Button("BGM 볼륨 수정 테스트")]
-    private void SetSoundVolume(AudioType audioType, float value)
+    public void SetSoundVolume(AudioType audioType, float value)
     {
         _volumes[(int)audioType] = value;
         if(OnAudioVolumeChanged != null)
