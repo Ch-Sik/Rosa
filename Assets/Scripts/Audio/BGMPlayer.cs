@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 using DG.Tweening;
 
 [RequireComponent(typeof(AudioSource))]
-public class BGMPlayer : MonoBehaviour
+public class BGMPlayer : SingletonBehaviour<BGMPlayer>
 {
     [InfoBox("BGM 재생용 컴포넌트.\nAudioManager의 볼륨에 영향받음.")]
 
@@ -13,11 +13,11 @@ public class BGMPlayer : MonoBehaviour
     [SerializeField] AudioSource audioSourceA;
     [SerializeField] AudioSource audioSourceB;
 
-    [SerializeField] AudioClip startBGMclip;
+    [SerializeField] AudioResource startBGM;
     [SerializeField] bool playAutomatically;
     [SerializeField] float fadeDuration = 0.3f;
 
-    [SerializeField, ReadOnly] AudioClip currentPlayingClip;
+    [SerializeField, ReadOnly] AudioResource currentPlayingClip;
     public AudioClip CurrentPlayingClip { get { return currentPlayingClip; } }
 
     AudioManager audioManager;
@@ -25,8 +25,9 @@ public class BGMPlayer : MonoBehaviour
     bool readyToFade = true;
     float bgmVolume = 1;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         audioManager = AudioManager.Instance;
         audioManager.OnAudioVolumeChanged += OnVolumeChanged;
     }
@@ -39,32 +40,37 @@ public class BGMPlayer : MonoBehaviour
 
         if(playAutomatically)
         {
-            if (startBGMclip != null)
-                PlayBGM(startBGMclip);
+            if (startBGM != null)
+                PlayBGM(startBGM);
             else
                 Debug.LogError("시작 BGM이 설정되어있지 않음");
         }
 
-        MapManager.Instance.OnNextRoomLoaded += PlayRoomBGM;
+        // MapManager.Instance.OnNextRoomLoaded += PlayRoomBGM;
     }
 
     void OnVolumeChanged(AudioType type, float value)
     {
         if (type != AudioType.BGM) return;
         bgmVolume = value;
-        audioSourceA.volume = bgmVolume;
+        SetAudioSourceAVolume();
+    }
+
+    private void SetAudioSourceAVolume()
+    {
+        audioSourceA.volume = bgmVolume * currentPlayingClip.volume;
     }
 
     [Button("브금 전환 테스트")]
-    public void PlayBGM(AudioClip newClip)
+    public void PlayBGM(AudioResource newClip)
     {
         currentPlayingClip = newClip;
         if (audioSourceA.isPlaying)
         {
             if (audioSourceA.clip != newClip)
                 SwitchBGM(newClip);
-            else
-                Debug.LogWarning("이미 재생중인 BGM임!");
+            // else
+            //     Debug.LogWarning("이미 재생중인 BGM임!");
         }
         else
         {
@@ -73,7 +79,7 @@ public class BGMPlayer : MonoBehaviour
         }
     }
 
-    private void SwitchBGM(AudioClip newClip)
+    private void SwitchBGM(AudioResource newClip)
     {
         Debug.Log($"브금 전환: {audioSourceA.clip.name} → {newClip}");
 
@@ -95,16 +101,15 @@ public class BGMPlayer : MonoBehaviour
             .AppendCallback(() =>
             {
                 audioSourceA.Stop();
-                audioSourceB.Play();
+                if(audioSourceB.clip)
+                    audioSourceB.Play();
             })
-            .Append(audioSourceB.DOFade(bgmVolume, fadeDuration))
+            .Append(audioSourceB.DOFade(bgmVolume * currentPlayingClip.volume, fadeDuration))
             .OnComplete(() => {
                 // 다음 페이드 수행가능하다고 표시
                 readyToFade = true;
                 // 두 AudioSource의 참조를 교환
-                AudioSource temp = audioSourceA;
-                audioSourceA = audioSourceB;
-                audioSourceB = temp;
+                (audioSourceA, audioSourceB) = (audioSourceB, audioSourceA);
             });
     }
 
@@ -117,7 +122,7 @@ public class BGMPlayer : MonoBehaviour
             return;
         }
         // 같은 브금이 재생중일 때의 예외 처리는 PlayBGM 내부에서 이루어짐
-        AudioClip roomBGM = MapManager.Instance.CurrentRoom.defaultBGM;
+        var roomBGM = MapManager.Instance.CurrentRoom.defaultBGM;
         if (roomBGM)
             PlayBGM(roomBGM);
     }

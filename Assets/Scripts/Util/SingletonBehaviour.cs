@@ -6,7 +6,7 @@ public abstract class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehavi
 {
     public static T Instance { get; private set; }
 
-    public void Awake()
+    protected virtual void Awake()
     {
         if (Instance)
         {

@@ -6760,6 +6760,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2483334463963587515}
     - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: bgmClip.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: disableWallRenderer
       value: 1
       objectReference: {fileID: 0}
@@ -6771,6 +6775,10 @@ PrefabInstance:
       propertyPath: OutroCommunication_ID
       value: 306
       objectReference: {fileID: 0}
+    - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
+      propertyPath: bgmClip.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 7a1bb945263049e4d90432340f727b6a, type: 2}
     - target: {fileID: 1140408841211284687, guid: 36ab35a19732a664d8f916056d0ba3c7, type: 3}
       propertyPath: requireWallActivation
       value: 1

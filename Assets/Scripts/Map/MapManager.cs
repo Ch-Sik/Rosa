@@ -64,6 +64,12 @@ public class MapManager : MonoBehaviour
     private void Awake()
     {
         LoadAllRooms();
+        if (!BGMPlayer.Instance)
+        {
+            Debug.LogError("[MapManager] Cannot find BGMPlayer instance");
+            return;
+        }
+        OnNextRoomLoaded += BGMPlayer.Instance.PlayRoomBGM;
     }
 
     // 각 방의 정보를 들고 있는 ScriptableObject를 일괄 로드

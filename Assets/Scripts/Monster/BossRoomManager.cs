@@ -12,7 +12,7 @@ public class BossRoomManager : MonoBehaviour
     Blackboard bossBlackboard;
 
     [SerializeField, FoldoutGroup("보스전 BGM 관련")] 
-    AudioClip[] bgmClip;           // 각 페이즈 별 브금 클립
+    AudioResource[] bgmClip;           // 각 페이즈 별 브금 클립
     [SerializeField, FoldoutGroup("보스전 BGM 관련")] 
     float bgmReturnDelay = 3f;     // 보스 사망 후 기본 BGM으로 돌아올 때까지의 딜레이
 
@@ -134,7 +134,7 @@ public class BossRoomManager : MonoBehaviour
         // 브금 재생
         if(bgmPlayer == null)
         {
-            bgmPlayer = Camera.main.gameObject.GetComponentInChildren<BGMPlayer>();
+            bgmPlayer = BGMPlayer.Instance;
         }
         bgmPlayer.PlayBGM(bgmClip[0]);
     }
