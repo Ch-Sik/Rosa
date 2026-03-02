@@ -73398,7 +73398,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '~~
+  m_text: '~
 
 '
   m_isRightToLeft: 0
@@ -83425,10 +83425,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: KeyTutorial attack
       objectReference: {fileID: 0}
+    - target: {fileID: 2109852372998578376, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
+      propertyPath: m_Name
+      value: Key_explain_Attack
+      objectReference: {fileID: 0}
     - target: {fileID: 3382236870440700430, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 747ec892a85bd2b499e74db322fce328, type: 3}
+    - target: {fileID: 6852240493263719403, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
+      propertyPath: inputActionName
+      value: Attack
+      objectReference: {fileID: 0}
     - target: {fileID: 8118559679075160869, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.37
@@ -90564,11 +90572,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9187043069685137025, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 85.21
+      value: 45.937
       objectReference: {fileID: 0}
     - target: {fileID: 9187043069685137025, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.29
+      value: -2.337
       objectReference: {fileID: 0}
     - target: {fileID: 9187043069685137025, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
       propertyPath: m_LocalPosition.z
