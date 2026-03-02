@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class GimmickSignalConnector : MonoBehaviour
 {
-    [SerializeField] bool useSave;
     [SerializeField] string saveKey;
     [Tooltip("SignalConnector에서 시네마틱 사용이 ON이더라도, 각 SignalReceiver에서 시네마틱 사용이 설정되어있어야 함")]
     [SerializeField] bool useCinematic = true;
@@ -19,6 +18,7 @@ public class GimmickSignalConnector : MonoBehaviour
     // 기존 isActive값 보관
     private bool curIsActive = false;
     ProCamera2DCinematics cinematicsComponent;
+    private bool _useSave = true;
 
     public void Awake()
     {
@@ -36,38 +36,28 @@ public class GimmickSignalConnector : MonoBehaviour
         {
             cinematicsComponent = Camera.main?.GetComponent<ProCamera2DCinematics>();
         }
+        
+        if (saveKey == null || saveKey.Length == 0)
+            Debug.LogError($"{gameObject.name}: 세이브에 사용할 플래그 키값 미지정됨");
 
-        if (useSave)
+        // 이 타이밍에 FlagManager.instance가 초기화되어있어야 정상임
+        if (FlagManager.Instance == null)
         {
-            if (saveKey == null || saveKey.Length == 0)
-                Debug.LogError($"{gameObject.name}: 세이브에 사용할 플래그 키값 미지정됨");
-
-            // 이 타이밍에 FlagManager.instance가 초기화되어있어야 정상임
-            if (FlagManager.Instance == null)
-            {
-                Debug.LogError("FlagManager가 초기화되어있지 않음!!!!");
-            }
-            // 플래그 읽어와서 1이라면 sender와 receiver 모두 '작동'시켜줘야 함
-            int flag = FlagManager.Instance.GetFlag(saveKey);
-            if (flag != 0)
-            {
-                foreach (var receiver in gimmicks)
-                    receiver?.ImmediateOnAct();
-                foreach (var sender in signals)
-                    sender?.Init(GimmickSignalSenderState.Activated);
-            }
-            else
-            {
-                foreach (var receiver in gimmicks)
-                    receiver?.ImmediateOffAct();
-                foreach (var sender in signals)
-                    sender?.Init(GimmickSignalSenderState.Inactivated);
-            }
+            Debug.LogError("FlagManager가 초기화되어있지 않음!!!!");
+        }
+        // 플래그 읽어와서 1이라면 sender와 receiver 모두 '작동'시켜줘야 함
+        int flag = FlagManager.Instance.GetFlag(saveKey);
+        if (flag != 0)
+        {
+            foreach (var receiver in gimmicks)
+                receiver?.ImmediateOnAct();
+            foreach (var sender in signals)
+                sender?.Init(GimmickSignalSenderState.Activated);
         }
         else
         {
-            for (int i = 0; i < gimmicks.Count; i++)
-                gimmicks[i]?.ImmediateOffAct();
+            foreach (var receiver in gimmicks)
+                receiver?.ImmediateOffAct();
             foreach (var sender in signals)
                 sender?.Init(GimmickSignalSenderState.Inactivated);
         }

@@ -540,7 +540,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2b8cedd89ae7b40a8bf93fd065cf15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useSave: 0
   saveKey: 203door1
   useCinematic: 1
   gimmicks:
@@ -23357,7 +23356,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1051647789}
   audioResource: {fileID: 11400000, guid: 23b9555f71ac5e447bc57ac422dffc08, type: 2}
-  playOnAwake: 0
+  playOnEnable: 0
+  loop: 0
+  loopStartDelay: 0
 --- !u!82 &1051647789
 AudioSource:
   m_ObjectHideFlags: 0

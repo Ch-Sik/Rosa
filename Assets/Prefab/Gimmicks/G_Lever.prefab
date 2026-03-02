@@ -334,7 +334,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 3117374476077415143}
   audioResource: {fileID: 11400000, guid: 7c01c6b87120e1849baba34a75a47c15, type: 2}
-  playOnAwake: 0
+  playOnEnable: 0
+  loop: 0
+  loopStartDelay: 0
 --- !u!1001 &6702635070984787791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -346,6 +348,10 @@ PrefabInstance:
     - target: {fileID: 2163229420971205857, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2503579700913220947, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
+      propertyPath: allowRepeatInteract
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2503579700913220947, guid: 6ed50e421bbaaf74ea9715d5738570d0, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.size

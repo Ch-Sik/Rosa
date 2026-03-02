@@ -73,9 +73,6 @@ public class G_Lever : GimmickSignalSender
         // 현재 활성화 상태인 경우 -> 비활성화함
         else
         {
-            // 1회용인 레버의 경우 비활성화 자체가 불가능
-            if (isOnce)
-                return;
             SetState(GimmickSignalSenderState.Inactivated);
             ActivateSignal(false);
         }
