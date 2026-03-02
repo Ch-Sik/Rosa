@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public class FieldItem : MonoBehaviour
 {
+    [SerializeField] private Collider2D col;
     [SerializeField] private SO_Item item;
     [Min(1)]
     [SerializeField] private int quantity = 1;
@@ -24,6 +25,8 @@ public class FieldItem : MonoBehaviour
 
     private void Disappear()
     {
+        if(col)
+            col.enabled = false;
         DOVirtual.DelayedCall(3f, () =>
         {
             if(gameObject)

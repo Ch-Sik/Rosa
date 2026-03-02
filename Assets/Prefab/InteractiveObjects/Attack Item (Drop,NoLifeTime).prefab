@@ -117,11 +117,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e2743c2c618e7c4085695976ab40948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  col: {fileID: 1528419509112557260}
   item: {fileID: 11400000, guid: ec69c91fd2c17f949a27e50aeed7c37c, type: 2}
   quantity: 1
+  interactTrigger: {fileID: 1528419509112557260}
   hasLifetime: 0
   lifetime: 5
-  interactTrigger: {fileID: 1528419509112557260}
 --- !u!50 &3240697950117872969
 Rigidbody2D:
   serializedVersion: 4

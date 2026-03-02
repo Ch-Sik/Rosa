@@ -4989,6 +4989,7 @@ MonoBehaviour:
   audioResource: {fileID: 11400000, guid: b4f3f7761248b4842ac83cb6ca50ad99, type: 2}
   playOnEnable: 1
   loop: 1
+  loopStartDelay: 0
 --- !u!1 &7633514647639658921
 GameObject:
   m_ObjectHideFlags: 0
@@ -5095,7 +5096,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.size
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
@@ -5110,6 +5111,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[4].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 407120747010238472}
@@ -5120,7 +5125,7 @@ PrefabInstance:
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 2143918271248890345}
+      objectReference: {fileID: 712113140462496323}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[3].m_Target
       value: 
@@ -5138,6 +5143,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[4].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnInteraction
       objectReference: {fileID: 0}
@@ -5147,7 +5156,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
-      value: StopSfx
+      value: PlaySfx
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
@@ -5170,6 +5179,10 @@ PrefabInstance:
       value: SFXPlayer, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
+      propertyPath: function.m_PersistentCalls.m_Calls.Array.data[4].m_TargetAssemblyTypeName
+      value: SFXPlayer, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2901889030617209952, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: function.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
@@ -5185,6 +5198,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Attack Item
       objectReference: {fileID: 0}
+    - target: {fileID: 5343948873282582934, guid: 74b002008b07363489272fd9c9006418, type: 3}
+      propertyPath: col
+      value: 
+      objectReference: {fileID: 5326312231019476412}
     - target: {fileID: 5343948873282582934, guid: 74b002008b07363489272fd9c9006418, type: 3}
       propertyPath: item
       value: 
@@ -5272,6 +5289,11 @@ MonoBehaviour:
 --- !u!4 &1533546291947379953 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6541380861961686383, guid: 74b002008b07363489272fd9c9006418, type: 3}
+  m_PrefabInstance: {fileID: 5733054864761016734}
+  m_PrefabAsset: {fileID: 0}
+--- !u!58 &5326312231019476412 stripped
+CircleCollider2D:
+  m_CorrespondingSourceObject: {fileID: 460840264091313186, guid: 74b002008b07363489272fd9c9006418, type: 3}
   m_PrefabInstance: {fileID: 5733054864761016734}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &8203244285188480584 stripped
@@ -5436,3 +5458,4 @@ MonoBehaviour:
   audioResource: {fileID: 11400000, guid: e2e5d1883df59954ca02d735d99ad150, type: 2}
   playOnEnable: 0
   loop: 0
+  loopStartDelay: 0
