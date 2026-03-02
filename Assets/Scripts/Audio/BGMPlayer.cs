@@ -67,7 +67,7 @@ public class BGMPlayer : SingletonBehaviour<BGMPlayer>
         currentPlayingClip = newClip;
         if (audioSourceA.isPlaying)
         {
-            if (audioSourceA.clip != newClip)
+            if (audioSourceA.clip.name != newClip.audioClip.name)
                 SwitchBGM(newClip);
             // else
             //     Debug.LogWarning("이미 재생중인 BGM임!");
