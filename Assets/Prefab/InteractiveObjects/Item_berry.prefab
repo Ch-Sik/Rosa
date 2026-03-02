@@ -108,6 +108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healAmount: 0.2
+  col: {fileID: 6469520355662432656}
 --- !u!114 &3884886971284944490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,7 +273,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 2176812180607489205}
   audioResource: {fileID: 11400000, guid: e56e64ae3eb93a942882eebe9c055d11, type: 2}
-  playOnAwake: 0
+  playOnEnable: 0
+  loop: 0
+  loopStartDelay: 0
 --- !u!1 &8131466654967182720
 GameObject:
   m_ObjectHideFlags: 0
