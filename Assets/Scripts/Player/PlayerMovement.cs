@@ -313,7 +313,9 @@ public class PlayerMovement : MonoBehaviour
         dashEnabled = FlagManager.Instance?.GetFlag("dashEnabled") == 1 ? true : false;
         mushJumpEnabled = FlagManager.Instance?.GetFlag("mushJumpEnabled") == 1 ? true : false;
         glidingEnabled = FlagManager.Instance?.GetFlag("glidingEnabled") == 1 ? true : false;
-        attackEnabled = FlagManager.Instance?.GetFlag("attackEnabled") == 1 ? true : false;
+        // attackEnabled = FlagManager.Instance?.GetFlag("attackEnabled") == 1 ? true : false;
+        // 26.03.03) 공격 항상 활성화되도록 수정
+        attackEnabled = true;
     }
     #endregion
 
