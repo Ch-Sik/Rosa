@@ -58,7 +58,8 @@ public class BGMPlayer : SingletonBehaviour<BGMPlayer>
 
     private void SetAudioSourceAVolume()
     {
-        audioSourceA.volume = bgmVolume * currentPlayingClip.volume;
+        float curClipVolume = currentPlayingClip ? currentPlayingClip.volume : 1;
+        audioSourceA.volume = bgmVolume * curClipVolume;
     }
 
     [Button("브금 전환 테스트")]
