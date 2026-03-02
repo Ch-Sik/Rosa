@@ -60,6 +60,9 @@ public class ProjectileBase : MonoBehaviour
     private Animator animator;
     [SerializeField]
     private SpriteRenderer spriteRenderer;
+    // 26.03.03) 기존 데이터 망가뜨리지 않으려고 추가 렌더러 별도 선언
+    [SerializeField] 
+    private List<SpriteRenderer> additionalSpriteRenderers;     
     [FormerlySerializedAs("hitEffect")] [SerializeField]
     private VfxPoolEntity disappearEffect;
     [SerializeField] 
@@ -210,6 +213,11 @@ public class ProjectileBase : MonoBehaviour
             if(!animator && spriteRenderer)
             {
                 spriteRenderer.enabled = false;
+                foreach (var sr in additionalSpriteRenderers)
+                {
+                    if(sr)
+                        sr.enabled = false;
+                }
             }
             VfxManager.Instance.SpawnVfxObject(disappearEffect, transform.position);
         }
