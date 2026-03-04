@@ -68,7 +68,9 @@ public class BGMPlayer : SingletonBehaviour<BGMPlayer>
         currentPlayingClip = newClip;
         if (audioSourceA.isPlaying)
         {
-            if (audioSourceA.clip.name != newClip.audioClip.name)
+            // 26.03.05) newClip.audioClip == null인 경우 추가
+            // 그 경우에는 기존 브금을 끄는 형태로 동작
+            if (newClip.audioClip == null || audioSourceA.clip.name != newClip.audioClip.name)
                 SwitchBGM(newClip);
             // else
             //     Debug.LogWarning("이미 재생중인 BGM임!");
@@ -76,6 +78,7 @@ public class BGMPlayer : SingletonBehaviour<BGMPlayer>
         else
         {
             audioSourceA.clip = newClip;
+            audioSourceA.volume = bgmVolume * currentPlayingClip.volume;
             audioSourceA.Play();
         }
     }
@@ -126,5 +129,13 @@ public class BGMPlayer : SingletonBehaviour<BGMPlayer>
         var roomBGM = MapManager.Instance.CurrentRoom.defaultBGM;
         if (roomBGM)
             PlayBGM(roomBGM);
+    }
+
+    public void SetLoop(bool value)
+    {
+        if (readyToFade)
+            audioSourceA.loop = value;
+        else
+            audioSourceB.loop = value;
     }
 }

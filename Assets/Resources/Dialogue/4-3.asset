@@ -301,7 +301,7 @@ MonoBehaviour:
   - type: 5
     target: 0
     emotion: 0
-    text: "\uD2F0\uB77C\uBBF8\uC218 \uCF00\uC774\uD06C, \uBA39\uC744\uB798\uC694?"
+    text: "\uB77C\uC988\uBCA0\uB9AC \uCF00\uC774\uD06C, \uBA39\uC744\uB798\uC694?"
     location: 0
     position: {x: 0, y: 0}
     delay: 0
@@ -322,6 +322,17 @@ MonoBehaviour:
     room: {fileID: 0}
   - type: 12
     target: 1
+    emotion: 0
+    text: 
+    location: 0
+    position: {x: 0, y: 0}
+    delay: 0
+    sfx: {fileID: 0}
+    key: 
+    flagValue: 0
+    room: {fileID: 0}
+  - type: 99
+    target: 0
     emotion: 0
     text: 
     location: 0

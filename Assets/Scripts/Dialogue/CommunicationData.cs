@@ -77,6 +77,7 @@ public enum CommunicationType
     UnlockPlayerAction,         // 25.05.12) 캐릭터의 특정 액션을 해금한다.
     DisappearNPC,
     ActivavteObjectWithTag,     // 26.01.13) 챕터3 보스전 연출 전용. 특정 오브젝트를 활성화한다.
+    GotoEndingScroll = 99,      // 26.03.05) 엔딩크레딧 기능 추가
 }
 
 public enum CommunicationTarget

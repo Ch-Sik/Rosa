@@ -87,6 +87,14 @@ public class BossRoomManager : MonoBehaviour
 
     void ActivateBoss()
     {
+        // 브금 재생
+        if(bgmPlayer == null)
+        {
+            bgmPlayer = BGMPlayer.Instance;
+        }
+        
+        bgmPlayer.PlayBGM(bgmClip[0]);
+        
         bossAI.enabled = true;
         if (requireWallActivation)
         {
@@ -130,13 +138,6 @@ public class BossRoomManager : MonoBehaviour
     {
         if (_enteredBossRoom) return;
         _enteredBossRoom = true;
-        
-        // 브금 재생
-        if(bgmPlayer == null)
-        {
-            bgmPlayer = BGMPlayer.Instance;
-        }
-        bgmPlayer.PlayBGM(bgmClip[0]);
     }
 
     void OnBossPhaseChanged(int phase)

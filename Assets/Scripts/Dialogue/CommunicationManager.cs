@@ -322,6 +322,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(curData.key); break;
             case CommunicationType.DisappearNPC: DisappearNPC(target); break;
             case CommunicationType.ActivavteObjectWithTag: ActivateChildrenOfObjectWithTag(curData.key); break;
+            case CommunicationType.GotoEndingScroll: GotoEndingScroll(); break;
         }
     }
 
@@ -356,6 +357,7 @@ public class CommunicationManager : MonoBehaviour
                 case CommunicationType.Flag:
                 case CommunicationType.DisappearNPC:
                 case CommunicationType.ActivavteObjectWithTag:
+                case CommunicationType.GotoEndingScroll:
                     HandleCurCommunication(data[curIndex]);
                     break;
                 case CommunicationType.WalkTo:
@@ -581,6 +583,18 @@ public class CommunicationManager : MonoBehaviour
             }
         }
         Next();
+    }
+
+    public void GotoEndingScroll()
+    {
+        GotoEndingScrollInternal().Forget();
+    }
+
+    private async UniTaskVoid GotoEndingScrollInternal()
+    {
+        FadeoutPanel.Fadeout();
+        await UniTask.WaitForSeconds(FadeoutPanel.fadeDuration);
+        SceneManager.LoadScene("EndingScroll");
     }
 
     //다음 커뮤니케이션 실행
