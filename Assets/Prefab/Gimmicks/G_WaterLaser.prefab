@@ -5329,6 +5329,7 @@ MonoBehaviour:
   audioResource: {fileID: 11400000, guid: 4b2ea72d5d3d79f4fb8c66efe59604d5, type: 2}
   playOnEnable: 0
   loop: 0
+  loopStartDelay: 0
 --- !u!1 &4712618653274071965
 GameObject:
   m_ObjectHideFlags: 0
@@ -15259,6 +15260,7 @@ MonoBehaviour:
   audioResource: {fileID: 11400000, guid: b95516c42f99bba47b905dcbb6c45692, type: 2}
   playOnEnable: 1
   loop: 1
+  loopStartDelay: 0
 --- !u!1 &7653173915864004037
 GameObject:
   m_ObjectHideFlags: 0
@@ -15324,7 +15326,7 @@ MonoBehaviour:
     m_Bits: 128
   obstaclesLayerMask:
     serializedVersion: 2
-    m_Bits: 132096
+    m_Bits: 0
   onReadyParticles:
   - {fileID: 4687224155575156955}
   onActiveParticles:
