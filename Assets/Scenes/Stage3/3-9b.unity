@@ -11463,6 +11463,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 814034665}
+    - target: {fileID: 4183514140311886875, guid: ab1646249fb827c499ef4ba7e7903638, type: 3}
+      propertyPath: sourceInfos.Array.data[0].isFoldout
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5372439640685448667, guid: ab1646249fb827c499ef4ba7e7903638, type: 3}
       propertyPath: whooshSfx
       value: 
@@ -11471,6 +11475,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1219995751}
+    - target: {fileID: 6388337958607545320, guid: ab1646249fb827c499ef4ba7e7903638, type: 3}
+      propertyPath: phaseMinHP.Array.data[0]
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6584005780933344129, guid: ab1646249fb827c499ef4ba7e7903638, type: 3}
       propertyPath: m_LocalPosition.x
       value: 12.28
@@ -11519,6 +11527,10 @@ PrefabInstance:
       propertyPath: launchSfx
       value: 
       objectReference: {fileID: 1291357436}
+    - target: {fileID: 7619662339497483517, guid: ab1646249fb827c499ef4ba7e7903638, type: 3}
+      propertyPath: maxHP
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 8303780242194927480, guid: ab1646249fb827c499ef4ba7e7903638, type: 3}
       propertyPath: m_Mesh
       value: 

@@ -66,6 +66,7 @@ MonoBehaviour:
     m_Bits: 656384
   canDestroyMushroom: 0
   onWallHit: 3
+  onTargetHit: 3
   useLifetime: 0
   lifetime: 0
   disappearDelay: 1
@@ -74,7 +75,9 @@ MonoBehaviour:
   - {fileID: 8302385115658067482}
   animator: {fileID: 6297934210235680986}
   spriteRenderer: {fileID: 0}
-  hitEffect: {fileID: 0}
+  additionalSpriteRenderers: []
+  disappearEffect: {fileID: 0}
+  reflectVfx: {fileID: 0}
 --- !u!58 &8302385115658067482
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -205,6 +208,8 @@ MonoBehaviour:
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2
+  overrideKnockbackPower: 0
+  knockbackPower: 0
 --- !u!95 &6297934210235680986
 Animator:
   serializedVersion: 5
@@ -240,7 +245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackItemPrefab: {fileID: 3245708322660951352, guid: e587c90cfeb71e64d9ab9b40f671f202, type: 3}
   attackItemSpawnPos: {fileID: 3092172275926816396}
-  attackItemSpawnProbability: 0.3
+  attackItemSpawnProbability: 1
   attackItemPopVertical: 150
   attackItemPopHorizontal: 100
   projectileComponent: {fileID: 1458802229609378900}

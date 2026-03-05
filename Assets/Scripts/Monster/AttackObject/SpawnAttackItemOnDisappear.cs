@@ -6,7 +6,7 @@ public class SpawnAttackItemOnDisappear : MonoBehaviour
 {
     [SerializeField] private GameObject attackItemPrefab;
     [SerializeField] private Transform attackItemSpawnPos;
-    [SerializeField] private float attackItemSpawnProbability = 0.3f;
+    [SerializeField] private float attackItemSpawnProbability = 1;
     [SerializeField] private float attackItemPopVertical = 150f;
     [SerializeField] private float attackItemPopHorizontal = 100f;
     
@@ -20,6 +20,10 @@ public class SpawnAttackItemOnDisappear : MonoBehaviour
     private void SpawnAttackItem()
     {
         if (!attackItemPrefab)
+            return;
+
+        float random = Random.Range(0f, 1f);
+        if (random > attackItemSpawnProbability)
             return;
         
         var instance = Instantiate(attackItemPrefab, attackItemSpawnPos.position, Quaternion.identity);
