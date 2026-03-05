@@ -317,6 +317,7 @@ public class CommunicationManager : MonoBehaviour
             case CommunicationType.HideAll: HideAll(); break;
             case CommunicationType.MoveRoom: 
                 MoveRoomAndSave(curData.room, curData.position).Forget();
+                Next();
                 break;
             case CommunicationType.WalkTo: WalkTo(target, curData.position); break;
             case CommunicationType.UnlockPlayerAction: UnlockPlayerAction(curData.key); break;
