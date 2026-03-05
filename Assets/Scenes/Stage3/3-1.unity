@@ -92050,13 +92050,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 392049176450579461, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1660407065}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3224365470989602158, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 144985840843103956, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd233b6f46839ca4f9f935bb8f2f76d5, type: 3}
 --- !u!114 &1754332953 stripped
 MonoBehaviour:
@@ -93410,9 +93404,9 @@ Transform:
   m_GameObject: {fileID: 1814025443}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -0.121, y: -0.048, z: 0}
+  m_LocalScale: {x: 0.33, y: 0.33, z: 0.33}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1089186338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -93457,8 +93451,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 100
-  m_Sprite: {fileID: 21300000, guid: 1ce999a5af438a3438638db719b11f10, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 1d62d28a559965b49af53be9a87cc25f, type: 3}
+  m_Color: {r: 0.9339623, g: 0.9339623, b: 0.9339623, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
