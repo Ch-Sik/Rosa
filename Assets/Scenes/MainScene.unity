@@ -3632,6 +3632,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueUI
       objectReference: {fileID: 0}
+    - target: {fileID: 7465266371644733058, guid: ecd58cad1688dc645aab0f29fb5675c7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7689592206824444975, guid: ecd58cad1688dc645aab0f29fb5675c7, type: 3}
       propertyPath: m_text
       value: "DialogueText\nDialogueText\nDialogueText\n\uB300\uD654\uBB38\n\uB300\uD654\uBB38\n\uB300\uD654\uBB38"
@@ -11797,6 +11801,10 @@ PrefabInstance:
     - target: {fileID: 8167067386915402170, guid: 72b69d9791caccf459e623ac157f59f5, type: 3}
       propertyPath: m_Name
       value: DebugInfoUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 8167067386915402170, guid: 72b69d9791caccf459e623ac157f59f5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
