@@ -5119,7 +5119,7 @@ MonoBehaviour:
   startDelay: 0
   onTime: 1
   offTime: 1
-  autoLaserLength: 1
+  autoLaserLength: 0
   activeLength: 30
   inactiveLength: 0
   shutByTerrain: 1
@@ -10337,6 +10337,7 @@ MonoBehaviour:
   audioResource: {fileID: 11400000, guid: 10badc7f021e0f64cbe25335bf63862e, type: 2}
   playOnEnable: 0
   loop: 0
+  loopStartDelay: 0
 --- !u!1 &8272317340135939634
 GameObject:
   m_ObjectHideFlags: 0
