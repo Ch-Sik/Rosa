@@ -10,6 +10,13 @@ public class TestplayAssist : MonoBehaviour
     public TMP_Dropdown roomSelectDropdown;
     public TMP_InputField Xcoord, Ycoord;
 
+#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+    private void Awake()
+    {
+        Destroy(gameObject);
+    }
+#endif
+
     private void Start()
     {
         // 드롭다운 메뉴에 MapManager에서 관리되는 모든 방 추가
