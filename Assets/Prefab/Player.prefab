@@ -954,8 +954,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1561906219881309557}
   audioResource: {fileID: 0}
-  playOnAwake: 0
+  playOnEnable: 0
   loop: 0
+  loopStartDelay: 0
   footstep: {fileID: 11400000, guid: eebb98a1f43a29541835578777fe834b, type: 2}
   climb: {fileID: 11400000, guid: 421acd841544ca14fb037fc35445f2c1, type: 2}
   jump: {fileID: 11400000, guid: 9fa2014bb39f0d9498b34f9edc060c72, type: 2}
@@ -1047,8 +1048,8 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.7, y: 1.5}
-  m_EdgeRadius: 0
+  m_Size: {x: 0.6, y: 1.4}
+  m_EdgeRadius: 0.05
 --- !u!95 &5950979649482116841
 Animator:
   serializedVersion: 5
