@@ -67,6 +67,15 @@ public class SaveLoadManager : MonoBehaviour
     {
         saveUI.ShowSaveUI();
     }
+
+    public bool HasSaveData()
+    {
+        string filePath = GetPath(playerPathName) + "/player.json";
+        if (File.Exists(filePath)) 
+            return true;
+        else
+            return false;
+    }
     
     #region Utils
     //Path 병합해서 전달

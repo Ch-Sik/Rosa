@@ -18,6 +18,15 @@ public class TitleScreenUI : MonoBehaviour
     {
         // TODO: SaveLoadManager를 통해 기존에 저장된 파일이 있는지 확인하고,
         //      없다면 이어하기 버튼 비활성화하기
+        Debug.Log("[TitleScreenUI] 세이브 테이터 있는지 체크");
+        if(SaveLoadManager.Instance.HasSaveData())
+        {
+            button_contiue.interactable = true;
+        }
+        else
+        {
+            button_contiue.interactable = false;
+        }
     }
 
     public void OnClickNewGameButton()
