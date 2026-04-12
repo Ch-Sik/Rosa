@@ -49,7 +49,9 @@ public class PlayerDamageReceiver : MonoBehaviour
     {
         // 낙사 등의 상황 고려, _ignoreDamage 무시함
         // _ignoreDamage 대신 리스폰 시퀀스 중인지 여부로 무한 데미지 입는 상황 방지
-        if (RespawnHandler.Instance.IsDoingRespawn)
+        if (RespawnHandler.Instance.IsDoingRespawn) // 물대포, 레이저 등 강제 리스폰
+            return;
+        if(PlayerRef.Instance.state.CurrentHP <= 0) // 사망으로 인한 게임 리셋
             return;
         
         // isDead인 경우 리스폰은 GetDamageInternal -> TakeDamage -> OnDie가 처리
