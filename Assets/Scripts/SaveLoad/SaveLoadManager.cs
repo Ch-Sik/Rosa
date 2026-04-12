@@ -210,7 +210,7 @@ public class SaveLoadManager : MonoBehaviour
     {
         string filePath = GetPath(inputPathName) + "/input.json";
         if (!File.Exists(filePath)) {
-            Debug.LogWarning($"[InputBinding Data] {filePath}를 찾을 수 없다.");
+            Debug.LogWarning($"[InputBinding Data] {filePath}를 찾을 수 없음");
             return null;
         }
 

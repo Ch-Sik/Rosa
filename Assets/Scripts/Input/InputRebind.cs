@@ -62,6 +62,8 @@ public class InputRebind : MonoBehaviour
     private void LoadBinding()
     {
         string json = SaveLoadManager.Instance.LoadInputBinding();
+        if(json == null || json.Length == 0)
+            return;
         inputActionAsset.LoadBindingOverridesFromJson(json);
         UpdateAllBindingDisplay();
     }
