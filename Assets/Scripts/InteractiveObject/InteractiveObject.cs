@@ -83,7 +83,8 @@ public class InteractiveObject : MonoBehaviour
     public void OnInactive()
     {
         RemoveEvent();
-        interactiveKeyUI.SetActive(false);
+        if(interactiveKeyUI != null)
+            interactiveKeyUI.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
