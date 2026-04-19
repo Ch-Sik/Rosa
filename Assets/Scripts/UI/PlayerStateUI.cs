@@ -84,6 +84,7 @@ public class PlayerStateUI : MonoBehaviour
         if (itemCode != ItemCode.AttackItem)
             return;
         attackItemUI?.SetActive(true);
+        attackItemUiAnim.ResetTrigger("Out");
         attackItemUiAnim.SetTrigger("In");
     }
 
@@ -91,6 +92,7 @@ public class PlayerStateUI : MonoBehaviour
     {
         if (itemCode != ItemCode.AttackItem)
             return;
+        attackItemUiAnim.ResetTrigger("In");
         attackItemUiAnim.SetTrigger("Out");
     }
 }
