@@ -261,7 +261,11 @@ public class MapManager : MonoBehaviour
         yield return new WaitForSeconds(FadeoutPanel.fadeDuration);
 
         // fade 완전히 해제된 다음에야 플레이어 움직임 제한 해제
-        PlayerRef.Instance.controller.SetMoveState(PlayerMoveState.DEFAULT);
+        // 단, 방 이동 직후 강제 대화 이벤트인 경우에는 움직임 제한 해제하지 않음.
+        if(!CommunicationManager.Instance.isCommunicating)
+        {
+            PlayerRef.Instance.controller.SetMoveState(PlayerMoveState.DEFAULT);
+        }
     }
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
