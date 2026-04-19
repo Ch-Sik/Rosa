@@ -10,13 +10,16 @@ public class HeartIcon : MonoBehaviour
     [SerializeField] private AudioResource heartRegenSound;
 
     [Button("하트 아이콘 수동 조작")]
-    public void ChangeHeartValue(float value)
+    public void ChangeHeartValue(float value, bool allowSfx)
     {
-        if (imageComponent.fillAmount < 1.0f && value >= 1.0f)
+        if(allowSfx)
         {
-            if (UiSoundPlayer.Instance)
+            if (imageComponent.fillAmount < 1.0f && value >= 1.0f)
             {
-                UiSoundPlayer.Instance.PlayClip(heartRegenSound, heartRegenSound.volume);
+                if (UiSoundPlayer.Instance)
+                {
+                    UiSoundPlayer.Instance.PlayClip(heartRegenSound, heartRegenSound.volume);
+                }
             }
         }
         imageComponent.fillAmount = value;

@@ -24,7 +24,7 @@ public class PlayerState : MonoBehaviour
     [SerializeField] private bool respawnOnDie;
 
     // events
-    public delegate void HpEvent(float currentValue);
+    public delegate void HpEvent(float currentValue, bool allowSfx);
     public HpEvent OnHpChanged;
 
     private void Start()
@@ -37,7 +37,7 @@ public class PlayerState : MonoBehaviour
         // HP, 공격력 등의 값 초기화하기
         stateUI = PlayerStateUI.Instance;
         currentHp = maxHp;
-        OnHpChanged?.Invoke(currentHp);
+        OnHpChanged?.Invoke(currentHp, false);
     }
 
     // 소숫점 단위로 회복
@@ -46,7 +46,7 @@ public class PlayerState : MonoBehaviour
         if (amount <= 0) return;
 
         currentHp = Mathf.Min(currentHp + amount, maxHp);
-        OnHpChanged?.Invoke(currentHp);
+        OnHpChanged?.Invoke(currentHp, true);
     }
     
     /// <returns>사망 여부</returns>
@@ -55,7 +55,7 @@ public class PlayerState : MonoBehaviour
         if (amount <= 0) return false;
 
         currentHp = Mathf.Max(currentHp - amount, 0);
-        OnHpChanged?.Invoke(currentHp);
+        OnHpChanged?.Invoke(currentHp, true);
 
         if (currentHp <= 0)
         {

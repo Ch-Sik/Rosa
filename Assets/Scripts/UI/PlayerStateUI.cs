@@ -61,11 +61,11 @@ public class PlayerStateUI : MonoBehaviour
     }
 
     [Button("HP 게이지 테스트")]
-    public void OnHpChanged(float newHP)
+    public void OnHpChanged(float newHP, bool allowSfx)
     {
         for(int i=0; i<heartUiList.Count; i++)
         {
-            heartUiList[i].ChangeHeartValue(Mathf.Min(newHP, 1.0f));
+            heartUiList[i].ChangeHeartValue(Mathf.Min(newHP, 1.0f), allowSfx);
             newHP -= 1.0f;
         }
     }
