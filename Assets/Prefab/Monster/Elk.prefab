@@ -1266,8 +1266,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b20cb10af2dc08c4bb164d108091d559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 1
-  currentHP: 0
+  maxHP: 3
+  currentHP: 3
   blackboard: {fileID: 0}
   vfxOnDisappear: {fileID: 8849755972545359957, guid: e8d081c42009b6f498d9b6fa16e4ab3d, type: 3}
   dieSfx: {fileID: 6399652080187783698}
@@ -1302,14 +1302,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blackboard: {fileID: 0}
-  monsterState: {fileID: 0}
+  monsterState: {fileID: 4787640417757565278}
   rigidbody: {fileID: 0}
-  portrait: {fileID: 0}
-  pandaBT: {fileID: 0}
-  monsterAttackComponent: {fileID: 0}
+  portrait: {fileID: 100829098113969068}
+  pandaBT: {fileID: 3630580085028515371}
+  monsterAttackComponent: {fileID: 2789448997687073503}
   isSuperArmour: 0
   tempSuperArmour: 0
-  isInvincible: 1
+  isInvincible: 0
   tempInvincible: 0
   knockbackCoeff: 5
   ignoreKnockbackOnSuperArmour: 1
@@ -1593,6 +1593,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2914902710496441752}
   m_SourcePrefab: {fileID: 100100000, guid: e34dd9cf80fcdc14883171e6fd404688, type: 3}
+--- !u!114 &100829098113969068 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3152147625855600004, guid: e34dd9cf80fcdc14883171e6fd404688, type: 3}
+  m_PrefabInstance: {fileID: 3087386969457421864}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 424655951842358795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e5468fa1bf05b4896cd7b2ef8664ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &424655951842358795 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3403652875786410019, guid: e34dd9cf80fcdc14883171e6fd404688, type: 3}
