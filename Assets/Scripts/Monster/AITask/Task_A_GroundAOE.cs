@@ -79,6 +79,11 @@ public class Task_A_GroundAOE : Task_A_Base
             _attackCount = 0;
         }
     }
+
+    protected override void OnRecoveryBegin()
+    {
+        _attackInstance?.FinishAttack();
+    }
     
     private void SpawnAttackItem()
     {
