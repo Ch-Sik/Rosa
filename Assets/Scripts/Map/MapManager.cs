@@ -222,6 +222,9 @@ public class MapManager : MonoBehaviour
             Debug.Log("이미 페이드 아웃 효과 적용되어있으므로 추가 적용은 생략");
         }
 
+        // 플레이어 움직임 제한
+        PlayerRef.Instance.controller.SetMoveState(PlayerMoveState.NO_MOVE);
+
         StorePlayer(out wasClimbing);
 
         // 페이드아웃과 플레이어 치워두기가 끝난 후에만 다음 씬 활성화 허용
@@ -254,6 +257,11 @@ public class MapManager : MonoBehaviour
 
         OnNextRoomLoaded?.Invoke();
         FadeoutPanel.FadeIn();
+
+        yield return new WaitForSeconds(FadeoutPanel.fadeDuration);
+
+        // fade 완전히 해제된 다음에야 플레이어 움직임 제한 해제
+        PlayerRef.Instance.controller.SetMoveState(PlayerMoveState.DEFAULT);
     }
 
     public SORoom GetRoomSOtoConnectedPorts(List<ConnectedPort> ports)
