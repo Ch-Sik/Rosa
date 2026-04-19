@@ -60,7 +60,7 @@ public class PlayerAudio : SFXPlayer
     {
         audioSource.PlayOneShot(glideOn, glideOn.volume);
 
-        if (!glideLoop)
+        if (glideLoop != null)
         {
             audioSource.clip = glideLoop;
             audioSource.volume = glideLoop.volume;
