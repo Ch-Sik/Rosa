@@ -51999,7 +51999,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1059301286}
   audioResource: {fileID: 11400000, guid: 23b9555f71ac5e447bc57ac422dffc08, type: 2}
-  playOnAwake: 0
+  playOnEnable: 0
+  loop: 0
+  loopStartDelay: 0
 --- !u!82 &1059301286
 AudioSource:
   m_ObjectHideFlags: 0
@@ -97856,6 +97858,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 648699565}
+    - target: {fileID: 7264049485729823671, guid: 2a583d6c3a9bef749ae499de92a68574, type: 3}
+      propertyPath: anim
+      value: 
+      objectReference: {fileID: 2055324729}
     - target: {fileID: 7345535507427372470, guid: 2a583d6c3a9bef749ae499de92a68574, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.8
@@ -97997,6 +98003,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a583d6c3a9bef749ae499de92a68574, type: 3}
+--- !u!95 &2055324729 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7895955471648937280, guid: 2a583d6c3a9bef749ae499de92a68574, type: 3}
+  m_PrefabInstance: {fileID: 2055324728}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &2059737842
 Mesh:
   m_ObjectHideFlags: 0

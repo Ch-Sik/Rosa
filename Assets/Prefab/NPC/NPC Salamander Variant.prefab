@@ -199,8 +199,9 @@ MonoBehaviour:
   _goalPositionX: 0
   _moveSpeed: 3
   rb: {fileID: 7762046604824240853}
-  anim: {fileID: 0}
+  anim: {fileID: 7895955471648937280}
   disappearVfx: {fileID: 6127854823537551600, guid: e6347ac206a2192448e1535b29cdb06d, type: 3}
+  npcDisappearSaveKey: 
 --- !u!50 &7762046604824240853
 Rigidbody2D:
   serializedVersion: 4
@@ -228,3 +229,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!95 &7895955471648937280 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5111541773876361739, guid: 57ef6de996b6510419a8a388ac6959fc, type: 3}
+  m_PrefabInstance: {fileID: 3133319534532341579}
+  m_PrefabAsset: {fileID: 0}
