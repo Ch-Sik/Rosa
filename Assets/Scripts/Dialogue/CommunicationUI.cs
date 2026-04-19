@@ -110,6 +110,11 @@ public class CommunicationUI : MonoBehaviour
             return;
         }
 
+        // 26.04.19) 텍스트 대치 누락된 것 추가
+        text = text.Replace("KEY_DASH", key_dash);
+        text = text.Replace("KEY_JUMP", key_jump);
+        text = text.Replace("KEY_SUPERJUMP", key_superJump);
+
         talk.Pause();
         Dialogue.text = text;
         isTalking = false;
