@@ -6,6 +6,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+// NOTE: Transform.Scale은 애니메이팅에 사용
 public class G_Laser : GimmickSignalReceiver
 {
     [Title("레퍼런스")]
@@ -98,7 +99,7 @@ public class G_Laser : GimmickSignalReceiver
             100f, obstaclesLayerMask);
         if (hit.collider && ((1 << hit.collider.gameObject.layer) & obstaclesLayerMask) != 0)
         {
-            curLength = hit.distance;
+            activeLength = hit.distance;
         }
     }
 
@@ -127,6 +128,9 @@ public class G_Laser : GimmickSignalReceiver
     [Button]
     public void ActivateLaser()
     {
+        if(shutByTerrain)
+            UpdateLaserLength();
+
         isActivate = true;
         
         _cts.Cancel();
