@@ -88,9 +88,12 @@ public class G_Laser : GimmickSignalReceiver
             }
         }
         
-        var spriteSize = new Vector2(laserSprite.size.x, curLength);
+        // curLength가 doTween에 의존해서 정확한 값이 아님;; 
+        // 억지로 이렇게라도 처리
+        float laserLength = Mathf.Min(curLength, activeLength);
+        var spriteSize = new Vector2(laserSprite.size.x, laserLength);
         laserSprite.size = spriteSize;
-        topAnim.transform.localPosition = Vector3.up * curLength;
+        topAnim.transform.localPosition = Vector3.up * laserLength;
     }
     
     private void UpdateLaserLength()
