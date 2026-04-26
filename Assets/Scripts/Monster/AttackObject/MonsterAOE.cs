@@ -43,6 +43,10 @@ public class MonsterAOE : MonoBehaviour
 
     public void ExecuteAttack()
     {
+        if(!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
         // Debug.Log("범위 공격 수행");
         collider.enabled = true;
         activatedSfx?.PlaySfx();

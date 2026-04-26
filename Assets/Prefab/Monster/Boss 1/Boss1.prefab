@@ -1200,6 +1200,7 @@ MonoBehaviour:
   projectileSpeed: 0
   projectileDirOption: 0
   fixedTarget: {fileID: 0}
+  launchSfx: {fileID: 0}
 --- !u!114 &2311326092470834545
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1711,7 +1712,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6939096114796468692
 Transform:
   m_ObjectHideFlags: 0
@@ -1781,6 +1782,7 @@ MonoBehaviour:
   startupSprite: {fileID: 695624479191446078}
   activatedSprite: {fileID: 6340368601856942078}
   animator: {fileID: 0}
+  activatedSfx: {fileID: 0}
 --- !u!58 &8534114361893034127
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -2436,6 +2438,7 @@ MonoBehaviour:
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 8254188707243180256}
   animator: {fileID: 0}
+  activatedSfx: {fileID: 0}
 --- !u!1773428102 &1785131484344043299
 ParentConstraint:
   m_ObjectHideFlags: 0
@@ -3640,6 +3643,7 @@ MonoBehaviour:
   startupSprite: {fileID: 0}
   activatedSprite: {fileID: 0}
   animator: {fileID: 0}
+  activatedSfx: {fileID: 0}
 --- !u!212 &8182394743246902476
 SpriteRenderer:
   m_ObjectHideFlags: 0
