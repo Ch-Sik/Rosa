@@ -223,7 +223,11 @@ public class MapManager : MonoBehaviour
         }
 
         // 플레이어 움직임 제한
-        PlayerRef.Instance.controller.SetMoveState(PlayerMoveState.NO_MOVE);
+        var playerController = PlayerRef.Instance.controller;
+        if(playerController)
+        {
+            playerController.SetMoveState(PlayerMoveState.NO_MOVE);
+        }
 
         StorePlayer(out wasClimbing);
 
@@ -262,9 +266,9 @@ public class MapManager : MonoBehaviour
 
         // fade 완전히 해제된 다음에야 플레이어 움직임 제한 해제
         // 단, 방 이동 직후 강제 대화 이벤트인 경우에는 움직임 제한 해제하지 않음.
-        if(!CommunicationManager.Instance.isCommunicating)
+        if(!CommunicationManager.Instance.isCommunicating && playerController)
         {
-            PlayerRef.Instance.controller.SetMoveState(PlayerMoveState.DEFAULT);
+            playerController.SetMoveState(PlayerMoveState.DEFAULT);
         }
     }
 

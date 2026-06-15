@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
     // 가능하면 inputManager.ChangeMoveState를 사용할 것.
     public void SetMoveState(PlayerMoveState newMoveState)
     {
-        inputManager.SetMoveInputState(newMoveState);
+        inputManager?.SetMoveInputState(newMoveState);
     }
 
     #region InputAction 이벤트 핸들러
