@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -84,12 +85,12 @@ public class MonsterAOE : MonoBehaviour
         if(destroyOnAttackEnd)
             Destroy(gameObject, finishDelay);
         else
-            StartCoroutine(SetActiveWithDelay(false, finishDelay));
+            SetActiveWithDelay(false, finishDelay).Forget();
     }
 
-    private IEnumerator SetActiveWithDelay(bool value, float delay)
+    private async UniTaskVoid SetActiveWithDelay(bool value, float delay)
     {
-        yield return new WaitForSeconds( delay );
-        gameObject.SetActive( value );
+        await UniTask.WaitForSeconds(delay);
+        gameObject.SetActive(value);
     }
 }

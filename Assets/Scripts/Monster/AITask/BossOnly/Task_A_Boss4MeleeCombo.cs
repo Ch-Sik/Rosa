@@ -42,7 +42,8 @@ public class Task_A_Boss4MeleeCombo : Task_A_Melee
             // 공격 판정과 이펙트 활성화하기
             seq.AppendCallback(()=>
             {
-                atk.attackColliderAndVFX.SetActive(true);
+                attackInstance.ExecuteAttack();
+                // atk.attackColliderAndVFX.SetActive(true);
             });
             // forwardDist만큼 전진
             seq.Append(rigidbody.DOMoveX(
@@ -51,7 +52,8 @@ public class Task_A_Boss4MeleeCombo : Task_A_Melee
             // 공격 사이 딜레이에는 이펙트 끄기
             seq.AppendCallback(()=>
             {
-                atk.attackColliderAndVFX.SetActive(false);
+                attackInstance.FinishAttack();
+                // atk.attackColliderAndVFX.SetActive(false);
             });
             // 공격 사이 딜레이
             seq.AppendInterval(atk.recoveryDuration);

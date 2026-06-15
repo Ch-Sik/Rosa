@@ -40,7 +40,7 @@ public class Task_A_Melee : Task_A_Base
 
         LookAt2D(enemy.transform.position);
 
-        attackInstance.Init();
+        attackInstance?.Init();
     }
 
     protected override void OnActiveBegin()
