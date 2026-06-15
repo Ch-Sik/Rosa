@@ -24,11 +24,11 @@ tree("Phase0")
                     not isEnemyAtFront()                     // 적이 등 뒤에 있다면
                     tree("TurningAttack")                   // '뒤돌기' 사용
                 sequence
-                    CheckCooldown("OrbAttack",20.0)         // 쿨타임 돌았다면
+                    CheckCooldown("OrbAttack",25.0)         // 쿨타임 돌았다면
                     tree("OrbAttack")                       // 약필살기 '구슬 동시 공격' 사용
                 // 이하 평타 패턴
                 sequence
-                    isEnemyCloserThan(15.0)                 // 기본 3 + 전진거리 12
+                    isEnemyCloserThan(10.0)
                     tree("MeleeCombo")
                 sequence
                     isEnemyCloserThan(7.0)                  // 적이 가까울 경우 근접 공격
@@ -59,11 +59,11 @@ tree("Phase1")
                 not isEnemyAtFront()                    // 적이 등 뒤에 있다면
                 tree("TurningAttack")                   // '뒤돌기' 사용
             sequence
-                CheckCooldown("OrbAttack",20.0)         // 쿨타임 돌았다면
+                CheckCooldown("OrbAttack",25.0)         // 쿨타임 돌았다면
                 tree("OrbAttack")                       // 약필살기 '구슬 동시 공격' 사용
             // 이하 평타 패턴
             sequence
-                isEnemyCloserThan(15.0)                 // 기본 3 + 전진거리 12
+                isEnemyCloserThan(10.0)
                 tree("MeleeCombo")
             sequence
                 isEnemyCloserThan(7.0)                  // 적이 가까울 경우 근접 공격
