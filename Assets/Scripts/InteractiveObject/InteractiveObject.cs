@@ -1,7 +1,9 @@
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -25,6 +27,8 @@ public class InteractiveObject : MonoBehaviour
 
     Collider2D col;
     private float lastInterationTime = -10000f;
+    [SerializeField, ReadOnly]
+    private bool playerOverlapped = false;
 
     private void Start()
     {
@@ -56,10 +60,10 @@ public class InteractiveObject : MonoBehaviour
             return;
 
         PlayerRef.Instance.controller.ResetInteraction();
-        PlayerRef.Instance.controller.SetInteraction(OnInteration);
+        PlayerRef.Instance.controller.SetInteraction(OnInteraction);
     }
 
-    private void OnInteration()
+    private void OnInteraction()
     {
         if(Time.time - lastInterationTime < coolDown)
         {
@@ -69,18 +73,35 @@ public class InteractiveObject : MonoBehaviour
 
         function.Invoke();
         lastInterationTime = Time.time;
-        OnInactive();
+        OnUninteractive();
         if(allowRepeatInteract)
-            DOVirtual.DelayedCall(coolDown, () => { OnActive(); });
+        {
+            WaitAndSetActive(coolDown).Forget();
+        }
     }
 
-    private void OnActive() 
+    private async UniTaskVoid WaitAndSetActive(float waitTime)
+    {
+        await UniTask.WaitForSeconds(waitTime);
+        OnInteractive();
+    }
+
+    private void OnInteractive() 
     {
         if (!autoInteract && interactiveKeyUI != null)
             interactiveKeyUI.SetActive(true);
+        
+        if (playerOverlapped)
+        {
+            if (autoInteract && !RespawnHandler.Instance.IsDoingRespawn)
+                function.Invoke();
+            else
+                // autoInteract가 아니면 플레이어 '상호작용' 입력 이벤트에 function 예약
+                SetEvent();
+        }
     }
 
-    public void OnInactive()
+    public void OnUninteractive()
     {
         RemoveEvent();
         if(interactiveKeyUI != null)
@@ -95,12 +116,9 @@ public class InteractiveObject : MonoBehaviour
         if (collision.tag != "Player")
             return;
 
-        OnActive();
-        if (autoInteract && !RespawnHandler.Instance.IsDoingRespawn)
-            function.Invoke();
-        else
-            // autoInteract가 아니면 플레이어 '상호작용' 입력 이벤트에 function 예약
-            SetEvent();
+        playerOverlapped = true;
+
+        OnInteractive();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -111,7 +129,9 @@ public class InteractiveObject : MonoBehaviour
         if (collision.tag != "Player")
             return;
 
-        OnInactive();
+        playerOverlapped = false;
+
+        OnUninteractive();
         if (autoInteract)
         {
             // Do nothing

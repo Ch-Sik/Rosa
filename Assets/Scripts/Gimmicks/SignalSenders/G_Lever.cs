@@ -42,7 +42,7 @@ public class G_Lever : GimmickSignalSender
         if (isOnce)
         {
             interactiveObject.canInteract = false;
-            interactiveObject.OnInactive();
+            interactiveObject.OnUninteractive();
         }
 
         leverHandle.DORotate(new Vector3(0, 0, -90), 0f, RotateMode.LocalAxisAdd).SetRelative(true);
@@ -89,7 +89,7 @@ public class G_Lever : GimmickSignalSender
         {
             isInteractable = false;
             interactiveObject.canInteract = false;
-            interactiveObject.OnInactive();
+            interactiveObject.OnUninteractive();
         }
     }
 
