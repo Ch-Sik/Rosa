@@ -1885,8 +1885,8 @@ MonoBehaviour:
   superArmourOnRecovery: 1
   currentState: 0
   blinkDelay: 0.3
-  blinkVFX: {fileID: 0}
-  bodyVisual: {fileID: 0}
+  blinkVFX: {fileID: 7497358978028250641, guid: 9d1958141a310394f8ebad36ff8748c3, type: 3}
+  bodyVisual: {fileID: 6464145561215989241}
   bodyCollider: {fileID: 6671818774169967242}
   jumpHeight: 10
   attackColliderAndVFX: {fileID: 5317062497357948356}
@@ -2596,7 +2596,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7e361b8e5ec339439677f0f6e371dba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0
+  damage: 1
   attackEnabled: 1
   overrideInvincibleDuration: 0
   ignoreDuration: 2

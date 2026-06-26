@@ -10,7 +10,7 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
     [SerializeField] float blinkDelay;
 
     [Tooltip("사라지는 이펙트")]
-    [SerializeField] GameObject blinkVFX = null;
+    [SerializeField] VfxPoolEntity blinkVFX = null;
 
     [Tooltip("몬스터 본체의 비주얼")]
     [SerializeField] GameObject bodyVisual;
@@ -40,21 +40,10 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
     {
         _startHeight = transform.position.y;
         _isSpawnedAttackItem = false;
-        DOTween.Sequence()
-            .AppendInterval(blinkDelay)
-            .AppendCallback(()=>
-            {
-                // 이펙트 남겨두고 비주얼은 사라지기, 충돌판정 끄기
-                if(blinkVFX != null)
-                    blinkVFX?.SetActive(true);
-                bodyVisual?.SetActive(false);
-                bodyCollider.enabled = false;
-            })
-            .AppendInterval(1f)
-            .AppendCallback(()=>{
-                if(blinkVFX != null)
-                    blinkVFX?.SetActive(false);      // 약 1초 후에 점멸 이펙트 끄기.
-            });
+
+        VfxManager.Instance.SpawnVfxObject(blinkVFX, transform.position);
+        bodyVisual?.SetActive(false);
+        bodyCollider.enabled = false;
     }
 
     protected override void OnActiveBegin()
@@ -77,8 +66,6 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
             .AppendInterval(0.1f)       // 공격 판정 켜고 잠시 기다려서 '벽에 충돌하여 튕겨나오는 모습' 보이지 않도록 함.
             .AppendCallback(()=>
             {
-                if(blinkVFX != null)
-                    blinkVFX?.SetActive(true);           // 점멸 이펙트 켜기
                 bodyVisual?.SetActive(true);
             });
         
@@ -88,8 +75,6 @@ public class Task_A_Boss4BlinkAttack : Task_A_Base
     protected override void OnRecoveryBegin()
     {
         attackColliderAndVFX.SetActive(false);
-        if(blinkVFX != null)
-            blinkVFX?.SetActive(false);
     }
     
     protected override void OnRecoveryLast()
