@@ -90,12 +90,15 @@ public class PlayerDamageReceiver : MonoBehaviour
     {
         // 무적 플래그 ON & 충돌 무시 설정 (몬스터와 피격 시 몬스터 통과하여 지나갈 수 있게)
         int collisionLayer = gameObject.layer;
+        int monsterBodyLayer = LayerMask.NameToLayer("Monster");
+        Physics2D.IgnoreLayerCollision(monsterBodyLayer, collisionLayer, true); // 투사체 등에 맞았어도 몬스터 지나갈 수 있도록 수정
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
         _ignoreDamage = true;
         
         await UniTask.WaitForSeconds(delay);
         
         // 무적 해제
+        Physics2D.IgnoreLayerCollision(monsterBodyLayer, collisionLayer, false);
         Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, false);
         _ignoreDamage = false;
     }

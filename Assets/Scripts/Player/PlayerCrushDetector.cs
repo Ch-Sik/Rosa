@@ -27,9 +27,13 @@ public class PlayerCrushDetector : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        // 플랫폼 오르는 도중에 압사판정되는 것 방지를 위해 Platform이 '아래 방향'일 때에만 압사 판정에 산입
         foreach (ContactPoint2D contact in collision.contacts)
         {
+            // 몬스터는 압사 판정에 포함시키지 않음
+            if (collision.gameObject.CompareTag("Monster"))
+                continue;
+
+            // 플랫폼 오르는 도중에 압사판정되는 것 방지를 위해 Platform이 '아래 방향'일 때에만 압사 판정에 산입
             if (!collision.gameObject.CompareTag("Platform"))
             {
                 // 수평 충돌 확인
