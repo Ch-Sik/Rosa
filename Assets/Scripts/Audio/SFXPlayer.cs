@@ -34,6 +34,12 @@ public class SFXPlayer : MonoBehaviour
         }
     }
 
+    protected void OnDestroy()
+    {
+        audioManager = AudioManager.Instance;
+        audioManager.OnAudioVolumeChanged -= OnVolumeChanged;
+    }
+
     void OnVolumeChanged(AudioType type, float value)
     {
         if (type != AudioType.SFX) return;

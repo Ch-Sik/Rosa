@@ -28,8 +28,17 @@ public class BGMPlayer : SingletonBehaviour<BGMPlayer>
     protected override void Awake()
     {
         base.Awake();
+        // 기존에 다른 BGMPlayer가 있어서 싱글톤 등록에 실패한 경우
+        if(Instance != this)
+            return;
         audioManager = AudioManager.Instance;
         audioManager.OnAudioVolumeChanged += OnVolumeChanged;
+    }
+
+    protected void OnDestroy()
+    {
+        audioManager = AudioManager.Instance;
+        audioManager.OnAudioVolumeChanged -= OnVolumeChanged;
     }
 
     // Start is called before the first frame update
