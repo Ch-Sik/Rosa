@@ -100,4 +100,9 @@ public class TestplayAssist : MonoBehaviour
     {
         InventoryController.Instance.AddItem(ItemCode.AttackItem, 1);
     }
+
+    public void ImmetdiateKillBoss()
+    {
+        FindObjectOfType<BossRoomManager>().Test_KillBossImmediatly();
+    }
 }

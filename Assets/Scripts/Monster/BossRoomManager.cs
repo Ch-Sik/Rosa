@@ -171,7 +171,7 @@ public class BossRoomManager : MonoBehaviour
     }
 
     [Button("테스트: 보스 즉시 사망")]
-    void Test_KillBossImmediatly()
+    public void Test_KillBossImmediatly()
     {
         bossBlackboard.gameObject.GetComponent<MonsterState>().TakeDamage(999);
     }
