@@ -91,15 +91,26 @@ public class PlayerDamageReceiver : MonoBehaviour
         // 무적 플래그 ON & 충돌 무시 설정 (몬스터와 피격 시 몬스터 통과하여 지나갈 수 있게)
         int collisionLayer = gameObject.layer;
         int monsterBodyLayer = LayerMask.NameToLayer("Monster");
+        int monsterAttackLayer = LayerMask.NameToLayer("MonsterAttack");
+
+        // 26.07.08) 피격 소스가 Default 등 몬스터 외 레이어일 때 해당 레이어 전체를 전역으로 충돌 무시하면
+        // 같은 레이어에 있는 트리거(대화 존 등)와의 접촉이 끊겼다가 무적 해제 시 재생성되면서
+        // OnTriggerEnter2D가 재발화하는 문제(최종보스전 인트로 대사 반복 버그)가 있어
+        // 몬스터 관련 레이어에 한해서만 충돌 무시하도록 제한.
+        // 피해 자체는 _ignoreDamage가 막아주므로 그 외 레이어는 충돌 무시가 필요 없음.
+        bool ignoreSourceLayer = originalLayer == monsterBodyLayer || originalLayer == monsterAttackLayer;
+
         Physics2D.IgnoreLayerCollision(monsterBodyLayer, collisionLayer, true); // 투사체 등에 맞았어도 몬스터 지나갈 수 있도록 수정
-        Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
+        if (ignoreSourceLayer)
+            Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, true);
         _ignoreDamage = true;
-        
+
         await UniTask.WaitForSeconds(delay);
-        
+
         // 무적 해제
         Physics2D.IgnoreLayerCollision(monsterBodyLayer, collisionLayer, false);
-        Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, false);
+        if (ignoreSourceLayer)
+            Physics2D.IgnoreLayerCollision(originalLayer, collisionLayer, false);
         _ignoreDamage = false;
     }
 }

@@ -24,6 +24,9 @@ public class CommunicationZone : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
+        // 26.07.08) 이미 대화 중일 때 재트리거 방지
+        // (레이어 충돌 매트릭스 변경 등으로 물리 접촉이 재생성되며 Enter가 재발화하는 경우 방어)
+        if (CommunicationManager.Instance != null && CommunicationManager.Instance.isCommunicating) return;
         ReadyForCommunication();
     }
 

@@ -81,7 +81,25 @@ public class BossRoomManager : MonoBehaviour
             if (bossRoomCameraTrigger)
                 bossRoomCameraTrigger.gameObject.SetActive(true);
             DOVirtual.DelayedCall(IntroCommunication_BossActivateDelay, ActivateBoss);
+            DisableIntroCommunicationZone();
             CommunicationManager.Instance.OnCommunicationFinish -= OnIntroCommunicationFinish;
+        }
+    }
+
+    // 26.07.08) 인트로 대화가 끝나면 해당 대화를 발동시킨 트리거 존을 비활성화.
+    // iterativeID가 설정된 존이 전투 중 재트리거되어 인트로 대사가 반복 재생되고
+    // 플레이어가 대화 시작 위치로 강제 이동되는 문제 방지.
+    // 사망 리스폰 시에는 씬이 새로 로드되어 존이 다시 활성화되므로 반복 대사(의도된 동작)는 유지됨.
+    void DisableIntroCommunicationZone()
+    {
+        foreach (var zone in FindObjectsOfType<CommunicationZone>())
+        {
+            if (zone.ID != IntroCommunication_ID)
+                continue;
+
+            var zoneCollider = zone.GetComponent<Collider2D>();
+            if (zoneCollider != null)
+                zoneCollider.enabled = false;
         }
     }
 
